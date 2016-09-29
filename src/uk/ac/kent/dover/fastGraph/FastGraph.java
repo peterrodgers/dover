@@ -119,9 +119,9 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(10000000,100000000,false); // 10 million nodes, 100 million edges, close to edgeBuf limit, but fails on heap space with 14g
 
 //		time = System.currentTimeMillis();
-//		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
+		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
-		FastGraph g1 = adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false); // SNAP web page gives 1768149 edges
+//		FastGraph g1 = adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false); // SNAP web page gives 1768149 edges
 //		FastGraph g1 = adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(4847571,68993773,null,"soc-LiveJournal1.txt",false);
 		
@@ -701,7 +701,6 @@ public class FastGraph {
 			wChannel.close();
 			
 		}catch(Exception e) {
-			// TODO Error Message
 			System.out.println("ERROR executing saveBuffers("+directory+","+fileBaseName+")");
 			e.printStackTrace();
 		}
@@ -732,15 +731,17 @@ public class FastGraph {
 	 * directory named /data/snap under current working directory.
 	 */
 	@SuppressWarnings("resource")
-	private void loadAdjacencyListGraph(String directory, String fileName) {
-		
-		String path = startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"snap"+File.separatorChar+fileName;
-		if(directory != null) {
-			if(directory.charAt(directory.length()-1)== File.separatorChar) {
-				path = directory+fileName;
-			} else {
-				path = directory+File.separatorChar+fileName;
-			}
+	private void loadAdjacencyListGraph(String dir, String fileName) {
+	
+		String directory = dir;
+		if(directory == null) {
+			directory = startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"snap";
+		}
+		String path = null;
+		if(directory.charAt(directory.length()-1)== File.separatorChar) {
+			path = directory+fileName;
+		} else {
+			path = directory+File.separatorChar+fileName;
 		}
 		
 		int edgeIndex = 0;
@@ -750,6 +751,13 @@ public class FastGraph {
 		HashMap<Integer,Integer> edgeNode1Map = new HashMap<Integer,Integer>(numberOfEdges*4);
 		HashMap<Integer,Integer> edgeNode2Map = new HashMap<Integer,Integer>(numberOfEdges*4);
 		try {
+			
+			File f = new File(path);
+			if(!f.exists()) {
+				System.out.println("Problem loading file "+path+". If you expect to access a SNAP file try downloading the file from:\nhttps://snap.stanford.edu/data/\nthen unzipping it and placing it in the directory "+directory);
+				System.exit(1);
+			}
+			
 			FileInputStream is = new FileInputStream(path);
 			InputStreamReader isr = new InputStreamReader(is);
 			BufferedReader br = new BufferedReader(isr);
@@ -803,7 +811,6 @@ System.out.println("edgeIndex "+edgeIndex);
 System.out.println("nodeIndex "+nodeIndex);
 			
 		} catch(Exception e) {
-			// TODO Error Message
 			System.out.println("ERROR executing loadSnapGraph("+directory+","+fileName+")");
 			e.printStackTrace();
 		}
@@ -1031,7 +1038,6 @@ System.out.println("nodeIndex "+nodeIndex);
 			rChannel.close();
 			
 		} catch(Exception e) {
-			// TODO Error Message
 			System.out.println("ERROR executing loadBuffers("+directory+","+fileBaseName+")");
 			e.printStackTrace();
 		}
