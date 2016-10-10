@@ -1433,6 +1433,18 @@ for(int i = 0; i< numberOfEdges; i++) {
 		}
 			
 	}
+	
+	/**
+	 * Prints the contents of an adjacency matrix to the screen in a simple way
+	 * Loops instead of using toDeepString() as it's better to display the matrix as a table
+	 * @param matrix A 2D array of booleans representing the graph
+	 */
+	public void printMatrix(boolean[][] matrix) {
+		for (boolean[] i : matrix) {
+			System.out.println(Arrays.toString(i));
+		}
+			
+	}
 
 
 	/**
