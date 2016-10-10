@@ -99,6 +99,7 @@ public class FastGraph {
 		
 		init();
 		
+		
 	}
 
 	
@@ -119,30 +120,38 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(10000000,100000000,false); // 10 million nodes, 100 million edges, close to edgeBuf limit, but fails on heap space with 14g
 
 //		time = System.currentTimeMillis();
-		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
+//		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false); // SNAP web page gives 1768149 edges
 //		FastGraph g1 = adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(4847571,68993773,null,"soc-LiveJournal1.txt",false);
 		
 //System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-		
+/*		
 		time = System.currentTimeMillis();
 		g1.saveBuffers(null,g1.getName());
 		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-
+*/
+		
 		time = System.currentTimeMillis();
-		FastGraph g2 = loadBuffersGraphFactory(null,g1.getName());
+		//FastGraph g2 = loadBuffersGraphFactory(null,g1.getName()); //for loading
+		FastGraph g1 = loadBuffersGraphFactory(null,"soc-pokec-relationships.txt"); //for testing
  		System.out.println("create graph from file test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+	
+ 		
 		
 		time = System.currentTimeMillis();
 		boolean connected = g1.isConnected();
 		System.out.println("connected test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		
 		System.out.println("connected "+connected);
-
-
 		
+		time = System.currentTimeMillis();
+		//int[][] matrix = g1.buildIntAdjacencyMatrix();
+		boolean[][] matrix = g1.buildBooleanAdjacencyMatrix();
+		System.out.println("building matrix test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+//		g1.printMatrix(matrix);
+		System.out.println(matrix.length);
 	}	
 
 
@@ -1277,7 +1286,62 @@ for(int i = 0; i< numberOfEdges; i++) {
 //System.out.println("nodes tested "+nodeCount);		
 		return allVisited;
 	}
+	
+	/**
+	 * Prints the contents of an adjacency matrix to the screen in a simple way
+	 * Loops instead of using toDeepString() as it's better to display the matrix as a table
+	 * @param matrix A 2D array of ints representing the graph
+	 */
+	public void printMatrix(int[][] matrix) {
+		for (int[] i : matrix) {
+			System.out.println(Arrays.toString(i));
+		}
+			
+	}
 
+	/**
+	 * Builds an adjacency matrix from a graph.
+	 * Assumes the graph is directed
+	 * 
+	 * @return A 2D array of ints representing the graph
+	 */
+	public int[][] buildIntAdjacencyMatrix() {
+		
+		int[][] matrix = new int[getNumberOfNodes()][getNumberOfNodes()]; //create an 2D array that has the dimensions of the current graph 
+		
+		for (int nid = 0; nid < getNumberOfNodes(); nid++) {
+			int[] connectingNodeIDs = getNodeConnectingNodes(nid);
+			for (int i : connectingNodeIDs) {
+				matrix[nid][i]++;
+			}			
+		}		
+		
+		return matrix;
+	}
+	
+	/**
+	 * Builds an adjacency matrix from a graph.
+	 * Assumes a nodes only connects to another once
+	 * Assumes the graph is directed
+	 * 
+	 * @return A 2D array of booleans representing the graph
+	 */
+	public boolean[][] buildBooleanAdjacencyMatrix() {
+		
+		boolean[][] matrix = new boolean[getNumberOfNodes()][getNumberOfNodes()]; //create an 2D array that has the dimensions of the current graph 
+		
+		for (int nid = 0; nid < getNumberOfNodes(); nid++) {
+			int[] connectingNodeIDs = getNodeConnectingNodes(nid);
+			for (int i : connectingNodeIDs) {
+				matrix[nid][i] = true;
+			}			
+		}		
+		
+		return matrix;
+	}
+
+	
+	
 /*	
 	public boolean isConnected() {
 
