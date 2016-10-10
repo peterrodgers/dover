@@ -3,6 +3,7 @@ package test.uk.ac.kent.dover.fastGraph;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.util.Arrays;
 
 import uk.ac.kent.dover.fastGraph.*;
 
@@ -745,9 +746,58 @@ public class FastGraphTest {
 		assertEquals(3,g.maximumDegree());
 	}
 
-
+	@Test
+	public void test099() {
+		FastGraph g;
+		g = FastGraph.jsonStringGraphFactory(get1Node0Edge(),false);
+		assertEquals(Arrays.deepToString(new int[][]{{0}}),Arrays.deepToString(g.buildIntAdjacencyMatrix()));
+		g = FastGraph.jsonStringGraphFactory(get2Node1Edge(),false);
+		assertEquals(Arrays.deepToString(new int[][]{{0,1},{1,0}}),Arrays.deepToString(g.buildIntAdjacencyMatrix()));
+		g = FastGraph.jsonStringGraphFactory(get2Node2Edge(),true);
+		assertEquals(Arrays.deepToString(new int[][]{{2,1},{1,0}}),Arrays.deepToString(g.buildIntAdjacencyMatrix()));
+		g = FastGraph.jsonStringGraphFactory(get4Node5Edge(),true);
+		assertEquals(Arrays.deepToString(new int[][]{{0,1,1,0},{1,0,1,1},{1,1,0,1},{0,1,1,0}}),Arrays.deepToString(g.buildIntAdjacencyMatrix()));
+	}
 	
-
+	@Test
+	public void test099b() {
+		FastGraph g;
+		g = FastGraph.jsonStringGraphFactory(get1Node0Edge(),false);
+		assertEquals(Arrays.deepToString(new boolean[][]{{false}}),Arrays.deepToString(g.buildBooleanAdjacencyMatrix()));
+		g = FastGraph.jsonStringGraphFactory(get2Node1Edge(),false);
+		assertEquals(Arrays.deepToString(new boolean[][]{{false,true},{true,false}}),Arrays.deepToString(g.buildBooleanAdjacencyMatrix()));
+		g = FastGraph.jsonStringGraphFactory(get2Node2Edge(),true);
+		assertEquals(Arrays.deepToString(new boolean[][]{{true,true},{true,false}}),Arrays.deepToString(g.buildBooleanAdjacencyMatrix()));
+		g = FastGraph.jsonStringGraphFactory(get4Node5Edge(),true);
+		assertEquals(Arrays.deepToString(new boolean[][]{{false,true,true,false},{true,false,true,true},{true,true,false,true},{false,true,true,false}}),Arrays.deepToString(g.buildBooleanAdjacencyMatrix()));
+	}
+ 
+	@Test
+	public void test100() {
+		FastGraph g;
+		g = FastGraph.jsonStringGraphFactory(get1Node0Edge(),false);
+		assertEquals(Arrays.deepToString(new int[][]{{0}}),Arrays.deepToString(g.buildIntDirectedAdjacencyMatrix()));
+		g = FastGraph.jsonStringGraphFactory(get2Node1Edge(),false);
+		assertEquals(Arrays.deepToString(new int[][]{{0,1},{0,0}}),Arrays.deepToString(g.buildIntDirectedAdjacencyMatrix()));
+		g = FastGraph.jsonStringGraphFactory(get2Node2Edge(),true);
+		assertEquals(Arrays.deepToString(new int[][]{{1,1},{0,0}}),Arrays.deepToString(g.buildIntDirectedAdjacencyMatrix()));
+		g = FastGraph.jsonStringGraphFactory(get4Node5Edge(),true);
+		assertEquals(Arrays.deepToString(new int[][]{{0,1,1,0},{0,0,0,1},{0,1,0,1},{0,0,0,0}}),Arrays.deepToString(g.buildIntDirectedAdjacencyMatrix()));
+	}
+	
+	@Test
+	public void test100b() {
+		FastGraph g;
+		g = FastGraph.jsonStringGraphFactory(get1Node0Edge(),false);
+		assertEquals(Arrays.deepToString(new boolean[][]{{false}}),Arrays.deepToString(g.buildBooleanDirectedAdjacencyMatrix()));
+		g = FastGraph.jsonStringGraphFactory(get2Node1Edge(),false);
+		assertEquals(Arrays.deepToString(new boolean[][]{{false,true},{false,false}}),Arrays.deepToString(g.buildBooleanDirectedAdjacencyMatrix()));
+		g = FastGraph.jsonStringGraphFactory(get2Node2Edge(),true);
+		assertEquals(Arrays.deepToString(new boolean[][]{{true,true},{false,false}}),Arrays.deepToString(g.buildBooleanDirectedAdjacencyMatrix()));
+		g = FastGraph.jsonStringGraphFactory(get4Node5Edge(),true);
+		assertEquals(Arrays.deepToString(new boolean[][]{{false,true,true,false},{false,false,false,true},{false,true,false,true},{false,false,false,false}}),Arrays.deepToString(g.buildBooleanDirectedAdjacencyMatrix()));
+	}
+	
 	//TODO Add tests here
 
 	

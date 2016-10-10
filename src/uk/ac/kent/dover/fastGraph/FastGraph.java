@@ -112,9 +112,9 @@ public class FastGraph {
 		long time;
 		
 //		FastGraph g1 = randomGraphFactory(2,1,false);
-//		FastGraph g1 = randomGraphFactory(5,6,true);
+		FastGraph g1 = randomGraphFactory(5,6,true);
 //		FastGraph g1 = randomGraphFactory(10000,100000,false); // 10 thousand nodes, 100 thousand edges
-		FastGraph g1 = randomGraphFactory(1000000,10000000,false); // 1 million nodes, 10 million edges
+//		FastGraph g1 = randomGraphFactory(1000000,10000000,false); // 1 million nodes, 10 million edges
 //		FastGraph g1 = randomGraphFactory(5000000,50000000,false); // limit for edgeLabelBuf at 20 chars per label
 //		FastGraph g1 = randomGraphFactory(4847571,68993773,false); // Size of LiveJournal1 example from SNAP
 //		FastGraph g1 = randomGraphFactory(10000000,100000000,false); // 10 million nodes, 100 million edges, close to edgeBuf limit, but fails on heap space with 14g
@@ -1449,7 +1449,7 @@ for(int i = 0; i< numberOfEdges; i++) {
 
 	/**
 	 * Builds an adjacency matrix from a graph.
-	 * Assumes the graph is directed
+	 * Assumes the graph is undirected
 	 * 
 	 * @return A 2D array of ints representing the graph
 	 */
@@ -1463,14 +1463,14 @@ for(int i = 0; i< numberOfEdges; i++) {
 				matrix[nid][i]++;
 			}			
 		}		
-		
+	 
 		return matrix;
 	}
 	
 	/**
 	 * Builds an adjacency matrix from a graph.
 	 * Assumes a nodes only connects to another once
-	 * Assumes the graph is directed
+	 * Assumes the graph is undirected
 	 * 
 	 * @return A 2D array of booleans representing the graph
 	 */
@@ -1487,7 +1487,48 @@ for(int i = 0; i< numberOfEdges; i++) {
 		
 		return matrix;
 	}
-
+	
+	
+	/**
+	 * Builds an adjacency matrix from a graph.
+	 * Assumes the graph is directed
+	 * 
+	 * @return A 2D array of ints representing the graph
+	 */
+	public int[][] buildIntDirectedAdjacencyMatrix() {
+		
+		int[][] matrix = new int[getNumberOfNodes()][getNumberOfNodes()]; //create an 2D array that has the dimensions of the current graph 
+		
+		for (int nid = 0; nid < getNumberOfNodes(); nid++) {
+			int[] connectingNodeIDs = getNodeConnectingOutNodes(nid);
+			for (int i : connectingNodeIDs) {
+				matrix[nid][i]++;
+			}			
+		}		
+	 
+		return matrix;
+	}
+	
+	/**
+	 * Builds an adjacency matrix from a graph.
+	 * Assumes a nodes only connects to another once
+	 * Assumes the graph is directed
+	 * 
+	 * @return A 2D array of booleans representing the graph
+	 */
+	public boolean[][] buildBooleanDirectedAdjacencyMatrix() {
+		
+		boolean[][] matrix = new boolean[getNumberOfNodes()][getNumberOfNodes()]; //create an 2D array that has the dimensions of the current graph 
+		
+		for (int nid = 0; nid < getNumberOfNodes(); nid++) {
+			int[] connectingNodeIDs = getNodeConnectingOutNodes(nid);
+			for (int i : connectingNodeIDs) {
+				matrix[nid][i] = true;
+			}			
+		}		
+		
+		return matrix;
+	}
 	
 	/** this version uses arrays for the connected nodes */
 /*	public boolean isConnected() {
