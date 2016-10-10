@@ -1479,10 +1479,12 @@ for(int i = 0; i< numberOfEdges; i++) {
 		
 		boolean[][] matrix = new boolean[getNumberOfNodes()][getNumberOfNodes()]; //create an 2D array that has the dimensions of the current graph 
 		
+		System.out.println("Matrix created");
 		for (int nid = 0; nid < getNumberOfNodes(); nid++) {
 			int[] connectingNodeIDs = getNodeConnectingOutNodes(nid);
 			for (int i : connectingNodeIDs) {
 				matrix[nid][i] = true;
+				matrix[i][nid] = true;
 			}			
 		}		
 		
