@@ -119,10 +119,10 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(10000000,100000000,false); // 10 million nodes, 100 million edges, close to edgeBuf limit, but fails on heap space with 14g
 
 //		time = System.currentTimeMillis();
-		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
+//		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false); // SNAP web page gives 1768149 edges
-//		FastGraph g1 = adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
+		FastGraph g1 = adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(4847571,68993773,null,"soc-LiveJournal1.txt",false);
 		
 //System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
@@ -132,11 +132,13 @@ public class FastGraph {
 		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 
 		time = System.currentTimeMillis();
-		FastGraph g2 = loadBuffersGraphFactory(null,g1.getName());
+String name = "random-n-1000000-e-10000000";
+//		String name = g1.getName();
+		FastGraph g2 = loadBuffersGraphFactory(null,name);
  		System.out.println("create graph from file test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		
 		time = System.currentTimeMillis();
-		boolean connected = g1.isConnected();
+		boolean connected = g2.isConnected();
 		System.out.println("connected test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		
 		System.out.println("connected "+connected);
@@ -223,6 +225,24 @@ public class FastGraph {
 		return ret;
 	}
 
+	/**
+	 * This version puts the connecting ids in the argument array, to avoid repeated object creation and so speed up multiple accesses.
+	 * create array with size of either getNodeDegree(nodeId) or maxDegree(). array elements beyond nodeDegree(nodeId)-1 are undefined.
+	 * Will throw an exception if ret is not large enough.
+	 */
+	public void getNodeConnectingEdges(int nodeId, int[] ret) {
+		
+		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int degree = getNodeDegree(nodeId);
+		
+		for(int i = 0; i < degree; i++) {
+			// don't need the edge, so step over edge/node pairs and the ege
+			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_EDGE_OFFSET;
+			int node = connectionBuf.getInt(nodeOffset);
+			ret[i] = node;
+		}
+	}
+
 	public int[] getNodeConnectingNodes(int nodeId) {
 		
 		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
@@ -238,6 +258,25 @@ public class FastGraph {
 		}
 		
 		return ret;
+	}
+
+	/**
+	 * This version puts the connecting ids in the argument array, to avoid repeated object creation and so speed up multiple accesses.
+	 * create array with size of either getNodeDegree(nodeId) or maxDegree(). array elements beyond nodeDegree(nodeId)-1 are undefined.
+	 * Will throw an exception if ret is not large enough.
+	 */
+	public void getNodeConnectingNodes(int nodeId, int[] ret) {
+		
+		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int degree = getNodeDegree(nodeId);
+		
+		for(int i = 0; i < degree; i++) {
+			// don't need the edge, so step over edge/node pairs and the ege
+			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_NODE_OFFSET;
+			int node = connectionBuf.getInt(nodeOffset);
+			ret[i] = node;
+		}
+		
 	}
 
 	public int[] getNodeConnectingInEdges(int nodeId) {
@@ -257,6 +296,26 @@ public class FastGraph {
 		return ret;
 	}
 
+	/**
+	 * This version puts the connecting ids in the argument array, to avoid repeated object creation and so speed up multiple accesses.
+	 * create array with size of either getNodeInDegree(nodeId) or maxDegree(). array elements beyond nodeDegree(nodeId)-1 are undefined.
+	 * Will throw an exception if ret is not large enough.
+	 */
+	public void getNodeConnectingInEdges(int nodeId, int[] ret) {
+		
+		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int degree = getNodeInDegree(nodeId);
+		
+		for(int i = 0; i < degree; i++) {
+			// don't need the edge, so step over edge/node pairs and the ege
+			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_EDGE_OFFSET;
+			int node = connectionBuf.getInt(nodeOffset);
+			ret[i] = node;
+		}
+	}
+
+
+	
 	public int[] getNodeConnectingInNodes(int nodeId) {
 		
 		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
@@ -274,6 +333,24 @@ public class FastGraph {
 		return ret;
 	}
 
+	/**
+	 * This version puts the connecting ids in the argument array, to avoid repeated object creation and so speed up multiple accesses.
+	 * create array with size of either getNodeInDegree(nodeId) or maxDegree(). array elements beyond nodeDegree(nodeId)-1 are undefined.
+	 * Will throw an exception if ret is not large enough.
+	 */
+	public void getNodeConnectingInNodes(int nodeId, int[] ret) {
+		
+		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int degree = getNodeInDegree(nodeId);
+		
+		for(int i = 0; i < degree; i++) {
+			// don't need the edge, so step over edge/node pairs and the ege
+			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_NODE_OFFSET;
+			int node = connectionBuf.getInt(nodeOffset);
+			ret[i] = node;
+		}
+	}
+
 	public int[] getNodeConnectingOutEdges(int nodeId) {
 		
 		int connectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
@@ -289,6 +366,25 @@ public class FastGraph {
 		
 		return ret;
 	}
+	
+	/**
+	 * This version puts the connecting ids in the argument array, to avoid repeated object creation and so speed up multiple accesses.
+	 * create array with size of either getNodeOutDegree(nodeId) or maxDegree(). array elements beyond nodeDegree(nodeId)-1 are undefined.
+	 * Will throw an exception if ret is not large enough.
+	 */
+	public void getNodeConnectingOutEdges(int nodeId, int[] ret) {
+		
+		int connectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int degree = getNodeOutDegree(nodeId);
+		
+		for(int i = 0; i < degree; i++) {
+			// don't need the edge, so step over edge/node pairs and the ege
+			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_EDGE_OFFSET;
+			int node = connectionBuf.getInt(nodeOffset);
+			ret[i] = node;
+		}
+	}
+
 
 	public int[] getNodeConnectingOutNodes(int nodeId) {
 		
@@ -306,6 +402,25 @@ public class FastGraph {
 		
 		return ret;
 	}
+	
+	/**
+	 * This version puts the connecting ids in the argument array, to avoid repeated object creation and so speed up multiple accesses.
+	 * create array with size of either getNodeOutDegree(nodeId) or maxDegree(). array elements beyond nodeDegree(nodeId)-1 are undefined.
+	 * Will throw an exception if ret is not large enough.
+	 */
+	public void getNodeConnectingOutNodes(int nodeId, int[] ret) {
+		
+		int connectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int degree = getNodeOutDegree(nodeId);
+		
+		for(int i = 0; i < degree; i++) {
+			// don't need the edge, so step over edge/node pairs and the ege
+			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_NODE_OFFSET;
+			int node = connectionBuf.getInt(nodeOffset);
+			ret[i] = node;
+		}
+	}
+
 
 	
 	public String getEdgeLabel(int edgeId) {
@@ -1231,6 +1346,25 @@ for(int i = 0; i< numberOfEdges; i++) {
 	}
 
 	
+	/**
+	 * Finds the largest degree for a node in the graph.
+	 */
+	public int maximumDegree() {
+		
+		int max = 0;
+		for(int i = 0; i< numberOfNodes; i++) {
+				short inDegree = nodeBuf.getShort(NODE_IN_DEGREE_OFFSET+i*nodeByteSize);
+				short outDegree = nodeBuf.getShort(NODE_OUT_DEGREE_OFFSET+i*nodeByteSize);
+				int degree = inDegree+outDegree;
+				if(degree > max) {
+					max = degree;
+				}
+		}
+		return max;
+	}
+
+
+	
 	
 	/** Breadth first search through the graph.
 	 * Note direct access to connectionBuf is a 3x speed up over accessing getNodeConnectingNodes(currentNode).
@@ -1278,29 +1412,37 @@ for(int i = 0; i< numberOfEdges; i++) {
 		return allVisited;
 	}
 
-/*	
-	public boolean isConnected() {
 
-		boolean[] nodeFlag = new boolean[nodeTotal];
+	
+	/** this version uses arrays for the connected nodes */
+/*	public boolean isConnected() {
+
+		boolean[] nodeFlag = new boolean[numberOfNodes];
 		
-		if(nodeTotal == 0) {
-			System.out.println("isConnected: No nodes");
+		if(numberOfNodes == 0) {
 			return true;
 		}
 		
+		int[] neighbours = new int[100000];
+		
 		boolean visited = true;
-		int nodesVisited = 0;
-int numberOfEdges = 0;		
+		int nodeCount = 0;
+int edgeCount = 0;		
 		LinkedList<Integer> queue = new LinkedList<Integer>();
 		queue.add(0);
 		nodeFlag[0] = visited;
 		while(queue.size() != 0) {
 			int currentNode = queue.removeFirst();
-			nodesVisited++;
+			nodeCount++;
 			
-			int[] neighbours = getNodeConnectingNodesArray(currentNode);
-			for(int i = 0; i < neighbours.length; i++) {
-numberOfEdges++;
+//			int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+currentNode*nodeByteSize);
+			getNodeConnectingNodes(currentNode,neighbours);
+			int degree = getNodeDegree(currentNode);
+			for(int i = 0; i < degree; i++) {
+edgeCount++;
+				// step over edge/node pairs and the edge
+//				int nodeOffset = CONNECTION_NODE_OFFSET+connectionOffset+i*connectionPairSize;
+//				int connectingNode = connectionBuf.getInt(nodeOffset);
 				int connectingNode = neighbours[i];
 				boolean flag = nodeFlag[connectingNode];
 				if(!flag) {
@@ -1310,58 +1452,14 @@ numberOfEdges++;
 			}
 		}
 		boolean allVisited = true;
-		if(nodesVisited < nodeTotal) {
+		if(nodeCount < numberOfNodes) {
 			allVisited = false;
 		}
-System.out.println("edges tested "+numberOfEdges);		
-System.out.println("nodes tested "+nodesVisited);		
+System.out.println("edges tested "+edgeCount);		
+System.out.println("nodes tested "+nodeCount);		
 		return allVisited;
 	}
 */
-	
-/*
-	public boolean isConnected() {
-
-		ByteBuffer nodeFlagBuf = ByteBuffer.allocate(nodeTotal);
-		nodeFlagBuf.clear();
-		
-		if(nodeTotal == 0) {
-			System.out.println("isConnected: No nodes");
-			return true;
-		}
-		
-		byte visited = 1;
-		int nodesVisited = 0;
-int numberOfEdges = 0;		
-		LinkedList<Integer> queue = new LinkedList<Integer>();
-		queue.add(0);
-		nodeFlagBuf.put(0,visited);
-		while(queue.size() != 0) {
-			int currentNode = queue.get(0);
-			queue.remove(0);
-			nodesVisited++;
-			
-			int[] neighbours = getNodeConnectingNodes(currentNode);
-			for(int i = 0; i < neighbours.length; i++) {
-numberOfEdges++;
-				int connectingNode = neighbours[i];
-				byte nodeFlag = nodeFlagBuf.get(connectingNode);
-				if(nodeFlag != visited) {
-					queue.add(connectingNode);
-					nodeFlagBuf.put(connectingNode,visited);
-				}
-			}
-		}
-		boolean allVisited = true;
-		if(nodesVisited < nodeTotal) {
-			allVisited = false;
-		}
-System.out.println("edges tested "+numberOfEdges);		
-System.out.println("nodes tested "+nodesVisited);		
-		return allVisited;
-	}
-*/	
-
 	
 
 	
