@@ -1458,9 +1458,10 @@ for(int i = 0; i< numberOfEdges; i++) {
 		int[][] matrix = new int[getNumberOfNodes()][getNumberOfNodes()]; //create an 2D array that has the dimensions of the current graph 
 		
 		for (int nid = 0; nid < getNumberOfNodes(); nid++) {
-			int[] connectingNodeIDs = getNodeConnectingNodes(nid);
+			int[] connectingNodeIDs = getNodeConnectingOutNodes(nid);
 			for (int i : connectingNodeIDs) {
 				matrix[nid][i]++;
+				matrix[i][nid]++;
 			}			
 		}		
 	 
@@ -1479,7 +1480,7 @@ for(int i = 0; i< numberOfEdges; i++) {
 		boolean[][] matrix = new boolean[getNumberOfNodes()][getNumberOfNodes()]; //create an 2D array that has the dimensions of the current graph 
 		
 		for (int nid = 0; nid < getNumberOfNodes(); nid++) {
-			int[] connectingNodeIDs = getNodeConnectingNodes(nid);
+			int[] connectingNodeIDs = getNodeConnectingOutNodes(nid);
 			for (int i : connectingNodeIDs) {
 				matrix[nid][i] = true;
 			}			
