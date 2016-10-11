@@ -7,6 +7,9 @@ import java.util.*;
 
 import org.json.*;
 
+import Jama.Matrix;
+import Jama.EigenvalueDecomposition;
+
 /**
  * 
  * Graph class with redundant node connections. Stores nodes, edges, node connections, node labels, edge labels
@@ -150,10 +153,11 @@ public class FastGraph {
 		System.out.println("connected "+connected);
 		
 		time = System.currentTimeMillis();
-		//int[][] matrix = g1.buildIntAdjacencyMatrix();
-		boolean[][] matrix = g1.buildBooleanAdjacencyMatrix();
+		int[][] matrix = g2.buildIntAdjacencyMatrix();
+		//boolean[][] matrix = g2.buildBooleanAdjacencyMatrix();
 		System.out.println("building matrix test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-//		g1.printMatrix(matrix);
+		g2.printMatrix(matrix);
+		System.out.println(Arrays.toString(g2.findEigenvalues(matrix)));
 		System.out.println(matrix.length);
 	}	
 
@@ -1478,7 +1482,6 @@ for(int i = 0; i< numberOfEdges; i++) {
 	public boolean[][] buildBooleanAdjacencyMatrix() {
 		
 		boolean[][] matrix = new boolean[getNumberOfNodes()][getNumberOfNodes()]; //create an 2D array that has the dimensions of the current graph 
-		
 		System.out.println("Matrix created");
 		for (int nid = 0; nid < getNumberOfNodes(); nid++) {
 			int[] connectingNodeIDs = getNodeConnectingOutNodes(nid);
@@ -1531,6 +1534,69 @@ for(int i = 0; i< numberOfEdges; i++) {
 		}		
 		
 		return matrix;
+	}
+	
+	/**
+	 * Finds the eigenvalue of a matrix
+	 * Taken from: http://introcs.cs.princeton.edu/java/95linear/Eigenvalues.java.html
+	 * 
+	 * @param inputMatrix int[][] is required. This is converted to a double[][]
+	 * @return double[][] of Eigenvalues
+	 */
+	public double[] findEigenvalues(int[][] inputMatrix) {
+
+		//have to convert the int[][] input into a double[][]
+		double[][] dArray = new double[inputMatrix.length][inputMatrix.length];
+		for (int row = 0; row < inputMatrix.length; row++) {
+		    for (int column = 0; column < inputMatrix[0].length; column++) {
+		        dArray[row][column] = (double) inputMatrix[row][column];
+		    }
+		}
+		
+		return findEigenvalues(dArray);	
+	}
+	
+	/**
+	 * Finds the eigenvalue of a matrix
+	 * Taken from: http://introcs.cs.princeton.edu/java/95linear/Eigenvalues.java.html
+	 * 
+	 * @param inputMatrix boolean[][] is required. This is converted to a double[][]
+	 * @return double[][] of Eigenvalues
+	 */
+	public double[] findEigenvalues(boolean[][] inputMatrix) {
+
+		//have to convert the int[][] input into a double[][]
+		double[][] dArray = new double[inputMatrix.length][inputMatrix.length];
+		for (int row = 0; row < inputMatrix.length; row++) {
+		    for (int column = 0; column < inputMatrix[0].length; column++) {
+		    	if (inputMatrix[row][column]) {
+		    		dArray[row][column] = 1;
+		    	} else {
+		    		dArray[row][column] = 0;
+		    	}
+		    }
+		}
+		
+		return findEigenvalues(dArray);	
+	}
+	
+	/**
+	 * Finds the eigenvalue of a matrix
+	 * Taken from: http://introcs.cs.princeton.edu/java/95linear/Eigenvalues.java.html
+	 * 
+	 * @param inputMatrix A double[][]
+	 * @return double[][] of Eigenvalues
+	 */
+	public double[] findEigenvalues(double[][] inputMatrix) {
+		int matrixSize = inputMatrix.length;
+
+		Matrix A = new Matrix(inputMatrix);
+		
+		// compute the spectral decomposition
+		EigenvalueDecomposition e = A.eig();
+		e.getD().print(6, 1);
+		e.getV().print(6, 1);
+		return e.getRealEigenvalues();	
 	}
 	
 	/** this version uses arrays for the connected nodes */
