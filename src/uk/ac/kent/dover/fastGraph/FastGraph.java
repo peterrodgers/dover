@@ -138,8 +138,8 @@ public class FastGraph {
 		
 		time = System.currentTimeMillis();
 
-//String name = "random-n-1000000-e-10000000";
-		String name = g1.getName();
+String name = "random-n-2-e-1";
+//		String name = g1.getName();
 		FastGraph g2 = loadBuffersGraphFactory(null,name);
 
  		System.out.println("create graph from file test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
@@ -1594,8 +1594,8 @@ for(int i = 0; i< numberOfEdges; i++) {
 		
 		// compute the spectral decomposition
 		EigenvalueDecomposition e = A.eig();
-		e.getD().print(6, 1);
-		e.getV().print(6, 1);
+		//e.getD().print(6, 1);
+		//e.getV().print(6, 1);
 		return e.getRealEigenvalues();	
 	}
 	

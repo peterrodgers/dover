@@ -797,7 +797,7 @@ public class FastGraphTest {
 		g = FastGraph.jsonStringGraphFactory(get4Node5Edge(),true);
 		assertEquals(Arrays.deepToString(new boolean[][]{{false,true,true,false},{false,false,false,true},{false,true,false,true},{false,false,false,false}}),Arrays.deepToString(g.buildBooleanDirectedAdjacencyMatrix()));
 	}
-	/*
+	
 	
 	@Test
 	public void test101() {
@@ -825,7 +825,7 @@ public class FastGraphTest {
 		assertEquals(Arrays.toString(new double[]{0,0,0,0}),Arrays.toString(g.findEigenvalues(g.buildBooleanDirectedAdjacencyMatrix())));
 	}
 	
-*/
+
 	//TODO Add tests here
 
 	
