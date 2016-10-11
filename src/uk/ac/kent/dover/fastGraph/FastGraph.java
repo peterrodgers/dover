@@ -1425,7 +1425,7 @@ for(int i = 0; i< numberOfEdges; i++) {
 //System.out.println("nodes tested "+nodeCount);		
 		return allVisited;
 	}
-	
+
 	/**
 	 * Prints the contents of an adjacency matrix to the screen in a simple way
 	 * Loops instead of using toDeepString() as it's better to display the matrix as a table
@@ -1537,14 +1537,12 @@ for(int i = 0; i< numberOfEdges; i++) {
 	}
 	
 	/**
-	 * Finds the eigenvalue of a matrix
-	 * Taken from: http://introcs.cs.princeton.edu/java/95linear/Eigenvalues.java.html
-	 * 
-	 * @param inputMatrix int[][] is required. This is converted to a double[][]
-	 * @return double[][] of Eigenvalues
+	 * Converts an int[][] into a double[][]
+	 * Used when creating eigenvalues
+	 * @param inputMatrix The input 2D array
+	 * @return The output 2D array
 	 */
-	public double[] findEigenvalues(int[][] inputMatrix) {
-
+	private double[][] convertMatrix(int[][] inputMatrix) {
 		//have to convert the int[][] input into a double[][]
 		double[][] dArray = new double[inputMatrix.length][inputMatrix.length];
 		for (int row = 0; row < inputMatrix.length; row++) {
@@ -1552,20 +1550,17 @@ for(int i = 0; i< numberOfEdges; i++) {
 		        dArray[row][column] = (double) inputMatrix[row][column];
 		    }
 		}
-		
-		return findEigenvalues(dArray);	
+		return dArray;
 	}
 	
 	/**
-	 * Finds the eigenvalue of a matrix
-	 * Taken from: http://introcs.cs.princeton.edu/java/95linear/Eigenvalues.java.html
-	 * 
-	 * @param inputMatrix boolean[][] is required. This is converted to a double[][]
-	 * @return double[][] of Eigenvalues
+	 * Converts an boolean[][] into a double[][]
+	 * Used when creating eigenvalues
+	 * @param inputMatrix The input 2D array
+	 * @return The output 2D array
 	 */
-	public double[] findEigenvalues(boolean[][] inputMatrix) {
-
-		//have to convert the int[][] input into a double[][]
+	private double[][] convertMatrix(boolean[][] inputMatrix) {
+		//have to convert the boolean[][] input into a double[][]
 		double[][] dArray = new double[inputMatrix.length][inputMatrix.length];
 		for (int row = 0; row < inputMatrix.length; row++) {
 		    for (int column = 0; column < inputMatrix[0].length; column++) {
@@ -1576,8 +1571,29 @@ for(int i = 0; i< numberOfEdges; i++) {
 		    	}
 		    }
 		}
-		
-		return findEigenvalues(dArray);	
+		return dArray;
+	}
+	
+	/**
+	 * Finds the eigenvalue of a matrix
+	 * Taken from: http://introcs.cs.princeton.edu/java/95linear/Eigenvalues.java.html
+	 * 
+	 * @param inputMatrix int[][] is required. This is converted to a double[][]
+	 * @return double[][] of Eigenvalues
+	 */
+	public double[] findEigenvalues(int[][] inputMatrix) {		
+		return findEigenvalues(convertMatrix(inputMatrix));	
+	}
+	
+	/**
+	 * Finds the eigenvalue of a matrix
+	 * Taken from: http://introcs.cs.princeton.edu/java/95linear/Eigenvalues.java.html
+	 * 
+	 * @param inputMatrix boolean[][] is required. This is converted to a double[][]
+	 * @return double[][] of Eigenvalues
+	 */
+	public double[] findEigenvalues(boolean[][] inputMatrix) {		
+		return findEigenvalues(convertMatrix(inputMatrix));	
 	}
 	
 	/**
