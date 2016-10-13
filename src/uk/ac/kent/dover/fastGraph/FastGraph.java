@@ -771,13 +771,19 @@ String name = "random-n-2-e-1";
 	public void saveBuffers(String directory, String fileBaseName) {
 		File file;
 		
-		String directoryAndBaseName = startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+fileBaseName;
+		//new File("/path/directory").mkdirs();
+		
+		
+		String directoryAndBaseName = "";
 		if(directory != null) {
 			if(directory.charAt(directory.length()-1)== File.separatorChar) {
 				directoryAndBaseName = directory+fileBaseName;
 			} else {
 				directoryAndBaseName = directory+File.separatorChar+fileBaseName;
 			}
+		} else {
+			directoryAndBaseName = startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+fileBaseName+File.separatorChar+fileBaseName;
+			new File(startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+fileBaseName).mkdirs();
 		}
 		
 		boolean append;
