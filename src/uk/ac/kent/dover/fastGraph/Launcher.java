@@ -30,10 +30,12 @@ public class Launcher {
 		System.out.println(Arrays.toString(args));
 		System.out.println(args.length);
 		if (args.length == 0) {
-			FastGraph.main(args); //will replace this with loading GUI instead
+			new LauncherGUI(this);
+			//FastGraph.main(args); //will replace this with loading GUI instead
 		} else {
 			FastGraph.main(args); //will replace this with some actual handling of arguments
 		}
 	}
+	
 
 }
