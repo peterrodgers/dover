@@ -7,6 +7,8 @@ import java.util.*;
 
 import org.json.*;
 
+import uk.ac.kent.displayGraph.*;
+
 import Jama.Matrix;
 import Jama.EigenvalueDecomposition;
 
@@ -1618,6 +1620,40 @@ for(int i = 0; i< numberOfEdges; i++) {
 		//e.getD().print(6, 1);
 		//e.getV().print(6, 1);
 		return e.getRealEigenvalues();	
+	}
+	
+	
+	public Graph generateDisplayGraph() {
+		
+		Graph g = new Graph(getName());
+		
+		for(int i = 0; i< numberOfNodes; i++) {
+			Node n = new Node();
+			n.setLabel(getNodeLabel(i));
+			n.setScore(getNodeWeight(i));
+			String typeLabel = Integer.toString(getNodeType(i));
+			NodeType type = NodeType.withLabel(typeLabel);
+			if(type == null) {
+				type = new NodeType(typeLabel);
+			}
+			g.addNode(n);
+		}
+		
+		for(int i = 0; i< numberOfEdges; i++) {
+			Node n1 = g.getNodes().get(getEdgeNode1(i));
+			Node n2 = g.getNodes().get(getEdgeNode2(i));
+			Edge e = new Edge(n1,n2);
+			e.setLabel(getEdgeLabel(i));
+			e.setScore(getEdgeWeight(i));
+			String typeLabel = Integer.toString(getEdgeType(i));
+			EdgeType type = EdgeType.withLabel(typeLabel);
+			if(type == null) {
+				type = new EdgeType(typeLabel);
+			}
+			g.addEdge(e);
+		}
+		
+		return g;
 	}
 	
 	/** this version uses arrays for the connected nodes */

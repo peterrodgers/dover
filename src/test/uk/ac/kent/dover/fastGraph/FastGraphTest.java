@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.util.Arrays;
 
+import uk.ac.kent.displayGraph.*;
 import uk.ac.kent.dover.fastGraph.*;
 
 import org.junit.*;
@@ -823,6 +824,76 @@ public class FastGraphTest {
 		assertEquals(Arrays.toString(new double[]{1,0}),Arrays.toString(g.findEigenvalues(g.buildBooleanDirectedAdjacencyMatrix())));
 		g = FastGraph.jsonStringGraphFactory(get4Node5Edge(),false);
 		assertEquals(Arrays.toString(new double[]{0,0,0,0}),Arrays.toString(g.findEigenvalues(g.buildBooleanDirectedAdjacencyMatrix())));
+	}
+	
+	@Test
+	public void test102() {
+		FastGraph g;
+		g = FastGraph.jsonStringGraphFactory(get0Node0Edge(),false);
+		Graph displayGraph = g.generateDisplayGraph();
+		assertEquals(g.getName(),displayGraph.getLabel());
+		assertEquals(0,displayGraph.getNodes().size());
+		assertEquals(0,displayGraph.getEdges().size());
+	}
+	
+	@Test
+	public void test103() {
+		FastGraph g;
+		g = FastGraph.jsonStringGraphFactory(get1Node0Edge(),false);
+		Graph displayGraph = g.generateDisplayGraph();
+		assertEquals(g.getName(),displayGraph.getLabel());
+		assertEquals(1,displayGraph.getNodes().size());
+		assertEquals(0,displayGraph.getEdges().size());
+		assertEquals(g.getNodeLabel(0),displayGraph.getNodes().get(0).getLabel());
+		assertEquals(g.getNodeWeight(0),(int)(displayGraph.getNodes().get(0).getScore()));
+	}
+	
+	@Test
+	public void test104() {
+		FastGraph g;
+		g = FastGraph.jsonStringGraphFactory(get2Node1Edge(),false);
+		Graph displayGraph = g.generateDisplayGraph();
+		assertEquals(g.getName(),displayGraph.getLabel());
+		assertEquals(2,displayGraph.getNodes().size());
+		assertEquals(1,displayGraph.getEdges().size());
+		assertEquals(g.getNodeLabel(1),displayGraph.getNodes().get(1).getLabel());
+		assertEquals(g.getNodeWeight(1),(int)(displayGraph.getNodes().get(1).getScore()));
+		assertEquals(g.getEdgeLabel(0),displayGraph.getEdges().get(0).getLabel());
+		assertEquals(g.getEdgeWeight(0),(int)(displayGraph.getEdges().get(0).getScore()));
+		assertEquals(g.getNodeLabel(0),displayGraph.getEdges().get(0).getFrom().getLabel());
+		assertEquals(g.getNodeLabel(1),displayGraph.getEdges().get(0).getTo().getLabel());
+	}
+	
+	@Test
+	public void test105() {
+		FastGraph g;
+		g = FastGraph.jsonStringGraphFactory(get2Node2Edge(),false);
+		Graph displayGraph = g.generateDisplayGraph();
+		assertEquals(g.getName(),displayGraph.getLabel());
+		assertEquals(2,displayGraph.getNodes().size());
+		assertEquals(2,displayGraph.getEdges().size());
+		assertEquals(g.getNodeLabel(0),displayGraph.getNodes().get(0).getLabel());
+		assertEquals(g.getNodeWeight(0),(int)(displayGraph.getNodes().get(0).getScore()));
+		assertEquals(g.getEdgeLabel(1),displayGraph.getEdges().get(1).getLabel());
+		assertEquals(g.getEdgeWeight(1),(int)(displayGraph.getEdges().get(1).getScore()));
+		assertEquals(g.getNodeLabel(0),displayGraph.getEdges().get(1).getFrom().getLabel());
+		assertEquals(g.getNodeLabel(0),displayGraph.getEdges().get(1).getTo().getLabel());
+	}
+	
+	@Test
+	public void test106() {
+		FastGraph g;
+		g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
+		Graph displayGraph = g.generateDisplayGraph();
+		assertEquals(g.getName(),displayGraph.getLabel());
+		assertEquals(5,displayGraph.getNodes().size());
+		assertEquals(5,displayGraph.getEdges().size());
+		assertEquals(g.getNodeLabel(4),displayGraph.getNodes().get(4).getLabel());
+		assertEquals(g.getNodeWeight(4),(int)(displayGraph.getNodes().get(4).getScore()));
+		assertEquals(g.getEdgeLabel(4),displayGraph.getEdges().get(4).getLabel());
+		assertEquals(g.getEdgeWeight(4),(int)(displayGraph.getEdges().get(4).getScore()));
+		assertEquals(g.getNodeLabel(3),displayGraph.getEdges().get(4).getFrom().getLabel());
+		assertEquals(g.getNodeLabel(4),displayGraph.getEdges().get(4).getTo().getLabel());
 	}
 	
 
