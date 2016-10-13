@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 import uk.ac.kent.displayGraph.*;
 import uk.ac.kent.dover.fastGraph.*;
+import uk.ac.kent.dover.fastGraph.Util;
 
 import org.junit.*;
 
@@ -758,6 +759,11 @@ public class FastGraphTest {
 		assertEquals(Arrays.deepToString(new int[][]{{2,1},{1,0}}),Arrays.deepToString(g.buildIntAdjacencyMatrix()));
 		g = FastGraph.jsonStringGraphFactory(get4Node5Edge(),true);
 		assertEquals(Arrays.deepToString(new int[][]{{0,1,1,0},{1,0,1,1},{1,1,0,1},{0,1,1,0}}),Arrays.deepToString(g.buildIntAdjacencyMatrix()));
+		g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),true);
+		assertEquals(Arrays.deepToString(new int[][]{{0,1,1,0,0},{1,0,1,0,0},{1,1,0,1,0},{0,0,1,0,1},{0,0,0,1,0}}),Arrays.deepToString(g.buildIntAdjacencyMatrix()));
+		g = FastGraph.jsonStringGraphFactory(get5Node4Edge(),true);
+		assertEquals(Arrays.deepToString(new int[][]{{0,1,1,0,0},{1,0,1,0,0},{1,1,0,0,0},{0,0,0,0,1},{0,0,0,1,0}}),Arrays.deepToString(g.buildIntAdjacencyMatrix()));
+	
 	}
 	
 	@Test
@@ -808,7 +814,7 @@ public class FastGraphTest {
 		g = FastGraph.jsonStringGraphFactory(get2Node1Edge(),false);
 		assertEquals(Arrays.toString(new double[]{0,0}),Arrays.toString(g.findEigenvalues(g.buildIntDirectedAdjacencyMatrix())));
 		g = FastGraph.jsonStringGraphFactory(get2Node2Edge(),false);
-		assertEquals(Arrays.toString(new double[]{1,0}),Arrays.toString(g.findEigenvalues(g.buildIntDirectedAdjacencyMatrix())));
+		assertEquals(Arrays.toString(new double[]{0,1}),Arrays.toString(g.findEigenvalues(g.buildIntDirectedAdjacencyMatrix())));
 		g = FastGraph.jsonStringGraphFactory(get4Node5Edge(),false);
 		assertEquals(Arrays.toString(new double[]{0,0,0,0}),Arrays.toString(g.findEigenvalues(g.buildIntDirectedAdjacencyMatrix())));
 	}
@@ -821,9 +827,18 @@ public class FastGraphTest {
 		g = FastGraph.jsonStringGraphFactory(get2Node1Edge(),false);
 		assertEquals(Arrays.toString(new double[]{0,0}),Arrays.toString(g.findEigenvalues(g.buildBooleanDirectedAdjacencyMatrix())));
 		g = FastGraph.jsonStringGraphFactory(get2Node2Edge(),false);
-		assertEquals(Arrays.toString(new double[]{1,0}),Arrays.toString(g.findEigenvalues(g.buildBooleanDirectedAdjacencyMatrix())));
+		assertEquals(Arrays.toString(new double[]{0,1}),Arrays.toString(g.findEigenvalues(g.buildBooleanDirectedAdjacencyMatrix())));
 		g = FastGraph.jsonStringGraphFactory(get4Node5Edge(),false);
 		assertEquals(Arrays.toString(new double[]{0,0,0,0}),Arrays.toString(g.findEigenvalues(g.buildBooleanDirectedAdjacencyMatrix())));
+	}
+	
+	@Test
+	public void test101c() {
+		FastGraph g;
+		g = FastGraph.jsonStringGraphFactory(get1Node0Edge(),false);
+		assertEquals(Arrays.toString(new int[]{0,3,3,5,5}),Arrays.toString(Util.roundArray(g.findEigenvalues(new int[][]{{4,-1,-1,-1,-1},{-1,3,-1,0,1},{-1,-1,3,-1,0},{-1,0,-1,3,-1},{-1,-1,0,-1,3}}))));
+		g = FastGraph.jsonStringGraphFactory(get1Node0Edge(),false);
+		assertEquals(Arrays.toString(new int[]{-2,-1,1,2}),Arrays.toString(Util.roundArray(g.findEigenvalues(new int[][]{{0,1,0,0},{1,0,1,0},{0,1,0,1},{0,0,1,0}}))));
 	}
 	
 	@Test
@@ -936,6 +951,10 @@ public class FastGraphTest {
 		return json;
 	}
 	
+	int[][] get0Node0EdgeAdjMatrix() {
+		return new int[][]{{0}};
+	}
+	
 	public String get2Node0Edge() {
 		String json = "{\n";
 		json += "\"name\": \"two nodes, no edges\",\n";
@@ -960,7 +979,9 @@ public class FastGraphTest {
 		return json;
 	}
 	
-	
+	int[][] get2Node0EdgeAdjMatrix() {
+		return new int[][]{{0,0},{0,0}};
+	}
 
 	public String get2Node1Edge() {
 		String json = "{\n";
@@ -995,7 +1016,10 @@ public class FastGraphTest {
 		json += "}\n";
 		return json;
 	}
-
+	
+	int[][] get2Node1EdgeAdjMatrix() {
+		return new int[][]{{0,1},{1,0}};
+	}
 	
 	public String get2Node2Edge() {
 		String json = "{\n";
@@ -1038,6 +1062,10 @@ public class FastGraphTest {
 		json += "],\n";
 		json += "}\n";
 		return json;
+	}
+	
+	int[][] get2Node2EdgeAdjMatrix() {
+		return new int[][]{{2,1},{1,0}};
 	}
 	
 	/*
@@ -1137,7 +1165,9 @@ public class FastGraphTest {
 		return json;
 	}
 	
-	
+	int[][] get5Node5EdgeAdjMatrix() {
+		return new int[][]{{0,1,1,0,0},{1,0,1,0,0},{1,1,0,1,0},{0,0,1,0,1},{0,0,0,1,0}};
+	}
 	
 	/*
 	 * Disconnected
@@ -1226,6 +1256,10 @@ public class FastGraphTest {
 		json += "],\n";
 		json += "}\n";
 		return json;
+	}
+	
+	int[][] get5Node4EdgeAdjMatrix() {
+		return new int[][]{{0,1,1,0,0},{1,0,1,0,0},{1,1,0,0,0},{0,0,0,0,1},{0,0,0,1,0}};
 	}
 
 	/*
@@ -1316,6 +1350,10 @@ public class FastGraphTest {
 		json += "],\n";
 		json += "}\n";
 		return json;
+	}
+	
+	int[][] get4Node5EdgeAdjMatrix() {
+		return new int[][]{{0,1,1,0},{1,0,1,1},{1,1,0,1},{0,1,1,0}};
 	}
 
 }

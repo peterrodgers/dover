@@ -1624,7 +1624,9 @@ for(int i = 0; i< numberOfEdges; i++) {
 		EigenvalueDecomposition e = A.eig();
 		//e.getD().print(6, 1);
 		//e.getV().print(6, 1);
-		return e.getRealEigenvalues();	
+		double[] result = e.getRealEigenvalues();
+		Arrays.sort(result);
+		return result;	
 	}
 	
 	
