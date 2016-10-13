@@ -846,6 +846,7 @@ public class FastGraphTest {
 		assertEquals(0,displayGraph.getEdges().size());
 		assertEquals(g.getNodeLabel(0),displayGraph.getNodes().get(0).getLabel());
 		assertEquals(g.getNodeWeight(0),(int)(displayGraph.getNodes().get(0).getScore()));
+		assertEquals(Byte.toString(g.getNodeType(0)),displayGraph.getNodes().get(0).getType().getLabel());
 	}
 	
 	@Test
@@ -858,8 +859,10 @@ public class FastGraphTest {
 		assertEquals(1,displayGraph.getEdges().size());
 		assertEquals(g.getNodeLabel(1),displayGraph.getNodes().get(1).getLabel());
 		assertEquals(g.getNodeWeight(1),(int)(displayGraph.getNodes().get(1).getScore()));
+		assertEquals(Byte.toString(g.getNodeType(1)),displayGraph.getNodes().get(1).getType().getLabel());
 		assertEquals(g.getEdgeLabel(0),displayGraph.getEdges().get(0).getLabel());
 		assertEquals(g.getEdgeWeight(0),(int)(displayGraph.getEdges().get(0).getScore()));
+		assertEquals(Byte.toString(g.getEdgeType(0)),displayGraph.getEdges().get(0).getType().getLabel());
 		assertEquals(g.getNodeLabel(0),displayGraph.getEdges().get(0).getFrom().getLabel());
 		assertEquals(g.getNodeLabel(1),displayGraph.getEdges().get(0).getTo().getLabel());
 	}
@@ -874,8 +877,10 @@ public class FastGraphTest {
 		assertEquals(2,displayGraph.getEdges().size());
 		assertEquals(g.getNodeLabel(0),displayGraph.getNodes().get(0).getLabel());
 		assertEquals(g.getNodeWeight(0),(int)(displayGraph.getNodes().get(0).getScore()));
+		assertEquals(Byte.toString(g.getNodeType(0)),displayGraph.getNodes().get(0).getType().getLabel());
 		assertEquals(g.getEdgeLabel(1),displayGraph.getEdges().get(1).getLabel());
 		assertEquals(g.getEdgeWeight(1),(int)(displayGraph.getEdges().get(1).getScore()));
+		assertEquals(Byte.toString(g.getEdgeType(1)),displayGraph.getEdges().get(1).getType().getLabel());
 		assertEquals(g.getNodeLabel(0),displayGraph.getEdges().get(1).getFrom().getLabel());
 		assertEquals(g.getNodeLabel(0),displayGraph.getEdges().get(1).getTo().getLabel());
 	}
@@ -890,8 +895,10 @@ public class FastGraphTest {
 		assertEquals(5,displayGraph.getEdges().size());
 		assertEquals(g.getNodeLabel(4),displayGraph.getNodes().get(4).getLabel());
 		assertEquals(g.getNodeWeight(4),(int)(displayGraph.getNodes().get(4).getScore()));
+		assertEquals(Byte.toString(g.getNodeType(4)),displayGraph.getNodes().get(4).getType().getLabel());
 		assertEquals(g.getEdgeLabel(4),displayGraph.getEdges().get(4).getLabel());
 		assertEquals(g.getEdgeWeight(4),(int)(displayGraph.getEdges().get(4).getScore()));
+		assertEquals(Byte.toString(g.getEdgeType(4)),displayGraph.getEdges().get(4).getType().getLabel());
 		assertEquals(g.getNodeLabel(3),displayGraph.getEdges().get(4).getFrom().getLabel());
 		assertEquals(g.getNodeLabel(4),displayGraph.getEdges().get(4).getTo().getLabel());
 	}

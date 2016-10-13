@@ -1,5 +1,7 @@
 package uk.ac.kent.dover.fastGraph;
 
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
@@ -136,7 +138,10 @@ public class FastGraph {
 		g1.saveBuffers(null,g1.getName());
 		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 */
-		
+	
+Graph displayGraph = g1.generateDisplayGraph();
+displayGraph.randomizeNodePoints(new Point(50,50), 200, 200);
+uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(displayGraph);
 		time = System.currentTimeMillis();
 
 String name = "random-n-2-e-1";
@@ -1623,6 +1628,18 @@ for(int i = 0; i< numberOfEdges; i++) {
 	}
 	
 	
+	/**
+	 * Creates a displayGraph.Graph which can then be accessed, manipulated and visualized
+	 * using that package. displayGraph.Graph name becomes this FastGrapph label
+	 * The displayGraph.Graph node and edge labels, are taken
+	 * from this FastGraph nodes and edges. node and edge weights become node
+	 * and edge scores. New NodeType
+	 * and EdgeType are created if needed with label of the integer of this type.
+	 * Node and Edge Ids are not stored, but order of nodes and edges in the displayGraph.Graph
+	 * is as this FastGraph.
+	 * 
+	 * @return a displayGraph.Graph with the same data as this Fast Graph
+	 */
 	public Graph generateDisplayGraph() {
 		
 		Graph g = new Graph(getName());
@@ -1636,6 +1653,7 @@ for(int i = 0; i< numberOfEdges; i++) {
 			if(type == null) {
 				type = new NodeType(typeLabel);
 			}
+			n.setType(type);
 			g.addNode(n);
 		}
 		
@@ -1650,6 +1668,7 @@ for(int i = 0; i< numberOfEdges; i++) {
 			if(type == null) {
 				type = new EdgeType(typeLabel);
 			}
+			e.setType(type);
 			g.addEdge(e);
 		}
 		
