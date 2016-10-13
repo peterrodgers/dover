@@ -71,7 +71,6 @@ public class FastGraph {
 	
 	public static final String INFO_SPLIT_STRING = "~";
 	
-	public static final String startingWorkingDirectory = System.getProperty("user.dir");
 
 	private ByteBuffer nodeBuf;
 	private ByteBuffer edgeBuf;
@@ -120,7 +119,7 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(1000000,10000000,false); // 1 million nodes, 10 million edges
 //		FastGraph g1 = randomGraphFactory(5000000,50000000,false); // limit for edgeLabelBuf at 20 chars per label
 //		FastGraph g1 = randomGraphFactory(4847571,68993773,false); // Size of LiveJournal1 example from SNAP
-//		FastGraph g1 = randomGraphFactory(10000000,100000000,false); // 10 million nodes, 100 million edges, close to edgeBuf limit, but fails on heap space with 14g
+//		FastGraph g1 = randomGraphFactory(10000000,100000000,false); // 10 million nodes, 100 million edges, close to edgeBuf limit, but fails on heap space with 14g, but pass with heap space of 30g
 
 //		time = System.currentTimeMillis();
 //		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
@@ -782,8 +781,8 @@ String name = "random-n-2-e-1";
 				directoryAndBaseName = directory+File.separatorChar+fileBaseName;
 			}
 		} else {
-			directoryAndBaseName = startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+fileBaseName+File.separatorChar+fileBaseName;
-			new File(startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+fileBaseName).mkdirs();
+			directoryAndBaseName = Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+fileBaseName+File.separatorChar+fileBaseName;
+			new File(Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+fileBaseName).mkdirs();
 		}
 		
 		boolean append;
@@ -870,7 +869,7 @@ String name = "random-n-2-e-1";
 	
 		String directory = dir;
 		if(directory == null) {
-			directory = startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"snap";
+			directory = Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"snap";
 		}
 		String path = null;
 		if(directory.charAt(directory.length()-1)== File.separatorChar) {
@@ -1101,7 +1100,7 @@ System.out.println("nodeIndex "+nodeIndex);
 	@SuppressWarnings("resource")
 	private static FastGraph loadBuffers(String directory, String fileBaseName) {
 		
-		String directoryAndBaseName = startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+fileBaseName;
+		String directoryAndBaseName = Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+fileBaseName+File.separatorChar+fileBaseName;
 		if(directory != null) {
 			if(directory.charAt(directory.length()-1)== File.separatorChar) {
 				directoryAndBaseName = directory+fileBaseName;
