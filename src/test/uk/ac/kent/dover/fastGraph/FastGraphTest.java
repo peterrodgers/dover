@@ -693,7 +693,7 @@ public class FastGraphTest {
 
 	@Test
 	public void test095() {
-		FastGraph g = FastGraph.adjacencyListGraphFactory(0, 0, FastGraph.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "testAdj1.txt", false);
+		FastGraph g = FastGraph.adjacencyListGraphFactory(0, 0, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "testAdj1.txt", false);
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
 		assertTrue(g.isConnected());
@@ -701,7 +701,7 @@ public class FastGraphTest {
 
 	@Test
 	public void test096() {
-		FastGraph g = FastGraph.adjacencyListGraphFactory(2, 1, FastGraph.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "testAdj2.txt", true);
+		FastGraph g = FastGraph.adjacencyListGraphFactory(2, 1, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "testAdj2.txt", true);
 		assertEquals("testAdj2.txt",g.getName());
 		assertEquals(2,g.getNumberOfNodes());
 		assertEquals(1,g.getNumberOfEdges());
@@ -720,7 +720,7 @@ public class FastGraphTest {
 
 	@Test
 	public void test097() {
-		FastGraph g = FastGraph.adjacencyListGraphFactory(4, 4, FastGraph.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "testAdj3.txt", false);
+		FastGraph g = FastGraph.adjacencyListGraphFactory(4, 4, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "testAdj3.txt", false);
 		int[] connections;
 		connections = g.getNodeConnectingOutNodes(0);
 		assertEquals(1,connections.length);

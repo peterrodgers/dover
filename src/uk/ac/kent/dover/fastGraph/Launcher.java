@@ -10,6 +10,8 @@ import java.util.Arrays;
  */
 public class Launcher {
 	
+	public static final String startingWorkingDirectory = System.getProperty("user.dir");
+	
 	/**
 	 * Main method
 	 * 
@@ -21,7 +23,12 @@ public class Launcher {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		new Launcher(args);
+	}
+	
+	public Launcher(String[] args) {
 		System.out.println(Arrays.toString(args));
+		System.out.println(args.length);
 		if (args.length == 0) {
 			FastGraph.main(args); //will replace this with loading GUI instead
 		} else {
