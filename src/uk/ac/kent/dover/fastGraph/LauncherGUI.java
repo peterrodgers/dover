@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -146,7 +147,24 @@ public class LauncherGUI extends JFrame {
 	 */
 	private JPanel buildMotifTab() {
 		JPanel motifPanel = new JPanel(new BorderLayout());
-		motifPanel.add(new JLabel("Motif area"), BorderLayout.EAST);
+		
+		JTextField input = new JTextField(5);		
+		JButton motifBtn = new JButton("Find Motifs");
+		
+		motifBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				try {
+					int number = Integer.parseInt(input.getText());
+					System.out.println("Motif search, with number: " + number);
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(motifPanel, "Please enter an integer", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+				}				
+			}
+		});
+		
+		motifPanel.add(input, BorderLayout.WEST);	
+		motifPanel.add(motifBtn, BorderLayout.EAST);
 		return motifPanel;
 	}
 	

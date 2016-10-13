@@ -2,6 +2,12 @@ package uk.ac.kent.dover.fastGraph;
 
 import java.util.Arrays;
 
+/**
+ * A class to hold a number of useful methods
+ * 
+ * @author Rob Baker
+ *
+ */
 public class Util {
 
 	/**
