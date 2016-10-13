@@ -111,14 +111,15 @@ public class FastGraph {
 	
 	/**
 	 * @param args
+	 * @throws Exception 
 	 */
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		
 		long time;
 		
 //		FastGraph g1 = randomGraphFactory(2,1,false);
-		FastGraph g1 = randomGraphFactory(5,6,true);
+//		FastGraph g1 = randomGraphFactory(5,6,true);
 //		FastGraph g1 = randomGraphFactory(10000,100000,false); // 10 thousand nodes, 100 thousand edges
 //		FastGraph g1 = randomGraphFactory(1000000,10000000,false); // 1 million nodes, 10 million edges
 //		FastGraph g1 = randomGraphFactory(5000000,50000000,false); // limit for edgeLabelBuf at 20 chars per label
@@ -126,19 +127,19 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(10000000,100000000,false); // 10 million nodes, 100 million edges, close to edgeBuf limit, but fails on heap space with 14g, but pass with heap space of 30g
 
 //		time = System.currentTimeMillis();
-//		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
+		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false); // SNAP web page gives 1768149 edges
 //		FastGraph g1 = adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(4847571,68993773,null,"soc-LiveJournal1.txt",false);
 		
 //System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-/*		
+		
 		time = System.currentTimeMillis();
 		g1.saveBuffers(null,g1.getName());
 		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-*/
-	
+
+	/*
 Graph displayGraph = g1.generateDisplayGraph();
 displayGraph.randomizeNodePoints(new Point(50,50), 200, 200);
 uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(displayGraph);
@@ -146,25 +147,33 @@ uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.dis
 
 String name = "random-n-2-e-1";
 //		String name = g1.getName();
-		FastGraph g2 = loadBuffersGraphFactory(null,name);
+		FastGraph g2;
+		try {
+			g2 = loadBuffersGraphFactory(null,name);
+			System.out.println("create graph from file test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+			
+	 		
+			
+			time = System.currentTimeMillis();
+			boolean connected = g2.isConnected();
+			System.out.println("connected test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+			
+			System.out.println("connected "+connected);
+			
+			time = System.currentTimeMillis();
+			int[][] matrix = g2.buildIntAdjacencyMatrix();
+			//boolean[][] matrix = g2.buildBooleanAdjacencyMatrix();
+			System.out.println("building matrix test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+			g2.printMatrix(matrix);
+			System.out.println(Arrays.toString(g2.findEigenvalues(matrix)));
+			System.out.println(matrix.length);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
- 		System.out.println("create graph from file test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-	
- 		
-		
-		time = System.currentTimeMillis();
-		boolean connected = g2.isConnected();
-		System.out.println("connected test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-		
-		System.out.println("connected "+connected);
-		
-		time = System.currentTimeMillis();
-		int[][] matrix = g2.buildIntAdjacencyMatrix();
-		//boolean[][] matrix = g2.buildBooleanAdjacencyMatrix();
-		System.out.println("building matrix test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-		g2.printMatrix(matrix);
-		System.out.println(Arrays.toString(g2.findEigenvalues(matrix)));
-		System.out.println(matrix.length);
+ 		*/
 	}	
 
 
@@ -583,9 +592,10 @@ String name = "random-n-2-e-1";
 	/**
 	 * creates a FastGraph by loading in various files from the given directory, or data under
 	 * current working directory if directory is null.
+	 * @throws IOException If the buffers cannot be loaded
 	 * @See loadBuffers
 	 */
-	public static FastGraph loadBuffersGraphFactory(String directory, String fileBaseName) {
+	public static FastGraph loadBuffersGraphFactory(String directory, String fileBaseName) throws IOException {
 		FastGraph g = loadBuffers(null,fileBaseName);
 		return g;
 	}
@@ -855,8 +865,9 @@ String name = "random-n-2-e-1";
 	 * represented by one node id pair per line delimited by tabs or spaces, ignores lines starting with # and any line without a tab.
 	 * Looks for the file in given directory If directory is null, then to a
 	 * directory named data/snap under current working directory.
+	 * @throws Exception Throws if the adjacency list cannot be built correctly. Might be an IO error
 	 */
-	public static FastGraph adjacencyListGraphFactory(int nodeCount, int edgeCount, String directory, String fileName, boolean direct) {
+	public static FastGraph adjacencyListGraphFactory(int nodeCount, int edgeCount, String directory, String fileName, boolean direct) throws Exception {
 		FastGraph g = new FastGraph(nodeCount,edgeCount,DEFAULT_AVERAGE_LABEL_LENGTH,DEFAULT_AVERAGE_LABEL_LENGTH,direct);
 		g.setName(fileName);
 		g.loadAdjacencyListGraph(directory,fileName);
@@ -872,7 +883,7 @@ String name = "random-n-2-e-1";
 	 * directory named /data/snap under current working directory.
 	 */
 	@SuppressWarnings("resource")
-	private void loadAdjacencyListGraph(String dir, String fileName) {
+	private void loadAdjacencyListGraph(String dir, String fileName) throws Exception {
 	
 		String directory = dir;
 		if(directory == null) {
@@ -891,21 +902,21 @@ String name = "random-n-2-e-1";
 		HashMap<Integer,String> nodeIndexToSnapIdMap = new HashMap<Integer,String>(numberOfNodes*4);
 		HashMap<Integer,Integer> edgeNode1Map = new HashMap<Integer,Integer>(numberOfEdges*4);
 		HashMap<Integer,Integer> edgeNode2Map = new HashMap<Integer,Integer>(numberOfEdges*4);
-		try {
-			
-			File f = new File(path);
-			if(!f.exists()) {
-				System.out.println("Problem loading file "+path+". If you expect to access a SNAP file try downloading the file from:\nhttps://snap.stanford.edu/data/\nthen unzipping it and placing it in the directory "+directory);
-				System.exit(1);
-			}
-			
-			FileInputStream is = new FileInputStream(path);
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
+		
+		
+		File f = new File(path);
+		if(!f.exists()) {
+			throw new IOException("Problem loading file "+path+". If you expect to access a SNAP file try downloading the file from:\nhttps://snap.stanford.edu/data/\nthen unzipping it and placing it in the directory "+directory);
+			//System.exit(1);
+		}
+		
+		FileInputStream is = new FileInputStream(path);
+		InputStreamReader isr = new InputStreamReader(is);
+		BufferedReader br = new BufferedReader(isr);
 
-			String[] splitLine;
-			
-			String line = "";
+		String[] splitLine;
+		
+		String line = "";
 long time = System.currentTimeMillis();			
 			while(line != null) {
 				line = br.readLine();
@@ -916,32 +927,32 @@ long time = System.currentTimeMillis();
 					continue;
 				}
 				if(line.charAt(0) == '#') {
+				continue;
+			}
+			splitLine = line.split(" ");
+			if(splitLine.length < 2) {
+				splitLine = line.split("\t");
+				if(splitLine.length < 2) {
+					System.out.println("FAILED TO RECOGNISE LINE:"+line+" in loadAdjacencyListGraph("+directory+","+fileName+")");
 					continue;
 				}
-				splitLine = line.split(" ");
-				if(splitLine.length < 2) {
-					splitLine = line.split("\t");
-					if(splitLine.length < 2) {
-						System.out.println("FAILED TO RECOGNISE LINE:"+line+" in loadAdjacencyListGraph("+directory+","+fileName+")");
-						continue;
-					}
-				}
+			}
 
-				String node1String = splitLine[0];
-				String node2String = splitLine[1];
-				
-				if(!nodeSnapIdToIndexMap.containsKey(node1String)) {
-					nodeSnapIdToIndexMap.put(node1String,nodeIndex);
-					nodeIndexToSnapIdMap.put(nodeIndex,node1String);
-					nodeIndex++;
-				}
-				if(!nodeSnapIdToIndexMap.containsKey(node2String)) {
-					nodeSnapIdToIndexMap.put(node2String,nodeIndex);
-					nodeIndexToSnapIdMap.put(nodeIndex,node2String);
-					nodeIndex++;
-				}
-				edgeNode1Map.put(edgeIndex, nodeSnapIdToIndexMap.get(node1String));
-				edgeNode2Map.put(edgeIndex, nodeSnapIdToIndexMap.get(node2String));
+			String node1String = splitLine[0];
+			String node2String = splitLine[1];
+			
+			if(!nodeSnapIdToIndexMap.containsKey(node1String)) {
+				nodeSnapIdToIndexMap.put(node1String,nodeIndex);
+				nodeIndexToSnapIdMap.put(nodeIndex,node1String);
+				nodeIndex++;
+			}
+			if(!nodeSnapIdToIndexMap.containsKey(node2String)) {
+				nodeSnapIdToIndexMap.put(node2String,nodeIndex);
+				nodeIndexToSnapIdMap.put(nodeIndex,node2String);
+				nodeIndex++;
+			}
+			edgeNode1Map.put(edgeIndex, nodeSnapIdToIndexMap.get(node1String));
+			edgeNode2Map.put(edgeIndex, nodeSnapIdToIndexMap.get(node2String));
 				
 				edgeIndex++;
 if(edgeIndex%1000000==0 ) {
@@ -951,10 +962,6 @@ if(edgeIndex%1000000==0 ) {
 System.out.println("edgeIndex "+edgeIndex);
 System.out.println("nodeIndex "+nodeIndex);
 			
-		} catch(Exception e) {
-			System.out.println("ERROR executing loadSnapGraph("+directory+","+fileName+")");
-			e.printStackTrace();
-		}
 		
 
 		short labelLength = -999;
@@ -1103,9 +1110,10 @@ System.out.println("nodeIndex "+nodeIndex);
 	 * loads the current graph from several files created by saveBuffers,
 	 * in directory given to base name given (i.e. fileBaseName should have no extension).
 	 * If directory is null, then to a directory named data under current working directory.
+	 * @throws IOException If the buffers cannot be loaded
 	 */
 	@SuppressWarnings("resource")
-	private static FastGraph loadBuffers(String directory, String fileBaseName) {
+	private static FastGraph loadBuffers(String directory, String fileBaseName) throws IOException {
 		
 		String directoryAndBaseName = Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+fileBaseName+File.separatorChar+fileBaseName;
 		if(directory != null) {
@@ -1122,66 +1130,62 @@ System.out.println("nodeIndex "+nodeIndex);
 		FileChannel rChannel;
 		String line;
 		String[] splitLine;
-		try {
-			FileInputStream is = new FileInputStream(directoryAndBaseName+".info");
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-			line = br.readLine();
-			splitLine = line.split(INFO_SPLIT_STRING);
-			String name = splitLine[1];
-			line = br.readLine();
-			splitLine = line.split(INFO_SPLIT_STRING);
-			int inNodeTotal = Integer.parseInt(splitLine[1]);
-			line = br.readLine();
-			splitLine = line.split(INFO_SPLIT_STRING);
-			int inEdgeTotal = Integer.parseInt(splitLine[1]);
-			line = br.readLine();
-			splitLine = line.split(INFO_SPLIT_STRING);
-			int inAverageNodeLabelLength = Integer.parseInt(splitLine[1]);
-			line = br.readLine();
-			splitLine = line.split(INFO_SPLIT_STRING);
-			int inAverageEdgeLabelLength = Integer.parseInt(splitLine[1]);
-			line = br.readLine();
-			splitLine = line.split(INFO_SPLIT_STRING);
-			String directValue = splitLine[1];
-			boolean inDirect = true;
-			if(directValue.equals("false")) {
-				inDirect = false;
-			}
-			br.close();
-			
-			g = new FastGraph(inNodeTotal, inEdgeTotal, inAverageNodeLabelLength, inAverageEdgeLabelLength, inDirect);
-			g.setName(name);
 
-			file = new File(directoryAndBaseName+".nodeBuf");
-			rChannel = new FileInputStream(file).getChannel();
-			rChannel.read(g.nodeBuf);
-			rChannel.close();
-
-			file = new File(directoryAndBaseName+".edgeBuf");
-			rChannel = new FileInputStream(file).getChannel();
-			rChannel.read(g.edgeBuf);
-			rChannel.close();
-			
-			file = new File(directoryAndBaseName+".connectionBuf");
-			rChannel = new FileInputStream(file).getChannel();
-			rChannel.read(g.connectionBuf);
-			rChannel.close();
-
-			file = new File(directoryAndBaseName+".nodeLabelBuf");
-			rChannel = new FileInputStream(file).getChannel();
-			rChannel.read(g.nodeLabelBuf);
-			rChannel.close();
-			
-			file = new File(directoryAndBaseName+".edgeLabelBuf");
-			rChannel = new FileInputStream(file).getChannel();
-			rChannel.read(g.edgeLabelBuf);
-			rChannel.close();
-			
-		} catch(Exception e) {
-			System.out.println("ERROR executing loadBuffers("+directory+","+fileBaseName+")");
-			e.printStackTrace();
+		FileInputStream is = new FileInputStream(directoryAndBaseName+".info");
+		InputStreamReader isr = new InputStreamReader(is);
+		BufferedReader br = new BufferedReader(isr);
+		line = br.readLine();
+		splitLine = line.split(INFO_SPLIT_STRING);
+		String name = splitLine[1];
+		line = br.readLine();
+		splitLine = line.split(INFO_SPLIT_STRING);
+		int inNodeTotal = Integer.parseInt(splitLine[1]);
+		line = br.readLine();
+		splitLine = line.split(INFO_SPLIT_STRING);
+		int inEdgeTotal = Integer.parseInt(splitLine[1]);
+		line = br.readLine();
+		splitLine = line.split(INFO_SPLIT_STRING);
+		int inAverageNodeLabelLength = Integer.parseInt(splitLine[1]);
+		line = br.readLine();
+		splitLine = line.split(INFO_SPLIT_STRING);
+		int inAverageEdgeLabelLength = Integer.parseInt(splitLine[1]);
+		line = br.readLine();
+		splitLine = line.split(INFO_SPLIT_STRING);
+		String directValue = splitLine[1];
+		boolean inDirect = true;
+		if(directValue.equals("false")) {
+			inDirect = false;
 		}
+		br.close();
+		
+		g = new FastGraph(inNodeTotal, inEdgeTotal, inAverageNodeLabelLength, inAverageEdgeLabelLength, inDirect);
+		g.setName(name);
+
+		file = new File(directoryAndBaseName+".nodeBuf");
+		rChannel = new FileInputStream(file).getChannel();
+		rChannel.read(g.nodeBuf);
+		rChannel.close();
+
+		file = new File(directoryAndBaseName+".edgeBuf");
+		rChannel = new FileInputStream(file).getChannel();
+		rChannel.read(g.edgeBuf);
+		rChannel.close();
+		
+		file = new File(directoryAndBaseName+".connectionBuf");
+		rChannel = new FileInputStream(file).getChannel();
+		rChannel.read(g.connectionBuf);
+		rChannel.close();
+
+		file = new File(directoryAndBaseName+".nodeLabelBuf");
+		rChannel = new FileInputStream(file).getChannel();
+		rChannel.read(g.nodeLabelBuf);
+		rChannel.close();
+		
+		file = new File(directoryAndBaseName+".edgeLabelBuf");
+		rChannel = new FileInputStream(file).getChannel();
+		rChannel.read(g.edgeLabelBuf);
+		rChannel.close();
+
 		
 		return g;
 	}

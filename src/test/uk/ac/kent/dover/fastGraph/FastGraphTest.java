@@ -3,6 +3,7 @@ package test.uk.ac.kent.dover.fastGraph;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 
 import uk.ac.kent.displayGraph.*;
@@ -579,7 +580,7 @@ public class FastGraphTest {
 	}
 	
 	@Test
-	public void test090() {
+	public void test090() throws IOException {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get0Node0Edge(),false);
 		g.saveBuffers(null,"test");
 		FastGraph g2 = FastGraph.loadBuffersGraphFactory(null,"test");
@@ -589,7 +590,7 @@ public class FastGraphTest {
 	}
 	
 	@Test
-	public void test091() {
+	public void test091() throws IOException {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get4Node5Edge(),false);
 		g.saveBuffers(null,"test");
 		FastGraph g2 = FastGraph.loadBuffersGraphFactory(null,"test");

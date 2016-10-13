@@ -1,5 +1,7 @@
 package uk.ac.kent.dover.fastGraph;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -37,5 +39,13 @@ public class Launcher {
 		}
 	}
 	
+	public FastGraph loadFromBuffers(String directory, String fileBaseName) throws IOException {
+		return FastGraph.loadBuffersGraphFactory(directory, fileBaseName);
+	}
+	
+	public void convertGraphToBuffers(int nodeCount, int edgeCount, String directory, String fileName, boolean direct) throws Exception {
+		FastGraph g1 = FastGraph.adjacencyListGraphFactory(nodeCount, edgeCount, directory, fileName, direct);
+		g1.saveBuffers(null,fileName);
+	}
 
 }

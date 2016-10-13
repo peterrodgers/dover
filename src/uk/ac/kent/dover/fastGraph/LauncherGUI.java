@@ -4,28 +4,37 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.BorderFactory;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -43,12 +52,16 @@ import javax.swing.UIManager;
 @SuppressWarnings("serial")
 public class LauncherGUI extends JFrame {
 	
+	public String DEFAULT_STATUS_MESSAGE = "Ready"; //The default message displayed to a user
+	public Launcher launcher;
+	
 	/**
 	 * The main builder for the GUI
 	 * 
 	 * @param launcher Requires the launcher so it can make callback commands when the user presses buttons etc
 	 */
 	public LauncherGUI(Launcher launcher) {
+		this.launcher = launcher;
 		try {
 			//Makes the GUI look like the OS. This has the benefit of scaling the display if the user has zooming or a changed DPI (as Rob does)
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -94,10 +107,14 @@ public class LauncherGUI extends JFrame {
 		JPanel patternPanel = buildPatternTab();
 		tabbedPane.addTab("Pattern", patternPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_2);
+		
+		JPanel convertPanel = buildConvertTab(graphList, progressBar, statusBar);
+		tabbedPane.addTab("Convert Graph", convertPanel);
+		tabbedPane.setMnemonicAt(0, KeyEvent.VK_3);
 
 		JPanel otherPanel = buildOtherTab(graphList, progressBar, statusBar);
 		tabbedPane.addTab("Others", otherPanel);
-		tabbedPane.setMnemonicAt(0, KeyEvent.VK_3);
+		tabbedPane.setMnemonicAt(0, KeyEvent.VK_4);
 		
 		blackline = BorderFactory.createLineBorder(Color.black);
 		titled = BorderFactory.createTitledBorder(blackline, "Task");
@@ -114,6 +131,7 @@ public class LauncherGUI extends JFrame {
 		this.setContentPane(mainPanel);
 		setTitle("Dover");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainPanel.setPreferredSize(new Dimension(800,800));
 		pack();
 		setVisible(true);
 	}
@@ -154,12 +172,12 @@ public class LauncherGUI extends JFrame {
 		motifBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent evt) {
-				try {
-					int number = Integer.parseInt(input.getText());
+				int number = checkForPositiveInteger(input.getText(),motifPanel);
+				if (number != -1) {
+					
+					//replace with actual motif code
 					System.out.println("Motif search, with number: " + number);
-				} catch (Exception e) {
-					JOptionPane.showMessageDialog(motifPanel, "Please enter an integer", "Invalid Input", JOptionPane.ERROR_MESSAGE);
-				}				
+				}		
 			}
 		});
 		
@@ -176,6 +194,173 @@ public class LauncherGUI extends JFrame {
 		JPanel patternPanel = new JPanel(new BorderLayout());
 		patternPanel.add(new JButton("Button"), BorderLayout.WEST);
 		return patternPanel;
+	}
+	
+	/**
+	 * Builds the Panel used to house the GUI elements for the Pattern Tab
+	 * @return The Pattern Tab
+	 */
+	private JPanel buildConvertTab(JList graphList, JProgressBar progressBar, JPanel statusBar) {
+		JLabel status = (JLabel) statusBar.getComponent(0);
+		JLabel label = new JLabel("Convert from data source to Buffers");
+		JLabel fileLabel = new JLabel("No file selected");
+		fileLabel.setFont(new Font(fileLabel.getFont().getFontName(), Font.ITALIC, fileLabel.getFont().getSize()));
+		
+		//Panel used to house the two buttons
+		JPanel convertPanel = new JPanel(new GridBagLayout());
+		
+		JFileChooser fileChooser = new JFileChooser();
+		JButton openBtn = new JButton("Open File...");
+		
+		//The action for when the user chooses a file
+		openBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				status.setText("Waiting for user response");
+			    //Handle open button action.
+			    if (evt.getSource() == openBtn) {
+			        int returnVal = fileChooser.showOpenDialog(convertPanel);
+	
+			        if (returnVal == JFileChooser.APPROVE_OPTION) {
+			            File file = fileChooser.getSelectedFile();
+			            fileLabel.setText(file.getName());
+			            fileLabel.setFont(new Font(fileLabel.getFont().getFontName(), Font.PLAIN, fileLabel.getFont().getSize()));
+			        }
+			   }
+			   status.setText(DEFAULT_STATUS_MESSAGE);
+			}
+		});
+		
+		JLabel nodeLabel = new JLabel("Number of Nodes:");
+		JTextField nodeField = new JTextField(12);
+		
+		JLabel edgeLabel = new JLabel("Number of Edges:");
+		JTextField edgeField = new JTextField(12);
+		
+		JRadioButton undirected = new JRadioButton("Undirected");
+		undirected.setSelected(true);
+		JRadioButton directed = new JRadioButton("Directed");
+		ButtonGroup group = new ButtonGroup();
+		group.add(undirected);
+		group.add(directed);
+		
+		JButton convertBtn = new JButton("Convert");
+		
+		//The action for when the user converts a file
+		convertBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				//check that the numbers of nodes are valid
+				
+				int nodeNumber = checkForPositiveInteger(nodeField.getText(),convertPanel);
+				int edgeNumber = checkForPositiveInteger(edgeField.getText(),convertPanel);
+				if (nodeNumber != -1 && edgeNumber != -1) {
+					//input numbers are valid
+					
+					//if the undirected button is selected, then the graph is undirected
+					boolean directedGraph = directed.isSelected();
+					File graphFile = fileChooser.getSelectedFile();
+					String name = graphFile.getName();
+					String path = fileChooser.getCurrentDirectory().toString();
+					
+					System.out.println(fileChooser.getSelectedFile());
+					System.out.println("path: " + fileChooser.getCurrentDirectory());
+					System.out.println("node: " + nodeNumber);
+					System.out.println("edge: " + edgeNumber);
+					System.out.println("directed: " + directedGraph);
+					
+					//set the Progress Bar to move
+					progressBar.setIndeterminate(true);
+					status.setText("Converting...");
+
+					// Start converting the Graph, but in a separate thread, to avoid locking up the GUI
+					Thread thread = new Thread(new Runnable() {
+
+					    @Override
+					    public void run() {
+					    	
+					    	//Display error message to the user if this is unavailable
+							try {
+								
+								launcher.convertGraphToBuffers(nodeNumber, edgeNumber, path, name, directedGraph);
+								
+								status.setText("Conversion Complete");
+						    	//stop the Progress Bar
+						    	progressBar.setIndeterminate(false);
+							} catch (Exception e) {
+								//stop the Progress Bar
+								progressBar.setIndeterminate(false);
+								JOptionPane.showMessageDialog(convertPanel, "This buffer could not be built. \n" + e.getMessage(), "Error: Exception", JOptionPane.ERROR_MESSAGE);
+								
+								e.printStackTrace();
+							}
+
+					    }
+					            
+					});					        
+					thread.start();
+					
+				}
+			}
+		});
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 3;
+		convertPanel.add(label, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 1;
+		c.gridx = 0;
+		c.gridy = 1;
+		convertPanel.add(openBtn, c);		
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 1;
+		c.gridy = 1;
+		convertPanel.add(fileLabel, c);	
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 2;
+		convertPanel.add(nodeLabel, c);	
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 1;
+		c.gridy = 2;
+		convertPanel.add(nodeField, c);	
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 3;
+		convertPanel.add(edgeLabel, c);	
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 1;
+		c.gridy = 3;
+		convertPanel.add(edgeField, c);	
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 4;
+		convertPanel.add(undirected, c);	
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 1;
+		c.gridy = 4;
+		convertPanel.add(directed, c);	
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 5;
+		c.gridwidth = 2;
+		convertPanel.add(convertBtn, c);	
+		
+		return convertPanel;
 	}
 	
 	/**
@@ -209,12 +394,23 @@ public class LauncherGUI extends JFrame {
 
 					    @Override
 					    public void run() {
-					    	FastGraph g = FastGraph.loadBuffersGraphFactory(null, graph);
-					    	status.setText("Loading Complete");
-					    	System.out.println(g.getNumberOfNodes());
 					    	
-					    	//stop the Progress Bar
-					    	progressBar.setIndeterminate(false);
+					    	//Display error message to the user if this is unavailable
+							try {
+								FastGraph g = launcher.loadFromBuffers(null,graph);
+								status.setText("Loading Complete");
+						    	System.out.println(g.getNumberOfNodes());
+						    	
+						    	//stop the Progress Bar
+						    	progressBar.setIndeterminate(false);
+							} catch (IOException e) {
+								//stop the Progress Bar
+								progressBar.setIndeterminate(false);
+								JOptionPane.showMessageDialog(otherPanel, "This buffer could not be found. \n" + e.getMessage(), "Error: IOException", JOptionPane.ERROR_MESSAGE);
+								
+								e.printStackTrace();
+							}
+
 					    }
 					            
 					});					        
@@ -241,10 +437,28 @@ public class LauncherGUI extends JFrame {
 		JPanel statusPanel = new JPanel();
 		statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
 		statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
-		JLabel statusLabel = new JLabel("Okay");
+		JLabel statusLabel = new JLabel(DEFAULT_STATUS_MESSAGE);
 		statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		statusPanel.add(statusLabel);
 		return statusPanel;
+	}
+	/**
+	 * Checks that a String is a positive integer
+	 * @param input The input String to be tested
+	 * @param panel The JPanel to attach the error Popup
+	 * @return The converted integer, or -1 if failed.
+	 */
+	private int checkForPositiveInteger(String input, JPanel panel) {
+		try {
+			int number = Integer.parseInt(input);
+			if (number <= 0) {
+				throw new Exception();
+			}
+			return number;
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(panel, "Please enter a positive integer", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+			return -1;
+		} 
 	}
 
 }
