@@ -1,7 +1,6 @@
 "# dover" 
 
 MS Windows only. There will be a similar process for linux and mac, but these are not directly supported.
-Requires Java Version 8.
 Ensure java bin directory is in the path variable
 
 Build the jar by doubleclicking buildjar.bat

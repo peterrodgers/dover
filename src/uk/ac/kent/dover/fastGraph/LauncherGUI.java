@@ -207,7 +207,7 @@ public class LauncherGUI extends JFrame {
 	 */
 	private JPanel buildConvertTab(JList graphList, JProgressBar progressBar, JPanel statusBar) {
 		JLabel status = (JLabel) statusBar.getComponent(0);
-		JLabel label = new JLabel("Convert from adjacency list to buffers");
+		JLabel label = new JLabel("Convert from data source to Buffers");
 		JLabel fileLabel = new JLabel("No file selected");
 		fileLabel.setFont(new Font(fileLabel.getFont().getFontName(), Font.ITALIC, fileLabel.getFont().getSize()));
 		
@@ -456,7 +456,10 @@ public class LauncherGUI extends JFrame {
 	 */
 	private int checkForPositiveInteger(String input, JPanel panel) {
 		try {
-			int number = Util.checkForPositiveInteger(input);
+			int number = Integer.parseInt(input);
+			if (number <= 0) {
+				throw new Exception();
+			}
 			return number;
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(panel, "Please enter a positive integer", "Invalid Input", JOptionPane.ERROR_MESSAGE);
