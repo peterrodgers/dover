@@ -24,11 +24,11 @@ public class Launcher {
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		new Launcher(args);
 	}
 	
-	public Launcher(String[] args) {
+	public Launcher(String[] args) throws Exception {
 		System.out.println(Arrays.toString(args));
 		System.out.println(args.length);
 		if (args.length == 0) {

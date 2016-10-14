@@ -695,7 +695,7 @@ public class FastGraphTest {
 	}
 
 	@Test
-	public void test095() {
+	public void test095() throws Exception {
 		FastGraph g = FastGraph.adjacencyListGraphFactory(0, 0, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "testAdj1.txt", false);
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
@@ -703,7 +703,7 @@ public class FastGraphTest {
 	}
 
 	@Test
-	public void test096() {
+	public void test096() throws Exception {
 		FastGraph g = FastGraph.adjacencyListGraphFactory(2, 1, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "testAdj2.txt", true);
 		assertEquals("testAdj2.txt",g.getName());
 		assertEquals(2,g.getNumberOfNodes());
@@ -722,7 +722,7 @@ public class FastGraphTest {
 
 
 	@Test
-	public void test097() {
+	public void test097() throws Exception {
 		FastGraph g = FastGraph.adjacencyListGraphFactory(4, 4, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "testAdj3.txt", false);
 		int[] connections;
 		connections = g.getNodeConnectingOutNodes(0);
