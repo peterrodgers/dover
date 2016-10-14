@@ -58,7 +58,7 @@ public class LauncherCmd {
 		options.addOption("h", "help", false, "Prints this message");
 		
 		// add t option
-		options.addOption("t", false, "testing");
+		options.addOption("t", false, "Runs the FastGraph as it used to in the early stages of development");
 		
 		return options;
 	}
@@ -128,13 +128,13 @@ public class LauncherCmd {
 				
 				//if the user is testing the command line
 			} else if(cmd.hasOption("t")) {
-			    System.out.println("test");
+				FastGraph.main(args);
 			    
 			    //if the user wants some help
 			} else if (cmd.hasOption("h")) {
 				// automatically generate the help statement
 				HelpFormatter formatter = new HelpFormatter();
-				formatter.printHelp( "dover.jar", options );
+				formatter.printHelp("java -jar -Xmx14g dover.jar", options);
 			}
 		} catch (Exception e) {
 			//ParseException
