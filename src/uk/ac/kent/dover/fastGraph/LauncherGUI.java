@@ -21,6 +21,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
 import javax.swing.BorderFactory;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
@@ -54,6 +55,7 @@ public class LauncherGUI extends JFrame {
 	
 	public String DEFAULT_STATUS_MESSAGE = "Ready"; //The default message displayed to a user
 	public Launcher launcher;
+	DefaultListModel model = new DefaultListModel();
 	
 	/**
 	 * The main builder for the GUI
@@ -151,8 +153,11 @@ public class LauncherGUI extends JFrame {
 	    	}
 	    }
 	    Collections.sort(graphs, String.CASE_INSENSITIVE_ORDER);
-		
-		JList list = new JList(graphs.toArray());
+	    
+	    for(String s : graphs) {
+	    	model.addElement(s);
+	    }		
+		JList list = new JList(model);
 		list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		list.setLayoutOrientation(JList.VERTICAL);
 		list.setVisibleRowCount(-1);
@@ -285,6 +290,7 @@ public class LauncherGUI extends JFrame {
 								launcher.convertGraphToBuffers(nodeNumber, edgeNumber, path, name, directedGraph);
 								
 								status.setText("Conversion Complete");
+								model.addElement(name);
 						    	//stop the Progress Bar
 						    	progressBar.setIndeterminate(false);
 							} catch (Exception e) {
