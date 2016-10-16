@@ -862,6 +862,7 @@ public class FastGraphTest {
 		assertEquals(0,displayGraph.getEdges().size());
 		assertEquals(g.getNodeLabel(0),displayGraph.getNodes().get(0).getLabel());
 		assertEquals(g.getNodeWeight(0),(int)(displayGraph.getNodes().get(0).getScore()));
+		assertEquals(g.getNodeAge(0),(int)(displayGraph.getNodes().get(0).getAge()));
 		assertEquals(Byte.toString(g.getNodeType(0)),displayGraph.getNodes().get(0).getType().getLabel());
 	}
 	
@@ -875,9 +876,11 @@ public class FastGraphTest {
 		assertEquals(1,displayGraph.getEdges().size());
 		assertEquals(g.getNodeLabel(1),displayGraph.getNodes().get(1).getLabel());
 		assertEquals(g.getNodeWeight(1),(int)(displayGraph.getNodes().get(1).getScore()));
+		assertEquals(g.getNodeAge(1),(int)(displayGraph.getNodes().get(1).getAge()));
 		assertEquals(Byte.toString(g.getNodeType(1)),displayGraph.getNodes().get(1).getType().getLabel());
 		assertEquals(g.getEdgeLabel(0),displayGraph.getEdges().get(0).getLabel());
 		assertEquals(g.getEdgeWeight(0),(int)(displayGraph.getEdges().get(0).getScore()));
+		assertEquals(g.getEdgeAge(0),(int)(displayGraph.getEdges().get(0).getAge()));
 		assertEquals(Byte.toString(g.getEdgeType(0)),displayGraph.getEdges().get(0).getType().getLabel());
 		assertEquals(g.getNodeLabel(0),displayGraph.getEdges().get(0).getFrom().getLabel());
 		assertEquals(g.getNodeLabel(1),displayGraph.getEdges().get(0).getTo().getLabel());
@@ -893,6 +896,7 @@ public class FastGraphTest {
 		assertEquals(2,displayGraph.getEdges().size());
 		assertEquals(g.getNodeLabel(0),displayGraph.getNodes().get(0).getLabel());
 		assertEquals(g.getNodeWeight(0),(int)(displayGraph.getNodes().get(0).getScore()));
+		assertEquals(g.getNodeAge(0),(int)(displayGraph.getNodes().get(0).getAge()));
 		assertEquals(Byte.toString(g.getNodeType(0)),displayGraph.getNodes().get(0).getType().getLabel());
 		assertEquals(g.getEdgeLabel(1),displayGraph.getEdges().get(1).getLabel());
 		assertEquals(g.getEdgeWeight(1),(int)(displayGraph.getEdges().get(1).getScore()));
@@ -911,12 +915,156 @@ public class FastGraphTest {
 		assertEquals(5,displayGraph.getEdges().size());
 		assertEquals(g.getNodeLabel(4),displayGraph.getNodes().get(4).getLabel());
 		assertEquals(g.getNodeWeight(4),(int)(displayGraph.getNodes().get(4).getScore()));
+		assertEquals(g.getNodeAge(4),(int)(displayGraph.getNodes().get(4).getAge()));
 		assertEquals(Byte.toString(g.getNodeType(4)),displayGraph.getNodes().get(4).getType().getLabel());
 		assertEquals(g.getEdgeLabel(4),displayGraph.getEdges().get(4).getLabel());
 		assertEquals(g.getEdgeWeight(4),(int)(displayGraph.getEdges().get(4).getScore()));
+		assertEquals(g.getEdgeAge(4),(int)(displayGraph.getEdges().get(4).getAge()));
 		assertEquals(Byte.toString(g.getEdgeType(4)),displayGraph.getEdges().get(4).getType().getLabel());
 		assertEquals(g.getNodeLabel(3),displayGraph.getEdges().get(4).getFrom().getLabel());
 		assertEquals(g.getNodeLabel(4),displayGraph.getEdges().get(4).getTo().getLabel());
+	}
+	
+	@Test
+	public void test107() {
+		Graph displayGraph = new Graph("empty");
+		FastGraph g = FastGraph.displayGraphFactory(displayGraph,false);
+		
+		assertEquals(g.getName(),displayGraph.getLabel());
+		assertEquals(g.getNumberOfNodes(),displayGraph.getNodes().size());
+		assertEquals(g.getNumberOfEdges(),displayGraph.getEdges().size());
+		Graph displayGraph2 = g.generateDisplayGraph();
+		assertTrue(displayGraph.isomorphic(displayGraph2));
+	}
+	
+	@Test
+	public void test108() {
+		Graph displayGraph = new Graph("one node");
+		Node n1 = new Node("node 1");
+		n1.setScore(4.0);
+		n1.setAge(19);
+		n1.setType(new NodeType("3"));
+		displayGraph.addNode(n1);
+		FastGraph g = FastGraph.displayGraphFactory(displayGraph,false);
+		
+		assertEquals(g.getName(),displayGraph.getLabel());
+		assertEquals(g.getNumberOfNodes(),displayGraph.getNodes().size());
+		assertEquals(g.getNumberOfEdges(),displayGraph.getEdges().size());
+		assertEquals(g.getNodeWeight(0),(int)(displayGraph.getNodes().get(0).getScore()));
+		assertEquals(Byte.toString(g.getNodeType(0)),displayGraph.getNodes().get(0).getType().getLabel());
+		assertEquals(g.getNodeAge(0),displayGraph.getNodes().get(0).getAge());
+		assertEquals(g.getNodeLabel(0),displayGraph.getNodes().get(0).getLabel());
+		assertEquals(g.getNodeInDegree(0),0);
+		assertEquals(g.getNodeOutDegree(0),0);
+		Graph displayGraph2 = g.generateDisplayGraph();
+		assertTrue(displayGraph.isomorphic(displayGraph2));
+	}
+	
+	@Test
+	public void test109() {
+		Graph displayGraph = new Graph("two nodes, one edge");
+		Node n1 = new Node("node 1");
+		n1.setScore(4.0);
+		n1.setAge(19);
+		n1.setType(new NodeType("3"));
+		displayGraph.addNode(n1);
+		Node n2 = new Node("node 2");
+		n2.setScore(-4.0);
+		n2.setAge(-19);
+		n2.setType(new NodeType("text label"));
+		displayGraph.addNode(n2);
+		Edge e1 = new Edge(n1,n2,"edge 1");
+		e1.setScore(0.0);
+		e1.setAge(-34);
+		e1.setType(new EdgeType("14"));
+		displayGraph.addEdge(e1);
+		FastGraph g = FastGraph.displayGraphFactory(displayGraph,false);
+		
+		assertEquals(g.getName(),displayGraph.getLabel());
+		assertEquals(g.getNumberOfNodes(),displayGraph.getNodes().size());
+		assertEquals(g.getNumberOfEdges(),displayGraph.getEdges().size());
+		assertEquals(g.getNodeWeight(1),(int)(displayGraph.getNodes().get(1).getScore()));
+		assertEquals(g.getNodeType(1),-1);
+		assertEquals(g.getNodeAge(1),displayGraph.getNodes().get(1).getAge());
+		assertEquals(g.getNodeLabel(1),displayGraph.getNodes().get(1).getLabel());
+		assertEquals(1,g.getNodeInDegree(1));
+		assertEquals(0,g.getNodeOutDegree(1));
+		assertEquals(0,g.getNodeInDegree(0));
+		assertEquals(1,g.getNodeOutDegree(0));
+		assertEquals(g.getEdgeWeight(0),(int)(displayGraph.getEdges().get(0).getScore()));
+		assertEquals(Byte.toString(g.getEdgeType(0)),displayGraph.getEdges().get(0).getType().getLabel());
+		assertEquals(g.getEdgeAge(0),displayGraph.getEdges().get(0).getAge());
+		assertEquals(g.getEdgeLabel(0),displayGraph.getEdges().get(0).getLabel());
+		assertEquals(g.getNodeLabel(g.getEdgeNode1(0)),"node 1");
+		assertEquals(g.getNodeLabel(g.getEdgeNode2(0)),"node 2");
+		Graph displayGraph2 = g.generateDisplayGraph();
+		assertTrue(displayGraph.isomorphic(displayGraph2));
+	}
+	
+	@Test
+	public void test110() {
+		Graph displayGraph = new Graph("two nodes, one edge");
+		Node n1 = new Node("node 1");
+		n1.setScore(4.0);
+		n1.setAge(19);
+		n1.setType(new NodeType("3"));
+		displayGraph.addNode(n1);
+		Node n2 = new Node("node 2");
+		n2.setScore(-4.0);
+		n2.setAge(-19);
+		n2.setType(new NodeType("text label"));
+		displayGraph.addNode(n2);
+		Node n3 = new Node("node label 3");
+		n3.setScore(0);
+		n3.setAge(5);
+		n3.setType(new NodeType("90"));
+		displayGraph.addNode(n3);
+		Node n4 = new Node("node 4");
+		n4.setScore(45);
+		n4.setAge(2);
+		n4.setType(new NodeType("65"));
+		displayGraph.addNode(n4);
+		Edge e1 = new Edge(n1,n2,"edge 1");
+		e1.setScore(0.0);
+		e1.setAge(-34);
+		e1.setType(new EdgeType("14"));
+		displayGraph.addEdge(e1);
+		Edge e2 = new Edge(n1,n1,"edge 2 label");
+		e2.setScore(12);
+		e2.setAge(8);
+		e2.setType(new EdgeType("0"));
+		displayGraph.addEdge(e2);
+		Edge e3 = new Edge(n3,n1,"edge 3");
+		e3.setScore(121);
+		e3.setAge(81);
+		e3.setType(new EdgeType("21"));
+		displayGraph.addEdge(e3);
+		Edge e4 = new Edge(n3,n1,"edge 4");
+		e4.setScore(123);
+		e4.setAge(83);
+		e4.setType(new EdgeType("text label"));
+		displayGraph.addEdge(e4);
+		FastGraph g = FastGraph.displayGraphFactory(displayGraph,false);
+		
+		assertEquals(g.getName(),displayGraph.getLabel());
+		assertEquals(g.getNumberOfNodes(),displayGraph.getNodes().size());
+		assertEquals(g.getNumberOfEdges(),displayGraph.getEdges().size());
+		assertEquals(g.getNodeWeight(3),(int)(displayGraph.getNodes().get(3).getScore()));
+		assertEquals(Byte.toString(g.getNodeType(3)),displayGraph.getNodes().get(3).getType().getLabel());
+		assertEquals(g.getNodeAge(3),displayGraph.getNodes().get(3).getAge());
+		assertEquals(g.getNodeLabel(3),displayGraph.getNodes().get(3).getLabel());
+		assertEquals(0,g.getNodeInDegree(3));
+		assertEquals(0,g.getNodeOutDegree(3));
+		assertEquals(3,g.getNodeInDegree(0));
+		assertEquals(2,g.getNodeOutDegree(0));
+		assertEquals(g.getEdgeWeight(3),(int)(displayGraph.getEdges().get(3).getScore()));
+		assertEquals(g.getEdgeType(3),-1);
+		assertEquals(g.getEdgeAge(3),displayGraph.getEdges().get(3).getAge());
+		assertEquals(g.getEdgeLabel(3),displayGraph.getEdges().get(3).getLabel());
+		assertEquals(g.getNodeLabel(g.getEdgeNode1(3)),"node label 3");
+		assertEquals(g.getNodeLabel(g.getEdgeNode2(3)),"node 1");
+		Graph displayGraph2 = g.generateDisplayGraph();
+		assertTrue(displayGraph.isomorphic(displayGraph2));
 	}
 	
 

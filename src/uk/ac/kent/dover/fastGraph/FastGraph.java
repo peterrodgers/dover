@@ -1,7 +1,5 @@
 package uk.ac.kent.dover.fastGraph;
 
-import java.awt.Point;
-import java.awt.geom.Point2D;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
@@ -169,7 +167,6 @@ String name = "random-n-2-e-1";
 			System.out.println(matrix.length);
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -882,7 +879,6 @@ String name = "random-n-2-e-1";
 	 * Looks for the file in given directory. If directory is null, then to a
 	 * directory named /data/snap under current working directory.
 	 */
-	@SuppressWarnings("resource")
 	private void loadAdjacencyListGraph(String dir, String fileName) throws Exception {
 	
 		String directory = dir;
@@ -918,15 +914,15 @@ String name = "random-n-2-e-1";
 		
 		String line = "";
 long time = System.currentTimeMillis();			
-			while(line != null) {
-				line = br.readLine();
-				if(line == null) {
-					continue;
-				}
-				if(line.length() == 0) {
-					continue;
-				}
-				if(line.charAt(0) == '#') {
+		while(line != null) {
+			line = br.readLine();
+			if(line == null) {
+				continue;
+			}
+			if(line.length() == 0) {
+				continue;
+			}
+			if(line.charAt(0) == '#') {
 				continue;
 			}
 			splitLine = line.split(" ");
@@ -937,7 +933,7 @@ long time = System.currentTimeMillis();
 					continue;
 				}
 			}
-
+	
 			String node1String = splitLine[0];
 			String node2String = splitLine[1];
 			
@@ -954,11 +950,11 @@ long time = System.currentTimeMillis();
 			edgeNode1Map.put(edgeIndex, nodeSnapIdToIndexMap.get(node1String));
 			edgeNode2Map.put(edgeIndex, nodeSnapIdToIndexMap.get(node2String));
 				
-				edgeIndex++;
+			edgeIndex++;
 if(edgeIndex%1000000==0 ) {
 	System.out.println("edgesLoaded "+edgeIndex+" time "+(System.currentTimeMillis()-time)/1000.0);
 }
-			}
+		}
 System.out.println("edgeIndex "+edgeIndex);
 System.out.println("nodeIndex "+nodeIndex);
 			
@@ -1194,7 +1190,7 @@ System.out.println("nodeIndex "+nodeIndex);
 	
 	public void populateRandomGraph() {
 
-		long time;
+		//long time;
 		Random r = new Random();
 
 		short labelLength = -999;
@@ -1206,7 +1202,7 @@ System.out.println("nodeIndex "+nodeIndex);
 		byte type = -7;
 		byte age = -9;
 		int labelOffset = 0;
-		time = System.currentTimeMillis();
+		//time = System.currentTimeMillis();
 		for(int i = 0; i< numberOfNodes; i++) {
 			weight = r.nextInt(100);
 			nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+i*nodeByteSize,inStart); // offset for inward connecting edges/nodes
@@ -1233,7 +1229,7 @@ System.out.println("nodeIndex "+nodeIndex);
 
 		}
 		//System.out.println("node put time " + (System.currentTimeMillis()-time)/1000.0+" seconds, direct "+nodeBuf.isDirect());
-
+/*
 time = System.currentTimeMillis();
 for(int i = 0; i< numberOfNodes; i++) {
 	int labelStart = nodeBuf.getInt(NODE_LABEL_START_OFFSET+i*nodeByteSize);
@@ -1247,8 +1243,8 @@ for(int i = 0; i< numberOfNodes; i++) {
 	int ageOut = nodeBuf.get(NODE_AGE_OFFSET+i*nodeByteSize);
 	//System.out.println(i+" "+labelStart+" "+labelLengthOut+" "+inStartOut+" "+inLengthOut+" "+outStartOut+" "+outLengthOut+" "+weightOut+" "+typeOut+" "+ageOut);
 }
-//System.out.println("node get time " + (System.currentTimeMillis()-time)/1000.0+" seconds, direct "+nodeBuf.isDirect());
-
+System.out.println("node get time " + (System.currentTimeMillis()-time)/1000.0+" seconds, direct "+nodeBuf.isDirect());
+*/
 		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of inward edges
 		for(int i = 0; i< numberOfNodes; i++) {
 			ArrayList<Integer> edges = new ArrayList<Integer>(20);
@@ -1269,7 +1265,7 @@ for(int i = 0; i< numberOfNodes; i++) {
 		type = -103;
 		age = -105;
 		labelOffset = 0;
-		time = System.currentTimeMillis();
+		//time = System.currentTimeMillis();
 		for(int i = 0; i< numberOfEdges; i++) {
 			weight = r.nextInt(100);
 			node1 = r.nextInt(numberOfNodes);
@@ -1304,7 +1300,7 @@ for(int i = 0; i< numberOfNodes; i++) {
 		}
 //		System.out.println("edge put time " + (System.currentTimeMillis()-time)/1000.0+" seconds, direct "+edgeBuf.isDirect());
 	
-
+/*
 time = System.currentTimeMillis();
 for(int i = 0; i< numberOfEdges; i++) {
 	int node1Out = edgeBuf.getInt(EDGE_NODE1_OFFSET+i*edgeByteSize);
@@ -1316,8 +1312,8 @@ for(int i = 0; i< numberOfEdges; i++) {
 	int ageOut = edgeBuf.get(EDGE_AGE_OFFSET+i*edgeByteSize);
 	//System.out.println(i+" "+node1Out+" "+node2Out+" "+labelStart+" "+labelSize+" "+weightOut+" "+typeOut+" "+ageOut);
 }
-//System.out.println("edge get time " + (System.currentTimeMillis()-time)/1000.0+" seconds, direct "+edgeBuf.isDirect());
-
+System.out.println("edge get time " + (System.currentTimeMillis()-time)/1000.0+" seconds, direct "+edgeBuf.isDirect());
+*/
 		// Initialise the connection buffer, modifying the node buffer connection data
 		//time = System.currentTimeMillis();
 		int offset = 0;
@@ -1372,8 +1368,200 @@ for(int i = 0; i< numberOfEdges; i++) {
 		}
 		//System.out.println("connection put time " + (System.currentTimeMillis()-time)/1000.0+" seconds, direct "+edgeBuf.isDirect());
 
-
 	}
+	
+	
+	
+	/**
+	 * Creates a graph from a displayGraph.Graph. label becomes the displayGraph.Graph name
+	 * node and edge labels, are taken from displayGraph.Graph nodes and edges.
+	 * node and edge weights are from displayGraph node and edge scores. Types are
+	 * from displayGraph edgeType edgeType if they can be parsed as bytes,
+	 * otherwise they get a default of -1. Node and edge Age is from displayGraph age, but
+	 * only least significant byte, as the displayGraph age is a integer.
+	 * Order of nodes and edges is as in the displayGraph.Graph
+	 * 
+	 * @return new fastGraph with attributes based on the given displayGraph.
+	 */
+	public static FastGraph displayGraphFactory(Graph displayGraph, boolean direct) {
+		FastGraph g = new FastGraph(displayGraph.getNodes().size(),displayGraph.getEdges().size(),DEFAULT_AVERAGE_LABEL_LENGTH,DEFAULT_AVERAGE_LABEL_LENGTH,direct);
+		g.setName(displayGraph.getLabel());
+		g.populateFromDisplayGraph(displayGraph);
+		return g;
+	}
+
+
+	
+	/**
+	 * Populates byteBuffers based on the contents of the displayGraph.graph.
+	 * Nodes and edges are in the order they appear in the displayGraph.
+	 */
+	private void populateFromDisplayGraph(Graph displayGraph) {
+
+		short labelLength = -17;
+		int inStart = -27;
+		short inLength = -37;
+		int outStart = -47;
+		short outLength = -57;
+		int weight = -67;
+		byte type = -77;
+		byte age = -87;
+		ByteBuffer bb = ByteBuffer.allocate(4);
+		int labelOffset = 0;
+		for(int i = 0; i< numberOfNodes; i++) {
+			Node dgn = displayGraph.getNodes().get(i);
+			weight = (int)(dgn.getScore());
+			bb.putInt(0,dgn.getAge());
+			age = bb.get(3);
+			try {
+				type = Byte.parseByte(dgn.getType().getLabel());
+			} catch(NumberFormatException e) {
+				type = -1;
+			}
+			
+			nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+i*nodeByteSize,inStart); // offset for inward connecting edges/nodes
+			nodeBuf.putShort(NODE_IN_DEGREE_OFFSET+i*nodeByteSize,inLength); // number of inward connecting edges/nodes
+			nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+i*nodeByteSize,outStart); // offset for outward connecting edges/nodes
+			nodeBuf.putShort(NODE_OUT_DEGREE_OFFSET+i*nodeByteSize,outLength); // number of outward connecting edges/nodes
+			nodeBuf.putInt(NODE_WEIGHT_OFFSET+i*nodeByteSize,weight); // weight
+			nodeBuf.put(NODE_TYPE_OFFSET+i*nodeByteSize,type); // type
+			nodeBuf.put(NODE_AGE_OFFSET+i*nodeByteSize,age); // age
+
+			// label
+			String label = dgn.getLabel();
+			char[] labelArray = label.toCharArray();
+			labelLength = (short)(labelArray.length);
+
+			nodeBuf.putInt(NODE_LABEL_START_OFFSET+i*nodeByteSize,labelOffset); // label start
+			nodeBuf.putShort(NODE_LABEL_LENGTH_OFFSET+i*nodeByteSize,labelLength); // label size
+
+			for(int j = 0; j < labelArray.length; j++) {
+				char c = labelArray[j];
+				nodeLabelBuf.putChar(labelOffset,c);
+				labelOffset += 2;  // increment by 2 as it is a char (2 bytes)
+			}
+
+		}
+		//System.out.println("node put time " + (System.currentTimeMillis()-time)/1000.0+" seconds, direct "+nodeBuf.isDirect());
+
+
+		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of inward edges
+		for(int i = 0; i< numberOfNodes; i++) {
+			ArrayList<Integer> edges = new ArrayList<Integer>(20);
+			nodeIn.add(i,edges);
+		}
+		
+		ArrayList<ArrayList<Integer>> nodeOut = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of outward edges
+		for(int i = 0; i< numberOfNodes; i++) {
+			ArrayList<Integer> edges = new ArrayList<Integer>(20);
+			nodeOut.add(i,edges);
+		}
+				
+		ArrayList<Integer> inEdgeList;	
+		ArrayList<Integer> outEdgeList;	
+		int node1;
+		int node2;
+		weight = -15;
+		type = -25;
+		age = -35;
+		labelOffset = 0;
+		for(int i = 0; i< numberOfEdges; i++) {
+			Edge dge = displayGraph.getEdges().get(i);
+			node1 = displayGraph.getNodes().indexOf(dge.getFrom());
+			node2 = displayGraph.getNodes().indexOf(dge.getTo());
+			weight = (int)(dge.getScore());
+			bb.putInt(0,dge.getAge());
+			age = bb.get(3);
+			try {
+				type = Byte.parseByte(dge.getType().getLabel());
+			} catch(NumberFormatException e) {
+				type = -1;
+			}
+
+			
+			edgeBuf.putInt(EDGE_NODE1_OFFSET+i*edgeByteSize,node1); // one end of edge
+			edgeBuf.putInt(EDGE_NODE2_OFFSET+i*edgeByteSize,node2); // other end of edge
+			edgeBuf.putInt(EDGE_WEIGHT_OFFSET+i*edgeByteSize,weight); // weight
+			edgeBuf.put(EDGE_TYPE_OFFSET+i*edgeByteSize,type); // type
+			edgeBuf.put(EDGE_AGE_OFFSET+i*edgeByteSize,age); // age
+			
+			// label
+			String label = dge.getLabel();
+			char[] labelArray = label.toCharArray();
+			labelLength = (short)(labelArray.length);
+
+			edgeBuf.putInt(EDGE_LABEL_START_OFFSET+i*edgeByteSize,labelOffset); // label start
+			edgeBuf.putShort(EDGE_LABEL_LENGTH_OFFSET+i*edgeByteSize,labelLength); // label size
+			
+			for(int j = 0; j < labelArray.length; j++) {
+				char c = labelArray[j];
+				edgeLabelBuf.putChar(labelOffset,c);
+				labelOffset += 2;  // increment by 2 as it is a char (2 bytes)
+			}
+			
+			// store connecting nodes
+			inEdgeList = nodeIn.get(node2);
+			inEdgeList.add(i);
+			outEdgeList = nodeOut.get(node1);
+			outEdgeList.add(i);
+
+		}
+
+
+		// Initialise the connection buffer, modifying the node buffer connection data
+		//time = System.currentTimeMillis();
+		int offset = 0;
+		for(int i = 0; i< numberOfNodes; i++) {
+			// setting the in connection offset and length
+			ArrayList<Integer> inEdges = nodeIn.get(i);
+			short inEdgeLength = (short)(inEdges.size());
+			nodeBuf.putInt(i*nodeByteSize+NODE_IN_CONNECTION_START_OFFSET,offset);
+			nodeBuf.putShort(i*nodeByteSize+NODE_IN_DEGREE_OFFSET,inEdgeLength);
+		
+			// now put the in edge/node pairs
+			for(int edgeId : inEdges) {
+				int nodeId = -1;
+				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*edgeByteSize);
+				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*edgeByteSize);
+				if(n1 == i) {
+					nodeId = n2;
+				} else if(n2 == i) {
+					nodeId = n1;
+				} else {
+					System.out.println("ERROR When finding connections for node "+i+" connecting edge "+edgeId+ " has connecting nodes "+n1+" "+n2);
+				}
+				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeId);
+				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeId);
+				offset += connectionPairSize;
+			}
+			
+			// setting the out connection offset and length
+			ArrayList<Integer> outEdges = nodeOut.get(i);
+			short outEdgeLength = (short)(outEdges.size());
+			nodeBuf.putInt(i*nodeByteSize+NODE_OUT_CONNECTION_START_OFFSET,offset);
+			nodeBuf.putShort(i*nodeByteSize+NODE_OUT_DEGREE_OFFSET,outEdgeLength);
+		
+			// now put the out edge/node pairs
+			for(int edgeId : outEdges) {
+				int nodeId = -1;
+				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*edgeByteSize);
+				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*edgeByteSize);
+				if(n1 == i) {
+					nodeId = n2;
+				} else if(n2 == i) {
+					nodeId = n1;
+				} else {
+					System.out.println("ERROR When finding connections for node "+i+" connecting edge "+edgeId+ " has connecting nodes "+n1+" "+n2);
+				}
+				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeId);
+				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeId);
+				offset += connectionPairSize;
+			}
+		}
+	}
+
+
+
 
 	
 	/**
@@ -1636,13 +1824,12 @@ for(int i = 0; i< numberOfEdges; i++) {
 	
 	/**
 	 * Creates a displayGraph.Graph which can then be accessed, manipulated and visualized
-	 * using that package. displayGraph.Graph name becomes this FastGrapph label
+	 * using that package. displayGraph.Graph name becomes this FastGraph label
 	 * The displayGraph.Graph node and edge labels, are taken
 	 * from this FastGraph nodes and edges. node and edge weights become node
-	 * and edge scores. New NodeType
-	 * and EdgeType are created if needed with label of the integer of this type.
-	 * Node and Edge Ids are not stored, but order of nodes and edges in the displayGraph.Graph
-	 * is as this FastGraph.
+	 * and edge scores node and edge ages become ages in displayGraph nodes and edges.
+	 * New NodeType and EdgeType are created if needed with label of the integer of this type.
+	 * Order of nodes and edges in the displayGraph.Graph is as this FastGraph.
 	 * 
 	 * @return a displayGraph.Graph with the same data as this Fast Graph
 	 */
@@ -1654,6 +1841,7 @@ for(int i = 0; i< numberOfEdges; i++) {
 			Node n = new Node();
 			n.setLabel(getNodeLabel(i));
 			n.setScore(getNodeWeight(i));
+			n.setAge(getNodeAge(i));
 			String typeLabel = Integer.toString(getNodeType(i));
 			NodeType type = NodeType.withLabel(typeLabel);
 			if(type == null) {
@@ -1669,6 +1857,7 @@ for(int i = 0; i< numberOfEdges; i++) {
 			Edge e = new Edge(n1,n2);
 			e.setLabel(getEdgeLabel(i));
 			e.setScore(getEdgeWeight(i));
+			e.setAge(getEdgeAge(i));
 			String typeLabel = Integer.toString(getEdgeType(i));
 			EdgeType type = EdgeType.withLabel(typeLabel);
 			if(type == null) {
@@ -1680,7 +1869,8 @@ for(int i = 0; i< numberOfEdges; i++) {
 		
 		return g;
 	}
-	
+
+
 	/** this version uses arrays for the connected nodes */
 /*	public boolean isConnected() {
 

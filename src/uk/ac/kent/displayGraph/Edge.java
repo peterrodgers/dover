@@ -33,6 +33,8 @@ public class Edge {
 	protected boolean visited = false;
 	/** This value can be used to score edges during a graph algorithm. */
 	protected double score = 0.0;
+	/** Not often used. */
+	protected int age = 0;
 	/**
 	 * A variable for use in graph algorithms. General Use, but can be used for
 	 * pointing at nodes in matching algorithms.
@@ -121,13 +123,16 @@ public class Edge {
 	public boolean getVisited() {return visited;}
 	public double getScore() {return score;}
 	public Object getMatch() {return match;}
+	public int getAge() {return age;}
 	public ArrayList<Point> getBends() {return bends;}
+	
 	public void setLabel(String inLabel) {label = inLabel;}
 	public void setWeight(double inWeight) {weight = inWeight;}
 	public void setType(EdgeType inType) {type=inType;}
 	public void setVisited(boolean inVisited) {visited = inVisited;}
 	public void setScore(double inScore) {score = inScore;}
 	public void setMatch(Object inMatch) {match = inMatch;}
+	public void setAge(int inAge) {age = inAge;}
 	public void setBends(ArrayList<Point> inEdgeBends) {bends = inEdgeBends;}
 	public void setIndex(int i){ index =i;}
 	

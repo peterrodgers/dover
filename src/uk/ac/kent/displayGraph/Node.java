@@ -47,6 +47,8 @@ import java.awt.geom.*;
 	protected boolean visited = false;
 	/** A variable for use in graph algorithms. This can be used to score nodes. */
 	protected double score = 0.0;
+	/** Not often used. */
+	protected int age = 0;
 	/**
 	 * A variable for use in graph algorithms. General Use, but can be used for
 	 * pointing at nodes in matching algorithms.
@@ -119,6 +121,7 @@ import java.awt.geom.*;
 	public boolean getVisited() {return visited;}
 	public double getScore() {return score;}
 	public Object getMatch() {return match;}
+	public int getAge() {return age;}
 
 	public void setLabel(String inLabel) {label=inLabel;}
 	public void setType(NodeType inType) {type=inType;}
@@ -126,6 +129,7 @@ import java.awt.geom.*;
 	public void setVisited(boolean inVisited) {visited = inVisited;}
 	public void setScore(double inScore) {score = inScore;}
 	public void setMatch(Object inMatch) {match = inMatch;}
+	public void setAge(int inAge) {age = inAge;}
 	protected boolean addEdgeFrom(Edge e) {return(edgesFrom.add(e));}
 	protected boolean addEdgeTo(Edge e) {return(edgesTo.add(e));}
 	protected boolean removeEdgeFrom(Edge e) {return(edgesFrom.remove(e));}
