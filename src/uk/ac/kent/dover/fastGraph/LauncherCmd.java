@@ -128,8 +128,15 @@ public class LauncherCmd {
 				
 				//if the user is testing the command line
 			} else if(cmd.hasOption("t")) {
-				FastGraph.main(args);
-			    
+				//FastGraph.main(args);
+			    try {
+			    	NamePicker np = new NamePicker();
+			    	System.out.println(np.getName());
+			    } catch (Exception e) {
+			    	System.err.println(e.getMessage());
+			    	e.printStackTrace();
+			    }
+				
 			    //if the user wants some help
 			} else if (cmd.hasOption("h")) {
 				// automatically generate the help statement
