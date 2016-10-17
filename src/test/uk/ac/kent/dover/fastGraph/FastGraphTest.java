@@ -13,7 +13,12 @@ import uk.ac.kent.dover.fastGraph.Util;
 import org.junit.*;
 
 
-
+/**
+ * 
+ * @author Peter Rodgers
+ * @author Rob Baker
+ *
+ */
 public class FastGraphTest {
 
 	@Test
@@ -645,13 +650,13 @@ public class FastGraphTest {
 		assertEquals(0,connections[0]);
 		
 		connections = new int[10];
-		g.getNodeConnectingNodes(0,connections);
+		g.getNodeConnectingNodes(connections,0);
 		assertEquals(1,connections[0]);
-		g.getNodeConnectingEdges(0,connections);
+		g.getNodeConnectingEdges(connections,0);
 		assertEquals(0,connections[0]);
-		g.getNodeConnectingOutNodes(0,connections);
+		g.getNodeConnectingOutNodes(connections,0);
 		assertEquals(1,connections[0]);
-		g.getNodeConnectingOutEdges(0,connections);
+		g.getNodeConnectingOutEdges(connections,0);
 		assertEquals(0,connections[0]);
 	}
 
@@ -679,17 +684,17 @@ public class FastGraphTest {
 		assertEquals(4,connections[1]);
 		
 		connections = new int[10];
-		g.getNodeConnectingNodes(2,connections);
+		g.getNodeConnectingNodes(connections,2);
 		assertEquals(3,connections[2]);
-		g.getNodeConnectingEdges(2,connections);
+		g.getNodeConnectingEdges(connections,2);
 		assertEquals(4,connections[2]);
-		g.getNodeConnectingInNodes(2,connections);
+		g.getNodeConnectingInNodes(connections,2);
 		assertEquals(0,connections[0]);
-		g.getNodeConnectingInEdges(2,connections);
+		g.getNodeConnectingInEdges(connections,2);
 		assertEquals(1,connections[0]);
-		g.getNodeConnectingOutNodes(2,connections);
+		g.getNodeConnectingOutNodes(connections,2);
 		assertEquals(3,connections[1]);
-		g.getNodeConnectingOutEdges(2,connections);
+		g.getNodeConnectingOutEdges(connections,2);
 		assertEquals(4,connections[1]);
 
 	}

@@ -35,12 +35,8 @@ import Jama.EigenvalueDecomposition;
  * </ul>
  * json from <a href="https://github.com/stleary/JSON-java"> json library </a>
  * 
- * @author pjr
- *
- */
-/**
- * @author pjr
- *
+ * @author Peter Rodgers
+ * @author Rob Baker
  */
 public class FastGraph {
 
@@ -174,17 +170,31 @@ String name = "random-n-2-e-1";
 	}	
 
 
+	/**
+	 * @return the number of nodes in the graph
+	 */
 	public int getNumberOfNodes() {
 		return numberOfNodes;
 	}
 
 
+	/**
+	 * @return the number of edges in the graph
+	 */
 	public int getNumberOfEdges() {
 		return numberOfEdges;
 	}
 
 	
+	/**
+	 * Names should be simple alphanumeric. Spaces and dashes are permitted. Note that tilde ("~") cannot be used.
+	 */
+	public void setName(String name) {this.name = name;}
 
+
+	/**
+	 * @return the node label
+	 */
 	public String getNodeLabel(int nodeId) {
 		int labelStart = nodeBuf.getInt(NODE_LABEL_START_OFFSET+nodeId*nodeByteSize);
 		int labelLength = nodeBuf.getShort(NODE_LABEL_LENGTH_OFFSET+nodeId*nodeByteSize);
@@ -199,41 +209,63 @@ String name = "random-n-2-e-1";
 	}
 	
 	
+	/**
+	 * @return the node weight
+	 */
 	public int getNodeWeight(int nodeId) {
 		int type= nodeBuf.getInt(NODE_WEIGHT_OFFSET+nodeId*nodeByteSize);
 		return type;
 	}
 	
 	
+	/**
+	 * @return the node type
+	 */
 	public byte getNodeType(int nodeId) {
 		byte type= nodeBuf.get(NODE_TYPE_OFFSET+nodeId*nodeByteSize);
 		return type;
 	}
 	
 	
+	/**
+	 * @return the node age
+	 */
 	public byte getNodeAge(int nodeId) {
 		byte age = nodeBuf.get(NODE_AGE_OFFSET+nodeId*nodeByteSize);
 		return age;
 	}
 	
+
+	/**
+	 * @return the node degree (number of connecting edges)
+	 */
 	public int getNodeDegree(int nodeId) {
 		int degree = getNodeInDegree(nodeId)+getNodeOutDegree(nodeId);
 		return degree;
 	}
 	
+
+	/**
+	 * @return the node in degree (number of edges entering the node)
+	 */
 	public short getNodeInDegree(int nodeId) {
 		short degree = nodeBuf.getShort(NODE_IN_DEGREE_OFFSET+nodeId*nodeByteSize);
 		return degree;
 	}
+
 	
+	/**
+	 * @return the node out degree (number of edges leaving the node)
+	 */
 	public short getNodeOutDegree(int nodeId) {
 		short degree = nodeBuf.getShort(NODE_OUT_DEGREE_OFFSET+nodeId*nodeByteSize);
 		return degree;
 	}
 	
-	
-	
 
+	/**
+	 * @return all connecting edges. 
+	 */
 	public int[] getNodeConnectingEdges(int nodeId) {
 		
 		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
@@ -250,13 +282,16 @@ String name = "random-n-2-e-1";
 		
 		return ret;
 	}
+	
 
 	/**
-	 * This version puts the connecting ids in the argument array, to avoid repeated object creation and so speed up multiple accesses.
+	 * This version puts the connecting edges in the argument array, to avoid repeated object creation and so speed up multiple accesses.
 	 * create array with size of either getNodeDegree(nodeId) or maxDegree(). array elements beyond nodeDegree(nodeId)-1 are undefined.
 	 * Will throw an exception if ret is not large enough.
+	 * 
+	 * @return all connecting edges via parameter array. 
 	 */
-	public void getNodeConnectingEdges(int nodeId, int[] ret) {
+	public void getNodeConnectingEdges(int[] ret, int nodeId) {
 		
 		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
 		int degree = getNodeDegree(nodeId);
@@ -268,7 +303,11 @@ String name = "random-n-2-e-1";
 			ret[i] = node;
 		}
 	}
+	
 
+	/**
+	 * @return all node neighbours. 
+	 */
 	public int[] getNodeConnectingNodes(int nodeId) {
 		
 		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
@@ -285,13 +324,16 @@ String name = "random-n-2-e-1";
 		
 		return ret;
 	}
+	
 
 	/**
-	 * This version puts the connecting ids in the argument array, to avoid repeated object creation and so speed up multiple accesses.
+	 * This version puts the connecting nodes in the argument array, to avoid repeated object creation and so speed up multiple accesses.
 	 * create array with size of either getNodeDegree(nodeId) or maxDegree(). array elements beyond nodeDegree(nodeId)-1 are undefined.
 	 * Will throw an exception if ret is not large enough.
+	 * 
+	 * @return all node neighbours. 
 	 */
-	public void getNodeConnectingNodes(int nodeId, int[] ret) {
+	public void getNodeConnectingNodes(int[] ret, int nodeId) {
 		
 		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
 		int degree = getNodeDegree(nodeId);
@@ -302,9 +344,14 @@ String name = "random-n-2-e-1";
 			int node = connectionBuf.getInt(nodeOffset);
 			ret[i] = node;
 		}
-		
 	}
+	
 
+	/**
+	 * For directed graphs.
+	 * 
+	 * @return all connecting edges that enter the passed node. 
+	 */
 	public int[] getNodeConnectingInEdges(int nodeId) {
 		
 		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
@@ -321,13 +368,17 @@ String name = "random-n-2-e-1";
 		
 		return ret;
 	}
+	
 
 	/**
-	 * This version puts the connecting ids in the argument array, to avoid repeated object creation and so speed up multiple accesses.
+	 * For directed graphs.
+	 * This version puts the connecting edges in the argument array, to avoid repeated object creation and so speed up multiple accesses.
 	 * create array with size of either getNodeInDegree(nodeId) or maxDegree(). array elements beyond nodeDegree(nodeId)-1 are undefined.
 	 * Will throw an exception if ret is not large enough.
+	 * 
+	 * @return all connecting edges that enter the passed node via the parameter array. 
 	 */
-	public void getNodeConnectingInEdges(int nodeId, int[] ret) {
+	public void getNodeConnectingInEdges(int[] ret, int nodeId) {
 		
 		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
 		int degree = getNodeInDegree(nodeId);
@@ -341,7 +392,11 @@ String name = "random-n-2-e-1";
 	}
 
 
-	
+	/**
+	 * For directed graphs.
+	 * 
+	 * @return all node neighbours that are on the end of edges that enter the passed node. 
+	 */
 	public int[] getNodeConnectingInNodes(int nodeId) {
 		
 		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
@@ -360,11 +415,14 @@ String name = "random-n-2-e-1";
 	}
 
 	/**
-	 * This version puts the connecting ids in the argument array, to avoid repeated object creation and so speed up multiple accesses.
+	 * For directed graphs.
+	 * This version puts the connecting nodes in the argument array, to avoid repeated object creation and so speed up multiple accesses.
 	 * create array with size of either getNodeInDegree(nodeId) or maxDegree(). array elements beyond nodeDegree(nodeId)-1 are undefined.
 	 * Will throw an exception if ret is not large enough.
+	 * 
+ 	 * @return all node neighbours that are on the end of edges that enter the passed node via the parameter array.
 	 */
-	public void getNodeConnectingInNodes(int nodeId, int[] ret) {
+	public void getNodeConnectingInNodes(int[] ret, int nodeId) {
 		
 		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
 		int degree = getNodeInDegree(nodeId);
@@ -377,6 +435,11 @@ String name = "random-n-2-e-1";
 		}
 	}
 
+	/**
+	 * For directed graphs.
+	 * 
+	 * @return all edges that leave the passed node. 
+	 */
 	public int[] getNodeConnectingOutEdges(int nodeId) {
 		
 		int connectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
@@ -394,11 +457,14 @@ String name = "random-n-2-e-1";
 	}
 	
 	/**
-	 * This version puts the connecting ids in the argument array, to avoid repeated object creation and so speed up multiple accesses.
+	 * For directed graphs.
+	 * This version puts the connecting nodes in the argument array, to avoid repeated object creation and so speed up multiple accesses.
 	 * create array with size of either getNodeOutDegree(nodeId) or maxDegree(). array elements beyond nodeDegree(nodeId)-1 are undefined.
 	 * Will throw an exception if ret is not large enough.
+	 * 
+	 * @return all edges that leave the passed node via the argument array. 
 	 */
-	public void getNodeConnectingOutEdges(int nodeId, int[] ret) {
+	public void getNodeConnectingOutEdges(int[] ret, int nodeId) {
 		
 		int connectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
 		int degree = getNodeOutDegree(nodeId);
@@ -412,6 +478,11 @@ String name = "random-n-2-e-1";
 	}
 
 
+	/**
+	 * For directed graphs. 
+	 *
+ 	 * @return all node neighbours that are on the end of edges that leave the passed node. 
+	 */
 	public int[] getNodeConnectingOutNodes(int nodeId) {
 		
 		int connectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
@@ -429,12 +500,16 @@ String name = "random-n-2-e-1";
 		return ret;
 	}
 	
+	
 	/**
-	 * This version puts the connecting ids in the argument array, to avoid repeated object creation and so speed up multiple accesses.
+	 * For directed graphs. 
+	 * This version puts the connecting nodes in the argument array, to avoid repeated object creation and so speed up multiple accesses.
 	 * create array with size of either getNodeOutDegree(nodeId) or maxDegree(). array elements beyond nodeDegree(nodeId)-1 are undefined.
 	 * Will throw an exception if ret is not large enough.
+	 * 
+  	 * @return all node neighbours that are on the end of edges that leave the passed node via the paramete array. 
 	 */
-	public void getNodeConnectingOutNodes(int nodeId, int[] ret) {
+	public void getNodeConnectingOutNodes(int[] ret, int nodeId) {
 		
 		int connectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
 		int degree = getNodeOutDegree(nodeId);
@@ -448,7 +523,9 @@ String name = "random-n-2-e-1";
 	}
 
 
-	
+	/**
+	 * @return the edge label
+	 */
 	public String getEdgeLabel(int edgeId) {
 		int labelStart = edgeBuf.getInt(EDGE_LABEL_START_OFFSET+edgeId*edgeByteSize);
 		int labelLength = edgeBuf.getShort(EDGE_LABEL_LENGTH_OFFSET+edgeId*edgeByteSize);
@@ -463,44 +540,62 @@ String name = "random-n-2-e-1";
 	}
 
 	
+	/**
+	 * @return the first connecting node (the node the edge leaves for directed graphs).
+	 */
 	public int getEdgeNode1(int edgeId) {
 		int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*edgeByteSize);
 		return n1;
 	}
 	
 	
+	/**
+	 * @return the second connecting node (the node the edge enters for directed graphs).
+	 */
 	public int getEdgeNode2(int edgeId) {
 		int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*edgeByteSize);
 		return n2;
 	}
 	
 	
+	/**
+	 * @return the edge weight
+	 */
 	public int getEdgeWeight(int edgeId) {
 		int type= edgeBuf.getInt(EDGE_WEIGHT_OFFSET+edgeId*edgeByteSize);
 		return type;
 	}
 	
 	
+	/**
+	 * @return the edge type
+	 */
 	public byte getEdgeType(int edgeId) {
 		byte type= edgeBuf.get(EDGE_TYPE_OFFSET+edgeId*edgeByteSize);
 		return type;
 	}
 	
 	
+	/**
+	 * @return the edge age
+	 */
 	public byte getEdgeAge(int edgeId) {
 		byte age = edgeBuf.get(EDGE_AGE_OFFSET+edgeId*edgeByteSize);
 		return age;
 	}
 
-	public String getName() {return name;}
+
+	/**
+	 * @return the graph name
+	 */
+	public String getName() {
+		return name;
+	}
+
 	
 	/**
-	 * Names should be simple alphanumeric. Spaces and dashes are permitted. Note that tilde ("~") cannot be used.
+	 * Allocates space for the ByteBuffers.
 	 */
-	public void setName(String name) {this.name = name;}
-
-
-
 	private void init() {
 		
 		int nodeLabelSize;
@@ -539,6 +634,11 @@ String name = "random-n-2-e-1";
 	}
 
 
+	/**
+	 * Create a FastGraph from a json string.
+	 *
+	 * @return the created FastGraph.
+	 */
 	public static FastGraph jsonStringGraphFactory(String json, boolean direct) {
 		
 		int nodeCount = 0;
@@ -578,6 +678,8 @@ String name = "random-n-2-e-1";
 
 	/**
 	 * Generate a random graph of the desired size. Self sourcing edges may exist.
+	 * 
+	 * @return the created FastGraph
 	 */
 	public static FastGraph randomGraphFactory(int numberOfNodes, int numberOfEdges, boolean direct) {
 		FastGraph g = new FastGraph(numberOfNodes,numberOfEdges,DEFAULT_AVERAGE_LABEL_LENGTH,DEFAULT_AVERAGE_LABEL_LENGTH,direct);
@@ -585,10 +687,13 @@ String name = "random-n-2-e-1";
 		g.populateRandomGraph();
 		return g;
 	}
+	
 
 	/**
 	 * creates a FastGraph by loading in various files from the given directory, or data under
 	 * current working directory if directory is null.
+	 * 
+	 * @return the created FastGraph
 	 * @throws IOException If the buffers cannot be loaded
 	 * @See loadBuffers
 	 */
@@ -599,6 +704,9 @@ String name = "random-n-2-e-1";
 
 	
 	
+	/**
+	 * Populates the FastGraph ByteBuffers from a json string.
+	 */
 	private void populateFromJsonString(JSONObject jsonObj, boolean direct2) {
 
 		//long time;
@@ -878,6 +986,8 @@ String name = "random-n-2-e-1";
      * tabs or spaces, ignores lines starting with # and any line without a tab.
 	 * Looks for the file in given directory. If directory is null, then to a
 	 * directory named /data/snap under current working directory.
+	 * 
+	 * @throws IOException If the buffers cannot be loaded
 	 */
 	private void loadAdjacencyListGraph(String dir, String fileName) throws Exception {
 	
@@ -1106,6 +1216,7 @@ System.out.println("nodeIndex "+nodeIndex);
 	 * loads the current graph from several files created by saveBuffers,
 	 * in directory given to base name given (i.e. fileBaseName should have no extension).
 	 * If directory is null, then to a directory named data under current working directory.
+	 * 
 	 * @throws IOException If the buffers cannot be loaded
 	 */
 	@SuppressWarnings("resource")
@@ -1565,7 +1676,7 @@ System.out.println("edge get time " + (System.currentTimeMillis()-time)/1000.0+"
 
 	
 	/**
-	 * Finds the largest degree for a node in the graph.
+	 * @return the largest degree for a node in the graph.
 	 */
 	public int maximumDegree() {
 		
@@ -1587,6 +1698,8 @@ System.out.println("edge get time " + (System.currentTimeMillis()-time)/1000.0+"
 	/** Breadth first search through the graph.
 	 * Note direct access to connectionBuf is a 3x speed up over accessing getNodeConnectingNodes(currentNode).
 	 * Using arrays for nodeFlagBuf is a minor speed up on ByteBuffer
+	 * 
+	 * @return true if the graph is connected, false otherwise. Empty graphs are connected.
 	 */
 
 	public boolean isConnected() {
@@ -1871,52 +1984,6 @@ System.out.println("edge get time " + (System.currentTimeMillis()-time)/1000.0+"
 	}
 
 
-	/** this version uses arrays for the connected nodes */
-/*	public boolean isConnected() {
-
-		boolean[] nodeFlag = new boolean[numberOfNodes];
-		
-		if(numberOfNodes == 0) {
-			return true;
-		}
-		
-		int[] neighbours = new int[100000];
-		
-		boolean visited = true;
-		int nodeCount = 0;
-int edgeCount = 0;		
-		LinkedList<Integer> queue = new LinkedList<Integer>();
-		queue.add(0);
-		nodeFlag[0] = visited;
-		while(queue.size() != 0) {
-			int currentNode = queue.removeFirst();
-			nodeCount++;
-			
-//			int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+currentNode*nodeByteSize);
-			getNodeConnectingNodes(currentNode,neighbours);
-			int degree = getNodeDegree(currentNode);
-			for(int i = 0; i < degree; i++) {
-edgeCount++;
-				// step over edge/node pairs and the edge
-//				int nodeOffset = CONNECTION_NODE_OFFSET+connectionOffset+i*connectionPairSize;
-//				int connectingNode = connectionBuf.getInt(nodeOffset);
-				int connectingNode = neighbours[i];
-				boolean flag = nodeFlag[connectingNode];
-				if(!flag) {
-					queue.add(connectingNode);
-					nodeFlag[connectingNode] = visited;
-				}
-			}
-		}
-		boolean allVisited = true;
-		if(nodeCount < numberOfNodes) {
-			allVisited = false;
-		}
-System.out.println("edges tested "+edgeCount);		
-System.out.println("nodes tested "+nodeCount);		
-		return allVisited;
-	}
-*/
 	
 
 	
