@@ -53,9 +53,9 @@ import javax.swing.UIManager;
 @SuppressWarnings("serial")
 public class LauncherGUI extends JFrame {
 	
-	public String DEFAULT_STATUS_MESSAGE = "Ready"; //The default message displayed to a user
-	public Launcher launcher;
-	DefaultListModel model = new DefaultListModel();
+	private String DEFAULT_STATUS_MESSAGE = "Ready"; //The default message displayed to a user
+	private Launcher launcher;
+	private DefaultListModel model = new DefaultListModel();
 	
 	/**
 	 * The main builder for the GUI

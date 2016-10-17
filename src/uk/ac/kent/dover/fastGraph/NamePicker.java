@@ -10,7 +10,7 @@ import java.util.Random;
 /**
  * This class will load the list of potential names and can give a weighted random forename, surname pair<br>
  * Data has been obtained from http://www.census.gov/topics/population/genealogy/data/1990_census/1990_census_namefiles.html<br>
- * Data is from the 1990 US Census. The UK does not produce such stats and the US data has no copyright.<br>
+ * Data is from the 1990 US Census. The UK does not produce such stats and the US data has no copyright. https://ask.census.gov/faq.php?id=5000&faqId=431<br>
  * Data is stored in the /names/ directory, and has been modified in the following ways:
  * <ul>
  * <li>The surnames list has been cut short to 5000 names
