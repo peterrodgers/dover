@@ -24,7 +24,7 @@ import Jama.EigenvalueDecomposition;
  * Storage:
  * node and edge indexes are integers and must start at 0 and end and size-1. Indexes are not stored,
  * they are assumed, so node info with nodeIndex n can be found starting in nodeBuf at offset n*nodeByteSize,
- * similarly e starts in edgeBuf at e*edgeByteSize.
+ * similarly edge with edgeIndex e starts in edgeBuf at e*edgeByteSize.
  * <p>
  * <ul>
  * <li>nodeBuf stores offset of label start in nodeLabelBuf and size (in chars) of labels.</li>
@@ -32,7 +32,7 @@ import Jama.EigenvalueDecomposition;
  * which link to connectionBuf and size (in chars) of in or out edges.</li>
  * <li>edgeBuf stores offset of label start in edgeLabelBuf and size (in chars) of labels.</li>
  * <li>connectionBuf stores pairs of edgeIndex-nodeIndex (both are stored for fastest access) which form a
- * list of connecting items, with the in edge-nodes first, then out edge nodes</li>
+ * list of connecting items, with the in edge-nodes first, then out edge-nodes</li>
  * </ul>
  * json from <a href="https://github.com/stleary/JSON-java"> json library </a>
  * 
@@ -89,6 +89,10 @@ public class FastGraph {
 	/**
 	 * No direct access to constructor, as a number of data structures need to be created when
 	 * graph nodes and edges are added.
+	 * 
+	 * @param nodeTotal the number of nodes in the graph
+	 * @param edgeTotal the number of edges in the graph
+	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
 	 */
 	private FastGraph(int nodeTotal, int edgeTotal, boolean direct) {
 		
@@ -103,7 +107,7 @@ public class FastGraph {
 
 	
 	/**
-	 * @param args
+	 * @param args not used
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
@@ -187,11 +191,15 @@ String name = "random-n-2-e-1";
 	
 	/**
 	 * Names should be simple alphanumeric. Spaces and dashes are permitted. Note that tilde ("~") cannot be used.
+	 * @param name the name of the graph
 	 */
-	public void setName(String name) {this.name = name;}
+	public void setName(String name) {
+		this.name = name;
+	}
 
 
 	/**
+	 * @param nodeIndex the node
 	 * @return the node label
 	 */
 	public String getNodeLabel(int nodeIndex) {
@@ -209,6 +217,7 @@ String name = "random-n-2-e-1";
 	
 	
 	/**
+	 * @param nodeIndex the node
 	 * @return the node weight
 	 */
 	public int getNodeWeight(int nodeIndex) {
@@ -218,6 +227,7 @@ String name = "random-n-2-e-1";
 	
 	
 	/**
+	 * @param nodeIndex the node
 	 * @return the node type
 	 */
 	public byte getNodeType(int nodeIndex) {
@@ -227,6 +237,7 @@ String name = "random-n-2-e-1";
 	
 	
 	/**
+	 * @param nodeIndex the node
 	 * @return the node age
 	 */
 	public byte getNodeAge(int nodeIndex) {
@@ -236,6 +247,7 @@ String name = "random-n-2-e-1";
 	
 
 	/**
+	 * @param nodeIndex the node
 	 * @return the node degree (number of connecting edges)
 	 */
 	public int getNodeDegree(int nodeIndex) {
@@ -245,7 +257,8 @@ String name = "random-n-2-e-1";
 	
 
 	/**
-	 * @return the node in degree (number of edges entering the node)
+	 * @param nodeIndex the node
+	 * @return the node in-degree (number of edges entering the node)
 	 */
 	public short getNodeInDegree(int nodeIndex) {
 		short degree = nodeBuf.getShort(NODE_IN_DEGREE_OFFSET+nodeIndex*NODE_BYTE_SIZE);
@@ -254,7 +267,8 @@ String name = "random-n-2-e-1";
 
 	
 	/**
-	 * @return the node out degree (number of edges leaving the node)
+	 * @param nodeIndex the node
+	 * @return the node out-degree (number of edges leaving the node)
 	 */
 	public short getNodeOutDegree(int nodeIndex) {
 		short degree = nodeBuf.getShort(NODE_OUT_DEGREE_OFFSET+nodeIndex*NODE_BYTE_SIZE);
@@ -263,7 +277,8 @@ String name = "random-n-2-e-1";
 	
 
 	/**
-	 * @return all connecting edges. 
+	 * @param nodeIndex the node
+	 * @return all connecting edges
 	 */
 	public int[] getNodeConnectingEdges(int nodeIndex) {
 		
@@ -288,6 +303,8 @@ String name = "random-n-2-e-1";
 	 * create array with size of either getNodeDegree(nodeIndex) or maxDegree(). array elements beyond nodeDegree(nodeIndex)-1 are undefined.
 	 * Will throw an exception if ret is not large enough.
 	 * 
+	 * @param ret this is populated with the connecting edges found
+	 * @param nodeIndex the node
 	 * @return all connecting edges via parameter array. 
 	 */
 	public void getNodeConnectingEdges(int[] ret, int nodeIndex) {
@@ -305,6 +322,7 @@ String name = "random-n-2-e-1";
 	
 
 	/**
+	 * @param nodeIndex the node
 	 * @return all node neighbours. 
 	 */
 	public int[] getNodeConnectingNodes(int nodeIndex) {
@@ -329,6 +347,8 @@ String name = "random-n-2-e-1";
 	 * create array with size of either getNodeDegree(nodeIndex) or maxDegree(). array elements beyond nodeDegree(nodeIndex)-1 are undefined.
 	 * Will throw an exception if ret is not large enough.
 	 * 
+	 * @param ret this is populated with the connecting nodes found
+	 * @param nodeIndex the node
 	 * @return all node neighbours. 
 	 */
 	public void getNodeConnectingNodes(int[] ret, int nodeIndex) {
@@ -348,7 +368,8 @@ String name = "random-n-2-e-1";
 	/**
 	 * For directed graphs.
 	 * 
-	 * @return all connecting edges that enter the passed node. 
+	 * @param nodeIndex the node
+	 * @return all connecting edges for the node
 	 */
 	public int[] getNodeConnectingInEdges(int nodeIndex) {
 		
@@ -374,7 +395,9 @@ String name = "random-n-2-e-1";
 	 * create array with size of either getNodeInDegree(nodeIndex) or maxDegree(). array elements beyond nodeDegree(nodeIndex)-1 are undefined.
 	 * Will throw an exception if ret is not large enough.
 	 * 
-	 * @return all connecting edges that enter the passed node via the parameter array. 
+	 * @param ret this is populated with the connecting edges found
+	 * @param nodeIndex the node
+	 * @return all connecting edges that enter the node via the parameter array. 
 	 */
 	public void getNodeConnectingInEdges(int[] ret, int nodeIndex) {
 		
@@ -393,7 +416,8 @@ String name = "random-n-2-e-1";
 	/**
 	 * For directed graphs.
 	 * 
-	 * @return all node neighbours that are on the end of edges that enter the passed node. 
+	 * @param nodeIndex the node
+	 * @return all node neighbours that are on the end of edges that enter the node. 
 	 */
 	public int[] getNodeConnectingInNodes(int nodeIndex) {
 		
@@ -418,7 +442,9 @@ String name = "random-n-2-e-1";
 	 * create array with size of either getNodeInDegree(nodeIndex) or maxDegree(). array elements beyond nodeDegree(nodeIndex)-1 are undefined.
 	 * Will throw an exception if ret is not large enough.
 	 * 
- 	 * @return all node neighbours that are on the end of edges that enter the passed node via the parameter array.
+	 * @param ret this is populated with the connecting nodes found
+	 * @param nodeIndex the node
+ 	 * @return all node neighbours that are on the end of edges that enter the node via the parameter array.
 	 */
 	public void getNodeConnectingInNodes(int[] ret, int nodeIndex) {
 		
@@ -436,7 +462,8 @@ String name = "random-n-2-e-1";
 	/**
 	 * For directed graphs.
 	 * 
-	 * @return all edges that leave the passed node. 
+	 * @param nodeIndex the node
+	 * @return all edges that leave the node. 
 	 */
 	public int[] getNodeConnectingOutEdges(int nodeIndex) {
 		
@@ -460,7 +487,9 @@ String name = "random-n-2-e-1";
 	 * create array with size of either getNodeOutDegree(nodeIndex) or maxDegree(). array elements beyond nodeDegree(nodeIndex)-1 are undefined.
 	 * Will throw an exception if ret is not large enough.
 	 * 
-	 * @return all edges that leave the passed node via the argument array. 
+	 * @param ret this is populated with the connecting edges found
+	 * @param nodeIndex the node
+	 * @return all edges that leave the node via the argument array. 
 	 */
 	public void getNodeConnectingOutEdges(int[] ret, int nodeIndex) {
 		
@@ -479,6 +508,7 @@ String name = "random-n-2-e-1";
 	/**
 	 * For directed graphs. 
 	 *
+	 * @param nodeIndex the node
  	 * @return all node neighbours that are on the end of edges that leave the passed node. 
 	 */
 	public int[] getNodeConnectingOutNodes(int nodeIndex) {
@@ -505,6 +535,8 @@ String name = "random-n-2-e-1";
 	 * create array with size of either getNodeOutDegree(nodeIndex) or maxDegree(). array elements beyond nodeDegree(nodeIndex)-1 are undefined.
 	 * Will throw an exception if ret is not large enough.
 	 * 
+	 * @param ret this is populated with the connecting nodes found
+	 * @param nodeIndex the node
   	 * @return all node neighbours that are on the end of edges that leave the passed node via the parameter array. 
 	 */
 	public void getNodeConnectingOutNodes(int[] ret, int nodeIndex) {
@@ -522,6 +554,7 @@ String name = "random-n-2-e-1";
 
 
 	/**
+	 * @param edgeIndex the edge
 	 * @return the edge label
 	 */
 	public String getEdgeLabel(int edgeIndex) {
@@ -539,6 +572,7 @@ String name = "random-n-2-e-1";
 
 	
 	/**
+	 * @param edgeIndex the edge
 	 * @return the first connecting node (the node the edge leaves for directed graphs).
 	 */
 	public int getEdgeNode1(int edgeIndex) {
@@ -548,6 +582,7 @@ String name = "random-n-2-e-1";
 	
 	
 	/**
+	 * @param edgeIndex the edge
 	 * @return the second connecting node (the node the edge enters for directed graphs).
 	 */
 	public int getEdgeNode2(int edgeIndex) {
@@ -557,6 +592,7 @@ String name = "random-n-2-e-1";
 	
 	
 	/**
+	 * @param edgeIndex the edge
 	 * @return the edge weight
 	 */
 	public int getEdgeWeight(int edgeIndex) {
@@ -566,6 +602,7 @@ String name = "random-n-2-e-1";
 	
 	
 	/**
+	 * @param edgeIndex the edge
 	 * @return the edge type
 	 */
 	public byte getEdgeType(int edgeIndex) {
@@ -575,6 +612,7 @@ String name = "random-n-2-e-1";
 	
 	
 	/**
+	 * @param edgeIndex the edge
 	 * @return the edge age
 	 */
 	public byte getEdgeAge(int edgeIndex) {
@@ -605,7 +643,7 @@ String name = "random-n-2-e-1";
 		}
 		
 		if(totalLabelLength*2 > MAX_BYTE_BUFFER_SIZE) {
-			throw new OutOfMemoryError("Tried to create a edgeLabelBuf with too many chars");
+			throw new OutOfMemoryError("Tried to create a nodeLabelBuf with too many chars");
 		}
 		int bufSize = (int)(totalLabelLength*2); // this cast is safe because of the previous test
 		
@@ -678,10 +716,10 @@ String name = "random-n-2-e-1";
 	}
 	
 	/**
-	 * Allocates space for the ByteBuffers.
+	 * Allocates space for the node, edge and connection ByteBuffers. The label ByteBuffers
+	 * are created later
 	 */
 	private void init() {
-		
 
 		if(!direct) {
 			nodeBuf = ByteBuffer.allocate(numberOfNodes*NODE_BYTE_SIZE);
@@ -705,6 +743,8 @@ String name = "random-n-2-e-1";
 	/**
 	 * Create a FastGraph from a json string.
 	 *
+	 * @param json the json as a string
+	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
 	 * @return the created FastGraph.
 	 */
 	public static FastGraph jsonStringGraphFactory(String json, boolean direct) {
@@ -737,7 +777,7 @@ String name = "random-n-2-e-1";
 		}
 
 		FastGraph g = new FastGraph(nodeCount,edgeCount,direct);
-		g.populateFromJsonString(jsonObj, direct);
+		g.populateFromJsonString(jsonObj);
 		g.setName(graphName);
 		
 		return g;
@@ -747,6 +787,9 @@ String name = "random-n-2-e-1";
 	/**
 	 * Generate a random graph of the desired size. Self sourcing edges may exist.
 	 * 
+	 * @param numberOfNodes the number of nodes in the graph
+	 * @param numberOfEdges the number of edges in the graph
+	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
 	 * @return the created FastGraph
 	 */
 	public static FastGraph randomGraphFactory(int numberOfNodes, int numberOfEdges, boolean direct) {
@@ -761,6 +804,8 @@ String name = "random-n-2-e-1";
 	 * creates a FastGraph by loading in various files from the given directory, or data under
 	 * current working directory if directory is null.
 	 * 
+	 * @param directory where the files are held, or if null fileBaseName under data under the current working directory
+	 * @param fileBaseName the name of the files, to which extensions are added
 	 * @return the created FastGraph
 	 * @throws IOException If the buffers cannot be loaded
 	 * @See loadBuffers
@@ -774,8 +819,9 @@ String name = "random-n-2-e-1";
 	
 	/**
 	 * Populates the FastGraph ByteBuffers from a json string.
+	 * @param jsonObj the json code after parsing
 	 */
-	private void populateFromJsonString(JSONObject jsonObj, boolean direct2) {
+	private void populateFromJsonString(JSONObject jsonObj) {
 
 		//long time;
 
@@ -816,9 +862,7 @@ String name = "random-n-2-e-1";
 
 		}
 
-
 		setAllNodeLabels(nodeLabels);
-
 
 		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of inward edges
 		for(int i = 0; i< numberOfNodes; i++) {
@@ -936,13 +980,12 @@ String name = "random-n-2-e-1";
 	 * saves the current graph to several files, in directory given to base name given  (i.e. fileBaseName should have no extension).
 	 * If directory is null, then to a directory named data under current working directory. Directory should
 	 * already exist.
+	 * @param directory where the files are to be stored, or if null fileBaseName under data under the current working directory
+	 * @param fileBaseName the name of the files, to which extensions are added
 	 */
 	@SuppressWarnings("resource")
 	public void saveBuffers(String directory, String fileBaseName) {
 		File file;
-		
-		//new File("/path/directory").mkdirs();
-		
 		
 		String directoryAndBaseName = "";
 		if(directory != null) {
@@ -1243,6 +1286,9 @@ if(edgeIndex%1000000==0 ) {
 	 * in directory given to base name given (i.e. fileBaseName should have no extension).
 	 * If directory is null, then to a directory named data under current working directory.
 	 * 
+	 * @param directory where the files are held, or if null fileBaseName under data under the current working directory
+	 * @param fileBaseName the name of the files, to which extensions are added
+	 * @return the created FastGraph
 	 * @throws IOException If the buffers cannot be loaded
 	 */
 	@SuppressWarnings("resource")
@@ -1327,7 +1373,9 @@ if(edgeIndex%1000000==0 ) {
 	}
 
 
-	
+	/**
+	 * Creates a graph with the size specified by numberOfNodes and numberOfEdges
+	 */
 	public void populateRandomGraph() {
 
 		//long time;
@@ -1472,7 +1520,9 @@ if(edgeIndex%1000000==0 ) {
 	 * only least significant byte, as the displayGraph age is a integer.
 	 * Order of nodes and edges is as in the displayGraph.Graph
 	 * 
-	 * @return new fastGraph with attributes based on the given displayGraph.
+	 * @param displayGraph the graph that the new FastGraph is based on
+	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
+	 * @return new FastGraph with attributes based on the given displayGraph.
 	 */
 	public static FastGraph displayGraphFactory(Graph displayGraph, boolean direct) {
 		FastGraph g = new FastGraph(displayGraph.getNodes().size(),displayGraph.getEdges().size(),direct);
@@ -1486,6 +1536,8 @@ if(edgeIndex%1000000==0 ) {
 	/**
 	 * Populates byteBuffers based on the contents of the displayGraph.graph.
 	 * Nodes and edges are in the order they appear in the displayGraph.
+	 * 
+	 * @param displayGraph the graph that the new FastGraph is based on
 	 */
 	private void populateFromDisplayGraph(Graph displayGraph) {
 
@@ -1557,7 +1609,6 @@ if(edgeIndex%1000000==0 ) {
 			} catch(NumberFormatException e) {
 				type = -1;
 			}
-
 			
 			edgeBuf.putInt(EDGE_NODE1_OFFSET+i*EDGE_BYTE_SIZE,node1); // one end of edge
 			edgeBuf.putInt(EDGE_NODE2_OFFSET+i*EDGE_BYTE_SIZE,node2); // other end of edge
@@ -1578,8 +1629,6 @@ if(edgeIndex%1000000==0 ) {
 		}
 		
 		setAllEdgeLabels(edgeLabels);
-
-
 
 		// Initialise the connection buffer, modifying the node buffer connection data
 		//time = System.currentTimeMillis();
@@ -1633,9 +1682,6 @@ if(edgeIndex%1000000==0 ) {
 		}
 	}
 
-
-
-
 	
 	/**
 	 * @return the largest degree for a node in the graph.
@@ -1663,7 +1709,6 @@ if(edgeIndex%1000000==0 ) {
 	 * 
 	 * @return true if the graph is connected, false otherwise. Empty graphs are connected.
 	 */
-
 	public boolean isConnected() {
 
 		boolean[] nodeFlag = new boolean[numberOfNodes];
