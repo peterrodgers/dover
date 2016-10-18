@@ -190,13 +190,12 @@ String name = "random-n-2-e-1";
 
 	
 	/**
-	 * Names should be simple alphanumeric. Spaces and dashes are permitted. Note that tilde ("~") cannot be used.
-	 * @param name the name of the graph
+	 * @return the graph name
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public String getName() {
+		return name;
 	}
-
+	
 
 	/**
 	 * @param nodeIndex the node
@@ -221,8 +220,8 @@ String name = "random-n-2-e-1";
 	 * @return the node weight
 	 */
 	public int getNodeWeight(int nodeIndex) {
-		int type= nodeBuf.getInt(NODE_WEIGHT_OFFSET+nodeIndex*NODE_BYTE_SIZE);
-		return type;
+		int weight = nodeBuf.getInt(NODE_WEIGHT_OFFSET+nodeIndex*NODE_BYTE_SIZE);
+		return weight;
 	}
 	
 	
@@ -231,7 +230,7 @@ String name = "random-n-2-e-1";
 	 * @return the node type
 	 */
 	public byte getNodeType(int nodeIndex) {
-		byte type= nodeBuf.get(NODE_TYPE_OFFSET+nodeIndex*NODE_BYTE_SIZE);
+		byte type = nodeBuf.get(NODE_TYPE_OFFSET+nodeIndex*NODE_BYTE_SIZE);
 		return type;
 	}
 	
@@ -596,7 +595,7 @@ String name = "random-n-2-e-1";
 	 * @return the edge weight
 	 */
 	public int getEdgeWeight(int edgeIndex) {
-		int type= edgeBuf.getInt(EDGE_WEIGHT_OFFSET+edgeIndex*EDGE_BYTE_SIZE);
+		int type = edgeBuf.getInt(EDGE_WEIGHT_OFFSET+edgeIndex*EDGE_BYTE_SIZE);
 		return type;
 	}
 	
@@ -619,13 +618,68 @@ String name = "random-n-2-e-1";
 		byte age = edgeBuf.get(EDGE_AGE_OFFSET+edgeIndex*EDGE_BYTE_SIZE);
 		return age;
 	}
+	
+	
+	/**
+	 * Names should be simple alphanumeric. Spaces and dashes are permitted. Note that tilde ("~") cannot be used.
+	 * @param name the name of the graph
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
 
 
 	/**
-	 * @return the graph name
+	 * @param nodeIndex the node
+	 * @param weight the new node weight
 	 */
-	public String getName() {
-		return name;
+	public void setNodeWeight(int nodeIndex, int weight) {
+		nodeBuf.putInt(NODE_WEIGHT_OFFSET+nodeIndex*NODE_BYTE_SIZE, weight);
+	}
+	
+	
+	/**
+	 * @param nodeIndex the node
+	 * @param type the new node type
+	 */
+	public void setNodeType(int nodeIndex, byte type) {
+		nodeBuf.put(NODE_TYPE_OFFSET+nodeIndex*NODE_BYTE_SIZE, type);
+	}
+	
+	
+	/**
+	 * @param nodeIndex the node
+	 * @return the node age
+	 */
+	public void setNodeAge(int nodeIndex, byte age) {
+		nodeBuf.put(NODE_AGE_OFFSET+nodeIndex*NODE_BYTE_SIZE, age);
+	}
+	
+
+	/**
+	 * @param nodeIndex the edge
+	 * @param weight the new edge weight
+	 */
+	public void setEdgeWeight(int edgeIndex, int weight) {
+		edgeBuf.putInt(EDGE_WEIGHT_OFFSET+edgeIndex*EDGE_BYTE_SIZE, weight);
+	}
+	
+	
+	/**
+	 * @param nodeIndex the edge
+	 * @param type the new edge type
+	 */
+	public void setEdgeType(int edgeIndex, byte type) {
+		edgeBuf.put(EDGE_TYPE_OFFSET+edgeIndex*EDGE_BYTE_SIZE, type);
+	}
+	
+	
+	/**
+	 * @param nodeIndex the edge
+	 * @return the edge age
+	 */
+	public void setEdgeAge(int edgeIndex, byte age) {
+		edgeBuf.put(EDGE_AGE_OFFSET+edgeIndex*EDGE_BYTE_SIZE, age);
 	}
 	
 
@@ -865,13 +919,13 @@ String name = "random-n-2-e-1";
 		setAllNodeLabels(nodeLabels);
 
 		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of inward edges
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 			ArrayList<Integer> edges = new ArrayList<Integer>(20);
 			nodeIn.add(i,edges);
 		}
 		
 		ArrayList<ArrayList<Integer>> nodeOut = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of outward edges
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 			ArrayList<Integer> edges = new ArrayList<Integer>(20);
 			nodeOut.add(i,edges);
 		}
@@ -922,7 +976,7 @@ String name = "random-n-2-e-1";
 		// Initialise the connection buffer, modifying the node buffer connection data
 		//time = System.currentTimeMillis();
 		int offset = 0;
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 			// setting the in connection offset and length
 			ArrayList<Integer> inEdges = nodeIn.get(i);
 			short inEdgeLength = (short)(inEdges.size());
@@ -1167,7 +1221,7 @@ if(edgeIndex%1000000==0 ) {
 		int weight = -55;
 		byte type = -77;
 		byte age = -99;
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 			nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE,inStart); // offset for inward connecting edges/nodes
 			nodeBuf.putShort(NODE_IN_DEGREE_OFFSET+i*NODE_BYTE_SIZE,inLength); // number of inward connecting edges/nodes
 			nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE,outStart); // offset for outward connecting edges/nodes
@@ -1185,13 +1239,13 @@ if(edgeIndex%1000000==0 ) {
 		setAllNodeLabels(nodeLabels);
 
 		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of inward edges
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 			ArrayList<Integer> edges = new ArrayList<Integer>(20);
 			nodeIn.add(i,edges);
 		}
 		
 		ArrayList<ArrayList<Integer>> nodeOut = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of outward edges
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 			ArrayList<Integer> edges = new ArrayList<Integer>(20);
 			nodeOut.add(i,edges);
 		}
@@ -1203,7 +1257,7 @@ if(edgeIndex%1000000==0 ) {
 		weight = -51;
 		type = -53;
 		age = -55;
-		for(int i = 0; i< numberOfEdges; i++) {
+		for(int i = 0; i < numberOfEdges; i++) {
 			node1 = edgeNode1Map.get(i);
 			node2 = edgeNode2Map.get(i);
 			edgeBuf.putInt(EDGE_NODE1_OFFSET+i*EDGE_BYTE_SIZE,node1); // one end of edge
@@ -1230,7 +1284,7 @@ if(edgeIndex%1000000==0 ) {
 		// Initialise the connection buffer, modifying the node buffer connection data
 		//time = System.currentTimeMillis();
 		int offset = 0;
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 			// setting the in connection offset and length
 			ArrayList<Integer> inEdges = nodeIn.get(i);
 			short inEdgeLength = (short)(inEdges.size());
@@ -1391,7 +1445,7 @@ if(edgeIndex%1000000==0 ) {
 		byte type = -7;
 		byte age = -9;
 		//time = System.currentTimeMillis();
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 			weight = r.nextInt(100);
 			nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE,inStart); // offset for inward connecting edges/nodes
 			nodeBuf.putShort(NODE_IN_DEGREE_OFFSET+i*NODE_BYTE_SIZE,inLength); // number of inward connecting edges/nodes
@@ -1410,13 +1464,13 @@ if(edgeIndex%1000000==0 ) {
 		setAllNodeLabels(nodeLabels);
 
 		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of inward edges
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 			ArrayList<Integer> edges = new ArrayList<Integer>(20);
 			nodeIn.add(i,edges);
 		}
 		
 		ArrayList<ArrayList<Integer>> nodeOut = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of outward edges
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 			ArrayList<Integer> edges = new ArrayList<Integer>(20);
 			nodeOut.add(i,edges);
 		}
@@ -1429,7 +1483,7 @@ if(edgeIndex%1000000==0 ) {
 		type = -103;
 		age = -105;
 		//time = System.currentTimeMillis();
-		for(int i = 0; i< numberOfEdges; i++) {
+		for(int i = 0; i < numberOfEdges; i++) {
 			weight = r.nextInt(100);
 			node1 = r.nextInt(numberOfNodes);
 			node2 = r.nextInt(numberOfNodes);
@@ -1456,7 +1510,7 @@ if(edgeIndex%1000000==0 ) {
 		// Initialise the connection buffer, modifying the node buffer connection data
 		//time = System.currentTimeMillis();
 		int offset = 0;
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 			// setting the in connection offset and length
 			ArrayList<Integer> inEdges = nodeIn.get(i);
 			short inEdgeLength = (short)(inEdges.size());
@@ -1551,7 +1605,7 @@ if(edgeIndex%1000000==0 ) {
 		byte type = -77;
 		byte age = -87;
 		ByteBuffer bb = ByteBuffer.allocate(4); // used to convert from int to byte, due to lack of direct casting
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 			Node dgn = displayGraph.getNodes().get(i);
 			weight = (int)(dgn.getScore());
 			bb.putInt(0,dgn.getAge());
@@ -1579,13 +1633,13 @@ if(edgeIndex%1000000==0 ) {
 		setAllNodeLabels(nodeLabels);
 
 		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of inward edges
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 			ArrayList<Integer> edges = new ArrayList<Integer>(20);
 			nodeIn.add(i,edges);
 		}
 		
 		ArrayList<ArrayList<Integer>> nodeOut = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of outward edges
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 			ArrayList<Integer> edges = new ArrayList<Integer>(20);
 			nodeOut.add(i,edges);
 		}
@@ -1597,7 +1651,7 @@ if(edgeIndex%1000000==0 ) {
 		weight = -15;
 		type = -25;
 		age = -35;
-		for(int i = 0; i< numberOfEdges; i++) {
+		for(int i = 0; i < numberOfEdges; i++) {
 			Edge dge = displayGraph.getEdges().get(i);
 			node1 = displayGraph.getNodes().indexOf(dge.getFrom());
 			node2 = displayGraph.getNodes().indexOf(dge.getTo());
@@ -1633,7 +1687,7 @@ if(edgeIndex%1000000==0 ) {
 		// Initialise the connection buffer, modifying the node buffer connection data
 		//time = System.currentTimeMillis();
 		int offset = 0;
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 			// setting the in connection offset and length
 			ArrayList<Integer> inEdges = nodeIn.get(i);
 			short inEdgeLength = (short)(inEdges.size());
@@ -1689,7 +1743,7 @@ if(edgeIndex%1000000==0 ) {
 	public int maximumDegree() {
 		
 		int max = 0;
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 				short inDegree = nodeBuf.getShort(NODE_IN_DEGREE_OFFSET+i*NODE_BYTE_SIZE);
 				short outDegree = nodeBuf.getShort(NODE_OUT_DEGREE_OFFSET+i*NODE_BYTE_SIZE);
 				int degree = inDegree+outDegree;
@@ -1957,7 +2011,7 @@ if(edgeIndex%1000000==0 ) {
 		
 		Graph g = new Graph(getName());
 		
-		for(int i = 0; i< numberOfNodes; i++) {
+		for(int i = 0; i < numberOfNodes; i++) {
 			Node n = new Node();
 			n.setLabel(getNodeLabel(i));
 			n.setScore(getNodeWeight(i));
@@ -1971,7 +2025,7 @@ if(edgeIndex%1000000==0 ) {
 			g.addNode(n);
 		}
 		
-		for(int i = 0; i< numberOfEdges; i++) {
+		for(int i = 0; i < numberOfEdges; i++) {
 			Node n1 = g.getNodes().get(getEdgeNode1(i));
 			Node n2 = g.getNodes().get(getEdgeNode2(i));
 			Edge e = new Edge(n1,n2);

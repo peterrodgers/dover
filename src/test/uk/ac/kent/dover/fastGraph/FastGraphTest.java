@@ -1174,6 +1174,53 @@ public class FastGraphTest {
 	}
 	
 	
+	@Test
+	public void test116() {
+		FastGraph g = FastGraph.jsonStringGraphFactory(get1Node0Edge(),false);
+		g.setNodeWeight(0,33);
+		assertEquals(g.getNodeWeight(0),33);
+		g.setNodeType(0,(byte)(34));
+		assertEquals(g.getNodeType(0),34);
+		g.setNodeAge(0,(byte)(35));
+		assertEquals(g.getNodeAge(0),35);
+	}
+
+	@Test
+	public void test117() {
+		FastGraph g = FastGraph.jsonStringGraphFactory(get5Node4Edge(),false);
+		g.setNodeWeight(4,43);
+		assertEquals(g.getNodeWeight(4),43);
+		g.setNodeType(4,(byte)(44));
+		assertEquals(g.getNodeType(4),44);
+		g.setNodeAge(4,(byte)(45));
+		assertEquals(g.getNodeAge(4),45);
+	}
+	
+	@Test
+	public void test118() {
+		FastGraph g = FastGraph.jsonStringGraphFactory(get2Node1Edge(),false);
+		g.setEdgeWeight(0,63);
+		assertEquals(g.getEdgeWeight(0),63);
+		g.setEdgeType(0,(byte)(64));
+		assertEquals(g.getEdgeType(0),64);
+		g.setEdgeAge(0,(byte)(65));
+		assertEquals(g.getEdgeAge(0),65);
+	}
+
+	@Test
+	public void test119() {
+		FastGraph g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
+		g.setEdgeWeight(4,73);
+		assertEquals(g.getEdgeWeight(4),73);
+		g.setEdgeType(4,(byte)(74));
+		assertEquals(g.getEdgeType(4),74);
+		g.setEdgeAge(4,(byte)(75));
+		assertEquals(g.getEdgeAge(4),75);
+	}
+
+
+	
+	
 	//TODO Add tests here
 
 	
