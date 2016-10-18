@@ -1219,24 +1219,6 @@ public class FastGraphTest {
 	}
 
 
-	@Test
-	public void test120() {
-		FastGraph g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
-		g.setEdgeNode1(0,3);
-		g.setEdgeNode2(0,3);
-		g.setEdgeNode1(2,0);
-		g.setEdgeNode2(2,4);
-		g.setEdgeNode1(4,1);
-		g.setEdgeNode2(4,2);
-		assertEquals(g.getEdgeNode1(0),3);
-		assertEquals(g.getEdgeNode2(0),3);
-		assertEquals(g.getEdgeNode1(2),0);
-		assertEquals(g.getEdgeNode2(2),4);
-		assertEquals(g.getEdgeNode1(4),1);
-		assertEquals(g.getEdgeNode2(4),2);
-	}
-
-
 	
 	
 	//TODO Add tests here
