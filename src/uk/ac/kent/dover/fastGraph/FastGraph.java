@@ -657,7 +657,25 @@ String name = "random-n-2-e-1";
 	
 
 	/**
-	 * @param nodeIndex the edge
+	 * @param edgeIndex the edge
+	 * @param weight the new node1
+	 */
+	public void setEdgeNode1(int edgeIndex, int n) {
+		edgeBuf.putInt(EDGE_NODE1_OFFSET+edgeIndex*EDGE_BYTE_SIZE, n);
+	}
+	
+	
+	/**
+	 * @param edgeIndex the edge
+	 * @param weight the new node2
+	 */
+	public void setEdgeNode2(int edgeIndex, int n) {
+		edgeBuf.putInt(EDGE_NODE2_OFFSET+edgeIndex*EDGE_BYTE_SIZE, n);
+	}
+	
+	
+	/**
+	 * @param edgeIndex the edge
 	 * @param weight the new edge weight
 	 */
 	public void setEdgeWeight(int edgeIndex, int weight) {
@@ -666,7 +684,7 @@ String name = "random-n-2-e-1";
 	
 	
 	/**
-	 * @param nodeIndex the edge
+	 * @param edgeIndex the edge
 	 * @param type the new edge type
 	 */
 	public void setEdgeType(int edgeIndex, byte type) {
@@ -675,7 +693,7 @@ String name = "random-n-2-e-1";
 	
 	
 	/**
-	 * @param nodeIndex the edge
+	 * @param edgeIndex the edge
 	 * @return the edge age
 	 */
 	public void setEdgeAge(int edgeIndex, byte age) {
