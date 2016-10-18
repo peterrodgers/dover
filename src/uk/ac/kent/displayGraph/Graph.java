@@ -3339,7 +3339,7 @@ private Node start = null;
 	
 	/**
 	 * A deep copy of the Graph, attempting to duplicate nodes and edges,
-	 * but does not copy derived information like adjList and faceNodes.
+	 * but does not copy derived information like adjList.
  	*/
 	public Graph clone() {
 		Graph ret = new Graph(getLabel());
