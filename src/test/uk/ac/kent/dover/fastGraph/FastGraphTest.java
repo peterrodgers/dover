@@ -700,6 +700,44 @@ public class FastGraphTest {
 	}
 
 	@Test
+	public void test094a() {
+		FastGraph g = FastGraph.jsonStringGraphFactory(get2Node2Edge(),true);
+		int[] connections;
+		connections = g.getNodeConnectingNodes(0);
+		assertEquals(3,connections.length);
+		assertEquals(0,connections[2]);
+		connections = g.getNodeConnectingEdges(0);
+		assertEquals(3,connections.length);
+		assertEquals(1,connections[2]);
+		connections = g.getNodeConnectingInNodes(0);
+		assertEquals(1,connections.length);
+		assertEquals(0,connections[0]);
+		connections = g.getNodeConnectingInEdges(0);
+		assertEquals(1,connections.length);
+		assertEquals(1,connections[0]);
+		connections = g.getNodeConnectingOutNodes(0);
+		assertEquals(2,connections.length);
+		assertEquals(0,connections[1]);
+		connections = g.getNodeConnectingOutEdges(0);
+		assertEquals(2,connections.length);
+		assertEquals(1,connections[1]);
+
+		connections = new int[10];
+		g.getNodeConnectingNodes(connections,0);
+		assertEquals(0,connections[2]);
+		g.getNodeConnectingEdges(connections,0);
+		assertEquals(1,connections[2]);
+		g.getNodeConnectingInNodes(connections,0);
+		assertEquals(0,connections[0]);
+		g.getNodeConnectingInEdges(connections,0);
+		assertEquals(1,connections[0]);
+		g.getNodeConnectingOutNodes(connections,0);
+		assertEquals(0,connections[1]);
+		g.getNodeConnectingOutEdges(connections,0);
+		assertEquals(1,connections[1]);
+	}
+
+	@Test
 	public void test095() throws Exception {
 		FastGraph g = FastGraph.adjacencyListGraphFactory(0, 0, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "testAdj1.txt", false);
 		assertEquals(0,g.getNumberOfNodes());
@@ -1073,6 +1111,69 @@ public class FastGraphTest {
 	}
 	
 
+	@Test
+	public void test111() {
+		FastGraph g = FastGraph.jsonStringGraphFactory(get0Node0Edge(),false);
+		String[] nodeLabels = {};
+		g.setAllNodeLabels(nodeLabels);
+		
+		String[] edgeLabels = {};
+		g.setAllEdgeLabels(edgeLabels);
+	}
+	
+	
+	@Test
+	public void test112() {
+		FastGraph g = FastGraph.jsonStringGraphFactory(get1Node0Edge(),false);
+		String[] nodeLabels = {"node label 1"};
+		g.setAllNodeLabels(nodeLabels);
+		assertEquals(g.getNodeLabel(0),nodeLabels[0]);
+	}
+	
+	@Test
+	public void test113() {
+		FastGraph g = FastGraph.jsonStringGraphFactory(get2Node1Edge(),false);
+		String[] edgeLabels = {"edge label 1"};
+		g.setAllEdgeLabels(edgeLabels);
+		assertEquals(g.getEdgeLabel(0),edgeLabels[0]);
+	}
+	
+	@Test
+	public void test114() {
+		FastGraph g = FastGraph.jsonStringGraphFactory(get5Node4Edge(),false);
+		String[] nodeLabels = {"node label 1","","a","qwertyuiop.4","5"};
+		g.setAllNodeLabels(nodeLabels);
+		assertEquals(g.getNodeLabel(0),nodeLabels[0]);
+		assertEquals(g.getNodeLabel(1),nodeLabels[1]);
+		assertEquals(g.getNodeLabel(2),nodeLabels[2]);
+		assertEquals(g.getNodeLabel(3),nodeLabels[3]);
+		assertEquals(g.getNodeLabel(4),nodeLabels[4]);
+		
+		String[] edgeLabels = {"edge label 1","","a","lkjhgfdsa.4","8"};
+		g.setAllEdgeLabels(edgeLabels);
+		assertEquals(g.getEdgeLabel(0),edgeLabels[0]);
+		assertEquals(g.getEdgeLabel(1),edgeLabels[1]);
+		assertEquals(g.getEdgeLabel(2),edgeLabels[2]);
+		assertEquals(g.getEdgeLabel(3),edgeLabels[3]);
+
+	}
+	
+	
+	@Test
+	public void test115() {
+		FastGraph g = FastGraph.jsonStringGraphFactory(get2Node1Edge(),false);
+		String[] nodeLabels = {"","node label 2","a","qwertyuiop.4","5"};
+		g.setAllNodeLabels(nodeLabels);
+		assertEquals(g.getNodeLabel(0),nodeLabels[0]);
+		assertEquals(g.getNodeLabel(1),nodeLabels[1]);
+		
+		String[] edgeLabels = {"","edge label 2"};
+		g.setAllEdgeLabels(edgeLabels);
+		assertEquals(g.getEdgeLabel(0),edgeLabels[0]);
+
+	}
+	
+	
 	//TODO Add tests here
 
 	
@@ -1093,7 +1194,7 @@ public class FastGraphTest {
 		json += "\"name\": \"one node, no edges\",\n";
 		json += "\"nodes\": [\n";
 		json += "{\n";
-		json += "\"nodeId\": \"0\",\n";
+		json += "\"nodeIndex\": \"0\",\n";
 		json += "\"nodeLabel\": \"node label 0\",\n";
 		json += "\"nodeWeight\": \"12\",\n";
 		json += "\"nodeType\": \"1\",\n";
@@ -1114,14 +1215,14 @@ public class FastGraphTest {
 		json += "\"name\": \"two nodes, no edges\",\n";
 		json += "\"nodes\": [\n";
 		json += "{\n";
-		json += "\"nodeId\": \"0\",\n";
+		json += "\"nodeIndex\": \"0\",\n";
 		json += "\"nodeLabel\": \"node label 0\",\n";
 		json += "\"nodeWeight\": \"12\",\n";
 		json += "\"nodeType\": \"1\",\n";
 		json += "\"nodeAge\": \"-1\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"nodeId\": \"1\",\n";
+		json += "\"nodeIndex\": \"1\",\n";
 		json += "\"nodeLabel\": \"node label 1\",\n";
 		json += "\"nodeWeight\": \"6\",\n";
 		json += "\"nodeType\": \"0\",\n";
@@ -1142,14 +1243,14 @@ public class FastGraphTest {
 		json += "\"name\": \"two nodes, one edge\",\n";
 		json += "\"nodes\": [\n";
 		json += "{\n";
-		json += "\"nodeId\": \"0\",\n";
+		json += "\"nodeIndex\": \"0\",\n";
 		json += "\"nodeLabel\": \"node label 0\",\n";
 		json += "\"nodeWeight\": \"12\",\n";
 		json += "\"nodeType\": \"1\",\n";
 		json += "\"nodeAge\": \"-1\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"nodeId\": \"1\",\n";
+		json += "\"nodeIndex\": \"1\",\n";
 		json += "\"nodeLabel\": \"node label 1\",\n";
 		json += "\"nodeWeight\": \"6\",\n";
 		json += "\"nodeType\": \"0\",\n";
@@ -1158,7 +1259,7 @@ public class FastGraphTest {
 		json += "],\n";
 		json += "\"edges\": [\n";
 		json += "{\n";
-		json += "\"edgeId\": \"0\",\n";
+		json += "\"edgeIndex\": \"0\",\n";
 		json += "\"node1\": \"0\",\n";
 		json += "\"node2\": \"1\",\n";
 		json += "\"edgeLabel\": \"edge label 0\",\n";
@@ -1180,14 +1281,14 @@ public class FastGraphTest {
 		json += "\"name\": \"two nodes, two edges\",\n";
 		json += "\"nodes\": [\n";
 		json += "{\n";
-		json += "\"nodeId\": \"0\",\n";
+		json += "\"nodeIndex\": \"0\",\n";
 		json += "\"nodeLabel\": \"node label 0\",\n";
 		json += "\"nodeWeight\": \"12\",\n";
 		json += "\"nodeType\": \"1\",\n";
 		json += "\"nodeAge\": \"-1\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"nodeId\": \"1\",\n";
+		json += "\"nodeIndex\": \"1\",\n";
 		json += "\"nodeLabel\": \"node label 1\",\n";
 		json += "\"nodeWeight\": \"6\",\n";
 		json += "\"nodeType\": \"0\",\n";
@@ -1196,7 +1297,7 @@ public class FastGraphTest {
 		json += "],\n";
 		json += "\"edges\": [\n";
 		json += "{\n";
-		json += "\"edgeId\": \"0\",\n";
+		json += "\"edgeIndex\": \"0\",\n";
 		json += "\"node1\": \"0\",\n";
 		json += "\"node2\": \"1\",\n";
 		json += "\"edgeLabel\": \"edge label 0\",\n";
@@ -1205,7 +1306,7 @@ public class FastGraphTest {
 		json += "\"edgeAge\": \"-1\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"edgeId\": \"1\",\n";
+		json += "\"edgeIndex\": \"1\",\n";
 		json += "\"node1\": \"0\",\n";
 		json += "\"node2\": \"0\",\n";
 		json += "\"edgeLabel\": \"edge label 1\",\n";
@@ -1233,35 +1334,35 @@ public class FastGraphTest {
 		json += "\"name\": \"five nodes, five edges\",\n";
 		json += "\"nodes\": [\n";
 		json += "{\n";
-		json += "\"nodeId\": \"0\",\n";
+		json += "\"nodeIndex\": \"0\",\n";
 		json += "\"nodeLabel\": \"node label 0\",\n";
 		json += "\"nodeWeight\": \"10\",\n";
 		json += "\"nodeType\": \"0\",\n";
 		json += "\"nodeAge\": \"0\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"nodeId\": \"1\",\n";
+		json += "\"nodeIndex\": \"1\",\n";
 		json += "\"nodeLabel\": \"node label 1\",\n";
 		json += "\"nodeWeight\": \"1\",\n";
 		json += "\"nodeType\": \"1\",\n";
 		json += "\"nodeAge\": \"1\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"nodeId\": \"2\",\n";
+		json += "\"nodeIndex\": \"2\",\n";
 		json += "\"nodeLabel\": \"node label 2\",\n";
 		json += "\"nodeWeight\": \"2\",\n";
 		json += "\"nodeType\": \"2\",\n";
 		json += "\"nodeAge\": \"2\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"nodeId\": \"3\",\n";
+		json += "\"nodeIndex\": \"3\",\n";
 		json += "\"nodeLabel\": \"node label 3\",\n";
 		json += "\"nodeWeight\": \"3\",\n";
 		json += "\"nodeType\": \"3\",\n";
 		json += "\"nodeAge\": \"3\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"nodeId\": \"4\",\n";
+		json += "\"nodeIndex\": \"4\",\n";
 		json += "\"nodeLabel\": \"node label 4\",\n";
 		json += "\"nodeWeight\": \"4\",\n";
 		json += "\"nodeType\": \"4\",\n";
@@ -1270,7 +1371,7 @@ public class FastGraphTest {
 		json += "],\n";
 		json += "\"edges\": [\n";
 		json += "{\n";
-		json += "\"edgeId\": \"0\",\n";
+		json += "\"edgeIndex\": \"0\",\n";
 		json += "\"node1\": \"0\",\n";
 		json += "\"node2\": \"1\",\n";
 		json += "\"edgeLabel\": \"edge label 0\",\n";
@@ -1279,7 +1380,7 @@ public class FastGraphTest {
 		json += "\"edgeAge\": \"0\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"edgeId\": \"1\",\n";
+		json += "\"edgeIndex\": \"1\",\n";
 		json += "\"node1\": \"0\",\n";
 		json += "\"node2\": \"2\",\n";
 		json += "\"edgeLabel\": \"edge label 1\",\n";
@@ -1288,7 +1389,7 @@ public class FastGraphTest {
 		json += "\"edgeAge\": \"1\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"edgeId\": \"2\",\n";
+		json += "\"edgeIndex\": \"2\",\n";
 		json += "\"node1\": \"1\",\n";
 		json += "\"node2\": \"2\",\n";
 		json += "\"edgeLabel\": \"edge label 2\",\n";
@@ -1297,7 +1398,7 @@ public class FastGraphTest {
 		json += "\"edgeAge\": \"2\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"edgeId\": \"3\",\n";
+		json += "\"edgeIndex\": \"3\",\n";
 		json += "\"node1\": \"2\",\n";
 		json += "\"node2\": \"3\",\n";
 		json += "\"edgeLabel\": \"edge label 3\",\n";
@@ -1306,7 +1407,7 @@ public class FastGraphTest {
 		json += "\"edgeAge\": \"3\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"edgeId\": \"4\",\n";
+		json += "\"edgeIndex\": \"4\",\n";
 		json += "\"node1\": \"3\",\n";
 		json += "\"node2\": \"4\",\n";
 		json += "\"edgeLabel\": \"edge label 4\",\n";
@@ -1335,35 +1436,35 @@ public class FastGraphTest {
 		json += "\"name\": \"five nodes, four edges\",\n";
 		json += "\"nodes\": [\n";
 		json += "{\n";
-		json += "\"nodeId\": \"0\",\n";
+		json += "\"nodeIndex\": \"0\",\n";
 		json += "\"nodeLabel\": \"node label 0\",\n";
 		json += "\"nodeWeight\": \"10\",\n";
 		json += "\"nodeType\": \"0\",\n";
 		json += "\"nodeAge\": \"0\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"nodeId\": \"1\",\n";
+		json += "\"nodeIndex\": \"1\",\n";
 		json += "\"nodeLabel\": \"node label 1\",\n";
 		json += "\"nodeWeight\": \"1\",\n";
 		json += "\"nodeType\": \"1\",\n";
 		json += "\"nodeAge\": \"1\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"nodeId\": \"2\",\n";
+		json += "\"nodeIndex\": \"2\",\n";
 		json += "\"nodeLabel\": \"node label 2\",\n";
 		json += "\"nodeWeight\": \"2\",\n";
 		json += "\"nodeType\": \"2\",\n";
 		json += "\"nodeAge\": \"2\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"nodeId\": \"3\",\n";
+		json += "\"nodeIndex\": \"3\",\n";
 		json += "\"nodeLabel\": \"node label 3\",\n";
 		json += "\"nodeWeight\": \"3\",\n";
 		json += "\"nodeType\": \"3\",\n";
 		json += "\"nodeAge\": \"3\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"nodeId\": \"4\",\n";
+		json += "\"nodeIndex\": \"4\",\n";
 		json += "\"nodeLabel\": \"node label 4\",\n";
 		json += "\"nodeWeight\": \"4\",\n";
 		json += "\"nodeType\": \"4\",\n";
@@ -1372,7 +1473,7 @@ public class FastGraphTest {
 		json += "],\n";
 		json += "\"edges\": [\n";
 		json += "{\n";
-		json += "\"edgeId\": \"0\",\n";
+		json += "\"edgeIndex\": \"0\",\n";
 		json += "\"node1\": \"0\",\n";
 		json += "\"node2\": \"1\",\n";
 		json += "\"edgeLabel\": \"edge label 0\",\n";
@@ -1381,7 +1482,7 @@ public class FastGraphTest {
 		json += "\"edgeAge\": \"0\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"edgeId\": \"1\",\n";
+		json += "\"edgeIndex\": \"1\",\n";
 		json += "\"node1\": \"0\",\n";
 		json += "\"node2\": \"2\",\n";
 		json += "\"edgeLabel\": \"edge label 1\",\n";
@@ -1390,7 +1491,7 @@ public class FastGraphTest {
 		json += "\"edgeAge\": \"1\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"edgeId\": \"2\",\n";
+		json += "\"edgeIndex\": \"2\",\n";
 		json += "\"node1\": \"1\",\n";
 		json += "\"node2\": \"2\",\n";
 		json += "\"edgeLabel\": \"edge label 2\",\n";
@@ -1399,7 +1500,7 @@ public class FastGraphTest {
 		json += "\"edgeAge\": \"2\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"edgeId\": \"3\",\n";
+		json += "\"edgeIndex\": \"3\",\n";
 		json += "\"node1\": \"3\",\n";
 		json += "\"node2\": \"4\",\n";
 		json += "\"edgeLabel\": \"edge label 3\",\n";
@@ -1427,28 +1528,28 @@ public class FastGraphTest {
 		json += "\"name\": \"four nodes, five edges\",\n";
 		json += "\"nodes\": [\n";
 		json += "{\n";
-		json += "\"nodeId\": \"0\",\n";
+		json += "\"nodeIndex\": \"0\",\n";
 		json += "\"nodeLabel\": \"node label 0\",\n";
 		json += "\"nodeWeight\": \"10\",\n";
 		json += "\"nodeType\": \"0\",\n";
 		json += "\"nodeAge\": \"0\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"nodeId\": \"1\",\n";
+		json += "\"nodeIndex\": \"1\",\n";
 		json += "\"nodeLabel\": \"node label 1\",\n";
 		json += "\"nodeWeight\": \"1\",\n";
 		json += "\"nodeType\": \"1\",\n";
 		json += "\"nodeAge\": \"1\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"nodeId\": \"2\",\n";
+		json += "\"nodeIndex\": \"2\",\n";
 		json += "\"nodeLabel\": \"node label 2\",\n";
 		json += "\"nodeWeight\": \"2\",\n";
 		json += "\"nodeType\": \"2\",\n";
 		json += "\"nodeAge\": \"2\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"nodeId\": \"3\",\n";
+		json += "\"nodeIndex\": \"3\",\n";
 		json += "\"nodeLabel\": \"node label 3\",\n";
 		json += "\"nodeWeight\": \"3\",\n";
 		json += "\"nodeType\": \"3\",\n";
@@ -1457,7 +1558,7 @@ public class FastGraphTest {
 		json += "],\n";
 		json += "\"edges\": [\n";
 		json += "{\n";
-		json += "\"edgeId\": \"0\",\n";
+		json += "\"edgeIndex\": \"0\",\n";
 		json += "\"node1\": \"0\",\n";
 		json += "\"node2\": \"1\",\n";
 		json += "\"edgeLabel\": \"edge label 0\",\n";
@@ -1466,7 +1567,7 @@ public class FastGraphTest {
 		json += "\"edgeAge\": \"0\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"edgeId\": \"1\",\n";
+		json += "\"edgeIndex\": \"1\",\n";
 		json += "\"node1\": \"0\",\n";
 		json += "\"node2\": \"2\",\n";
 		json += "\"edgeLabel\": \"edge label 1\",\n";
@@ -1475,7 +1576,7 @@ public class FastGraphTest {
 		json += "\"edgeAge\": \"1\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"edgeId\": \"2\",\n";
+		json += "\"edgeIndex\": \"2\",\n";
 		json += "\"node1\": \"2\",\n";
 		json += "\"node2\": \"1\",\n";
 		json += "\"edgeLabel\": \"edge label 2\",\n";
@@ -1484,7 +1585,7 @@ public class FastGraphTest {
 		json += "\"edgeAge\": \"2\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"edgeId\": \"3\",\n";
+		json += "\"edgeIndex\": \"3\",\n";
 		json += "\"node1\": \"1\",\n";
 		json += "\"node2\": \"3\",\n";
 		json += "\"edgeLabel\": \"edge label 3\",\n";
@@ -1493,7 +1594,7 @@ public class FastGraphTest {
 		json += "\"edgeAge\": \"3\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"edgeId\": \"4\",\n";
+		json += "\"edgeIndex\": \"4\",\n";
 		json += "\"node1\": \"2\",\n";
 		json += "\"node2\": \"3\",\n";
 		json += "\"edgeLabel\": \"edge label 4\",\n";
