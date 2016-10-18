@@ -1,6 +1,7 @@
 package uk.ac.kent.dover.fastGraph;
 
 import java.io.File;
+import java.util.Arrays;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -131,7 +132,7 @@ public class LauncherCmd {
 				//FastGraph.main(args);
 			    try {
 			    	NamePicker np = new NamePicker();
-			    	System.out.println(np.getName());
+			    	System.out.println(Arrays.toString(np.getNames(10)));
 			    } catch (Exception e) {
 			    	System.err.println(e.getMessage());
 			    	e.printStackTrace();

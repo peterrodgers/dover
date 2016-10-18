@@ -57,6 +57,7 @@ public class NamePicker {
 	    while (line != null) {
 	    	
 	    	String name = line.substring(0, 15).trim();
+	    	name = name.substring(0,1).toUpperCase() + name.substring(1).toLowerCase();
 	    	String probString = line.substring(21, 28).trim();
 	    	double prob = Double.parseDouble(probString);
 	    	list.add(new Name(name,prob));	    	
@@ -119,6 +120,20 @@ public class NamePicker {
 	 */
 	public String getName() {
 		return getForename() + " " + getSurname();
+	}
+	
+	/**
+	 * Returns a list of full names
+	 * 
+	 * @param number The number of name to return
+	 * @return The list of full names
+	 */
+	public String[] getNames(int number) {
+		String[] names = new String[number];
+		for (int i = 0; i < number; i++) {
+			names[i] = getName();
+		}
+		return names;
 	}
 	
 }
