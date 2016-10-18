@@ -8,6 +8,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -56,6 +57,8 @@ public class LauncherGUI extends JFrame {
 	private String DEFAULT_STATUS_MESSAGE = "Ready"; //The default message displayed to a user
 	private Launcher launcher;
 	private DefaultListModel model = new DefaultListModel();
+	private double screenWidth; //size of the user's screen
+	private double screenHeight;
 	
 	/**
 	 * The main builder for the GUI
@@ -70,6 +73,11 @@ public class LauncherGUI extends JFrame {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		//find and store the current screen size
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		screenWidth = screenSize.getWidth();
+		screenHeight = screenSize.getHeight();
 		
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		
@@ -133,7 +141,7 @@ public class LauncherGUI extends JFrame {
 		this.setContentPane(mainPanel);
 		setTitle("Dover");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		mainPanel.setPreferredSize(new Dimension(800,800));
+		mainPanel.setPreferredSize(new Dimension((int) Math.round(screenHeight/2),(int) Math.round(screenHeight/2))); //makes a square window
 		pack();
 		setVisible(true);
 	}
