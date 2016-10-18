@@ -63,9 +63,9 @@ public class FastGraph {
 	
 	public static final int DEFAULT_AVERAGE_LABEL_LENGTH = 20;
 	
-	private static int nodeByteSize = 24;
-	private static int edgeByteSize = 20;
-	private static int connectionPairSize = 8; // this is an edge id plus an node id
+	private static final int NODE_BYTE_SIZE = 24;
+	private static final int EDGE_BYTE_SIZE = 20;
+	private static final int CONNECTION_PAIR_SIZE = 8; // this is an edge id plus an node id
 	
 	public static final String INFO_SPLIT_STRING = "~";
 	
@@ -196,8 +196,8 @@ String name = "random-n-2-e-1";
 	 * @return the node label
 	 */
 	public String getNodeLabel(int nodeId) {
-		int labelStart = nodeBuf.getInt(NODE_LABEL_START_OFFSET+nodeId*nodeByteSize);
-		int labelLength = nodeBuf.getShort(NODE_LABEL_LENGTH_OFFSET+nodeId*nodeByteSize);
+		int labelStart = nodeBuf.getInt(NODE_LABEL_START_OFFSET+nodeId*NODE_BYTE_SIZE);
+		int labelLength = nodeBuf.getShort(NODE_LABEL_LENGTH_OFFSET+nodeId*NODE_BYTE_SIZE);
 		char[] label = new char[labelLength];
 		for(int i = 0; i < labelLength; i++) {
 			int offset = labelStart+i*2;
@@ -213,7 +213,7 @@ String name = "random-n-2-e-1";
 	 * @return the node weight
 	 */
 	public int getNodeWeight(int nodeId) {
-		int type= nodeBuf.getInt(NODE_WEIGHT_OFFSET+nodeId*nodeByteSize);
+		int type= nodeBuf.getInt(NODE_WEIGHT_OFFSET+nodeId*NODE_BYTE_SIZE);
 		return type;
 	}
 	
@@ -222,7 +222,7 @@ String name = "random-n-2-e-1";
 	 * @return the node type
 	 */
 	public byte getNodeType(int nodeId) {
-		byte type= nodeBuf.get(NODE_TYPE_OFFSET+nodeId*nodeByteSize);
+		byte type= nodeBuf.get(NODE_TYPE_OFFSET+nodeId*NODE_BYTE_SIZE);
 		return type;
 	}
 	
@@ -231,7 +231,7 @@ String name = "random-n-2-e-1";
 	 * @return the node age
 	 */
 	public byte getNodeAge(int nodeId) {
-		byte age = nodeBuf.get(NODE_AGE_OFFSET+nodeId*nodeByteSize);
+		byte age = nodeBuf.get(NODE_AGE_OFFSET+nodeId*NODE_BYTE_SIZE);
 		return age;
 	}
 	
@@ -249,7 +249,7 @@ String name = "random-n-2-e-1";
 	 * @return the node in degree (number of edges entering the node)
 	 */
 	public short getNodeInDegree(int nodeId) {
-		short degree = nodeBuf.getShort(NODE_IN_DEGREE_OFFSET+nodeId*nodeByteSize);
+		short degree = nodeBuf.getShort(NODE_IN_DEGREE_OFFSET+nodeId*NODE_BYTE_SIZE);
 		return degree;
 	}
 
@@ -258,7 +258,7 @@ String name = "random-n-2-e-1";
 	 * @return the node out degree (number of edges leaving the node)
 	 */
 	public short getNodeOutDegree(int nodeId) {
-		short degree = nodeBuf.getShort(NODE_OUT_DEGREE_OFFSET+nodeId*nodeByteSize);
+		short degree = nodeBuf.getShort(NODE_OUT_DEGREE_OFFSET+nodeId*NODE_BYTE_SIZE);
 		return degree;
 	}
 	
@@ -268,14 +268,14 @@ String name = "random-n-2-e-1";
 	 */
 	public int[] getNodeConnectingEdges(int nodeId) {
 		
-		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE); // in offset is the first one
 		int degree = getNodeDegree(nodeId);
 		
 		int[] ret = new int[degree];
 		
 		for(int i = 0; i < degree; i++) {
 			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_EDGE_OFFSET;
+			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
 			int node = connectionBuf.getInt(nodeOffset);
 			ret[i] = node;
 		}
@@ -293,12 +293,12 @@ String name = "random-n-2-e-1";
 	 */
 	public void getNodeConnectingEdges(int[] ret, int nodeId) {
 		
-		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE); // in offset is the first one
 		int degree = getNodeDegree(nodeId);
 		
 		for(int i = 0; i < degree; i++) {
 			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_EDGE_OFFSET;
+			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
 			int node = connectionBuf.getInt(nodeOffset);
 			ret[i] = node;
 		}
@@ -310,14 +310,14 @@ String name = "random-n-2-e-1";
 	 */
 	public int[] getNodeConnectingNodes(int nodeId) {
 		
-		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE); // in offset is the first one
 		int degree = getNodeDegree(nodeId);
 		
 		int[] ret = new int[degree];
 		
 		for(int i = 0; i < degree; i++) {
 			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_NODE_OFFSET;
+			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_NODE_OFFSET;
 			int node = connectionBuf.getInt(nodeOffset);
 			ret[i] = node;
 		}
@@ -335,12 +335,12 @@ String name = "random-n-2-e-1";
 	 */
 	public void getNodeConnectingNodes(int[] ret, int nodeId) {
 		
-		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE); // in offset is the first one
 		int degree = getNodeDegree(nodeId);
 		
 		for(int i = 0; i < degree; i++) {
 			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_NODE_OFFSET;
+			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_NODE_OFFSET;
 			int node = connectionBuf.getInt(nodeOffset);
 			ret[i] = node;
 		}
@@ -354,14 +354,14 @@ String name = "random-n-2-e-1";
 	 */
 	public int[] getNodeConnectingInEdges(int nodeId) {
 		
-		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE); // in offset is the first one
 		int degree = getNodeInDegree(nodeId);
 		
 		int[] ret = new int[degree];
 		
 		for(int i = 0; i < degree; i++) {
 			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_EDGE_OFFSET;
+			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
 			int node = connectionBuf.getInt(nodeOffset);
 			ret[i] = node;
 		}
@@ -380,12 +380,12 @@ String name = "random-n-2-e-1";
 	 */
 	public void getNodeConnectingInEdges(int[] ret, int nodeId) {
 		
-		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE); // in offset is the first one
 		int degree = getNodeInDegree(nodeId);
 		
 		for(int i = 0; i < degree; i++) {
 			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_EDGE_OFFSET;
+			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
 			int node = connectionBuf.getInt(nodeOffset);
 			ret[i] = node;
 		}
@@ -399,14 +399,14 @@ String name = "random-n-2-e-1";
 	 */
 	public int[] getNodeConnectingInNodes(int nodeId) {
 		
-		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE); // in offset is the first one
 		int degree = getNodeInDegree(nodeId);
 		
 		int[] ret = new int[degree];
 		
 		for(int i = 0; i < degree; i++) {
 			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_NODE_OFFSET;
+			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_NODE_OFFSET;
 			int node = connectionBuf.getInt(nodeOffset);
 			ret[i] = node;
 		}
@@ -424,12 +424,12 @@ String name = "random-n-2-e-1";
 	 */
 	public void getNodeConnectingInNodes(int[] ret, int nodeId) {
 		
-		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE); // in offset is the first one
 		int degree = getNodeInDegree(nodeId);
 		
 		for(int i = 0; i < degree; i++) {
 			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_NODE_OFFSET;
+			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_NODE_OFFSET;
 			int node = connectionBuf.getInt(nodeOffset);
 			ret[i] = node;
 		}
@@ -442,13 +442,13 @@ String name = "random-n-2-e-1";
 	 */
 	public int[] getNodeConnectingOutEdges(int nodeId) {
 		
-		int connectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int connectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE); // in offset is the first one
 		int degree = getNodeOutDegree(nodeId);
 		int[] ret = new int[degree];
 		
 		for(int i = 0; i < degree; i++) {
 			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_EDGE_OFFSET;
+			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
 			int node = connectionBuf.getInt(nodeOffset);
 			ret[i] = node;
 		}
@@ -466,12 +466,12 @@ String name = "random-n-2-e-1";
 	 */
 	public void getNodeConnectingOutEdges(int[] ret, int nodeId) {
 		
-		int connectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int connectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE); // in offset is the first one
 		int degree = getNodeOutDegree(nodeId);
 		
 		for(int i = 0; i < degree; i++) {
 			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_EDGE_OFFSET;
+			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
 			int node = connectionBuf.getInt(nodeOffset);
 			ret[i] = node;
 		}
@@ -485,14 +485,14 @@ String name = "random-n-2-e-1";
 	 */
 	public int[] getNodeConnectingOutNodes(int nodeId) {
 		
-		int connectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int connectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE); // in offset is the first one
 		int degree = getNodeOutDegree(nodeId);
 		
 		int[] ret = new int[degree];
 		
 		for(int i = 0; i < degree; i++) {
 			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_NODE_OFFSET;
+			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_NODE_OFFSET;
 			int node = connectionBuf.getInt(nodeOffset);
 			ret[i] = node;
 		}
@@ -511,12 +511,12 @@ String name = "random-n-2-e-1";
 	 */
 	public void getNodeConnectingOutNodes(int[] ret, int nodeId) {
 		
-		int connectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*nodeByteSize); // in offset is the first one
+		int connectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE); // in offset is the first one
 		int degree = getNodeOutDegree(nodeId);
 		
 		for(int i = 0; i < degree; i++) {
 			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*connectionPairSize)+CONNECTION_NODE_OFFSET;
+			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_NODE_OFFSET;
 			int node = connectionBuf.getInt(nodeOffset);
 			ret[i] = node;
 		}
@@ -527,8 +527,8 @@ String name = "random-n-2-e-1";
 	 * @return the edge label
 	 */
 	public String getEdgeLabel(int edgeId) {
-		int labelStart = edgeBuf.getInt(EDGE_LABEL_START_OFFSET+edgeId*edgeByteSize);
-		int labelLength = edgeBuf.getShort(EDGE_LABEL_LENGTH_OFFSET+edgeId*edgeByteSize);
+		int labelStart = edgeBuf.getInt(EDGE_LABEL_START_OFFSET+edgeId*EDGE_BYTE_SIZE);
+		int labelLength = edgeBuf.getShort(EDGE_LABEL_LENGTH_OFFSET+edgeId*EDGE_BYTE_SIZE);
 		char[] label = new char[labelLength];
 		for(int i = 0; i < labelLength; i++) {
 			int offset = labelStart+i*2;
@@ -544,7 +544,7 @@ String name = "random-n-2-e-1";
 	 * @return the first connecting node (the node the edge leaves for directed graphs).
 	 */
 	public int getEdgeNode1(int edgeId) {
-		int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*edgeByteSize);
+		int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*EDGE_BYTE_SIZE);
 		return n1;
 	}
 	
@@ -553,7 +553,7 @@ String name = "random-n-2-e-1";
 	 * @return the second connecting node (the node the edge enters for directed graphs).
 	 */
 	public int getEdgeNode2(int edgeId) {
-		int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*edgeByteSize);
+		int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*EDGE_BYTE_SIZE);
 		return n2;
 	}
 	
@@ -562,7 +562,7 @@ String name = "random-n-2-e-1";
 	 * @return the edge weight
 	 */
 	public int getEdgeWeight(int edgeId) {
-		int type= edgeBuf.getInt(EDGE_WEIGHT_OFFSET+edgeId*edgeByteSize);
+		int type= edgeBuf.getInt(EDGE_WEIGHT_OFFSET+edgeId*EDGE_BYTE_SIZE);
 		return type;
 	}
 	
@@ -571,7 +571,7 @@ String name = "random-n-2-e-1";
 	 * @return the edge type
 	 */
 	public byte getEdgeType(int edgeId) {
-		byte type= edgeBuf.get(EDGE_TYPE_OFFSET+edgeId*edgeByteSize);
+		byte type= edgeBuf.get(EDGE_TYPE_OFFSET+edgeId*EDGE_BYTE_SIZE);
 		return type;
 	}
 	
@@ -580,7 +580,7 @@ String name = "random-n-2-e-1";
 	 * @return the edge age
 	 */
 	public byte getEdgeAge(int edgeId) {
-		byte age = edgeBuf.get(EDGE_AGE_OFFSET+edgeId*edgeByteSize);
+		byte age = edgeBuf.get(EDGE_AGE_OFFSET+edgeId*EDGE_BYTE_SIZE);
 		return age;
 	}
 
@@ -614,15 +614,15 @@ String name = "random-n-2-e-1";
 		}
 
 		if(!direct) {
-			nodeBuf = ByteBuffer.allocate(numberOfNodes*nodeByteSize);
-			edgeBuf = ByteBuffer.allocate(numberOfEdges*edgeByteSize);
-			connectionBuf = ByteBuffer.allocate(numberOfEdges*2*connectionPairSize);
+			nodeBuf = ByteBuffer.allocate(numberOfNodes*NODE_BYTE_SIZE);
+			edgeBuf = ByteBuffer.allocate(numberOfEdges*EDGE_BYTE_SIZE);
+			connectionBuf = ByteBuffer.allocate(numberOfEdges*2*CONNECTION_PAIR_SIZE);
 			nodeLabelBuf = ByteBuffer.allocate(nodeLabelSize);
 			edgeLabelBuf = ByteBuffer.allocate(edgeLabelSize);
 		} else {
-			nodeBuf = ByteBuffer.allocateDirect(numberOfNodes*nodeByteSize);
-			edgeBuf = ByteBuffer.allocateDirect(numberOfEdges*edgeByteSize);
-			connectionBuf = ByteBuffer.allocateDirect(numberOfEdges*2*connectionPairSize);
+			nodeBuf = ByteBuffer.allocateDirect(numberOfNodes*NODE_BYTE_SIZE);
+			edgeBuf = ByteBuffer.allocateDirect(numberOfEdges*EDGE_BYTE_SIZE);
+			connectionBuf = ByteBuffer.allocateDirect(numberOfEdges*2*CONNECTION_PAIR_SIZE);
 			nodeLabelBuf = ByteBuffer.allocateDirect(nodeLabelSize);
 			edgeLabelBuf = ByteBuffer.allocateDirect(edgeLabelSize);
 		}
@@ -735,20 +735,20 @@ String name = "random-n-2-e-1";
 			age = (byte)(node.getInt("nodeAge"));
 			label = node.getString("nodeLabel");
 			
-			nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+id*nodeByteSize,inStart); // offset for inward connecting edges/nodes
-			nodeBuf.putShort(NODE_IN_DEGREE_OFFSET+id*nodeByteSize,inLength); // number of inward connecting edges/nodes
-			nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+id*nodeByteSize,outStart); // offset for outward connecting edges/nodes
-			nodeBuf.putShort(NODE_OUT_DEGREE_OFFSET+id*nodeByteSize,outLength); // number of outward connecting edges/nodes
-			nodeBuf.putInt(NODE_WEIGHT_OFFSET+id*nodeByteSize,weight); // weight
-			nodeBuf.put(NODE_TYPE_OFFSET+id*nodeByteSize,type); // type
-			nodeBuf.put(NODE_AGE_OFFSET+id*nodeByteSize,age); // age
+			nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+id*NODE_BYTE_SIZE,inStart); // offset for inward connecting edges/nodes
+			nodeBuf.putShort(NODE_IN_DEGREE_OFFSET+id*NODE_BYTE_SIZE,inLength); // number of inward connecting edges/nodes
+			nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+id*NODE_BYTE_SIZE,outStart); // offset for outward connecting edges/nodes
+			nodeBuf.putShort(NODE_OUT_DEGREE_OFFSET+id*NODE_BYTE_SIZE,outLength); // number of outward connecting edges/nodes
+			nodeBuf.putInt(NODE_WEIGHT_OFFSET+id*NODE_BYTE_SIZE,weight); // weight
+			nodeBuf.put(NODE_TYPE_OFFSET+id*NODE_BYTE_SIZE,type); // type
+			nodeBuf.put(NODE_AGE_OFFSET+id*NODE_BYTE_SIZE,age); // age
 			
 			// label
 			char[] labelArray = label.toCharArray();
 			labelLength = (short)(labelArray.length);
 
-			nodeBuf.putInt(NODE_LABEL_START_OFFSET+id*nodeByteSize,labelOffset); // label start
-			nodeBuf.putShort(NODE_LABEL_LENGTH_OFFSET+id*nodeByteSize,labelLength); // label size
+			nodeBuf.putInt(NODE_LABEL_START_OFFSET+id*NODE_BYTE_SIZE,labelOffset); // label start
+			nodeBuf.putShort(NODE_LABEL_LENGTH_OFFSET+id*NODE_BYTE_SIZE,labelLength); // label size
 
 			for(int j = 0; j < labelArray.length; j++) {
 				char c = labelArray[j];
@@ -797,18 +797,18 @@ String name = "random-n-2-e-1";
 			age = (byte)(edge.getInt("edgeAge"));
 			label = edge.getString("edgeLabel");
 			
-			edgeBuf.putInt(EDGE_NODE1_OFFSET+id*edgeByteSize,node1); // one end of edge
-			edgeBuf.putInt(EDGE_NODE2_OFFSET+id*edgeByteSize,node2); // other end of edge
-			edgeBuf.putInt(EDGE_WEIGHT_OFFSET+id*edgeByteSize,weight); // weight
-			edgeBuf.put(EDGE_TYPE_OFFSET+id*edgeByteSize,type); // type
-			edgeBuf.put(EDGE_AGE_OFFSET+id*edgeByteSize,age); // age
+			edgeBuf.putInt(EDGE_NODE1_OFFSET+id*EDGE_BYTE_SIZE,node1); // one end of edge
+			edgeBuf.putInt(EDGE_NODE2_OFFSET+id*EDGE_BYTE_SIZE,node2); // other end of edge
+			edgeBuf.putInt(EDGE_WEIGHT_OFFSET+id*EDGE_BYTE_SIZE,weight); // weight
+			edgeBuf.put(EDGE_TYPE_OFFSET+id*EDGE_BYTE_SIZE,type); // type
+			edgeBuf.put(EDGE_AGE_OFFSET+id*EDGE_BYTE_SIZE,age); // age
 			
 			// label
 			char[] labelArray = label.toCharArray();
 			labelLength = (short)(labelArray.length);
 
-			edgeBuf.putInt(EDGE_LABEL_START_OFFSET+id*edgeByteSize,labelOffset); // label start
-			edgeBuf.putShort(EDGE_LABEL_LENGTH_OFFSET+id*edgeByteSize,labelLength); // label size
+			edgeBuf.putInt(EDGE_LABEL_START_OFFSET+id*EDGE_BYTE_SIZE,labelOffset); // label start
+			edgeBuf.putShort(EDGE_LABEL_LENGTH_OFFSET+id*EDGE_BYTE_SIZE,labelLength); // label size
 			for(int j = 0; j < labelArray.length; j++) {
 				char c = labelArray[j];
 				edgeLabelBuf.putChar(labelOffset,c);
@@ -833,13 +833,13 @@ String name = "random-n-2-e-1";
 			// setting the in connection offset and length
 			ArrayList<Integer> inEdges = nodeIn.get(i);
 			short inEdgeLength = (short)(inEdges.size());
-			nodeBuf.putInt(i*nodeByteSize+NODE_IN_CONNECTION_START_OFFSET,offset);
-			nodeBuf.putShort(i*nodeByteSize+NODE_IN_DEGREE_OFFSET,inEdgeLength);
+			nodeBuf.putInt(i*NODE_BYTE_SIZE+NODE_IN_CONNECTION_START_OFFSET,offset);
+			nodeBuf.putShort(i*NODE_BYTE_SIZE+NODE_IN_DEGREE_OFFSET,inEdgeLength);
 			// now put the in edge/node pairs
 			for(int edgeId : inEdges) {
 				int nodeId = -1;
-				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*edgeByteSize);
-				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*edgeByteSize);
+				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*EDGE_BYTE_SIZE);
+				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*EDGE_BYTE_SIZE);
 				if(n1 == i) {
 					nodeId = n2;
 				} else if(n2 == i) {
@@ -849,20 +849,20 @@ String name = "random-n-2-e-1";
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeId);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeId);
-				offset += connectionPairSize;
+				offset += CONNECTION_PAIR_SIZE;
 			}
 			
 			// setting the out connection offset and length
 			ArrayList<Integer> outEdges = nodeOut.get(i);
 			short outEdgeLength = (short)(outEdges.size());
-			nodeBuf.putInt(i*nodeByteSize+NODE_OUT_CONNECTION_START_OFFSET,offset);
-			nodeBuf.putShort(i*nodeByteSize+NODE_OUT_DEGREE_OFFSET,outEdgeLength);
+			nodeBuf.putInt(i*NODE_BYTE_SIZE+NODE_OUT_CONNECTION_START_OFFSET,offset);
+			nodeBuf.putShort(i*NODE_BYTE_SIZE+NODE_OUT_DEGREE_OFFSET,outEdgeLength);
 
 			// now put the out edge/node pairs
 			for(int edgeId : outEdges) {
 				int nodeId = -1;
-				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*edgeByteSize);
-				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*edgeByteSize);
+				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*EDGE_BYTE_SIZE);
+				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*EDGE_BYTE_SIZE);
 				if(n1 == i) {
 					nodeId = n2;
 				} else if(n2 == i) {
@@ -872,7 +872,7 @@ String name = "random-n-2-e-1";
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeId);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeId);
-				offset += connectionPairSize;
+				offset += CONNECTION_PAIR_SIZE;
 			}
 			
 
@@ -1080,21 +1080,21 @@ System.out.println("nodeIndex "+nodeIndex);
 		byte age = -99;
 		int labelOffset = 0;
 		for(int i = 0; i< numberOfNodes; i++) {
-			nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+i*nodeByteSize,inStart); // offset for inward connecting edges/nodes
-			nodeBuf.putShort(NODE_IN_DEGREE_OFFSET+i*nodeByteSize,inLength); // number of inward connecting edges/nodes
-			nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+i*nodeByteSize,outStart); // offset for outward connecting edges/nodes
-			nodeBuf.putShort(NODE_OUT_DEGREE_OFFSET+i*nodeByteSize,outLength); // number of outward connecting edges/nodes
-			nodeBuf.putInt(NODE_WEIGHT_OFFSET+i*nodeByteSize,weight); // weight
-			nodeBuf.put(NODE_TYPE_OFFSET+i*nodeByteSize,type); // type
-			nodeBuf.put(NODE_AGE_OFFSET+i*nodeByteSize,age); // age
+			nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE,inStart); // offset for inward connecting edges/nodes
+			nodeBuf.putShort(NODE_IN_DEGREE_OFFSET+i*NODE_BYTE_SIZE,inLength); // number of inward connecting edges/nodes
+			nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE,outStart); // offset for outward connecting edges/nodes
+			nodeBuf.putShort(NODE_OUT_DEGREE_OFFSET+i*NODE_BYTE_SIZE,outLength); // number of outward connecting edges/nodes
+			nodeBuf.putInt(NODE_WEIGHT_OFFSET+i*NODE_BYTE_SIZE,weight); // weight
+			nodeBuf.put(NODE_TYPE_OFFSET+i*NODE_BYTE_SIZE,type); // type
+			nodeBuf.put(NODE_AGE_OFFSET+i*NODE_BYTE_SIZE,age); // age
 
 			// label
 			String label = nodeIndexToSnapIdMap.get(i);
 			char[] labelArray = label.toCharArray();
 			labelLength = (short)(labelArray.length);
 
-			nodeBuf.putInt(NODE_LABEL_START_OFFSET+i*nodeByteSize,labelOffset); // label start
-			nodeBuf.putShort(NODE_LABEL_LENGTH_OFFSET+i*nodeByteSize,labelLength); // label size
+			nodeBuf.putInt(NODE_LABEL_START_OFFSET+i*NODE_BYTE_SIZE,labelOffset); // label start
+			nodeBuf.putShort(NODE_LABEL_LENGTH_OFFSET+i*NODE_BYTE_SIZE,labelLength); // label size
 
 			for(int j = 0; j < labelArray.length; j++) {
 				char c = labelArray[j];
@@ -1129,19 +1129,19 @@ System.out.println("nodeIndex "+nodeIndex);
 		for(int i = 0; i< numberOfEdges; i++) {
 			node1 = edgeNode1Map.get(i);
 			node2 = edgeNode2Map.get(i);
-			edgeBuf.putInt(EDGE_NODE1_OFFSET+i*edgeByteSize,node1); // one end of edge
-			edgeBuf.putInt(EDGE_NODE2_OFFSET+i*edgeByteSize,node2); // other end of edge
-			edgeBuf.putInt(EDGE_WEIGHT_OFFSET+i*edgeByteSize,weight); // weight
-			edgeBuf.put(EDGE_TYPE_OFFSET+i*edgeByteSize,type); // type
-			edgeBuf.put(EDGE_AGE_OFFSET+i*edgeByteSize,age); // age
+			edgeBuf.putInt(EDGE_NODE1_OFFSET+i*EDGE_BYTE_SIZE,node1); // one end of edge
+			edgeBuf.putInt(EDGE_NODE2_OFFSET+i*EDGE_BYTE_SIZE,node2); // other end of edge
+			edgeBuf.putInt(EDGE_WEIGHT_OFFSET+i*EDGE_BYTE_SIZE,weight); // weight
+			edgeBuf.put(EDGE_TYPE_OFFSET+i*EDGE_BYTE_SIZE,type); // type
+			edgeBuf.put(EDGE_AGE_OFFSET+i*EDGE_BYTE_SIZE,age); // age
 			
 			// label
 			String label = "e"+i;
 			char[] labelArray = label.toCharArray();
 			labelLength = (short)(labelArray.length);
 
-			edgeBuf.putInt(EDGE_LABEL_START_OFFSET+i*edgeByteSize,labelOffset); // label start
-			edgeBuf.putShort(EDGE_LABEL_LENGTH_OFFSET+i*edgeByteSize,labelLength); // label size
+			edgeBuf.putInt(EDGE_LABEL_START_OFFSET+i*EDGE_BYTE_SIZE,labelOffset); // label start
+			edgeBuf.putShort(EDGE_LABEL_LENGTH_OFFSET+i*EDGE_BYTE_SIZE,labelLength); // label size
 			
 			for(int j = 0; j < labelArray.length; j++) {
 				char c = labelArray[j];
@@ -1165,14 +1165,14 @@ System.out.println("nodeIndex "+nodeIndex);
 			// setting the in connection offset and length
 			ArrayList<Integer> inEdges = nodeIn.get(i);
 			short inEdgeLength = (short)(inEdges.size());
-			nodeBuf.putInt(i*nodeByteSize+NODE_IN_CONNECTION_START_OFFSET,offset);
-			nodeBuf.putShort(i*nodeByteSize+NODE_IN_DEGREE_OFFSET,inEdgeLength);
+			nodeBuf.putInt(i*NODE_BYTE_SIZE+NODE_IN_CONNECTION_START_OFFSET,offset);
+			nodeBuf.putShort(i*NODE_BYTE_SIZE+NODE_IN_DEGREE_OFFSET,inEdgeLength);
 		
 			// now put the in edge/node pairs
 			for(int edgeId : inEdges) {
 				int nodeId = -1;
-				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*edgeByteSize);
-				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*edgeByteSize);
+				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*EDGE_BYTE_SIZE);
+				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*EDGE_BYTE_SIZE);
 				if(n1 == i) {
 					nodeId = n2;
 				} else if(n2 == i) {
@@ -1182,20 +1182,20 @@ System.out.println("nodeIndex "+nodeIndex);
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeId);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeId);
-				offset += connectionPairSize;
+				offset += CONNECTION_PAIR_SIZE;
 			}
 			
 			// setting the out connection offset and length
 			ArrayList<Integer> outEdges = nodeOut.get(i);
 			short outEdgeLength = (short)(outEdges.size());
-			nodeBuf.putInt(i*nodeByteSize+NODE_OUT_CONNECTION_START_OFFSET,offset);
-			nodeBuf.putShort(i*nodeByteSize+NODE_OUT_DEGREE_OFFSET,outEdgeLength);
+			nodeBuf.putInt(i*NODE_BYTE_SIZE+NODE_OUT_CONNECTION_START_OFFSET,offset);
+			nodeBuf.putShort(i*NODE_BYTE_SIZE+NODE_OUT_DEGREE_OFFSET,outEdgeLength);
 		
 			// now put the out edge/node pairs
 			for(int edgeId : outEdges) {
 				int nodeId = -1;
-				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*edgeByteSize);
-				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*edgeByteSize);
+				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*EDGE_BYTE_SIZE);
+				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*EDGE_BYTE_SIZE);
 				if(n1 == i) {
 					nodeId = n2;
 				} else if(n2 == i) {
@@ -1205,7 +1205,7 @@ System.out.println("nodeIndex "+nodeIndex);
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeId);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeId);
-				offset += connectionPairSize;
+				offset += CONNECTION_PAIR_SIZE;
 			}
 		}
 	}
@@ -1316,21 +1316,21 @@ System.out.println("nodeIndex "+nodeIndex);
 		//time = System.currentTimeMillis();
 		for(int i = 0; i< numberOfNodes; i++) {
 			weight = r.nextInt(100);
-			nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+i*nodeByteSize,inStart); // offset for inward connecting edges/nodes
-			nodeBuf.putShort(NODE_IN_DEGREE_OFFSET+i*nodeByteSize,inLength); // number of inward connecting edges/nodes
-			nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+i*nodeByteSize,outStart); // offset for outward connecting edges/nodes
-			nodeBuf.putShort(NODE_OUT_DEGREE_OFFSET+i*nodeByteSize,outLength); // number of outward connecting edges/nodes
-			nodeBuf.putInt(NODE_WEIGHT_OFFSET+i*nodeByteSize,weight); // weight
-			nodeBuf.put(NODE_TYPE_OFFSET+i*nodeByteSize,type); // type
-			nodeBuf.put(NODE_AGE_OFFSET+i*nodeByteSize,age); // age
+			nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE,inStart); // offset for inward connecting edges/nodes
+			nodeBuf.putShort(NODE_IN_DEGREE_OFFSET+i*NODE_BYTE_SIZE,inLength); // number of inward connecting edges/nodes
+			nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE,outStart); // offset for outward connecting edges/nodes
+			nodeBuf.putShort(NODE_OUT_DEGREE_OFFSET+i*NODE_BYTE_SIZE,outLength); // number of outward connecting edges/nodes
+			nodeBuf.putInt(NODE_WEIGHT_OFFSET+i*NODE_BYTE_SIZE,weight); // weight
+			nodeBuf.put(NODE_TYPE_OFFSET+i*NODE_BYTE_SIZE,type); // type
+			nodeBuf.put(NODE_AGE_OFFSET+i*NODE_BYTE_SIZE,age); // age
 			
 			// label
 			String label = "n"+i;
 			char[] labelArray = label.toCharArray();
 			labelLength = (short)(labelArray.length);
 
-			nodeBuf.putInt(NODE_LABEL_START_OFFSET+i*nodeByteSize,labelOffset); // label start
-			nodeBuf.putShort(NODE_LABEL_LENGTH_OFFSET+i*nodeByteSize,labelLength); // label size
+			nodeBuf.putInt(NODE_LABEL_START_OFFSET+i*NODE_BYTE_SIZE,labelOffset); // label start
+			nodeBuf.putShort(NODE_LABEL_LENGTH_OFFSET+i*NODE_BYTE_SIZE,labelLength); // label size
 
 			for(int j = 0; j < labelArray.length; j++) {
 				char c = labelArray[j];
@@ -1381,19 +1381,19 @@ System.out.println("node get time " + (System.currentTimeMillis()-time)/1000.0+"
 			weight = r.nextInt(100);
 			node1 = r.nextInt(numberOfNodes);
 			node2 = r.nextInt(numberOfNodes);
-			edgeBuf.putInt(EDGE_NODE1_OFFSET+i*edgeByteSize,node1); // one end of edge
-			edgeBuf.putInt(EDGE_NODE2_OFFSET+i*edgeByteSize,node2); // other end of edge
-			edgeBuf.putInt(EDGE_WEIGHT_OFFSET+i*edgeByteSize,weight); // weight
-			edgeBuf.put(EDGE_TYPE_OFFSET+i*edgeByteSize,type); // type
-			edgeBuf.put(EDGE_AGE_OFFSET+i*edgeByteSize,age); // age
+			edgeBuf.putInt(EDGE_NODE1_OFFSET+i*EDGE_BYTE_SIZE,node1); // one end of edge
+			edgeBuf.putInt(EDGE_NODE2_OFFSET+i*EDGE_BYTE_SIZE,node2); // other end of edge
+			edgeBuf.putInt(EDGE_WEIGHT_OFFSET+i*EDGE_BYTE_SIZE,weight); // weight
+			edgeBuf.put(EDGE_TYPE_OFFSET+i*EDGE_BYTE_SIZE,type); // type
+			edgeBuf.put(EDGE_AGE_OFFSET+i*EDGE_BYTE_SIZE,age); // age
 			
 			// label
 			String label = "e"+i;
 			char[] labelArray = label.toCharArray();
 			labelLength = (short)(labelArray.length);
 
-			edgeBuf.putInt(EDGE_LABEL_START_OFFSET+i*edgeByteSize,labelOffset); // label start
-			edgeBuf.putShort(EDGE_LABEL_LENGTH_OFFSET+i*edgeByteSize,labelLength); // label size
+			edgeBuf.putInt(EDGE_LABEL_START_OFFSET+i*EDGE_BYTE_SIZE,labelOffset); // label start
+			edgeBuf.putShort(EDGE_LABEL_LENGTH_OFFSET+i*EDGE_BYTE_SIZE,labelLength); // label size
 			
 			for(int j = 0; j < labelArray.length; j++) {
 				char c = labelArray[j];
@@ -1432,14 +1432,14 @@ System.out.println("edge get time " + (System.currentTimeMillis()-time)/1000.0+"
 			// setting the in connection offset and length
 			ArrayList<Integer> inEdges = nodeIn.get(i);
 			short inEdgeLength = (short)(inEdges.size());
-			nodeBuf.putInt(i*nodeByteSize+NODE_IN_CONNECTION_START_OFFSET,offset);
-			nodeBuf.putShort(i*nodeByteSize+NODE_IN_DEGREE_OFFSET,inEdgeLength);
+			nodeBuf.putInt(i*NODE_BYTE_SIZE+NODE_IN_CONNECTION_START_OFFSET,offset);
+			nodeBuf.putShort(i*NODE_BYTE_SIZE+NODE_IN_DEGREE_OFFSET,inEdgeLength);
 		
 			// now put the in edge/node pairs
 			for(int edgeId : inEdges) {
 				int nodeId = -1;
-				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*edgeByteSize);
-				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*edgeByteSize);
+				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*EDGE_BYTE_SIZE);
+				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*EDGE_BYTE_SIZE);
 				if(n1 == i) {
 					nodeId = n2;
 				} else if(n2 == i) {
@@ -1449,20 +1449,20 @@ System.out.println("edge get time " + (System.currentTimeMillis()-time)/1000.0+"
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeId);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeId);
-				offset += connectionPairSize;
+				offset += CONNECTION_PAIR_SIZE;
 			}
 			
 			// setting the out connection offset and length
 			ArrayList<Integer> outEdges = nodeOut.get(i);
 			short outEdgeLength = (short)(outEdges.size());
-			nodeBuf.putInt(i*nodeByteSize+NODE_OUT_CONNECTION_START_OFFSET,offset);
-			nodeBuf.putShort(i*nodeByteSize+NODE_OUT_DEGREE_OFFSET,outEdgeLength);
+			nodeBuf.putInt(i*NODE_BYTE_SIZE+NODE_OUT_CONNECTION_START_OFFSET,offset);
+			nodeBuf.putShort(i*NODE_BYTE_SIZE+NODE_OUT_DEGREE_OFFSET,outEdgeLength);
 		
 			// now put the out edge/node pairs
 			for(int edgeId : outEdges) {
 				int nodeId = -1;
-				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*edgeByteSize);
-				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*edgeByteSize);
+				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*EDGE_BYTE_SIZE);
+				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*EDGE_BYTE_SIZE);
 				if(n1 == i) {
 					nodeId = n2;
 				} else if(n2 == i) {
@@ -1472,7 +1472,7 @@ System.out.println("edge get time " + (System.currentTimeMillis()-time)/1000.0+"
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeId);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeId);
-				offset += connectionPairSize;
+				offset += CONNECTION_PAIR_SIZE;
 			}
 			
 		
@@ -1530,21 +1530,21 @@ System.out.println("edge get time " + (System.currentTimeMillis()-time)/1000.0+"
 				type = -1;
 			}
 			
-			nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+i*nodeByteSize,inStart); // offset for inward connecting edges/nodes
-			nodeBuf.putShort(NODE_IN_DEGREE_OFFSET+i*nodeByteSize,inLength); // number of inward connecting edges/nodes
-			nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+i*nodeByteSize,outStart); // offset for outward connecting edges/nodes
-			nodeBuf.putShort(NODE_OUT_DEGREE_OFFSET+i*nodeByteSize,outLength); // number of outward connecting edges/nodes
-			nodeBuf.putInt(NODE_WEIGHT_OFFSET+i*nodeByteSize,weight); // weight
-			nodeBuf.put(NODE_TYPE_OFFSET+i*nodeByteSize,type); // type
-			nodeBuf.put(NODE_AGE_OFFSET+i*nodeByteSize,age); // age
+			nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE,inStart); // offset for inward connecting edges/nodes
+			nodeBuf.putShort(NODE_IN_DEGREE_OFFSET+i*NODE_BYTE_SIZE,inLength); // number of inward connecting edges/nodes
+			nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE,outStart); // offset for outward connecting edges/nodes
+			nodeBuf.putShort(NODE_OUT_DEGREE_OFFSET+i*NODE_BYTE_SIZE,outLength); // number of outward connecting edges/nodes
+			nodeBuf.putInt(NODE_WEIGHT_OFFSET+i*NODE_BYTE_SIZE,weight); // weight
+			nodeBuf.put(NODE_TYPE_OFFSET+i*NODE_BYTE_SIZE,type); // type
+			nodeBuf.put(NODE_AGE_OFFSET+i*NODE_BYTE_SIZE,age); // age
 
 			// label
 			String label = dgn.getLabel();
 			char[] labelArray = label.toCharArray();
 			labelLength = (short)(labelArray.length);
 
-			nodeBuf.putInt(NODE_LABEL_START_OFFSET+i*nodeByteSize,labelOffset); // label start
-			nodeBuf.putShort(NODE_LABEL_LENGTH_OFFSET+i*nodeByteSize,labelLength); // label size
+			nodeBuf.putInt(NODE_LABEL_START_OFFSET+i*NODE_BYTE_SIZE,labelOffset); // label start
+			nodeBuf.putShort(NODE_LABEL_LENGTH_OFFSET+i*NODE_BYTE_SIZE,labelLength); // label size
 
 			for(int j = 0; j < labelArray.length; j++) {
 				char c = labelArray[j];
@@ -1590,19 +1590,19 @@ System.out.println("edge get time " + (System.currentTimeMillis()-time)/1000.0+"
 			}
 
 			
-			edgeBuf.putInt(EDGE_NODE1_OFFSET+i*edgeByteSize,node1); // one end of edge
-			edgeBuf.putInt(EDGE_NODE2_OFFSET+i*edgeByteSize,node2); // other end of edge
-			edgeBuf.putInt(EDGE_WEIGHT_OFFSET+i*edgeByteSize,weight); // weight
-			edgeBuf.put(EDGE_TYPE_OFFSET+i*edgeByteSize,type); // type
-			edgeBuf.put(EDGE_AGE_OFFSET+i*edgeByteSize,age); // age
+			edgeBuf.putInt(EDGE_NODE1_OFFSET+i*EDGE_BYTE_SIZE,node1); // one end of edge
+			edgeBuf.putInt(EDGE_NODE2_OFFSET+i*EDGE_BYTE_SIZE,node2); // other end of edge
+			edgeBuf.putInt(EDGE_WEIGHT_OFFSET+i*EDGE_BYTE_SIZE,weight); // weight
+			edgeBuf.put(EDGE_TYPE_OFFSET+i*EDGE_BYTE_SIZE,type); // type
+			edgeBuf.put(EDGE_AGE_OFFSET+i*EDGE_BYTE_SIZE,age); // age
 			
 			// label
 			String label = dge.getLabel();
 			char[] labelArray = label.toCharArray();
 			labelLength = (short)(labelArray.length);
 
-			edgeBuf.putInt(EDGE_LABEL_START_OFFSET+i*edgeByteSize,labelOffset); // label start
-			edgeBuf.putShort(EDGE_LABEL_LENGTH_OFFSET+i*edgeByteSize,labelLength); // label size
+			edgeBuf.putInt(EDGE_LABEL_START_OFFSET+i*EDGE_BYTE_SIZE,labelOffset); // label start
+			edgeBuf.putShort(EDGE_LABEL_LENGTH_OFFSET+i*EDGE_BYTE_SIZE,labelLength); // label size
 			
 			for(int j = 0; j < labelArray.length; j++) {
 				char c = labelArray[j];
@@ -1626,14 +1626,14 @@ System.out.println("edge get time " + (System.currentTimeMillis()-time)/1000.0+"
 			// setting the in connection offset and length
 			ArrayList<Integer> inEdges = nodeIn.get(i);
 			short inEdgeLength = (short)(inEdges.size());
-			nodeBuf.putInt(i*nodeByteSize+NODE_IN_CONNECTION_START_OFFSET,offset);
-			nodeBuf.putShort(i*nodeByteSize+NODE_IN_DEGREE_OFFSET,inEdgeLength);
+			nodeBuf.putInt(i*NODE_BYTE_SIZE+NODE_IN_CONNECTION_START_OFFSET,offset);
+			nodeBuf.putShort(i*NODE_BYTE_SIZE+NODE_IN_DEGREE_OFFSET,inEdgeLength);
 		
 			// now put the in edge/node pairs
 			for(int edgeId : inEdges) {
 				int nodeId = -1;
-				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*edgeByteSize);
-				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*edgeByteSize);
+				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*EDGE_BYTE_SIZE);
+				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*EDGE_BYTE_SIZE);
 				if(n1 == i) {
 					nodeId = n2;
 				} else if(n2 == i) {
@@ -1643,20 +1643,20 @@ System.out.println("edge get time " + (System.currentTimeMillis()-time)/1000.0+"
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeId);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeId);
-				offset += connectionPairSize;
+				offset += CONNECTION_PAIR_SIZE;
 			}
 			
 			// setting the out connection offset and length
 			ArrayList<Integer> outEdges = nodeOut.get(i);
 			short outEdgeLength = (short)(outEdges.size());
-			nodeBuf.putInt(i*nodeByteSize+NODE_OUT_CONNECTION_START_OFFSET,offset);
-			nodeBuf.putShort(i*nodeByteSize+NODE_OUT_DEGREE_OFFSET,outEdgeLength);
+			nodeBuf.putInt(i*NODE_BYTE_SIZE+NODE_OUT_CONNECTION_START_OFFSET,offset);
+			nodeBuf.putShort(i*NODE_BYTE_SIZE+NODE_OUT_DEGREE_OFFSET,outEdgeLength);
 		
 			// now put the out edge/node pairs
 			for(int edgeId : outEdges) {
 				int nodeId = -1;
-				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*edgeByteSize);
-				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*edgeByteSize);
+				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeId*EDGE_BYTE_SIZE);
+				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeId*EDGE_BYTE_SIZE);
 				if(n1 == i) {
 					nodeId = n2;
 				} else if(n2 == i) {
@@ -1666,7 +1666,7 @@ System.out.println("edge get time " + (System.currentTimeMillis()-time)/1000.0+"
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeId);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeId);
-				offset += connectionPairSize;
+				offset += CONNECTION_PAIR_SIZE;
 			}
 		}
 	}
@@ -1682,8 +1682,8 @@ System.out.println("edge get time " + (System.currentTimeMillis()-time)/1000.0+"
 		
 		int max = 0;
 		for(int i = 0; i< numberOfNodes; i++) {
-				short inDegree = nodeBuf.getShort(NODE_IN_DEGREE_OFFSET+i*nodeByteSize);
-				short outDegree = nodeBuf.getShort(NODE_OUT_DEGREE_OFFSET+i*nodeByteSize);
+				short inDegree = nodeBuf.getShort(NODE_IN_DEGREE_OFFSET+i*NODE_BYTE_SIZE);
+				short outDegree = nodeBuf.getShort(NODE_OUT_DEGREE_OFFSET+i*NODE_BYTE_SIZE);
 				int degree = inDegree+outDegree;
 				if(degree > max) {
 					max = degree;
@@ -1720,12 +1720,12 @@ System.out.println("edge get time " + (System.currentTimeMillis()-time)/1000.0+"
 			int currentNode = queue.removeFirst();
 			nodeCount++;
 			
-			int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+currentNode*nodeByteSize);
+			int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+currentNode*NODE_BYTE_SIZE);
 			int degree = getNodeDegree(currentNode);
 			for(int i = 0; i < degree; i++) {
 //edgeCount++;
 				// step over edge/node pairs and the edge
-				int nodeOffset = CONNECTION_NODE_OFFSET+connectionOffset+i*connectionPairSize;
+				int nodeOffset = CONNECTION_NODE_OFFSET+connectionOffset+i*CONNECTION_PAIR_SIZE;
 				int connectingNode = connectionBuf.getInt(nodeOffset);
 				boolean flag = nodeFlag[connectingNode];
 				if(!flag) {
