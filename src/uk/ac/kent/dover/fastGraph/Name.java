@@ -1,7 +1,7 @@
 package uk.ac.kent.dover.fastGraph;
 
 /**
- * Trivial class to hold a name & Cumulative Probability pair<br>
+ * Trivial class to hold a name and Cumulative Probability pair<br>
  * 
  * @author Rob Baker
  *

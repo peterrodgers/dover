@@ -27,8 +27,8 @@ public class LauncherCmd {
 	/**
 	 * Constructor that calls to the building and then parsing of command line options.
 	 * 
-	 * @param launcher
-	 * @param args
+	 * @param launcher The Launcher for callbacks
+	 * @param args The arguments passed to the system through the command line
 	 */
 	public LauncherCmd(Launcher launcher, String[] args) {
 		this.launcher = launcher;

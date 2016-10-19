@@ -45,7 +45,7 @@ public class Util {
 	/**
 	 * Checks if a String is a positive integer.
 	 * 
-	 * @param s The String to be converted
+	 * @param input The String to be converted
 	 * @throws NumberFormatException If the input is not an integer, or < 0.
 	 * @return The positive integer
 	 */

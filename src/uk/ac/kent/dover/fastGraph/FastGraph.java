@@ -85,6 +85,8 @@ public class FastGraph {
 	
 	private String name = "";
 	private boolean direct;
+	
+	private Random r; //used to pick random edges;
 		
 	/**
 	 * No direct access to constructor, as a number of data structures need to be created when
@@ -2043,7 +2045,90 @@ if(edgeIndex%1000000==0 ) {
 		return g;
 	}
 
-
+	/**
+	 * Will populated nodes and edges with the nodeIndex and edgeIndex of all the nodes and edges of this subgraph.<br>
+	 * Will create a subgraph with the required number of nodes in.
+	 * 
+	 * @param nodes The list of nodes to populate
+	 * @param edges The list of edges to populate
+	 * @param numOfNodes The number of nodes in the subgraph
+	 * @throws FastGraphException If there is an unspecified error - usually the number of nodes requested is too low
+	 */
+	public void createInducedSubgraph(ArrayList<Integer> nodes, ArrayList<Integer> edges, int numOfNodes) throws FastGraphException {
+		if (numOfNodes < 2) {
+			throw new FastGraphException("Can only induce a subgraph with 2 or more nodes");
+		}
+		
+		//initialise this Random generator if is hasn't been already
+		//don't do this in a constructor, as the node buffer might not have been built or populated yet
+		if (r == null) {
+			long seed = nodeBuf.getLong(); //used to ensure the random is the same for each graph
+			r = new Random(seed);
+		}		
+		
+		int startingEdge = r.nextInt(numberOfEdges); //picks an edge at random
+		int[] startingNodes = new int[2];
+		boolean[] visitedNodes = new boolean[numberOfNodes];
+		boolean[] visitedEdges = new boolean[numberOfEdges];
+		
+		//add starting nodes and edges to lists
+		nodes.add(startingNodes[0]);
+		visitedNodes[startingNodes[0]] = true;
+		nodes.add(startingNodes[1]);
+		visitedNodes[startingNodes[1]] = true;
+		edges.add(startingEdge);
+		visitedEdges[startingEdge] = true;
+		
+		if (numOfNodes == 2) { //return with the current selection if graph has been found already - no inducing required.
+			return;
+		}		
+		
+		//possibly could/should write recursively instead
+		
+		//TODO getNodesConnectingEdges(startingNodes,startingEdge);
+		while(startingNodes.length != 0) {
+			for(int n : startingNodes) {
+				int[] nodeConnections = getNodeConnectingNodes(n);
+				for(int fn : nodeConnections) {
+					if(!visitedNodes[fn]) { //if it hasn't been visited
+						visitedNodes[fn] = true;
+						nodes.add(fn);
+						//TODO edges.add(e);
+						//TODO visitedEdges[e] = true;
+					}
+					if (nodes.size() == numOfNodes) {
+						induceGraph(nodes, edges);
+						return;
+					}
+				}
+				startingNodes = nodeConnections;
+			}			
+		}	
+		
+		return;
+	}
+	
+	/**
+	 * When given an array of nodes will induce any edges that connect between any two of the given nodes.
+	 * 
+	 * @param nodes The list of nodes in the graph
+	 * @param edges The list of edges in the graph - to be expanded with the newly induced edges.
+	 */
+	private void induceGraph(ArrayList<Integer> nodes, ArrayList<Integer> edges) {
+		//for every node in the graph
+		for(int n : nodes) {
+			//find what nodes it connects to
+			int[] connectingNodes = getNodeConnectingNodes(n);
+			for (int cn : connectingNodes) {
+				//if that node is also in the graph, then add the edge
+				if (nodes.contains(cn)) {
+					//TODO edges.add(e);
+				}
+			}
+			
+		}		
+		return;
+	}
 	
 
 	
