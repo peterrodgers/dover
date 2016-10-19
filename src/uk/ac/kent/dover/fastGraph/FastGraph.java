@@ -840,7 +840,7 @@ String name = "random-n-2-e-1";
 
 
 	/**
-	 * Generate a random graph of the desired size. Self sourcing edges may exist.
+	 * Generate a random graph of the desired size. Self sourcing edges and parallel edges may exist.
 	 * 
 	 * @param numberOfNodes the number of nodes in the graph
 	 * @param numberOfEdges the number of edges in the graph
@@ -892,7 +892,7 @@ String name = "random-n-2-e-1";
 		byte age = -9;
 		String label;
 		
-		//time = System.currentTimeMillis();
+		//the nodes are the first elements
 		JSONArray nodes = jsonObj.getJSONArray("nodes");
 		Iterator<Object> itNodes = nodes.iterator();
 		while(itNodes.hasNext()) {
@@ -941,6 +941,7 @@ String name = "random-n-2-e-1";
 		age = -105;
 		//time = System.currentTimeMillis();
 		
+		//populate the edges
 		JSONArray edges = jsonObj.getJSONArray("edges");
 		Iterator<Object> itEdges = edges.iterator();
 		while(itEdges.hasNext()) {
@@ -975,7 +976,6 @@ String name = "random-n-2-e-1";
 		setAllEdgeLabels(edgeLabels);
 	
 		// Initialise the connection buffer, modifying the node buffer connection data
-		//time = System.currentTimeMillis();
 		int offset = 0;
 		for(int i = 0; i < numberOfNodes; i++) {
 			// setting the in connection offset and length
@@ -1022,10 +1022,7 @@ String name = "random-n-2-e-1";
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,n);
 				offset += CONNECTION_PAIR_SIZE;
 			}
-			
-
 		}
-		//System.out.println("connection put time " + (System.currentTimeMillis()-time)/1000.0+" seconds, direct "+edgeBuf.isDirect());
 
 	}
 
@@ -1429,7 +1426,7 @@ if(edgeIndex%1000000==0 ) {
 
 
 	/**
-	 * Creates a graph with the size specified by numberOfNodes and numberOfEdges
+	 * Creates a graph with the size specified by numberOfNodes and numberOfEdges. Possibly includes parallel edges and self sourcing nodes
 	 */
 	public void populateRandomGraph() {
 
@@ -1445,7 +1442,7 @@ if(edgeIndex%1000000==0 ) {
 		int weight = -5;
 		byte type = -7;
 		byte age = -9;
-		//time = System.currentTimeMillis();
+		//generate the nodes
 		for(int i = 0; i < numberOfNodes; i++) {
 			weight = r.nextInt(100);
 			nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE,inStart); // offset for inward connecting edges/nodes
@@ -1483,7 +1480,7 @@ if(edgeIndex%1000000==0 ) {
 		weight = -101;
 		type = -103;
 		age = -105;
-		//time = System.currentTimeMillis();
+		//generate the edges, with random node connections, possibly including parallel edges and self sourcing nodes
 		for(int i = 0; i < numberOfEdges; i++) {
 			weight = r.nextInt(100);
 			node1 = r.nextInt(numberOfNodes);
@@ -1509,7 +1506,6 @@ if(edgeIndex%1000000==0 ) {
 		setAllEdgeLabels(edgeLabels);
 		
 		// Initialise the connection buffer, modifying the node buffer connection data
-		//time = System.currentTimeMillis();
 		int offset = 0;
 		for(int i = 0; i < numberOfNodes; i++) {
 			// setting the in connection offset and length
@@ -1606,6 +1602,7 @@ if(edgeIndex%1000000==0 ) {
 		byte type = -77;
 		byte age = -87;
 		ByteBuffer bb = ByteBuffer.allocate(4); // used to convert from int to byte, due to lack of direct casting
+		// nodes first, will be in the same order as the list in the displayGraph
 		for(int i = 0; i < numberOfNodes; i++) {
 			Node dgn = displayGraph.getNodes().get(i);
 			weight = (int)(dgn.getScore());
@@ -1652,10 +1649,11 @@ if(edgeIndex%1000000==0 ) {
 		weight = -15;
 		type = -25;
 		age = -35;
+		// edges once nodes exist, will be in the same order as the list in the displayGraph
 		for(int i = 0; i < numberOfEdges; i++) {
 			Edge dge = displayGraph.getEdges().get(i);
-			node1 = displayGraph.getNodes().indexOf(dge.getFrom());
-			node2 = displayGraph.getNodes().indexOf(dge.getTo());
+			node1 = displayGraph.getNodes().indexOf(dge.getFrom()); // we can find the FastGraph node index from its position in the displayGraph nodeList
+			node2 = displayGraph.getNodes().indexOf(dge.getTo()); // we can find the FastGraph node index from its position in the displayGraph nodeList
 			weight = (int)(dge.getScore());
 			bb.putInt(0,dge.getAge());
 			age = bb.get(3); // get least significant byte of age
