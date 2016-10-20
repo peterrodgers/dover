@@ -10,11 +10,16 @@ import uk.ac.kent.displayGraph.Graph;
  */
 public class ExactIsomorphism {
 
+	private int maxNodes;
+	private int maxEdges;
+	private int maxLabelChars;
+	
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		ExactIsomorphism ei = new ExactIsomorphism();
+		ExactIsomorphism ei = new ExactIsomorphism(100,1000,100000);
 		FastGraph g2;
 		FastGraph g1;
 		int comparisons = 10000;
@@ -82,10 +87,20 @@ public class ExactIsomorphism {
 	/**
 	 *
 	 * Create an ExactIsomorphism before running isomorphic. The ExactIsomorphism creates
-	 * static data to speed up the algorithm.
+	 * static data to speed up the algorithm. Arguments can have quite high values
+	 * without compromising efficiency.
+	 * 
+	 * @param maxNodes equal to or more than the maximum number of nodes in any subgraph to be tested
+	 * @param maxEdges equal to or more than the maximum number of edges in any subgraph to be tested
+	 * @param maxNodes equal to or more than the maximum number of chars in total for either nodes or edges in any subgraph
 	 *
 	 */
-	public ExactIsomorphism() {
+	public ExactIsomorphism(int maxNodes, int maxEdges, int maxLabelChars) {
+		this.maxNodes = maxNodes;
+		this.maxEdges = maxEdges;
+		this.maxLabelChars = maxLabelChars;
+		
+		//TODO create the ByteBuffers and such for the subgraph to be constructed
 				
 	}
 	

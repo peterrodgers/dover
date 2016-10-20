@@ -1221,14 +1221,18 @@ public class FastGraphTest {
 	@Test
 	public void test120() {
 		FastGraph g1;
+		int[] nodes;
+		int[] edges;
 		FastGraph g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
-		ArrayList<Integer> nodes = new ArrayList<Integer>();
-		ArrayList<Integer> edges = new ArrayList<Integer>();
+		nodes = new int[0];
+		edges = new int[0];
 		g1 = g.generateGraphFromSubgraph(nodes,edges);
 		assertEquals(0,g1.getNumberOfNodes());
 		assertEquals(0,g1.getNumberOfEdges());
 		
-		nodes.add(4);
+		nodes = new int[1];
+		edges = new int[0];
+		nodes[0] = 4;
 		g1 = g.generateGraphFromSubgraph(nodes,edges);
 		assertEquals(g1.getNumberOfNodes(),1);
 		assertEquals(g1.getNumberOfEdges(),0);
@@ -1237,9 +1241,11 @@ public class FastGraphTest {
 		assertEquals(42,g1.getNodeType(0));
 		assertEquals(43,g1.getNodeAge(0));
 
-		nodes.add(3);
-		edges.add(4);
-		
+		nodes = new int[2];
+		edges = new int[1];
+		nodes[0] = 4;
+		nodes[1] = 3;
+		edges[0] = 4;
 		g1 = g.generateGraphFromSubgraph(nodes,edges);
 		assertEquals(g1.getNumberOfNodes(),2);
 		assertEquals(g1.getNumberOfEdges(),1);
@@ -1260,54 +1266,92 @@ public class FastGraphTest {
 		FastGraph g1;
 		FastGraph g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
 		Graph displayGraph = new Graph("test graph ");
-		ArrayList<Integer> nodes = new ArrayList<Integer>();
-		ArrayList<Integer> edges = new ArrayList<Integer>();
 		
-		nodes.add(0);
+		int[] nodes;
+		int[] edges;
+		nodes = new int[1];
+		edges = new int[0];
+		nodes[0] = 0;
 		g1 = g.generateGraphFromSubgraph(nodes,edges);
 		Node n0 = new Node("n0");
 		displayGraph.addNode(n0);
 		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
 		
-		nodes.add(1);
+		nodes = new int[2];
+		edges = new int[0];
+		nodes[0] = 0;
+		nodes[1] = 1;
 		g1 = g.generateGraphFromSubgraph(nodes,edges);
 		Node n1 = new Node("n1");
 		displayGraph.addNode(n1);
 		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
 		
-		edges.add(0);
+		nodes = new int[2];
+		edges = new int[1];
+		nodes[0] = 0;
+		nodes[1] = 1;
+		edges[0] = 0;
 		g1 = g.generateGraphFromSubgraph(nodes,edges);
 		Edge e0 = new Edge(n0,n1,"e1");
 		displayGraph.addEdge(e0);
 		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
 		
-		nodes.add(2);
-		edges.add(1);
-		edges.add(2);
+		nodes = new int[3];
+		edges = new int[3];
+		nodes[0] = 2;
+		nodes[1] = 0;
+		nodes[2] = 1;
+		edges[0] = 2;
+		edges[1] = 0;
+		edges[2] = 1;
 		g1 = g.generateGraphFromSubgraph(nodes,edges);
 		Node n2 = new Node("n2");
 		displayGraph.addNode(n2);
-		Edge e1 = new Edge(n2,n1,"e2");
-		Edge e2 = new Edge(n2,n0,"e3");
+		Edge e1 = new Edge(n2,n1,"e1");
+		Edge e2 = new Edge(n2,n0,"e2");
 		displayGraph.addEdge(e1);
 		displayGraph.addEdge(e2);
 		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
 
-		nodes.add(3);
-		nodes.add(4);
-		edges.add(3);
-		edges.add(4);
+		nodes = new int[5];
+		edges = new int[5];
+		nodes[0] = 4;
+		nodes[1] = 3;
+		nodes[2] = 2;
+		nodes[3] = 1;
+		nodes[4] = 0;
+		edges[0] = 4;
+		edges[1] = 3;
+		edges[2] = 2;
+		edges[3] = 1;
+		edges[4] = 0;
 		g1 = g.generateGraphFromSubgraph(nodes,edges);
 		Node n3 = new Node("n3");
 		Node n4 = new Node("n4");
 		displayGraph.addNode(n3);
 		displayGraph.addNode(n4);
-		Edge e4 = new Edge(n2,n3,"e3");
-		Edge e5 = new Edge(n4,n3,"e4");
+		Edge e3 = new Edge(n2,n3,"e3");
+		Edge e4 = new Edge(n4,n3,"e4");
+		displayGraph.addEdge(e3);
 		displayGraph.addEdge(e4);
-		displayGraph.addEdge(e5);
 		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
 
+	}
+
+	
+	@Test
+	public void test122() {
+		FastGraph g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
+		assertEquals(g.oppositeEnd(4,3),4);
+		assertEquals(g.oppositeEnd(4,4),3);
+		assertEquals(g.oppositeEnd(0,1),0);
+		assertEquals(g.oppositeEnd(0,0),1);
+	}
+		
+	@Test
+	public void test123() {
+		FastGraph g = FastGraph.jsonStringGraphFactory(get2Node2Edge(),false);
+		assertEquals(g.oppositeEnd(1,0),0);
 	}
 
 	

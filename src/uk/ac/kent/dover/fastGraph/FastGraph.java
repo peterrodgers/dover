@@ -1,8 +1,6 @@
 package uk.ac.kent.dover.fastGraph;
 
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
@@ -780,12 +778,15 @@ public class FastGraph {
 	
 	
 	/**
-	 * gets the other node connecting to the edge
+	 * gets the other node connecting to the edge.
+	 * If the argument node is not connected to the edge, then an undefined node will
+	 * be returned.
 	 * 
 	 * @param edge the edge
 	 * @param node the known node
+	 * @return the node on the opposite side of the edge
 	 */
-	int oppositeEnd(int edge, int node) {
+	public int oppositeEnd(int edge, int node) {
 		int n1 = getEdgeNode1(edge);
 		int n2 = getEdgeNode2(edge);
 		
@@ -1793,18 +1794,18 @@ if(edgeIndex%1000000==0 ) {
 	 * @aparam subgraphEdges edges in this graph that will appear in the new graph, must connect only to subgraphNodes
 	 * @return
 	 */
-	public FastGraph generateGraphFromSubgraph(List<Integer> subgraphNodes, List<Integer> subgraphEdges) {
+	public FastGraph generateGraphFromSubgraph(int[] subgraphNodes, int[] subgraphEdges) {
 
-		FastGraph g = new FastGraph(subgraphNodes.size(), subgraphEdges.size(), getDirect());
+		FastGraph g = new FastGraph(subgraphNodes.length, subgraphEdges.length, getDirect());
 		
-		String[] nodeLabels = new String[subgraphNodes.size()]; // stores the labels for creating the nodeLabelBuffer
-		HashMap<Integer,Integer> oldNodesToNew = new HashMap<>(subgraphNodes.size()*4); // for reference when adding edges, multiplier reduces chances of clashes
+		String[] nodeLabels = new String[subgraphNodes.length]; // stores the labels for creating the nodeLabelBuffer
+		HashMap<Integer,Integer> oldNodesToNew = new HashMap<>(subgraphNodes.length*4); // for reference when adding edges, multiplier reduces chances of clashes
 		// initial population of the new node array
 		int weight = -98;
 		byte type = -97;
 		byte age = -96;
 		int index = 0;
-		for(Integer n : subgraphNodes) {
+		for(int n : subgraphNodes) {
 
 			weight = nodeBuf.getInt(NODE_WEIGHT_OFFSET+n*NODE_BYTE_SIZE);
 			type = nodeBuf.get(NODE_TYPE_OFFSET+n*NODE_BYTE_SIZE);
@@ -1818,32 +1819,31 @@ if(edgeIndex%1000000==0 ) {
 			nodeLabels[index] = getNodeLabel(n);
 			// store old to new mapping for later
 			oldNodesToNew.put(n, index);
-System.out.println("old "+n+" new "+index);
 			index++;
 		}
 		
 		g.setAllNodeLabels(nodeLabels); // create the node label buffer
 		
-		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(subgraphNodes.size()); // temporary store of inward edges
-		for(int nodeIndex = 0; nodeIndex < subgraphNodes.size(); nodeIndex++) {
+		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(subgraphNodes.length); // temporary store of inward edges
+		for(int nodeIndex = 0; nodeIndex < subgraphNodes.length; nodeIndex++) {
 			ArrayList<Integer> edges = new ArrayList<Integer>(100);
 			nodeIn.add(nodeIndex,edges);
 		}
 		
-		ArrayList<ArrayList<Integer>> nodeOut = new ArrayList<ArrayList<Integer>>(subgraphNodes.size()); // temporary store of outward edges
-		for(int nodeIndex = 0; nodeIndex < subgraphNodes.size(); nodeIndex++) {
+		ArrayList<ArrayList<Integer>> nodeOut = new ArrayList<ArrayList<Integer>>(subgraphNodes.length); // temporary store of outward edges
+		for(int nodeIndex = 0; nodeIndex < subgraphNodes.length; nodeIndex++) {
 			ArrayList<Integer> edges = new ArrayList<Integer>(100);
 			nodeOut.add(nodeIndex,edges);
 		}
 				
-		String[] edgeLabels = new String[subgraphEdges.size()]; // stores the labels for creating the edgeLabelBuffer
+		String[] edgeLabels = new String[subgraphEdges.length]; // stores the labels for creating the edgeLabelBuffer
 		ArrayList<Integer> inEdgeList;	
 		ArrayList<Integer> outEdgeList;	
 		// create the edges
 		index = 0;
 		edgeBuf.position(0);
 		g.edgeBuf.position(0);
-		for(Integer e : subgraphEdges) {
+		for(int e : subgraphEdges) {
 			
 			weight = edgeBuf.getInt(EDGE_WEIGHT_OFFSET+e*EDGE_BYTE_SIZE);
 			type = edgeBuf.get(EDGE_TYPE_OFFSET+e*EDGE_BYTE_SIZE);
@@ -1878,7 +1878,7 @@ System.out.println("old "+n+" new "+index);
 		// Initialise the connection buffer, modifying the node buffer connection data
 		//time = System.currentTimeMillis();
 		int offset = 0;
-		for(int node = 0; node < subgraphNodes.size(); node++) {
+		for(int node = 0; node < subgraphNodes.length; node++) {
 			// setting the in connection offset and length
 			ArrayList<Integer> inEdges = nodeIn.get(node);
 			short inEdgeLength = (short)(inEdges.size());
