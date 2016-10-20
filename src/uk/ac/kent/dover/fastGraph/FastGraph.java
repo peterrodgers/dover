@@ -2249,15 +2249,18 @@ if(edgeIndex%1000000==0 ) {
 	 * @param numOfNodes The number of nodes in the subgraph
 	 * @throws FastGraphException If there is an unspecified error - usually the number of nodes requested is too low
 	 */
-	public void createInducedSubgraph(ArrayList<Integer> nodes, ArrayList<Integer> edges, int numOfNodes) throws FastGraphException {
+	public void createInducedSubgraph(LinkedList<Integer> nodes, LinkedList<Integer> edges, int numOfNodes) throws FastGraphException {
 		if (numOfNodes < 2) {
 			throw new FastGraphException("Can only induce a subgraph with 2 or more nodes");
+		}
+		if (numOfNodes > numberOfNodes) {
+			throw new FastGraphException("Cannot find a subgraph that is bigger than the original graph");
 		}
 		
 		//initialise this Random generator if is hasn't been already
 		//don't do this in a constructor, as the node buffer might not have been built or populated yet
 		if (r == null) {
-			long seed = nodeBuf.getLong(); //used to ensure the random is the same for each graph
+			long seed = nodeBuf.getLong(1); //used to ensure the random is the same for each graph
 			r = new Random(seed);
 		}		
 		
@@ -2265,6 +2268,9 @@ if(edgeIndex%1000000==0 ) {
 		int[] startingNodes = new int[2];
 		boolean[] visitedNodes = new boolean[numberOfNodes];
 		boolean[] visitedEdges = new boolean[numberOfEdges];
+		
+		startingNodes[0] = getEdgeNode1(startingEdge);
+		startingNodes[1] = getEdgeNode2(startingEdge);
 		
 		//add starting nodes and edges to lists
 		nodes.add(startingNodes[0]);
@@ -2278,25 +2284,31 @@ if(edgeIndex%1000000==0 ) {
 			return;
 		}		
 		
-		//possibly could/should write recursively instead
-		
-		//TODO getNodesConnectingEdges(startingNodes,startingEdge);
+		//while there are starting Nodes (incase the graph isn't big enough)
 		while(startingNodes.length != 0) {
+			//for each of these
 			for(int n : startingNodes) {
-				int[] nodeConnections = getNodeConnectingNodes(n);
-				for(int fn : nodeConnections) {
-					if(!visitedNodes[fn]) { //if it hasn't been visited
+				//find every edge that connects to this node
+				int[] edgeConnections = getNodeConnectingEdges(n);
+				for(int fe : edgeConnections) {
+					
+					//find the other end of the node
+					int fn = oppositeEnd(fe,n);
+					if(!visitedNodes[fn] && !nodes.contains(fn)) { //if it hasn't been visited and isn't already in the list
+						//then add to the subgraph
 						visitedNodes[fn] = true;
 						nodes.add(fn);
-						//TODO edges.add(e);
-						//TODO visitedEdges[e] = true;
+						edges.add(fe);
+						visitedEdges[fe] = true;
 					}
+					//if we've found enough nodes, then induce the rest of the graph and quit
 					if (nodes.size() == numOfNodes) {
 						induceGraph(nodes, edges);
 						return;
 					}
 				}
-				startingNodes = nodeConnections;
+				//if not, go one step deeper
+				startingNodes = getNodeConnectingNodes(n);
 			}			
 		}	
 		
@@ -2309,15 +2321,18 @@ if(edgeIndex%1000000==0 ) {
 	 * @param nodes The list of nodes in the graph
 	 * @param edges The list of edges in the graph - to be expanded with the newly induced edges.
 	 */
-	private void induceGraph(ArrayList<Integer> nodes, ArrayList<Integer> edges) {
+	private void induceGraph(LinkedList<Integer> nodes, LinkedList<Integer> edges) {
 		//for every node in the graph
 		for(int n : nodes) {
-			//find what nodes it connects to
-			int[] connectingNodes = getNodeConnectingNodes(n);
-			for (int cn : connectingNodes) {
-				//if that node is also in the graph, then add the edge
-				if (nodes.contains(cn)) {
-					//TODO edges.add(e);
+			//find what edges it connects to
+			int[] edgeConnections = getNodeConnectingEdges(n);
+			//for each of these connecting edges
+			for (int ce : edgeConnections) {
+				//find the other node
+				int cn = oppositeEnd(ce,n);
+				//if that node is also in the graph and this edge isn't already in the list, then add the edge
+				if (nodes.contains(cn) && !edges.contains(ce)) {
+					edges.add(ce);
 				}
 			}
 			
