@@ -127,7 +127,7 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(10000000,100000000,false); // 10 million nodes, 100 million edges, close to edgeBuf limit, but fails on heap space with 14g, but pass with heap space of 30g
 
 //		time = System.currentTimeMillis();
-		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
+//		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false); // SNAP web page gives 1768149 edges
 //		FastGraph g1 = adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
@@ -136,33 +136,43 @@ public class FastGraph {
 //System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		
 		time = System.currentTimeMillis();
+/*		
 		g1.saveBuffers(null,g1.getName());
 		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
-
-//String name = "random-n-2-e-1";
-		String name = g1.getName();
+*/
+String name = "testAdj4.txt";
+//		String name = g1.getName();
 		FastGraph g2;
 		try {
 			g2 = loadBuffersGraphFactory(null,name);
 			System.out.println("create graph from file test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			
 	 		
-			
+/*			
 			time = System.currentTimeMillis();
 			boolean connected = g2.isConnected();
 			System.out.println("connected test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			
 			System.out.println("connected "+connected);
-/*			
+*/			
 			time = System.currentTimeMillis();
 			int[][] matrix = g2.buildIntAdjacencyMatrix();
 			//boolean[][] matrix = g2.buildBooleanAdjacencyMatrix();
 			System.out.println("building matrix test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			g2.printMatrix(matrix);
-			System.out.println(Arrays.toString(g2.findEigenvalues(matrix)));
-			System.out.println(matrix.length);
-*/			
+			//System.out.println(Arrays.toString(g2.findEigenvalues(matrix)));
+			//System.out.println(matrix.length);
+			
+			LinkedList<Integer> nodes = new LinkedList<Integer>();
+			LinkedList<Integer> edges = new LinkedList<Integer>();
+			g2.createInducedSubgraph(nodes, edges, 3);
+			
+			System.out.println("nodes:");
+			System.out.println(nodes);
+			System.out.println("edges:");
+			System.out.println(edges);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -2294,7 +2304,7 @@ if(edgeIndex%1000000==0 ) {
 					
 					//find the other end of the node
 					int fn = oppositeEnd(fe,n);
-					if(!visitedNodes[fn] && !nodes.contains(fn)) { //if it hasn't been visited and isn't already in the list
+					if(!visitedNodes[fn]) { //if it hasn't been visited
 						//then add to the subgraph
 						visitedNodes[fn] = true;
 						nodes.add(fn);
@@ -2303,7 +2313,7 @@ if(edgeIndex%1000000==0 ) {
 					}
 					//if we've found enough nodes, then induce the rest of the graph and quit
 					if (nodes.size() == numOfNodes) {
-						induceGraph(nodes, edges);
+						induceGraph(nodes, edges, visitedEdges);
 						return;
 					}
 				}
@@ -2320,8 +2330,9 @@ if(edgeIndex%1000000==0 ) {
 	 * 
 	 * @param nodes The list of nodes in the graph
 	 * @param edges The list of edges in the graph - to be expanded with the newly induced edges.
+	 * @param visitedEdges The list of edges already visited
 	 */
-	private void induceGraph(LinkedList<Integer> nodes, LinkedList<Integer> edges) {
+	private void induceGraph(LinkedList<Integer> nodes, LinkedList<Integer> edges, boolean[] visitedEdges) {
 		//for every node in the graph
 		for(int n : nodes) {
 			//find what edges it connects to
@@ -2330,9 +2341,10 @@ if(edgeIndex%1000000==0 ) {
 			for (int ce : edgeConnections) {
 				//find the other node
 				int cn = oppositeEnd(ce,n);
-				//if that node is also in the graph and this edge isn't already in the list, then add the edge
-				if (nodes.contains(cn) && !edges.contains(ce)) {
+				//if that node is also in the graph and this edge hasn't been visited already, then add the edge
+				if (nodes.contains(cn) && !visitedEdges[ce]) {
 					edges.add(ce);
+					visitedEdges[ce] = true;
 				}
 			}
 			
