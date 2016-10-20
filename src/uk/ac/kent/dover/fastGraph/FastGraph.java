@@ -1,6 +1,8 @@
 package uk.ac.kent.dover.fastGraph;
 
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
@@ -11,6 +13,7 @@ import org.json.*;
 import uk.ac.kent.displayGraph.*;
 
 import Jama.Matrix;
+import test.uk.ac.kent.dover.fastGraph.FastGraphTest;
 import Jama.EigenvalueDecomposition;
 
 /**
@@ -118,7 +121,7 @@ public class FastGraph {
 		
 		
 //		FastGraph g1 = randomGraphFactory(2,1,false);
-//		FastGraph g1 = randomGraphFactory(5,6,true);
+//		FastGraph g1 = randomGraphFactory(5,6,1,true);
 //		FastGraph g1 = randomGraphFactory(10000,100000,false); // 10 thousand nodes, 100 thousand edges
 //		FastGraph g1 = randomGraphFactory(1000000,10000000,false); // 1 million nodes, 10 million edges
 //		FastGraph g1 = randomGraphFactory(5000000,50000000,false); // limit for edgeLabelBuf at 20 chars per label
@@ -137,15 +140,10 @@ public class FastGraph {
 		time = System.currentTimeMillis();
 		g1.saveBuffers(null,g1.getName());
 		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-		
-	/*
-Graph displayGraph = g1.generateDisplayGraph();
-displayGraph.randomizeNodePoints(new Point(50,50), 200, 200);
-uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(displayGraph);
 		time = System.currentTimeMillis();
 
-String name = "random-n-2-e-1";
-//		String name = g1.getName();
+//String name = "random-n-2-e-1";
+		String name = g1.getName();
 		FastGraph g2;
 		try {
 			g2 = loadBuffersGraphFactory(null,name);
@@ -158,7 +156,7 @@ String name = "random-n-2-e-1";
 			System.out.println("connected test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			
 			System.out.println("connected "+connected);
-			
+/*			
 			time = System.currentTimeMillis();
 			int[][] matrix = g2.buildIntAdjacencyMatrix();
 			//boolean[][] matrix = g2.buildBooleanAdjacencyMatrix();
@@ -166,12 +164,12 @@ String name = "random-n-2-e-1";
 			g2.printMatrix(matrix);
 			System.out.println(Arrays.toString(g2.findEigenvalues(matrix)));
 			System.out.println(matrix.length);
-			
+*/			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
- 		*/
+ 		
 	}	
 
 
@@ -196,6 +194,14 @@ String name = "random-n-2-e-1";
 	 */
 	public String getName() {
 		return name;
+	}
+	
+	
+	/**
+	 * @return the direct flag, false is on heap, true is off heap
+	 */
+	public boolean getDirect() {
+		return direct;
 	}
 	
 
@@ -772,6 +778,26 @@ String name = "random-n-2-e-1";
 
 	}
 	
+	
+	/**
+	 * gets the other node connecting to the edge
+	 * 
+	 * @param edge the edge
+	 * @param node the known node
+	 */
+	int oppositeEnd(int edge, int node) {
+		int n1 = getEdgeNode1(edge);
+		int n2 = getEdgeNode2(edge);
+		
+		if(n1 == node) {
+			return n2;
+		}
+		return n1;
+	}
+
+
+	
+	
 	/**
 	 * Allocates space for the node, edge and connection ByteBuffers. The label ByteBuffers
 	 * are created later
@@ -839,7 +865,7 @@ String name = "random-n-2-e-1";
 		
 		return g;
 	}
-
+	
 
 	/**
 	 * Generate a random graph of the desired size. Self sourcing edges and parallel edges may exist.
@@ -850,9 +876,24 @@ String name = "random-n-2-e-1";
 	 * @return the created FastGraph
 	 */
 	public static FastGraph randomGraphFactory(int numberOfNodes, int numberOfEdges, boolean direct) {
+		FastGraph graph = randomGraphFactory(numberOfNodes, numberOfEdges, -1, direct);
+		return graph;
+	}
+	
+	
+	/**
+	 * Generate a random graph of the desired size. Self sourcing edges and parallel edges may exist.
+	 * 
+	 * @param numberOfNodes the number of nodes in the graph
+	 * @param numberOfEdges the number of edges in the graph
+	 * @param seed random number seed, -1 for current time
+	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
+	 * @return the created FastGraph
+	 */
+	public static FastGraph randomGraphFactory(int numberOfNodes, int numberOfEdges, long seed, boolean direct) {
 		FastGraph g = new FastGraph(numberOfNodes,numberOfEdges,direct);
 		g.setName("random-n-"+numberOfNodes+"-e-"+numberOfEdges);
-		g.populateRandomGraph();
+		g.populateRandomGraph(seed);
 		return g;
 	}
 	
@@ -923,13 +964,13 @@ String name = "random-n-2-e-1";
 
 		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of inward edges
 		for(int i = 0; i < numberOfNodes; i++) {
-			ArrayList<Integer> edges = new ArrayList<Integer>(20);
+			ArrayList<Integer> edges = new ArrayList<Integer>(100);
 			nodeIn.add(i,edges);
 		}
 		
 		ArrayList<ArrayList<Integer>> nodeOut = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of outward edges
 		for(int i = 0; i < numberOfNodes; i++) {
-			ArrayList<Integer> edges = new ArrayList<Integer>(20);
+			ArrayList<Integer> edges = new ArrayList<Integer>(100);
 			nodeOut.add(i,edges);
 		}
 		
@@ -1240,13 +1281,13 @@ if(edgeIndex%1000000==0 ) {
 
 		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of inward edges
 		for(int i = 0; i < numberOfNodes; i++) {
-			ArrayList<Integer> edges = new ArrayList<Integer>(20);
+			ArrayList<Integer> edges = new ArrayList<Integer>(100);
 			nodeIn.add(i,edges);
 		}
 		
 		ArrayList<ArrayList<Integer>> nodeOut = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of outward edges
 		for(int i = 0; i < numberOfNodes; i++) {
-			ArrayList<Integer> edges = new ArrayList<Integer>(20);
+			ArrayList<Integer> edges = new ArrayList<Integer>(100);
 			nodeOut.add(i,edges);
 		}
 				
@@ -1429,11 +1470,16 @@ if(edgeIndex%1000000==0 ) {
 
 	/**
 	 * Creates a graph with the size specified by numberOfNodes and numberOfEdges. Possibly includes parallel edges and self sourcing nodes
+	 * 
+	 * @param seed the random number generator seed, -1 for current time
 	 */
-	public void populateRandomGraph() {
+	public void populateRandomGraph(long seed) {
 
 		//long time;
-		Random r = new Random();
+		if(seed == -1) {
+			seed = System.currentTimeMillis();
+		}
+		Random r = new Random(seed);
 
 		String[] nodeLabels = new String[numberOfNodes];
 		String[] edgeLabels = new String[numberOfEdges];
@@ -1465,13 +1511,13 @@ if(edgeIndex%1000000==0 ) {
 
 		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of inward edges
 		for(int i = 0; i < numberOfNodes; i++) {
-			ArrayList<Integer> edges = new ArrayList<Integer>(20);
+			ArrayList<Integer> edges = new ArrayList<Integer>(100);
 			nodeIn.add(i,edges);
 		}
 		
 		ArrayList<ArrayList<Integer>> nodeOut = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of outward edges
 		for(int i = 0; i < numberOfNodes; i++) {
-			ArrayList<Integer> edges = new ArrayList<Integer>(20);
+			ArrayList<Integer> edges = new ArrayList<Integer>(100);
 			nodeOut.add(i,edges);
 		}
 				
@@ -1634,13 +1680,13 @@ if(edgeIndex%1000000==0 ) {
 
 		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of inward edges
 		for(int i = 0; i < numberOfNodes; i++) {
-			ArrayList<Integer> edges = new ArrayList<Integer>(20);
+			ArrayList<Integer> edges = new ArrayList<Integer>(100);
 			nodeIn.add(i,edges);
 		}
 		
 		ArrayList<ArrayList<Integer>> nodeOut = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of outward edges
 		for(int i = 0; i < numberOfNodes; i++) {
-			ArrayList<Integer> edges = new ArrayList<Integer>(20);
+			ArrayList<Integer> edges = new ArrayList<Integer>(100);
 			nodeOut.add(i,edges);
 		}
 				
@@ -1736,6 +1782,154 @@ if(edgeIndex%1000000==0 ) {
 			}
 		}
 	}
+	
+	
+	
+
+	/**
+	 * Generates a new graph from the subgraph specified by the parameters.
+	 * 
+	 * @aparam subgraphNodes nodes in this graph that will appear in the new graph
+	 * @aparam subgraphEdges edges in this graph that will appear in the new graph, must connect only to subgraphNodes
+	 * @return
+	 */
+	public FastGraph generateGraphFromSubgraph(List<Integer> subgraphNodes, List<Integer> subgraphEdges) {
+
+		FastGraph g = new FastGraph(subgraphNodes.size(), subgraphEdges.size(), getDirect());
+		
+		String[] nodeLabels = new String[subgraphNodes.size()]; // stores the labels for creating the nodeLabelBuffer
+		HashMap<Integer,Integer> oldNodesToNew = new HashMap<>(subgraphNodes.size()*4); // for reference when adding edges, multiplier reduces chances of clashes
+		// initial population of the new node array
+		int weight = -98;
+		byte type = -97;
+		byte age = -96;
+		int index = 0;
+		for(Integer n : subgraphNodes) {
+
+			weight = nodeBuf.getInt(NODE_WEIGHT_OFFSET+n*NODE_BYTE_SIZE);
+			type = nodeBuf.get(NODE_TYPE_OFFSET+n*NODE_BYTE_SIZE);
+			age = nodeBuf.get(NODE_AGE_OFFSET+n*NODE_BYTE_SIZE);
+
+			g.nodeBuf.putInt(NODE_WEIGHT_OFFSET+index*NODE_BYTE_SIZE,weight);
+			g.nodeBuf.put(NODE_TYPE_OFFSET+index*NODE_BYTE_SIZE,type);
+			g.nodeBuf.put(NODE_AGE_OFFSET+index*NODE_BYTE_SIZE,age);
+			
+			// store labels for later
+			nodeLabels[index] = getNodeLabel(n);
+			// store old to new mapping for later
+			oldNodesToNew.put(n, index);
+System.out.println("old "+n+" new "+index);
+			index++;
+		}
+		
+		g.setAllNodeLabels(nodeLabels); // create the node label buffer
+		
+		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(subgraphNodes.size()); // temporary store of inward edges
+		for(int nodeIndex = 0; nodeIndex < subgraphNodes.size(); nodeIndex++) {
+			ArrayList<Integer> edges = new ArrayList<Integer>(100);
+			nodeIn.add(nodeIndex,edges);
+		}
+		
+		ArrayList<ArrayList<Integer>> nodeOut = new ArrayList<ArrayList<Integer>>(subgraphNodes.size()); // temporary store of outward edges
+		for(int nodeIndex = 0; nodeIndex < subgraphNodes.size(); nodeIndex++) {
+			ArrayList<Integer> edges = new ArrayList<Integer>(100);
+			nodeOut.add(nodeIndex,edges);
+		}
+				
+		String[] edgeLabels = new String[subgraphEdges.size()]; // stores the labels for creating the edgeLabelBuffer
+		ArrayList<Integer> inEdgeList;	
+		ArrayList<Integer> outEdgeList;	
+		// create the edges
+		index = 0;
+		edgeBuf.position(0);
+		g.edgeBuf.position(0);
+		for(Integer e : subgraphEdges) {
+			
+			weight = edgeBuf.getInt(EDGE_WEIGHT_OFFSET+e*EDGE_BYTE_SIZE);
+			type = edgeBuf.get(EDGE_TYPE_OFFSET+e*EDGE_BYTE_SIZE);
+			age = edgeBuf.get(EDGE_AGE_OFFSET+e*EDGE_BYTE_SIZE);
+
+			g.edgeBuf.putInt(EDGE_WEIGHT_OFFSET+index*EDGE_BYTE_SIZE,weight);
+			g.edgeBuf.put(EDGE_TYPE_OFFSET+index*EDGE_BYTE_SIZE,type);
+			g.edgeBuf.put(EDGE_AGE_OFFSET+index*EDGE_BYTE_SIZE,age);
+			
+			int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+e*EDGE_BYTE_SIZE);
+			int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+e*EDGE_BYTE_SIZE);
+			
+			int gn1 = oldNodesToNew.get(n1);
+			int gn2 = oldNodesToNew.get(n2);
+			
+			g.edgeBuf.putInt(EDGE_NODE1_OFFSET+index*EDGE_BYTE_SIZE,gn1); // one end of edge
+			g.edgeBuf.putInt(EDGE_NODE2_OFFSET+index*EDGE_BYTE_SIZE,gn2); // other end of edge
+			
+			// store labels for later
+			edgeLabels[index] = getEdgeLabel(e);
+			
+			// store connecting edges
+			inEdgeList = nodeIn.get(gn2);
+			inEdgeList.add(index);
+			outEdgeList = nodeOut.get(gn1);
+			outEdgeList.add(index);
+			index++;
+		}
+
+		g.setAllEdgeLabels(edgeLabels);
+		
+		// Initialise the connection buffer, modifying the node buffer connection data
+		//time = System.currentTimeMillis();
+		int offset = 0;
+		for(int node = 0; node < subgraphNodes.size(); node++) {
+			// setting the in connection offset and length
+			ArrayList<Integer> inEdges = nodeIn.get(node);
+			short inEdgeLength = (short)(inEdges.size());
+			g.nodeBuf.putInt(node*NODE_BYTE_SIZE+NODE_IN_CONNECTION_START_OFFSET,offset);
+			g.nodeBuf.putShort(node*NODE_BYTE_SIZE+NODE_IN_DEGREE_OFFSET,inEdgeLength);
+			
+			// now put the in edge/node pairs
+			for(int edgeIndex : inEdges) {
+				int nodeIndex = -1;
+				int n1 = g.edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeIndex*EDGE_BYTE_SIZE);
+				int n2 = g.edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeIndex*EDGE_BYTE_SIZE);
+				if(n1 == node) {
+					nodeIndex = n2;
+				} else if(n2 == node) {
+					nodeIndex = n1;
+				} else {
+					System.out.println("ERROR A When finding connections for node "+node+" connecting edge "+edgeIndex+ " has connecting nodes "+n1+" "+n2);
+				}
+				g.connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeIndex);
+				g.connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeIndex);
+				offset += CONNECTION_PAIR_SIZE;
+			}
+			
+			// setting the out connection offset and length
+			ArrayList<Integer> outEdges = nodeOut.get(node);
+			short outEdgeLength = (short)(outEdges.size());
+			g.nodeBuf.putInt(node*NODE_BYTE_SIZE+NODE_OUT_CONNECTION_START_OFFSET,offset);
+			g.nodeBuf.putShort(node*NODE_BYTE_SIZE+NODE_OUT_DEGREE_OFFSET,outEdgeLength);
+			
+			// now put the out edge/node pairs
+			for(int edgeIndex : outEdges) {
+				int nodeIndex = -1;
+				int n1 = g.edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeIndex*EDGE_BYTE_SIZE);
+				int n2 = g.edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeIndex*EDGE_BYTE_SIZE);
+
+				if(n1 == node) {
+					nodeIndex = n2;
+				} else if(n2 == node) {
+					nodeIndex = n1;
+				} else {
+					System.out.println("ERROR B When finding connections for node "+node+" connecting edge "+edgeIndex+ " has connecting nodes "+n1+" "+n2);
+				}
+				g.connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeIndex);
+				g.connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeIndex);
+				offset += CONNECTION_PAIR_SIZE;
+			}
+		}
+		
+		return g;
+	}
+
 
 	
 	/**
@@ -2129,8 +2323,6 @@ if(edgeIndex%1000000==0 ) {
 		}		
 		return;
 	}
-	
-
 	
 	
 }

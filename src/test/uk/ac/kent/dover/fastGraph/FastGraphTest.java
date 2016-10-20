@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.*;
 
 import uk.ac.kent.displayGraph.*;
 import uk.ac.kent.dover.fastGraph.*;
@@ -1218,6 +1218,97 @@ public class FastGraphTest {
 		assertEquals(g.getEdgeAge(4),75);
 	}
 
+	@Test
+	public void test120() {
+		FastGraph g1;
+		FastGraph g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
+		ArrayList<Integer> nodes = new ArrayList<Integer>();
+		ArrayList<Integer> edges = new ArrayList<Integer>();
+		g1 = g.generateGraphFromSubgraph(nodes,edges);
+		assertEquals(0,g1.getNumberOfNodes());
+		assertEquals(0,g1.getNumberOfEdges());
+		
+		nodes.add(4);
+		g1 = g.generateGraphFromSubgraph(nodes,edges);
+		assertEquals(g1.getNumberOfNodes(),1);
+		assertEquals(g1.getNumberOfEdges(),0);
+		assertEquals(g1.getNodeLabel(0),"node label 4");
+		assertEquals(41,g1.getNodeWeight(0));
+		assertEquals(42,g1.getNodeType(0));
+		assertEquals(43,g1.getNodeAge(0));
+
+		nodes.add(3);
+		edges.add(4);
+		
+		g1 = g.generateGraphFromSubgraph(nodes,edges);
+		assertEquals(g1.getNumberOfNodes(),2);
+		assertEquals(g1.getNumberOfEdges(),1);
+		assertEquals(g1.getNodeLabel(1),"node label 3");
+		assertEquals(31,g1.getNodeWeight(1));
+		assertEquals(32,g1.getNodeType(1));
+		assertEquals(33,g1.getNodeAge(1));
+		assertEquals(g1.getEdgeLabel(0),"edge label 4");
+		assertEquals(44,g1.getEdgeWeight(0));
+		assertEquals(45,g1.getEdgeType(0));
+		assertEquals(46,g1.getEdgeAge(0));
+
+	}
+
+	
+	@Test
+	public void test121() {
+		FastGraph g1;
+		FastGraph g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
+		Graph displayGraph = new Graph("test graph ");
+		ArrayList<Integer> nodes = new ArrayList<Integer>();
+		ArrayList<Integer> edges = new ArrayList<Integer>();
+		
+		nodes.add(0);
+		g1 = g.generateGraphFromSubgraph(nodes,edges);
+		Node n0 = new Node("n0");
+		displayGraph.addNode(n0);
+		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
+		
+		nodes.add(1);
+		g1 = g.generateGraphFromSubgraph(nodes,edges);
+		Node n1 = new Node("n1");
+		displayGraph.addNode(n1);
+		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
+		
+		edges.add(0);
+		g1 = g.generateGraphFromSubgraph(nodes,edges);
+		Edge e0 = new Edge(n0,n1,"e1");
+		displayGraph.addEdge(e0);
+		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
+		
+		nodes.add(2);
+		edges.add(1);
+		edges.add(2);
+		g1 = g.generateGraphFromSubgraph(nodes,edges);
+		Node n2 = new Node("n2");
+		displayGraph.addNode(n2);
+		Edge e1 = new Edge(n2,n1,"e2");
+		Edge e2 = new Edge(n2,n0,"e3");
+		displayGraph.addEdge(e1);
+		displayGraph.addEdge(e2);
+		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
+
+		nodes.add(3);
+		nodes.add(4);
+		edges.add(3);
+		edges.add(4);
+		g1 = g.generateGraphFromSubgraph(nodes,edges);
+		Node n3 = new Node("n3");
+		Node n4 = new Node("n4");
+		displayGraph.addNode(n3);
+		displayGraph.addNode(n4);
+		Edge e4 = new Edge(n2,n3,"e3");
+		Edge e5 = new Edge(n4,n3,"e4");
+		displayGraph.addEdge(e4);
+		displayGraph.addEdge(e5);
+		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
+
+	}
 
 	
 	
@@ -1404,16 +1495,16 @@ public class FastGraphTest {
 		json += "{\n";
 		json += "\"nodeIndex\": \"3\",\n";
 		json += "\"nodeLabel\": \"node label 3\",\n";
-		json += "\"nodeWeight\": \"3\",\n";
-		json += "\"nodeType\": \"3\",\n";
-		json += "\"nodeAge\": \"3\"\n";
+		json += "\"nodeWeight\": \"31\",\n";
+		json += "\"nodeType\": \"32\",\n";
+		json += "\"nodeAge\": \"33\"\n";
 		json += "},\n";
 		json += "{\n";
 		json += "\"nodeIndex\": \"4\",\n";
 		json += "\"nodeLabel\": \"node label 4\",\n";
-		json += "\"nodeWeight\": \"4\",\n";
-		json += "\"nodeType\": \"4\",\n";
-		json += "\"nodeAge\": \"4\"\n";
+		json += "\"nodeWeight\": \"41\",\n";
+		json += "\"nodeType\": \"42\",\n";
+		json += "\"nodeAge\": \"43\"\n";
 		json += "},\n";
 		json += "],\n";
 		json += "\"edges\": [\n";
@@ -1458,9 +1549,9 @@ public class FastGraphTest {
 		json += "\"node1\": \"3\",\n";
 		json += "\"node2\": \"4\",\n";
 		json += "\"edgeLabel\": \"edge label 4\",\n";
-		json += "\"edgeWeight\": \"4\",\n";
-		json += "\"edgeType\": \"4\",\n";
-		json += "\"edgeAge\": \"4\"\n";
+		json += "\"edgeWeight\": \"44\",\n";
+		json += "\"edgeType\": \"45\",\n";
+		json += "\"edgeAge\": \"46\"\n";
 		json += "},\n";
 		json += "],\n";
 		json += "}\n";
