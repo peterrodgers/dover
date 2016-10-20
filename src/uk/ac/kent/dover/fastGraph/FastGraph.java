@@ -1435,6 +1435,7 @@ if(edgeIndex%1000000==0 ) {
 			g.nodeLabelBuf = ByteBuffer.allocate(inNodeLabelSize);
 			g.edgeLabelBuf = ByteBuffer.allocate(inEdgeLabelSize);
 		} else {
+			g.nodeLabelBuf = ByteBuffer.allocateDirect(inNodeLabelSize);
 			g.edgeLabelBuf = ByteBuffer.allocateDirect(inEdgeLabelSize);
 		}
 		g.setName(name);
