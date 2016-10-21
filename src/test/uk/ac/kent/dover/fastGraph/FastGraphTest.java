@@ -20,6 +20,8 @@ import org.junit.*;
  *
  */
 public class FastGraphTest {
+	
+	private Connected c = new Connected();
 
 	@Test
 	public void test001() {
@@ -36,7 +38,7 @@ public class FastGraphTest {
 	@Test
 	public void test003() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get0Node0Edge(),false);
-		assertTrue(g.isConnected());
+		assertTrue(c.connected(g));
 	}
 	
 	@Test
@@ -56,7 +58,7 @@ public class FastGraphTest {
 	@Test
 	public void test006() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get0Node0Edge(),true);
-		assertTrue(g.isConnected());
+		assertTrue(c.connected(g));
 	}
 	
 	@Test
@@ -74,7 +76,7 @@ public class FastGraphTest {
 	@Test
 	public void test009() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get1Node0Edge(),false);
-		assertTrue(g.isConnected());
+		assertTrue(c.connected(g));
 	}
 	
 	@Test
@@ -92,7 +94,7 @@ public class FastGraphTest {
 	@Test
 	public void test012() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get1Node0Edge(),true);
-		assertTrue(g.isConnected());
+		assertTrue(c.connected(g));
 	}
 	
 	@Test
@@ -110,7 +112,7 @@ public class FastGraphTest {
 	@Test
 	public void test015() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get2Node0Edge(),false);
-		assertFalse(g.isConnected());
+		assertFalse(c.connected(g));
 	}
 	
 	@Test
@@ -176,7 +178,7 @@ public class FastGraphTest {
 	@Test
 	public void test026() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get2Node0Edge(),true);
-		assertFalse(g.isConnected());
+		assertFalse(c.connected(g));
 	}
 	
 	@Test
@@ -242,7 +244,7 @@ public class FastGraphTest {
 	@Test
 	public void test037() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get2Node1Edge(),false);
-		assertTrue(g.isConnected());
+		assertTrue(c.connected(g));
 	}
 	
 	@Test
@@ -261,7 +263,7 @@ public class FastGraphTest {
 	public void test040() {
 		
 		FastGraph g = FastGraph.jsonStringGraphFactory(get2Node1Edge(),true);
-		assertTrue(g.isConnected());
+		assertTrue(c.connected(g));
 	}
 	
 	@Test
@@ -279,7 +281,7 @@ public class FastGraphTest {
 	@Test
 	public void test043() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get2Node2Edge(),true);
-		assertTrue(g.isConnected());
+		assertTrue(c.connected(g));
 	}
 	
 	@Test
@@ -479,7 +481,7 @@ public class FastGraphTest {
 		FastGraph g = FastGraph.randomGraphFactory(0, 0, false);
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
-		assertTrue(g.isConnected());
+		assertTrue(c.connected(g));
 	}
 	
 	@Test
@@ -487,7 +489,7 @@ public class FastGraphTest {
 		FastGraph g = FastGraph.randomGraphFactory(0, 0, true);
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
-		assertTrue(g.isConnected());
+		assertTrue(c.connected(g));
 	}
 	
 	@Test
@@ -495,7 +497,7 @@ public class FastGraphTest {
 		FastGraph g = FastGraph.randomGraphFactory(10, 5, false);
 		assertEquals(10,g.getNumberOfNodes());
 		assertEquals(5,g.getNumberOfEdges());
-		assertFalse(g.isConnected());
+		assertFalse(c.connected(g));
 	}
 	
 	@Test
@@ -503,13 +505,13 @@ public class FastGraphTest {
 		FastGraph g = FastGraph.randomGraphFactory(10, 5, true);
 		assertEquals(10,g.getNumberOfNodes());
 		assertEquals(5,g.getNumberOfEdges());
-		assertFalse(g.isConnected());
+		assertFalse(c.connected(g));
 	}
 	
 	@Test
 	public void test080() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get5Node4Edge(),true);
-		assertFalse(g.isConnected());
+		assertFalse(c.connected(g));
 	}
 	
 	@Test
@@ -607,7 +609,7 @@ public class FastGraphTest {
 		assertEquals(2,g2.getNodeOutDegree(2));
 		assertEquals(0,g2.getNodeOutDegree(3));
 		assertEquals(2,g2.getNodeInDegree(3));
-		assertTrue(g2.isConnected());
+		assertTrue(c.connected(g2));
 	}
 
 	@Test
@@ -742,7 +744,7 @@ public class FastGraphTest {
 		FastGraph g = FastGraph.adjacencyListGraphFactory(0, 0, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "testAdj1.txt", false);
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
-		assertTrue(g.isConnected());
+		assertTrue(c.connected(g));
 	}
 
 	@Test
@@ -760,7 +762,7 @@ public class FastGraphTest {
 		assertEquals(0,connections[0]);
 		assertEquals("45",g.getNodeLabel(0));
 		assertEquals("76",g.getNodeLabel(1));
-		assertTrue(g.isConnected());
+		assertTrue(c.connected(g));
 	}
 
 
@@ -774,7 +776,7 @@ public class FastGraphTest {
 		connections = g.getNodeConnectingInEdges(2);
 		assertEquals(1,connections.length);
 		assertEquals(1,connections[0]);
-		assertTrue(g.isConnected());
+		assertTrue(c.connected(g));
 	}
 
 	@Test

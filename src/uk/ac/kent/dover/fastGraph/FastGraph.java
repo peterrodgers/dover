@@ -11,7 +11,6 @@ import org.json.*;
 import uk.ac.kent.displayGraph.*;
 
 import Jama.Matrix;
-import test.uk.ac.kent.dover.fastGraph.FastGraphTest;
 import Jama.EigenvalueDecomposition;
 
 /**
@@ -42,32 +41,32 @@ import Jama.EigenvalueDecomposition;
  */
 public class FastGraph {
 
-	private static final int NODE_LABEL_START_OFFSET = 0; // integer
-	private static final int NODE_LABEL_LENGTH_OFFSET = 4; // short
-	private static final int NODE_IN_CONNECTION_START_OFFSET = 6; // integer
-	private static final int NODE_IN_DEGREE_OFFSET = 10; // short
-	private static final int NODE_OUT_CONNECTION_START_OFFSET = 12; // integer
-	private static final int NODE_OUT_DEGREE_OFFSET = 16; // short
-	private static final int NODE_WEIGHT_OFFSET = 18; // integer
-	private static final int NODE_TYPE_OFFSET = 22; // byte
-	private static final int NODE_AGE_OFFSET = 23; // byte
+	protected static final int NODE_LABEL_START_OFFSET = 0; // integer
+	protected static final int NODE_LABEL_LENGTH_OFFSET = 4; // short
+	protected static final int NODE_IN_CONNECTION_START_OFFSET = 6; // integer
+	protected static final int NODE_IN_DEGREE_OFFSET = 10; // short
+	protected static final int NODE_OUT_CONNECTION_START_OFFSET = 12; // integer
+	protected  static final int NODE_OUT_DEGREE_OFFSET = 16; // short
+	protected  static final int NODE_WEIGHT_OFFSET = 18; // integer
+	protected  static final int NODE_TYPE_OFFSET = 22; // byte
+	protected  static final int NODE_AGE_OFFSET = 23; // byte
 	
-	private static final int EDGE_NODE1_OFFSET = 0; // integer
-	private static final int EDGE_NODE2_OFFSET = 4; // integer
-	private static final int EDGE_LABEL_START_OFFSET = 8; // integer
-	private static final int EDGE_LABEL_LENGTH_OFFSET = 12; // short
-	private static final int EDGE_WEIGHT_OFFSET = 14; // integer
-	private static final int EDGE_TYPE_OFFSET = 18; // byte
-	private static final int EDGE_AGE_OFFSET = 19; // byte
+	protected  static final int EDGE_NODE1_OFFSET = 0; // integer
+	protected  static final int EDGE_NODE2_OFFSET = 4; // integer
+	protected  static final int EDGE_LABEL_START_OFFSET = 8; // integer
+	protected  static final int EDGE_LABEL_LENGTH_OFFSET = 12; // short
+	protected  static final int EDGE_WEIGHT_OFFSET = 14; // integer
+	protected  static final int EDGE_TYPE_OFFSET = 18; // byte
+	protected  static final int EDGE_AGE_OFFSET = 19; // byte
 	
-	private static final int CONNECTION_EDGE_OFFSET = 0; // integer, edge is first of the pair
-	private static final int CONNECTION_NODE_OFFSET = 4; // integer, node is straight after the edge
+	protected  static final int CONNECTION_EDGE_OFFSET = 0; // integer, edge is first of the pair
+	protected  static final int CONNECTION_NODE_OFFSET = 4; // integer, node is straight after the edge
 	
 	public static final int DEFAULT_AVERAGE_LABEL_LENGTH = 20;
 	
-	private static final int NODE_BYTE_SIZE = 24;
-	private static final int EDGE_BYTE_SIZE = 20;
-	private static final int CONNECTION_PAIR_SIZE = 8; // this is an edge index plus an node index
+	protected  static final int NODE_BYTE_SIZE = 24;
+	protected  static final int EDGE_BYTE_SIZE = 20;
+	protected  static final int CONNECTION_PAIR_SIZE = 8; // this is an edge index plus an node index
 	
 	public static final String INFO_SPLIT_STRING = "~";
 	
@@ -213,6 +212,51 @@ String name = "random-n-8-e-9";
 		return direct;
 	}
 	
+	/**
+	 * 
+	 * @return the node ByteBuffer
+	 */
+	public ByteBuffer getNodeBuf() {
+		return nodeBuf;
+	}
+
+
+	/**
+	 * 
+	 * @return the edge ByteBuffer
+	 */
+	public ByteBuffer getEdgeBuf() {
+		return edgeBuf;
+	}
+
+
+	/**
+	 * 
+	 * @return the node label ByteBuffer
+	 */
+	public ByteBuffer getNodeLabelBuf() {
+		return nodeLabelBuf;
+	}
+
+
+	/**
+	 * 
+	 * @return the edge label ByteBuffer
+	 */
+	public ByteBuffer getEdgeLabelBuf() {
+		return edgeLabelBuf;
+	}
+
+
+	/**
+	 * 
+	 * @return the connections ByteBuffer
+	 */
+	public ByteBuffer getConnectionBuf() {
+		return connectionBuf;
+	}
+
+
 
 	/**
 	 * @param nodeIndex the node
@@ -1964,53 +2008,6 @@ if(edgeIndex%1000000==0 ) {
 
 	
 	
-	/** Breadth first search through the graph.
-	 * Note direct access to connectionBuf is a 3x speed up over accessing getNodeConnectingNodes(currentNode).
-	 * Using arrays for nodeFlagBuf is a minor speed up on ByteBuffer
-	 * 
-	 * @return true if the graph is connected, false otherwise. Empty graphs are connected.
-	 */
-	public boolean isConnected() {
-
-		boolean[] nodeFlag = new boolean[numberOfNodes];
-		
-		if(numberOfNodes == 0) {
-			return true;
-		}
-		
-		boolean visited = true;
-		int nodeCount = 0;
-//int edgeCount = 0;		
-		LinkedList<Integer> queue = new LinkedList<Integer>();
-		queue.add(0);
-		nodeFlag[0] = visited;
-		while(queue.size() != 0) {
-			int currentNode = queue.removeFirst();
-			nodeCount++;
-			
-			int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+currentNode*NODE_BYTE_SIZE);
-			int degree = getNodeDegree(currentNode);
-			for(int i = 0; i < degree; i++) {
-//edgeCount++;
-				// step over edge/node pairs and the edge
-				int nodeOffset = CONNECTION_NODE_OFFSET+connectionOffset+i*CONNECTION_PAIR_SIZE;
-				int connectingNode = connectionBuf.getInt(nodeOffset);
-				boolean flag = nodeFlag[connectingNode];
-				if(!flag) {
-					queue.add(connectingNode);
-					nodeFlag[connectingNode] = visited;
-				}
-			}
-		}
-		boolean allVisited = true;
-		if(nodeCount < numberOfNodes) {
-			allVisited = false;
-		}
-//System.out.println("edges tested "+edgeCount);		
-//System.out.println("nodes tested "+nodeCount);		
-		return allVisited;
-	}
-
 	/**
 	 * Prints the contents of an adjacency matrix to the screen in a simple way
 	 * Loops instead of using toDeepString() as it's better to display the matrix as a table
