@@ -2303,15 +2303,15 @@ public class Graph implements Cloneable {
 
 
 		if(node1Size != node2Size) {
-System.out.println("Not isomorphic: node collections are different sizes");
+//System.out.println("Not isomorphic: node collections are different sizes");
 			return(false);
 		}
 		if(edge1Size != edge2Size) {
-System.out.println("Not isomorphic: edge collections are different sizes");
+//System.out.println("Not isomorphic: edge collections are different sizes");
 			return(false);
 		}
 		if(node1Size == 0 && node2Size == 0) {
-System.out.println("Isomorphic: empty graphs");
+//System.out.println("Isomorphic: empty graphs");
 			return(true);
 		}
 
@@ -2349,7 +2349,7 @@ System.out.println("Isomorphic: empty graphs");
 		for(Node n : nodes1) {
 			int degree = n.degree();
 			if(degree > maxDegree2) {
-System.out.println("Not isomorphic: bigger degree in second graph");
+//System.out.println("Not isomorphic: bigger degree in second graph");
 				return(false);
 			}
 			degreeCheck[degree]++;
@@ -2362,7 +2362,7 @@ System.out.println("Not isomorphic: bigger degree in second graph");
 				if (degreeCheck[i] == 0) {
 					continue;
 				} else {
-System.out.println("Not isomorphic: graphs have different number of nodes with degree " + i);
+//System.out.println("Not isomorphic: graphs have different number of nodes with degree " + i);
 					return(false);
 				}
 			}
@@ -2370,12 +2370,12 @@ System.out.println("Not isomorphic: graphs have different number of nodes with d
 			ArrayList<Node> list2 = degrees2.get(i);
 			if(list2 == null) {
 				if(degreeCheck[i] != 0) {
-System.out.println("Not isomorphic: graphs have different number of nodes with degree " + i);
+//System.out.println("Not isomorphic: graphs have different number of nodes with degree " + i);
 					return(false);
 				}
 			} else {
 				if(degreeCheck[i] != list2.size()) {
-System.out.println("Not isomorphic: graphs have different number of nodes with degree " + i);
+//System.out.println("Not isomorphic: graphs have different number of nodes with degree " + i);
 					return(false);
 				}
 			}
@@ -2455,14 +2455,14 @@ System.out.println("Not isomorphic: graphs have different number of nodes with d
 
 		}
 
-System.out.println("This match " +nodeMatchesToString());
-System.out.println("Argument g "+g.nodeMatchesToString());
+//System.out.println("This match " +nodeMatchesToString());
+//System.out.println("Argument g "+g.nodeMatchesToString());
 
 		if (currentProgress != node1Size) {
-System.out.println("Not isomorphic: backtracking search failed ");
+//System.out.println("Not isomorphic: backtracking search failed ");
 			return(false);
 		}
-System.out.println("Isomorphic");
+//System.out.println("Isomorphic");
 		return(true);
 	}
 
