@@ -86,7 +86,6 @@ public class FastGraph {
 	private String name = "";
 	private boolean direct;
 	
-	private Random randomGen; //used to pick random edges;
 		
 	/**
 	 * No direct access to constructor, as a number of data structures need to be created when
@@ -141,7 +140,7 @@ public class FastGraph {
 		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 */
-String name = "random-n-8-e-9";
+String name = "random-n-10000-e-100000";
 //		String name = g1.getName();
 		FastGraph g2;
 		try {
@@ -161,19 +160,32 @@ String name = "random-n-8-e-9";
 			int[][] matrix = am.buildIntAdjacencyMatrix();
 			//boolean[][] matrix = g2.buildBooleanAdjacencyMatrix();
 			System.out.println("building matrix test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-			am.printMatrix(matrix);
+			//am.printMatrix(matrix);
 			//System.out.println(Arrays.toString(g2.findEigenvalues(matrix)));
 			//System.out.println(matrix.length);
 			
+			time = System.currentTimeMillis();
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
 			LinkedList<Integer> edges = new LinkedList<Integer>();
 			InducedSubgraph is = new InducedSubgraph(g2);
-			is.createInducedSubgraph(nodes, edges, 6);
+			is.createInducedSubgraph(nodes, edges, 60);
+			System.out.println("creating induced subgraph test time " + (System.currentTimeMillis()-time)+" milliseconds");
 			
 			System.out.println("nodes:");
 			System.out.println(nodes);
 			System.out.println("edges:");
 			System.out.println(edges);
+			
+			nodes.clear();
+			edges.clear();
+			time = System.currentTimeMillis();
+			is.createInducedSubgraph(nodes, edges, 60);
+			System.out.println("creating induced subgraph test time " + (System.currentTimeMillis()-time)+" milliseconds");
+			System.out.println("nodes:");
+			System.out.println(nodes);
+			System.out.println("edges:");
+			System.out.println(edges);
+			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -199,14 +211,6 @@ String name = "random-n-8-e-9";
 	}
 
 	
-	/**
-	 * @return the randomGen
-	 */
-	public Random getRandomGen() {
-		return randomGen;
-	}
-
-
 	/**
 	 * @return the graph name
 	 */
@@ -2061,7 +2065,6 @@ if(edgeIndex%1000000==0 ) {
 		}
 		
 		return g;
-	}
-	
+	}	
 	
 }

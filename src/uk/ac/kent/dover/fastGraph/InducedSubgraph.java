@@ -12,6 +12,7 @@ import java.util.Random;
 public class InducedSubgraph {
 
 	FastGraph g; //The FastGraph
+	private Random r; //used to pick random edges;
 	
 	/**
 	 * Constructor.
@@ -42,10 +43,12 @@ public class InducedSubgraph {
 		
 		//initialise this Random generator if is hasn't been already
 		//don't do this in a constructor, as the node buffer might not have been built or populated yet
-		Random r = g.getRandomGen();
+		//Random r = g.getRandomGen();
 		if (r == null) {
+			System.out.println("resetting random");
 			long seed = g.getNodeBuf().getLong(1); //used to ensure the random is the same for each graph
 			r = new Random(seed);
+			//g.setRandomGen(r);
 		}		
 		
 		int startingEdge = r.nextInt(g.getNumberOfEdges()); //picks an edge at random
