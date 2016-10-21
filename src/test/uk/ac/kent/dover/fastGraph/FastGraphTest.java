@@ -890,6 +890,7 @@ public class FastGraphTest {
 		FastGraph g;
 		g = FastGraph.jsonStringGraphFactory(get0Node0Edge(),false);
 		Graph displayGraph = g.generateDisplayGraph();
+		assertTrue(displayGraph.consistent());
 		assertEquals(g.getName(),displayGraph.getLabel());
 		assertEquals(0,displayGraph.getNodes().size());
 		assertEquals(0,displayGraph.getEdges().size());
@@ -900,6 +901,7 @@ public class FastGraphTest {
 		FastGraph g;
 		g = FastGraph.jsonStringGraphFactory(get1Node0Edge(),false);
 		Graph displayGraph = g.generateDisplayGraph();
+		assertTrue(displayGraph.consistent());
 		assertEquals(g.getName(),displayGraph.getLabel());
 		assertEquals(1,displayGraph.getNodes().size());
 		assertEquals(0,displayGraph.getEdges().size());
@@ -914,6 +916,7 @@ public class FastGraphTest {
 		FastGraph g;
 		g = FastGraph.jsonStringGraphFactory(get2Node1Edge(),false);
 		Graph displayGraph = g.generateDisplayGraph();
+		assertTrue(displayGraph.consistent());
 		assertEquals(g.getName(),displayGraph.getLabel());
 		assertEquals(2,displayGraph.getNodes().size());
 		assertEquals(1,displayGraph.getEdges().size());
@@ -934,6 +937,7 @@ public class FastGraphTest {
 		FastGraph g;
 		g = FastGraph.jsonStringGraphFactory(get2Node2Edge(),false);
 		Graph displayGraph = g.generateDisplayGraph();
+		assertTrue(displayGraph.consistent());
 		assertEquals(g.getName(),displayGraph.getLabel());
 		assertEquals(2,displayGraph.getNodes().size());
 		assertEquals(2,displayGraph.getEdges().size());
@@ -953,6 +957,7 @@ public class FastGraphTest {
 		FastGraph g;
 		g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
 		Graph displayGraph = g.generateDisplayGraph();
+		assertTrue(displayGraph.consistent());
 		assertEquals(g.getName(),displayGraph.getLabel());
 		assertEquals(5,displayGraph.getNodes().size());
 		assertEquals(5,displayGraph.getEdges().size());
@@ -977,6 +982,7 @@ public class FastGraphTest {
 		assertEquals(g.getNumberOfNodes(),displayGraph.getNodes().size());
 		assertEquals(g.getNumberOfEdges(),displayGraph.getEdges().size());
 		Graph displayGraph2 = g.generateDisplayGraph();
+		assertTrue(displayGraph2.consistent());
 		assertTrue(displayGraph.isomorphic(displayGraph2));
 	}
 	
@@ -1000,6 +1006,7 @@ public class FastGraphTest {
 		assertEquals(g.getNodeInDegree(0),0);
 		assertEquals(g.getNodeOutDegree(0),0);
 		Graph displayGraph2 = g.generateDisplayGraph();
+		assertTrue(displayGraph.consistent());
 		assertTrue(displayGraph.isomorphic(displayGraph2));
 	}
 	
@@ -1041,6 +1048,7 @@ public class FastGraphTest {
 		assertEquals(g.getNodeLabel(g.getEdgeNode1(0)),"node 1");
 		assertEquals(g.getNodeLabel(g.getEdgeNode2(0)),"node 2");
 		Graph displayGraph2 = g.generateDisplayGraph();
+		assertTrue(displayGraph2.consistent());
 		assertTrue(displayGraph.isomorphic(displayGraph2));
 	}
 	
@@ -1107,7 +1115,9 @@ public class FastGraphTest {
 		assertEquals(g.getNodeLabel(g.getEdgeNode1(3)),"node label 3");
 		assertEquals(g.getNodeLabel(g.getEdgeNode2(3)),"node 1");
 		Graph displayGraph2 = g.generateDisplayGraph();
+		assertTrue(displayGraph2.consistent());
 		assertTrue(displayGraph.isomorphic(displayGraph2));
+		assertTrue(displayGraph.consistent());
 	}
 	
 
@@ -1276,6 +1286,7 @@ public class FastGraphTest {
 		Node n0 = new Node("n0");
 		displayGraph.addNode(n0);
 		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
+		assertTrue(displayGraph.consistent());
 		
 		nodes = new int[2];
 		edges = new int[0];
@@ -1285,6 +1296,7 @@ public class FastGraphTest {
 		Node n1 = new Node("n1");
 		displayGraph.addNode(n1);
 		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
+		assertTrue(displayGraph.consistent());
 		
 		nodes = new int[2];
 		edges = new int[1];
@@ -1295,6 +1307,7 @@ public class FastGraphTest {
 		Edge e0 = new Edge(n0,n1,"e1");
 		displayGraph.addEdge(e0);
 		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
+		assertTrue(displayGraph.consistent());
 		
 		nodes = new int[3];
 		edges = new int[3];
@@ -1312,6 +1325,7 @@ public class FastGraphTest {
 		displayGraph.addEdge(e1);
 		displayGraph.addEdge(e2);
 		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
+		assertTrue(displayGraph.consistent());
 
 		nodes = new int[5];
 		edges = new int[5];
@@ -1335,6 +1349,7 @@ public class FastGraphTest {
 		displayGraph.addEdge(e3);
 		displayGraph.addEdge(e4);
 		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
+		assertTrue(displayGraph.consistent());
 
 	}
 

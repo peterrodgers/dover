@@ -13,7 +13,7 @@ public class ExactIsomorphismTest {
 	
 	@Test
 	public void test001() {
-		ExactIsomorphism ei = new ExactIsomorphism(100,1000,100000);
+		ExactIsomorphism ei = new ExactIsomorphism();
 		FastGraph g2;
 		FastGraph g1;
 		g1 = FastGraph.randomGraphFactory(10,20,1,false);
@@ -38,11 +38,10 @@ public class ExactIsomorphismTest {
 
 	}
 
-
 	
 	@Test
 	public void test002() {
-		ExactIsomorphism ei = new ExactIsomorphism(100,1000,100000);
+		ExactIsomorphism ei = new ExactIsomorphism();
 		FastGraph g2;
 		FastGraph g1;
 		
