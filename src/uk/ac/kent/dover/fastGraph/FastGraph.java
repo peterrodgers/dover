@@ -120,6 +120,7 @@ public class FastGraph {
 		
 //		FastGraph g1 = randomGraphFactory(2,1,false);
 //		FastGraph g1 = randomGraphFactory(5,6,1,true);
+//		FastGraph g1 = randomGraphFactory(8,9,1,true);
 //		FastGraph g1 = randomGraphFactory(10000,100000,false); // 10 thousand nodes, 100 thousand edges
 //		FastGraph g1 = randomGraphFactory(1000000,10000000,false); // 1 million nodes, 10 million edges
 //		FastGraph g1 = randomGraphFactory(5000000,50000000,false); // limit for edgeLabelBuf at 20 chars per label
@@ -141,7 +142,7 @@ public class FastGraph {
 		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 */
-String name = "testAdj4.txt";
+String name = "random-n-8-e-9";
 //		String name = g1.getName();
 		FastGraph g2;
 		try {
@@ -2285,8 +2286,10 @@ if(edgeIndex%1000000==0 ) {
 		//add starting nodes and edges to lists
 		nodes.add(startingNodes[0]);
 		visitedNodes[startingNodes[0]] = true;
-		nodes.add(startingNodes[1]);
-		visitedNodes[startingNodes[1]] = true;
+		if(startingNodes[0] != startingNodes[1]) { //incase the first edge is to itself
+			nodes.add(startingNodes[1]);
+			visitedNodes[startingNodes[1]] = true;
+		}		
 		edges.add(startingEdge);
 		visitedEdges[startingEdge] = true;
 		
