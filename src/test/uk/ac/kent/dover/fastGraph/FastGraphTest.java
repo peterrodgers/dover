@@ -1278,7 +1278,72 @@ public class FastGraphTest {
 		assertEquals(g.oppositeEnd(1,0),0);
 	}
 
-	
+	@Test
+	public void test124() {
+		FastGraph g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
+		FastGraph g1;
+		Graph displayGraph;
+		int[] nodes;
+		int[] edges;
+		
+		nodes = new int[0];
+		edges = new int[0];
+		g1 = g.generateGraphByDeletingItems(nodes,edges);
+		assertEquals(5,g1.getNumberOfNodes());
+		assertEquals(5,g1.getNumberOfEdges());
+		assertEquals(5,g1.getNumberOfEdges());
+		displayGraph = g1.generateDisplayGraph();
+		assertTrue(displayGraph.consistent());
+		
+		nodes = new int[0];
+		edges = new int[1];
+		edges[0] = 1;
+		g1 = g.generateGraphByDeletingItems(nodes,edges);
+		assertEquals(5,g1.getNumberOfNodes());
+		assertEquals(4,g1.getNumberOfEdges());
+		assertEquals("edge label 4",g1.getEdgeLabel(3));
+		displayGraph = g1.generateDisplayGraph();
+		assertTrue(displayGraph.consistent());
+		
+		nodes = new int[1];
+		nodes[0] = 1;
+		edges = new int[0];
+		g1 = g.generateGraphByDeletingItems(nodes,edges);
+		assertEquals(4,g1.getNumberOfNodes());
+		assertEquals(3,g1.getNumberOfEdges());
+		assertEquals("node label 2",g1.getNodeLabel(1));
+		assertEquals("edge label 1",g1.getEdgeLabel(0));
+		displayGraph = g1.generateDisplayGraph();
+		assertTrue(displayGraph.consistent());
+		
+		nodes = new int[0];
+		edges = new int[5];
+		edges[0] = 1;
+		edges[1] = 0;
+		edges[2] = 4;
+		edges[3] = 3;
+		edges[4] = 2;
+		g1 = g.generateGraphByDeletingItems(nodes,edges);
+		assertEquals(5,g1.getNumberOfNodes());
+		assertEquals(0,g1.getNumberOfEdges());
+		displayGraph = g1.generateDisplayGraph();
+		assertTrue(displayGraph.consistent());
+		
+		nodes = new int[5];
+		nodes[0] = 0;
+		nodes[1] = 1;
+		nodes[2] = 2;
+		nodes[3] = 3;
+		nodes[4] = 4;
+		edges = new int[0];
+		g1 = g.generateGraphByDeletingItems(nodes,edges);
+		assertEquals(0,g1.getNumberOfNodes());
+		assertEquals(0,g1.getNumberOfEdges());
+		displayGraph = g1.generateDisplayGraph();
+		assertTrue(displayGraph.consistent());
+		
+	}
+
 	
 	//TODO Add tests here
 

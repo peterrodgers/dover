@@ -81,7 +81,7 @@ public class AdjacencyMatrix {
 	public boolean[][] buildBooleanAdjacencyMatrix() {
 		
 		boolean[][] matrix = new boolean[g.getNumberOfNodes()][g.getNumberOfNodes()]; //create an 2D array that has the dimensions of the current graph 
-		System.out.println("Matrix created");
+//		System.out.println("Matrix created");
 		for (int n = 0; n < g.getNumberOfNodes(); n++) {
 			int[] connectingNodeIndexes = g.getNodeConnectingOutNodes(n);
 			for (int i : connectingNodeIndexes) {

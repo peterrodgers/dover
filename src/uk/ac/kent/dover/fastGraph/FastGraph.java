@@ -1858,11 +1858,75 @@ if(edgeIndex%1000000==0 ) {
 	
 
 	/**
+	 * Generates a new graph from the subgraph specified by the parameters. All
+	 * edges connected to deleted nodes are also removed.
+	 *
+	 * 
+	 * @aparam nodesToDelete nodes in this graph that will not appear in the new graph
+	 * @aparam edgesToDelete edges in this graph that will not appear in the new graph
+	 * @return the new FastGraph
+	 */
+	public FastGraph generateGraphByDeletingItems(int[] nodesToDelete, int[] edgesToDelete) {
+
+		LinkedList<Integer> allEdgesToDeleteList = new LinkedList<Integer>();
+		LinkedList<Integer> allNodesToDeleteList = new LinkedList<Integer>();
+		
+		for(int e : edgesToDelete) {
+			allEdgesToDeleteList.add(e);
+		}
+		
+		// delete the edges connecting to deleted nodes and create the node list
+		for(int n : nodesToDelete) {
+			allNodesToDeleteList.add(n);
+			int[] connectingEdges = getNodeConnectingEdges(n);
+			for(int e : connectingEdges) {
+				if(!allEdgesToDeleteList.contains(e)) {
+					allEdgesToDeleteList.add(e);
+				}
+			}
+		}
+		
+		// find the nodes that will remain
+		LinkedList<Integer> remainingNodeList = new LinkedList<Integer>();
+		for(int i = 0; i < getNumberOfNodes(); i++) {
+			if(!allNodesToDeleteList.contains(i)) {
+				remainingNodeList.add(i);
+			}
+		}
+		// turn it into an array
+		int[] remainingNodes = new int[remainingNodeList.size()];
+		int j = 0;
+		for(Integer n : remainingNodeList) {
+			remainingNodes[j] = n;
+			j++;
+		}
+
+		// find the edges that will remain
+		LinkedList<Integer> remainingEdgeList = new LinkedList<Integer>();
+		for(int i = 0; i < getNumberOfEdges(); i++) {
+			if(!allEdgesToDeleteList.contains(i)) {
+				remainingEdgeList.add(i);
+			}
+		}
+		// turn it into an array
+		int[] remainingEdges = new int[remainingEdgeList.size()];
+		int k = 0;
+		for(Integer e : remainingEdgeList) {
+			remainingEdges[k] = e;
+			k++;
+		}
+
+		FastGraph g = generateGraphFromSubgraph(remainingNodes,remainingEdges);
+		
+		return g;
+	}
+
+	/**
 	 * Generates a new graph from the subgraph specified by the parameters.
 	 * 
 	 * @aparam subgraphNodes nodes in this graph that will appear in the new graph
 	 * @aparam subgraphEdges edges in this graph that will appear in the new graph, must connect only to subgraphNodes
-	 * @return
+	 * @return the new FastGraph
 	 */
 	public FastGraph generateGraphFromSubgraph(int[] subgraphNodes, int[] subgraphEdges) {
 
