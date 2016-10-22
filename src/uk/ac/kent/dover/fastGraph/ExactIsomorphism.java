@@ -21,7 +21,7 @@ public class ExactIsomorphism {
 		ExactIsomorphism ei = new ExactIsomorphism();
 		FastGraph g2;
 		FastGraph g1;
-		int comparisons = 10000;
+		int comparisons = 100;
 		long time;
 		
 		time = System.currentTimeMillis();

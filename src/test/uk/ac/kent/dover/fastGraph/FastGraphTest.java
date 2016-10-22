@@ -8,7 +8,6 @@ import java.util.*;
 
 import uk.ac.kent.displayGraph.*;
 import uk.ac.kent.dover.fastGraph.*;
-import uk.ac.kent.dover.fastGraph.Util;
 
 import org.junit.*;
 
@@ -609,6 +608,14 @@ public class FastGraphTest {
 		assertEquals(2,g2.getNodeOutDegree(2));
 		assertEquals(0,g2.getNodeOutDegree(3));
 		assertEquals(2,g2.getNodeInDegree(3));
+		assertEquals("node label 3",g2.getNodeLabel(3));
+		assertEquals(31,g2.getNodeWeight(3));
+		assertEquals(32,g2.getNodeType(3));
+		assertEquals(33,g2.getNodeAge(3));
+		assertEquals("edge label 4",g2.getEdgeLabel(4));
+		assertEquals(45,g2.getEdgeWeight(4));
+		assertEquals(46,g2.getEdgeType(4));
+		assertEquals(47,g2.getEdgeAge(4));
 		assertTrue(c.connected(g2));
 	}
 
@@ -1722,9 +1729,9 @@ public class FastGraphTest {
 		json += "{\n";
 		json += "\"nodeIndex\": \"3\",\n";
 		json += "\"nodeLabel\": \"node label 3\",\n";
-		json += "\"nodeWeight\": \"3\",\n";
-		json += "\"nodeType\": \"3\",\n";
-		json += "\"nodeAge\": \"3\"\n";
+		json += "\"nodeWeight\": \"31\",\n";
+		json += "\"nodeType\": \"32\",\n";
+		json += "\"nodeAge\": \"33\"\n";
 		json += "},\n";
 		json += "],\n";
 		json += "\"edges\": [\n";
@@ -1769,9 +1776,9 @@ public class FastGraphTest {
 		json += "\"node1\": \"2\",\n";
 		json += "\"node2\": \"3\",\n";
 		json += "\"edgeLabel\": \"edge label 4\",\n";
-		json += "\"edgeWeight\": \"4\",\n";
-		json += "\"edgeType\": \"4\",\n";
-		json += "\"edgeAge\": \"4\"\n";
+		json += "\"edgeWeight\": \"45\",\n";
+		json += "\"edgeType\": \"46\",\n";
+		json += "\"edgeAge\": \"47\"\n";
 		json += "},\n";
 		json += "],\n";
 		json += "}\n";

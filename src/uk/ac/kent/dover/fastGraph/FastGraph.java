@@ -103,7 +103,6 @@ public class FastGraph {
 		
 		init();
 		
-		
 	}
 
 	
@@ -116,47 +115,54 @@ public class FastGraph {
 		long time;
 		
 		
+//		FastGraph g1 = randomGraphFactory(1,0,false);
 //		FastGraph g1 = randomGraphFactory(2,1,false);
 //		FastGraph g1 = randomGraphFactory(5,6,1,true);
-//		FastGraph g1 = randomGraphFactory(8,9,1,true);
-//		FastGraph g1 = randomGraphFactory(10000,100000,false); // 10 thousand nodes, 100 thousand edges
-//		FastGraph g1 = randomGraphFactory(1000000,10000000,false); // 1 million nodes, 10 million edges
-//		FastGraph g1 = randomGraphFactory(5000000,50000000,false); // limit for edgeLabelBuf at 20 chars per label
-//		FastGraph g1 = randomGraphFactory(4847571,68993773,false); // Size of LiveJournal1 example from SNAP
-//		FastGraph g1 = randomGraphFactory(10000000,100000000,false); // 10 million nodes, 100 million edges, close to edgeBuf limit, but fails on heap space with 14g, but pass with heap space of 30g
+//		FastGraph g1 = randomGraphFactory(8,9,1,false);
+//		FastGraph g1 = randomGraphFactory(10000,100000,1,false); // 10 thousand nodes, 100 thousand edges
+//		FastGraph g1 = randomGraphFactory(100000,1000000,1,false); // 100 thousand nodes, 1 million edges
+//		FastGraph g1 = randomGraphFactory(1000000,10000000,1,false); // 1 million nodes, 10 million edges
+//		FastGraph g1 = randomGraphFactory(5000000,50000000,1,false); // limit for edgeLabelBuf at 20 chars per label
+//		FastGraph g1 = randomGraphFactory(4847571,68993773,1,false); // Size of LiveJournal1 example from SNAP
+//		FastGraph g1 = randomGraphFactory(10000000,100000000,1,false); // 10 million nodes, 100 million edges, close to edgeBuf limit, but fails on heap space with 14g, but pass with heap space of 30g
 
 //		time = System.currentTimeMillis();
 //		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
-//		FastGraph g1 = adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false); // SNAP web page gives 1768149 edges
+		FastGraph g1 = adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false); // SNAP web page gives 1768149 edges
 //		FastGraph g1 = adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(4847571,68993773,null,"soc-LiveJournal1.txt",false);
 		
 //System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		
 		time = System.currentTimeMillis();
-/*		
+		
 		g1.saveBuffers(null,g1.getName());
 		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
-*/
-String name = "random-n-10000-e-100000";
+
+//String name = "random-n-1000000-e-10000000";
+//String name = "soc-pokec-relationships.txt";
+//String name = "soc-LiveJournal1.txt";
+//String name = "twitter_combined.txt";
+//String name = "Wiki-Vote.txt";
 //		String name = g1.getName();
 		FastGraph g2;
 		try {
+/*			time = System.currentTimeMillis();
 			g2 = loadBuffersGraphFactory(null,name);
 			System.out.println("create graph from file test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-			
-	 		
-/*			
-			time = System.currentTimeMillis();
-			boolean connected = g2.isConnected();
-			System.out.println("connected test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-			
-			System.out.println("connected "+connected);
-*/			
-			time = System.currentTimeMillis();
-			AdjacencyMatrix am = new AdjacencyMatrix(g2);
+			int[] deleteNodes = {0,456,766,6123,6422,7,9,111,7000,11,22,33,44,55};
+			deleteNodes[1] = g2.numberOfNodes-1;
+			//int[] deleteEdges = {};
+			int[] deleteEdges = {0,456,8766,60123,65422,7,9,111,7777,77,55,44,99,344,1115};
+			deleteEdges[1] = g2.numberOfEdges-1;
+			g2.generateGraphByDeletingItems(deleteNodes,deleteEdges);
+			//g2.generateGraphFromSubgraph(deleteNodes,deleteEdges);
+System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" seconds");
+*/
+
+/*			AdjacencyMatrix am = new AdjacencyMatrix(g2);
 			int[][] matrix = am.buildIntAdjacencyMatrix();
 			//boolean[][] matrix = g2.buildBooleanAdjacencyMatrix();
 			System.out.println("building matrix test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
@@ -185,7 +191,7 @@ String name = "random-n-10000-e-100000";
 			System.out.println(nodes);
 			System.out.println("edges:");
 			System.out.println(edges);
-			
+*/			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -277,8 +283,10 @@ String name = "random-n-10000-e-100000";
 	 * @return the node label
 	 */
 	public String getNodeLabel(int nodeIndex) {
+		
 		int labelStart = nodeBuf.getInt(NODE_LABEL_START_OFFSET+nodeIndex*NODE_BYTE_SIZE);
 		int labelLength = nodeBuf.getShort(NODE_LABEL_LENGTH_OFFSET+nodeIndex*NODE_BYTE_SIZE);
+		
 		char[] label = new char[labelLength];
 		for(int i = 0; i < labelLength; i++) {
 			int offset = labelStart+i*2;
@@ -1173,7 +1181,7 @@ String name = "random-n-10000-e-100000";
 			writer.write("numberOfNodes"+INFO_SPLIT_STRING+numberOfNodes+"\n");
 			writer.write("numberOfEdges"+INFO_SPLIT_STRING+numberOfEdges+"\n");
 			writer.write("numberOfNodeLabelBytes"+INFO_SPLIT_STRING+nodeLabelBuf.capacity()+"\n");
-			writer.write("numberOfEdgeLabelBytes"+INFO_SPLIT_STRING+nodeLabelBuf.capacity()+"\n");
+			writer.write("numberOfEdgeLabelBytes"+INFO_SPLIT_STRING+edgeLabelBuf.capacity()+"\n");
 			String directValue = "false";
 			if(direct) {
 				directValue = "true";
@@ -1199,6 +1207,7 @@ String name = "random-n-10000-e-100000";
 			wChannel = new FileOutputStream(file, append).getChannel();
 			wChannel.write(connectionBuf);
 			wChannel.close();
+			
 			file = new File(directoryAndBaseName+".nodeLabelBuf");
 			append = false;
 			wChannel = new FileOutputStream(file, append).getChannel();
@@ -1487,8 +1496,10 @@ if(edgeIndex%1000000==0 ) {
 		splitLine = line.split(INFO_SPLIT_STRING);
 		int inEdgeTotal = Integer.parseInt(splitLine[1]);
 		line = br.readLine();
+		splitLine = line.split(INFO_SPLIT_STRING);
 		int inNodeLabelSize = Integer.parseInt(splitLine[1]);
 		line = br.readLine();
+		splitLine = line.split(INFO_SPLIT_STRING);
 		int inEdgeLabelSize = Integer.parseInt(splitLine[1]);
 		line = br.readLine();
 		splitLine = line.split(INFO_SPLIT_STRING);
@@ -1498,7 +1509,6 @@ if(edgeIndex%1000000==0 ) {
 			inDirect = false;
 		}
 		br.close();
-		
 		g = new FastGraph(inNodeTotal, inEdgeTotal, inDirect);
 		if(!inDirect) {
 			g.nodeLabelBuf = ByteBuffer.allocate(inNodeLabelSize);
@@ -1507,6 +1517,7 @@ if(edgeIndex%1000000==0 ) {
 			g.nodeLabelBuf = ByteBuffer.allocateDirect(inNodeLabelSize);
 			g.edgeLabelBuf = ByteBuffer.allocateDirect(inEdgeLabelSize);
 		}
+		
 		g.setName(name);
 
 		file = new File(directoryAndBaseName+".nodeBuf");
@@ -1922,8 +1933,8 @@ if(edgeIndex%1000000==0 ) {
 	}
 
 	/**
-	 * Generates a new graph from the subgraph specified by the parameters.
-	 * 
+	 * Generates a new graph from the subgraph specified by the parameters. The nodes at the end of the edges must be in subgraphEdges.
+s	 * 
 	 * @aparam subgraphNodes nodes in this graph that will appear in the new graph
 	 * @aparam subgraphEdges edges in this graph that will appear in the new graph, must connect only to subgraphNodes
 	 * @return the new FastGraph
