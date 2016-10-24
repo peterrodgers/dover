@@ -179,7 +179,34 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			
 			for(int i = 0; i < 5; i++) {
 				System.out.println();
-				g2.displayAdjacencyMatrixOfInducedSubgraph(is,nodes,edges);	
+				boolean res = g2.displayAdjacencyMatrixOfInducedSubgraph(is,nodes,edges,Arrays.toString(new int[]{-1,-1,2}));	
+				if (res) {
+					String[] names = new String[g2.getNumberOfNodes()];
+					NamePicker np = new NamePicker();
+					//pick a surname, so all family members have the same surname
+					String surname = np.getSurname();
+					for(int n : nodes) {
+						names[n] = np.getForename() + " " + surname;
+					}
+					//replace the blanks with other names
+					for(int j = 0; j < names.length; j++) {						
+						if (names[j] == null) {
+							names[j] = np.getName();
+						}
+					}
+					//System.out.println(Arrays.toString(names));
+					g2.setAllNodeLabels(names);
+					
+					
+					//just for testing
+					System.out.println();
+					System.out.println("graph now has the labels:");
+					for(int j = 0; j < g2.getNumberOfNodes(); j++) {
+						System.out.println(g2.getNodeLabel(j));
+					}
+					
+					break;
+				}
 			}
 
 			//System.out.println("creating induced subgraph test time " + (System.currentTimeMillis()-time)+" milliseconds");
@@ -207,7 +234,17 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
  		
 	}	
 	
-	public void displayAdjacencyMatrixOfInducedSubgraph(InducedSubgraph is, LinkedList<Integer> nodes, LinkedList<Integer> edges) throws FastGraphException {
+	/**
+	 * Informal testing method for prototyping the code to change edge labels based on their connections
+	 * 
+	 * @param is The InducedSubgraph class for creating subgraphs
+	 * @param nodes The list of nodes ready to be populated
+	 * @param edges The list of edges ready to be populated
+	 * @param targetEigenString The target string
+	 * @return If a correct subgraph has been found
+	 * @throws FastGraphException
+	 */
+	public boolean displayAdjacencyMatrixOfInducedSubgraph(InducedSubgraph is, LinkedList<Integer> nodes, LinkedList<Integer> edges, String targetEigenString) throws FastGraphException {
 		nodes.clear();
 		edges.clear();
 		System.out.println("trying again");
@@ -219,9 +256,19 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 		//System.out.println("subgraph edges: " + Arrays.toString(es));
 		
 		FastGraph g3 = this.generateGraphFromSubgraph(ns, es);
-		AdjacencyMatrix am3 = new AdjacencyMatrix(g3);
-		int[][] matrix3 = am3.buildIntAdjacencyMatrix();
-		am3.printMatrix(matrix3);
+		AdjacencyMatrix am = new AdjacencyMatrix(g3);
+		int[][] matrix = am.buildIntAdjacencyMatrix();
+		am.printMatrix(matrix);
+		double[] eigens = am.findEigenvalues(matrix);
+		System.out.println("Eigenvalues: " + Arrays.toString(eigens));
+		String eigenString = Arrays.toString(Util.roundArray(eigens));
+		
+		if(eigenString.equals(targetEigenString)) { //not an isomorphism test, but will do for this experiment
+			System.out.println("correct subgraph found");
+			return true;
+		}
+		
+		return false;
 	}
 
 
