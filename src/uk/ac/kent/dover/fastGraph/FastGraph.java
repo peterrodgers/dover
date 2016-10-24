@@ -129,8 +129,8 @@ public class FastGraph {
 //		time = System.currentTimeMillis();
 //		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
-		FastGraph g1 = adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false); // SNAP web page gives 1768149 edges
-		FastGraph g1 = adjacencyListGraphFactory(1696415,11095298,null,"as-skitter.txt",false);
+//		FastGraph g1 = adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false); // SNAP web page gives 1768149 edges
+//		FastGraph g1 = adjacencyListGraphFactory(1696415,11095298,null,"as-skitter.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(4847571,68993773,null,"soc-LiveJournal1.txt",false);
 
@@ -138,12 +138,12 @@ public class FastGraph {
 //System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		
 		time = System.currentTimeMillis();
-		
+/*		
 		g1.saveBuffers(null,g1.getName());
 		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
-
-//String name = "random-n-1000000-e-10000000";
+*/
+String name = "testAdj4.txt";
 //String name = "soc-pokec-relationships.txt";
 //String name = "soc-LiveJournal1.txt";
 //String name = "twitter_combined.txt";
@@ -151,9 +151,9 @@ public class FastGraph {
 //		String name = g1.getName();
 		FastGraph g2;
 		try {
-/*			time = System.currentTimeMillis();
+			time = System.currentTimeMillis();
 			g2 = loadBuffersGraphFactory(null,name);
-			System.out.println("create graph from file test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+/*			System.out.println("create graph from file test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			int[] deleteNodes = {0,456,766,6123,6422,7,9,111,7000,11,22,33,44,55};
 			deleteNodes[1] = g2.numberOfNodes-1;
 			//int[] deleteEdges = {};
@@ -164,11 +164,11 @@ public class FastGraph {
 System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" seconds");
 */
 
-/*			AdjacencyMatrix am = new AdjacencyMatrix(g2);
+			AdjacencyMatrix am = new AdjacencyMatrix(g2);
 			int[][] matrix = am.buildIntAdjacencyMatrix();
 			//boolean[][] matrix = g2.buildBooleanAdjacencyMatrix();
-			System.out.println("building matrix test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-			//am.printMatrix(matrix);
+			//System.out.println("building matrix test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+			am.printMatrix(matrix);
 			//System.out.println(Arrays.toString(g2.findEigenvalues(matrix)));
 			//System.out.println(matrix.length);
 			
@@ -176,9 +176,14 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
 			LinkedList<Integer> edges = new LinkedList<Integer>();
 			InducedSubgraph is = new InducedSubgraph(g2);
-			is.createInducedSubgraph(nodes, edges, 60);
-			System.out.println("creating induced subgraph test time " + (System.currentTimeMillis()-time)+" milliseconds");
 			
+			for(int i = 0; i < 5; i++) {
+				System.out.println();
+				g2.displayAdjacencyMatrixOfInducedSubgraph(is,nodes,edges);	
+			}
+
+			//System.out.println("creating induced subgraph test time " + (System.currentTimeMillis()-time)+" milliseconds");
+			/*
 			System.out.println("nodes:");
 			System.out.println(nodes);
 			System.out.println("edges:");
@@ -187,13 +192,13 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			nodes.clear();
 			edges.clear();
 			time = System.currentTimeMillis();
-			is.createInducedSubgraph(nodes, edges, 60);
+			is.createInducedSubgraph(nodes, edges, 4);
 			System.out.println("creating induced subgraph test time " + (System.currentTimeMillis()-time)+" milliseconds");
 			System.out.println("nodes:");
 			System.out.println(nodes);
 			System.out.println("edges:");
 			System.out.println(edges);
-*/			
+			*/
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -201,6 +206,23 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 
  		
 	}	
+	
+	public void displayAdjacencyMatrixOfInducedSubgraph(InducedSubgraph is, LinkedList<Integer> nodes, LinkedList<Integer> edges) throws FastGraphException {
+		nodes.clear();
+		edges.clear();
+		System.out.println("trying again");
+		is.createInducedSubgraph(nodes, edges, 3);
+		int[] ns = nodes.stream().mapToInt(i->i).toArray(); //Useful way of converting a type list to a primitive array in Java 8
+		int[] es = edges.stream().mapToInt(i->i).toArray(); //Apparently http://stackoverflow.com/questions/960431/how-to-convert-listinteger-to-int-in-java/23945015#23945015
+		
+		System.out.println("subgraph nodes: " + Arrays.toString(ns));
+		//System.out.println("subgraph edges: " + Arrays.toString(es));
+		
+		FastGraph g3 = this.generateGraphFromSubgraph(ns, es);
+		AdjacencyMatrix am3 = new AdjacencyMatrix(g3);
+		int[][] matrix3 = am3.buildIntAdjacencyMatrix();
+		am3.printMatrix(matrix3);
+	}
 
 
 	/**
@@ -1936,7 +1958,7 @@ if(edgeIndex%1000000==0 ) {
 
 	/**
 	 * Generates a new graph from the subgraph specified by the parameters. The nodes at the end of the edges must be in subgraphEdges.
-s	 * 
+	 * 
 	 * @aparam subgraphNodes nodes in this graph that will appear in the new graph
 	 * @aparam subgraphEdges edges in this graph that will appear in the new graph, must connect only to subgraphNodes
 	 * @return the new FastGraph
