@@ -130,8 +130,10 @@ public class FastGraph {
 //		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
 		FastGraph g1 = adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false); // SNAP web page gives 1768149 edges
+		FastGraph g1 = adjacencyListGraphFactory(1696415,11095298,null,"as-skitter.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(4847571,68993773,null,"soc-LiveJournal1.txt",false);
+
 		
 //System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		
