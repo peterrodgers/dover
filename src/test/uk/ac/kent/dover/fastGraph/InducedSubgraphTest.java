@@ -124,10 +124,12 @@ public class InducedSubgraphTest {
 		InducedSubgraph is = new InducedSubgraph(g);
 		is.createInducedSubgraph(nodes, edges, 4);
 		assertEquals(nodes.toString(),Arrays.toString(new int[]{1,2,0}));
+		assertEquals(edges.toString(),Arrays.toString(new int[]{2,0,1}));
 		
 		prepare();
 		is.createInducedSubgraph(nodes, edges, 4);
 		assertEquals(nodes.toString(),Arrays.toString(new int[]{0,2,1}));
+		assertEquals(edges.toString(),Arrays.toString(new int[]{1,0,2}));
 		
 	}
 
