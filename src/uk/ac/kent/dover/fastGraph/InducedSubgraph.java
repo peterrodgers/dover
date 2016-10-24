@@ -45,7 +45,7 @@ public class InducedSubgraph {
 		//don't do this in a constructor, as the node buffer might not have been built or populated yet
 		//Random r = g.getRandomGen();
 		if (r == null) {
-			System.out.println("resetting random");
+			//System.out.println("resetting random");
 			long seed = g.getNodeBuf().getLong(1); //used to ensure the random is the same for each graph
 			r = new Random(seed);
 			//g.setRandomGen(r);
@@ -103,7 +103,9 @@ public class InducedSubgraph {
 				startingNodes = g.getNodeConnectingNodes(n);
 			}			
 		}	
-		
+		//Induce the graph and quit. This is run when the search runs out of nodes.
+		//This would be when the subgraph here is disconnected and therefore smaller than the target number of nodes
+		induceGraph(nodes, edges, visitedEdges);
 		return;
 	}
 	
@@ -115,6 +117,7 @@ public class InducedSubgraph {
 	 * @param visitedEdges The list of edges already visited
 	 */
 	private void induceGraph(LinkedList<Integer> nodes, LinkedList<Integer> edges, boolean[] visitedEdges) {
+	
 		//for every node in the graph
 		for(int n : nodes) {
 			//find what edges it connects to
@@ -130,7 +133,8 @@ public class InducedSubgraph {
 				}
 			}
 			
-		}		
+		}
+
 		return;
 	}
 }
