@@ -68,4 +68,25 @@ public class Util {
 	public static int[] convertLinkedList(LinkedList<Integer> list) {
 		return list.stream().mapToInt(i->i).toArray();
 	}
+	
+	/**
+	 * Converts a LinkedList of Integer to a given int[] using streams
+	 * 
+	 * @param list The linked list to convert
+	 * @param array The array to be populated
+	 */
+	public static void convertLinkedList(LinkedList<Integer> list, int[] array) {
+		array = list.stream().mapToInt(i->i).toArray();
+	}
+	
+	/**
+	 * Adds all items in a primitive array to the given linked list
+	 * @param list The list to be added to
+	 * @param array The array of items to add
+	 */
+	public static void addAll(LinkedList<Integer> list, int[] array) {
+		for(int i : array) {
+			list.add(i);
+		}
+	}
 }
