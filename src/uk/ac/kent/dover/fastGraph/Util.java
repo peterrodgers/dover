@@ -1,6 +1,7 @@
 package uk.ac.kent.dover.fastGraph;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
 
@@ -56,5 +57,15 @@ public class Util {
 		} else {
 			return number;
 		}
+	}
+	
+	/**
+	 * Converts a LinkedList of Integer to an int[] using streams
+	 * 
+	 * @param list The linked list to convert
+	 * @return The newly created array
+	 */
+	public static int[] convertLinkedList(LinkedList<Integer> list) {
+		return list.stream().mapToInt(i->i).toArray();
 	}
 }
