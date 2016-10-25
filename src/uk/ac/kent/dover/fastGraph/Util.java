@@ -1,6 +1,7 @@
 package uk.ac.kent.dover.fastGraph;
 
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
@@ -87,6 +88,17 @@ public class Util {
 	public static void addAll(LinkedList<Integer> list, int[] array) {
 		for(int i : array) {
 			list.add(i);
+		}
+	}
+	
+	/**
+	 * Adds all items in a primitive array to the given linked hash set
+	 * @param set The set to be added to
+	 * @param array The array of items to add
+	 */
+	public static void addAll(LinkedHashSet<Integer> set, int[] array) {
+		for(int i : array) {
+			set.add(i);
 		}
 	}
 }
