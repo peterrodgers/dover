@@ -119,6 +119,7 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(2,1,false);
 //		FastGraph g1 = randomGraphFactory(5,6,1,true);
 //		FastGraph g1 = randomGraphFactory(8,9,1,false);
+//		FastGraph g1 = randomGraphFactory(100,1000,1,false); // 1 hundred nodes, 1 thousand edges
 //		FastGraph g1 = randomGraphFactory(10000,100000,1,false); // 10 thousand nodes, 100 thousand edges
 //		FastGraph g1 = randomGraphFactory(100000,1000000,1,false); // 100 thousand nodes, 1 million edges
 //		FastGraph g1 = randomGraphFactory(1000000,10000000,1,false); // 1 million nodes, 10 million edges
@@ -136,14 +137,14 @@ public class FastGraph {
 
 		
 //System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-		
-		time = System.currentTimeMillis();
 /*		
+		time = System.currentTimeMillis();
+		
 		g1.saveBuffers(null,g1.getName());
 		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 */
-String name = "testAdj4.txt";
+String name = "random-n-100-e-1000";
 //String name = "soc-pokec-relationships.txt";
 //String name = "soc-LiveJournal1.txt";
 //String name = "twitter_combined.txt";
@@ -168,23 +169,32 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			int[][] matrix = am.buildIntAdjacencyMatrix();
 			//boolean[][] matrix = g2.buildBooleanAdjacencyMatrix();
 			//System.out.println("building matrix test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-			am.printMatrix(matrix);
+			//am.printMatrix(matrix);
 			//System.out.println(Arrays.toString(g2.findEigenvalues(matrix)));
 			//System.out.println(matrix.length);
 			
 			time = System.currentTimeMillis();
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
 			LinkedList<Integer> edges = new LinkedList<Integer>();
+			
+			g2.suggestNodesAndEdgesToRemove(nodes,edges,80,800);
+			
+			
+			
+			
+			
+			/**
 			InducedSubgraph is = new InducedSubgraph(g2);
 			
-			for(int i = 0; i < 5; i++) {
+			for(int i = 0; i < 100; i++) {
 				System.out.println();
-				boolean res = g2.displayAdjacencyMatrixOfInducedSubgraph(is,nodes,edges,Arrays.toString(new int[]{-1,-1,2}));	
+				boolean res = g2.displayAdjacencyMatrixOfInducedSubgraph(is,nodes,edges,Arrays.toString(new int[]{-2,0,0,2}));	
 				if (res) {
 					String[] names = new String[g2.getNumberOfNodes()];
 					NamePicker np = new NamePicker();
 					//pick a surname, so all family members have the same surname
 					String surname = np.getSurname();
+					System.out.println("Family name: " + surname);
 					for(int n : nodes) {
 						names[n] = np.getForename() + " " + surname;
 					}
@@ -200,7 +210,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 					
 					//just for testing
 					System.out.println();
-					System.out.println("graph now has the labels:");
+					System.out.println("graph now has the labels (taken from the buffer):");
 					for(int j = 0; j < g2.getNumberOfNodes(); j++) {
 						System.out.println(g2.getNodeLabel(j));
 					}
@@ -208,6 +218,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 					break;
 				}
 			}
+			**/
 
 			//System.out.println("creating induced subgraph test time " + (System.currentTimeMillis()-time)+" milliseconds");
 			/*
@@ -235,6 +246,67 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 	}	
 	
 	/**
+	 * Prototype method to generate a list of nodes and edges to remove from a graph. Doesn't pick anywhere near enough on dense graphs
+	 * 
+	 * @param nodes
+	 * @param edges
+	 * @param targetNodes
+	 * @param targetEdges
+	 */
+	public void suggestNodesAndEdgesToRemove(LinkedList<Integer> nodes, LinkedList<Integer> edges, int targetNodes, int targetEdges) {
+		
+		int currentTotalNodes = getNumberOfNodes();
+		int currentTotalEdges = getNumberOfEdges();
+		LinkedHashSet<Integer> edgesToRemove = new LinkedHashSet<Integer>();
+		
+		System.out.println("Current Nodes: " + currentTotalNodes + " Target Nodes: " + targetNodes);
+		System.out.println("Current Edges: " + currentTotalEdges + " Target Edges: " + targetEdges);
+		
+		//Any nodes to remove should have this number of edges - or close to this
+		int targetDensity = (currentTotalEdges - targetEdges) / (currentTotalNodes - targetNodes);	
+		
+		
+		//work backwards, as this makes it quicker deleting from the node buffer
+		for(int n = getNumberOfNodes()-1; n >= 0; n--) {
+			
+			int nodeDegree = getNodeDegree(n);
+			System.out.println("Current Density: " + nodeDegree + " Target Density: " + targetDensity);
+			//if this node has a similar degree to the density required
+			if (nodeDegree < targetDensity*1.6 && nodeDegree > targetDensity*0.4) {
+								
+				nodes.add(n);
+				Util.addAll(edgesToRemove,getNodeConnectingEdges(n));
+				
+				//adjust the target density if we've removed lots of edges
+				currentTotalNodes -= nodes.size();
+				currentTotalEdges -= edgesToRemove.size();
+				targetDensity = (currentTotalEdges - targetEdges) / (currentTotalNodes - targetNodes);
+				
+				//if the target nodes have been reached;
+				if(getNumberOfNodes() - nodes.size() <= targetNodes){
+					break;
+				}
+			}
+
+		}
+		edges.addAll(edgesToRemove);
+
+		System.out.println("nodes to remove:");
+		System.out.println(nodes);
+		System.out.println("edges  to remove:");
+		System.out.println(edges);
+		
+		FastGraph g3 = this.generateGraphByDeletingItems(Util.convertLinkedList(nodes),Util.convertLinkedList(edges));
+		//AdjacencyMatrix am3 = new AdjacencyMatrix(g3);
+		//int[][] matrix3 = am3.buildIntAdjacencyMatrix();
+		//am3.printMatrix(matrix3);
+		
+		System.out.println("Current Nodes in new FastGraph: " + g3.getNumberOfNodes());
+		System.out.println("Current Edges in new FastGraph: " + g3.getNumberOfEdges());
+		
+	}
+	
+	/**
 	 * Informal testing method for prototyping the code to change edge labels based on their connections
 	 * 
 	 * @param is The InducedSubgraph class for creating subgraphs
@@ -248,9 +320,9 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 		nodes.clear();
 		edges.clear();
 		System.out.println("trying again");
-		is.createInducedSubgraph(nodes, edges, 3);
-		int[] ns = nodes.stream().mapToInt(i->i).toArray(); //Useful way of converting a type list to a primitive array in Java 8
-		int[] es = edges.stream().mapToInt(i->i).toArray(); //Apparently http://stackoverflow.com/questions/960431/how-to-convert-listinteger-to-int-in-java/23945015#23945015
+		is.createInducedSubgraph(nodes, edges, 4);
+		int[] ns = Util.convertLinkedList(nodes); //Useful way of converting a type list to a primitive array in Java 8
+		int[] es = Util.convertLinkedList(edges); //Apparently http://stackoverflow.com/questions/960431/how-to-convert-listinteger-to-int-in-java/23945015#23945015
 		
 		System.out.println("subgraph nodes: " + Arrays.toString(ns));
 		//System.out.println("subgraph edges: " + Arrays.toString(es));
