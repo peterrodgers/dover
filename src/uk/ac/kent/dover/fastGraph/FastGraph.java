@@ -1377,12 +1377,19 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 	 * represented by one node index pair per line delimited by tabs or spaces, ignores lines starting with # and any line without a tab.
 	 * Looks for the file in given directory If directory is null, then to a
 	 * directory named data/snap under current working directory.
+	 * 
+	 * @param nodeCount the number of nodes
+	 * @param edgeCount the number of edges
+	 * @param dir the directory for the file, if null then a directory called data/ under the current working directory
+	 * @param fileName the file name for the file
+	 * @param direct if true the ByteBuffers are direct, if false they are allocated on the heap
+	 * 
 	 * @throws Exception Throws if the adjacency list cannot be built correctly. Might be an IO error
 	 */
-	public static FastGraph adjacencyListGraphFactory(int nodeCount, int edgeCount, String directory, String fileName, boolean direct) throws Exception {
+	public static FastGraph adjacencyListGraphFactory(int nodeCount, int edgeCount, String dir, String fileName, boolean direct) throws Exception {
 		FastGraph g = new FastGraph(nodeCount,edgeCount,direct);
 		g.setName(fileName);
-		g.loadAdjacencyListGraph(directory,fileName);
+		g.loadAdjacencyListGraph(dir,fileName);
 		return g;
 	}
 
@@ -1393,6 +1400,9 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
      * tabs or spaces, ignores lines starting with # and any line without a tab.
 	 * Looks for the file in given directory. If directory is null, then to a
 	 * directory named /data/snap under current working directory.
+	 * 
+	 * @param dir the directory for the file, if null then a directory called data/ under the current working directory
+	 * @param fileName the fileName for the file
 	 * 
 	 * @throws IOException If the buffers cannot be loaded
 	 */
@@ -1415,7 +1425,6 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 		HashMap<Integer,String> nodeIndexToSnapIdMap = new HashMap<Integer,String>(numberOfNodes*4);
 		HashMap<Integer,Integer> edgeNode1Map = new HashMap<Integer,Integer>(numberOfEdges*4);
 		HashMap<Integer,Integer> edgeNode2Map = new HashMap<Integer,Integer>(numberOfEdges*4);
-		
 		
 		File f = new File(path);
 		if(!f.exists()) {
@@ -1472,8 +1481,6 @@ if(edgeIndex%1000000==0 ) {
 	System.out.println("edgesLoaded "+edgeIndex+" time "+(System.currentTimeMillis()-time)/1000.0);
 }
 		}
-			
-		
 
 		String[] nodeLabels = new String[numberOfNodes];
 		String[] edgeLabels = new String[numberOfEdges];
@@ -1540,6 +1547,334 @@ if(edgeIndex%1000000==0 ) {
 			outEdgeList.add(i);
 
 		}
+		
+		setAllEdgeLabels(edgeLabels);
+
+
+		// Initialise the connection buffer, modifying the node buffer connection data
+		//time = System.currentTimeMillis();
+		int offset = 0;
+		for(int i = 0; i < numberOfNodes; i++) {
+			// setting the in connection offset and length
+			ArrayList<Integer> inEdges = nodeIn.get(i);
+			short inEdgeLength = (short)(inEdges.size());
+			nodeBuf.putInt(i*NODE_BYTE_SIZE+NODE_IN_CONNECTION_START_OFFSET,offset);
+			nodeBuf.putShort(i*NODE_BYTE_SIZE+NODE_IN_DEGREE_OFFSET,inEdgeLength);
+		
+			// now put the in edge/node pairs
+			for(int e : inEdges) {
+				int n = -1;
+				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+e*EDGE_BYTE_SIZE);
+				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+e*EDGE_BYTE_SIZE);
+				if(n1 == i) {
+					n = n2;
+				} else if(n2 == i) {
+					n = n1;
+				} else {
+					System.out.println("ERROR When finding connections for node "+i+" connecting edge "+e+ " has connecting nodes "+n1+" "+n2);
+				}
+				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,e);
+				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,n);
+				offset += CONNECTION_PAIR_SIZE;
+			}
+			
+			// setting the out connection offset and length
+			ArrayList<Integer> outEdges = nodeOut.get(i);
+			short outEdgeLength = (short)(outEdges.size());
+			nodeBuf.putInt(i*NODE_BYTE_SIZE+NODE_OUT_CONNECTION_START_OFFSET,offset);
+			nodeBuf.putShort(i*NODE_BYTE_SIZE+NODE_OUT_DEGREE_OFFSET,outEdgeLength);
+		
+			// now put the out edge/node pairs
+			for(int e : outEdges) {
+				int n = -1;
+				int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+e*EDGE_BYTE_SIZE);
+				int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+e*EDGE_BYTE_SIZE);
+				if(n1 == i) {
+					n = n2;
+				} else if(n2 == i) {
+					n = n1;
+				} else {
+					System.out.println("ERROR When finding connections for node "+i+" connecting edge "+e+ " has connecting nodes "+n1+" "+n2);
+				}
+				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,e);
+				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,n);
+				offset += CONNECTION_PAIR_SIZE;
+			}
+		}
+	}
+	
+	
+	/**
+	 * Creates a graph from two files: baseFileName.nodes and baseFileName.edges.
+	 * Files are structured as line *"\n" separated) lists of items. Each element
+	 * in an item is tab ("\t") separated. Hence no tabs in file names are allowed.
+	 * <br/>
+	 * Nodes are lists of <code>index	label	weight	type	age</code>
+	 * <br>
+	 * where index must start at 0 and end at nodeCount-1, label is a string, weight is
+	 * integer valued, type is byte valued and age is byte valued.
+	 * <br/> 
+	 * Edges are lists of <code>index	node1Index	node2Index	label	weight	type	age</code>
+	 * <br>
+	 * where index must start at 0 and end at edgeCount-1, node1Index is a node index,
+	 * node2Index is a nodeIndex, label is a string, weight is 
+	 * integer valued, type is byte valued and age is byte valued.
+	 * <br>
+	 * Ignores empty lines and lines starting with a hash ("#").
+	 * 
+	 * @param nodeCount the number of nodes
+	 * @param edgeCount the number of edges
+	 * @param dir the directory for the file, if null then a directory called data/ under the current working directory
+	 * @param baseFileName the base of the file name for the file, two files called baseFileName.nodes and baseFileName.edges are expected
+	 * @param direct if true the ByteBuffers are direct, if false they are allocated on the heap
+     *
+	 * @throws Exception Throws if the graph cannot be built correctly. Might be an IO error
+	 */
+	public static FastGraph nodeListEdgeListGraphFactory(int nodeCount, int edgeCount, String dir, String baseFileName, boolean direct) throws Exception {
+		FastGraph g = new FastGraph(nodeCount,edgeCount,direct);
+		g.setName(baseFileName);
+		g.loadnodeListEdgeListGraph(dir,baseFileName);
+		return g;
+	}
+
+
+	
+	/**
+	 * Populates a graph from two files: baseFileName.nodes and baseFileName.edges.
+	 * Files are structured as line *"\n" separated) lists of items. Each element
+	 * in an item is tab ("\t") separated. Hence no tabs in file names are allowed.
+	 * <br/>
+	 * Nodes are lists of <code>index	label	weight	type	age</code>
+	 * <br>
+	 * where index must start at 0 and end at nodeCount-1, label is a string, weight is
+	 * integer valued, type is byte valued and age is byte valued.
+	 * <br/> 
+	 * Edges are lists of <code>index	node1Index	node2Index	label	weight	type	age</code>
+	 * <br>
+	 * where index must start at 0 and end at edgeCount-1, node1Index is a node index,
+	 * node2Index is a nodeIndex, label is a string, weight is 
+	 * integer valued, type is byte valued and age is byte valued.
+	 * <br>
+	 * Ignores empty lines and lines starting with a hash ("#").
+	 * 
+	 * @param dir the directory for the file, if null then a directory called data/ under the current working directory
+	 * @param baseFileName the base of the file name for the file, two files called baseFileName.nodes and baseFileName.edges are expected
+	 * 
+	 * @throws IOException If the buffers cannot be loaded
+	 * 
+	 */
+	private void loadnodeListEdgeListGraph(String dir, String baseFileName) throws Exception {
+	
+		String directory = dir;
+		if(directory == null) {
+			directory = Launcher.startingWorkingDirectory+File.separatorChar+"data";
+		}
+		String basePath = null;
+		if(directory.charAt(directory.length()-1)== File.separatorChar) {
+			basePath = directory+baseFileName;
+		} else {
+			basePath = directory+File.separatorChar+baseFileName;
+		}
+		
+		String nodePath = basePath+".nodes";
+		File f = new File(nodePath);
+		if(!f.exists()) {
+			throw new IOException("Problem loading file "+nodePath);
+		}
+		
+		FileInputStream is = new FileInputStream(nodePath);
+		InputStreamReader isr = new InputStreamReader(is);
+		BufferedReader br = new BufferedReader(isr);
+
+		// load the nodes
+		String[] splitLine;
+		String[] nodeLabels = new String[numberOfNodes];
+		int inStart = -18;
+		short inLength = -13;
+		int outStart = -21;
+		short outLength = -23;
+		int index = -1;
+		String label;
+		int weight = -15;
+		byte type = -17;
+		byte age = -19;
+		String nodeLine = "";
+		while(nodeLine != null) {
+			nodeLine = br.readLine();
+			if(nodeLine == null) {
+				continue;
+			}
+			if(nodeLine.length() == 0) {
+				continue;
+			}
+			if(nodeLine.charAt(0) == '#') {
+				continue;
+			}
+			
+			splitLine = nodeLine.split("\t");
+			
+			if(splitLine.length < 5) {
+				br.close();
+				throw new IOException("Not enough elements, needs 5 tab separated elements in "+nodeLine);
+			}
+	
+			try {
+				index = Integer.parseInt(splitLine[0]);
+			} catch(NumberFormatException e) {
+				br.close();
+				throw new IOException("Problem parsing node index in line "+nodeLine);
+			}
+			if(index > numberOfNodes) {
+				br.close();
+				throw new IOException("index "+index+" is greater than the number of nodes "+numberOfNodes);
+			}
+			label = splitLine[1];
+			try {
+				weight = Integer.parseInt(splitLine[2]);
+			} catch(NumberFormatException e) {
+				br.close();
+				throw new IOException("Problem parsing node weight in line "+nodeLine);
+			}
+			try {
+				type = Byte.parseByte(splitLine[3]);
+			} catch(NumberFormatException e) {
+				br.close();
+				throw new IOException("Problem parsing node type in line "+nodeLine);
+			}
+			try {
+				age = Byte.parseByte(splitLine[4]);
+			} catch(NumberFormatException e) {
+				br.close();
+				throw new IOException("Problem parsing node age in line "+nodeLine);
+			}
+			
+			nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+index*NODE_BYTE_SIZE,inStart); // offset for inward connecting edges/nodes
+			nodeBuf.putShort(NODE_IN_DEGREE_OFFSET+index*NODE_BYTE_SIZE,inLength); // number of inward connecting edges/nodes
+			nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+index*NODE_BYTE_SIZE,outStart); // offset for outward connecting edges/nodes
+			nodeBuf.putShort(NODE_OUT_DEGREE_OFFSET+index*NODE_BYTE_SIZE,outLength); // number of outward connecting edges/nodes
+			nodeBuf.putInt(NODE_WEIGHT_OFFSET+index*NODE_BYTE_SIZE,weight); // weight
+			nodeBuf.put(NODE_TYPE_OFFSET+index*NODE_BYTE_SIZE,type); // type
+			nodeBuf.put(NODE_AGE_OFFSET+index*NODE_BYTE_SIZE,age); // age
+
+			// save labels for later
+			nodeLabels[index] = label;
+
+		}
+		br.close();
+
+		setAllNodeLabels(nodeLabels);
+
+		String[] edgeLabels = new String[numberOfEdges];
+		
+		String edgePath = basePath+".edges";
+		f = new File(edgePath);
+		if(!f.exists()) {
+			throw new IOException("Problem loading file "+edgePath+""+directory);
+		}
+		
+		is = new FileInputStream(edgePath);
+		isr = new InputStreamReader(is);
+		br = new BufferedReader(isr);
+
+
+		// load the Edges
+		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of inward edges
+		for(int i = 0; i < numberOfNodes; i++) {
+			ArrayList<Integer> edges = new ArrayList<Integer>(100);
+			nodeIn.add(i,edges);
+		}
+		
+		ArrayList<ArrayList<Integer>> nodeOut = new ArrayList<ArrayList<Integer>>(numberOfNodes); // temporary store of outward edges
+		for(int i = 0; i < numberOfNodes; i++) {
+			ArrayList<Integer> edges = new ArrayList<Integer>(100);
+			nodeOut.add(i,edges);
+		}
+				
+		ArrayList<Integer> inEdgeList;	
+		ArrayList<Integer> outEdgeList;	
+		
+		int node1 = -64;
+		int node2 = -65;
+		String edgeLine = "";
+		while(edgeLine != null) {
+			edgeLine = br.readLine();
+			if(edgeLine == null) {
+				continue;
+			}
+			if(edgeLine.length() == 0) {
+				continue;
+			}
+			if(edgeLine.charAt(0) == '#') {
+				continue;
+			}
+			
+			splitLine = edgeLine.split("\t");
+			
+			if(splitLine.length < 7) {
+				br.close();
+				throw new IOException("Not enough elements, needs 7 tab separated elements in "+edgeLine);
+			}
+	
+			try {
+				index = Integer.parseInt(splitLine[0]);
+			} catch(NumberFormatException e) {
+				br.close();
+				throw new IOException("Problem parsing edge index in line "+edgeLine);
+			}
+			if(index > numberOfEdges) {
+				br.close();
+				throw new IOException("index "+index+" is greater than the number of edges "+numberOfEdges);
+			}
+			try {
+				node1 = Integer.parseInt(splitLine[1]);
+			} catch(NumberFormatException e) {
+				br.close();
+				throw new IOException("Problem parsing node 1 index in line "+edgeLine);
+			}
+			try {
+				node2 = Integer.parseInt(splitLine[2]);
+			} catch(NumberFormatException e) {
+				br.close();
+				throw new IOException("Problem parsing node 2 index in line "+edgeLine);
+			}
+			label = splitLine[3];
+			try {
+				weight = Integer.parseInt(splitLine[4]);
+			} catch(NumberFormatException e) {
+				br.close();
+				throw new IOException("Problem parsing edge weight in line "+edgeLine);
+			}
+			try {
+				type = Byte.parseByte(splitLine[5]);
+			} catch(NumberFormatException e) {
+				br.close();
+				throw new IOException("Problem parsing edge type in line "+edgeLine);
+			}
+			try {
+				age = Byte.parseByte(splitLine[6]);
+			} catch(NumberFormatException e) {
+				br.close();
+				throw new IOException("Problem parsing edge age in line "+edgeLine);
+			}
+
+			edgeBuf.putInt(EDGE_NODE1_OFFSET+index*EDGE_BYTE_SIZE,node1); // one end of edge
+			edgeBuf.putInt(EDGE_NODE2_OFFSET+index*EDGE_BYTE_SIZE,node2); // other end of edge
+			edgeBuf.putInt(EDGE_WEIGHT_OFFSET+index*EDGE_BYTE_SIZE,weight); // weight
+			edgeBuf.put(EDGE_TYPE_OFFSET+index*EDGE_BYTE_SIZE,type); // type
+			edgeBuf.put(EDGE_AGE_OFFSET+index*EDGE_BYTE_SIZE,age); // age
+
+			// save labels for later
+			edgeLabels[index] = label;
+			
+			// store connecting nodes
+			inEdgeList = nodeIn.get(node2);
+			inEdgeList.add(index);
+			outEdgeList = nodeOut.get(node1);
+			outEdgeList.add(index);
+			
+		}
+		br.close();
+			
 		
 		setAllEdgeLabels(edgeLabels);
 

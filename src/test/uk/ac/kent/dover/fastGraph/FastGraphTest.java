@@ -1351,6 +1351,71 @@ public class FastGraphTest {
 		
 	}
 
+	@Test
+	public void test125() throws Exception {
+		FastGraph g = FastGraph.nodeListEdgeListGraphFactory(0, 0, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "test1", false);
+		assertEquals(0,g.getNumberOfNodes());
+		assertEquals(0,g.getNumberOfEdges());
+	}
+
+	@Test
+	public void test126() throws Exception {
+		FastGraph g = FastGraph.nodeListEdgeListGraphFactory(1, 0, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "test2", false);
+		assertEquals(1,g.getNumberOfNodes());
+		assertEquals(0,g.getNumberOfEdges());
+		assertEquals("node label 1",g.getNodeLabel(0));
+		assertEquals(23,g.getNodeWeight(0));
+		assertEquals(12,g.getNodeType(0));
+		assertEquals(3,g.getNodeAge(0));
+	}
+
+	@Test
+	public void test127() throws Exception {
+		Graph displayGraph;
+		FastGraph g = FastGraph.nodeListEdgeListGraphFactory(2, 1, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "test3", false);
+
+		assertEquals(2,g.getNumberOfNodes());
+		assertEquals(1,g.getNumberOfEdges());
+		assertEquals("node label 2",g.getNodeLabel(1));
+		assertEquals(33,g.getNodeWeight(1));
+		assertEquals(32,g.getNodeType(1));
+		assertEquals(34,g.getNodeAge(1));
+		assertEquals(1,g.getEdgeNode1(0));
+		assertEquals(0,g.getEdgeNode2(0));
+		assertEquals("edge label 1",g.getEdgeLabel(0));
+		assertEquals(223,g.getEdgeWeight(0));
+		assertEquals(43,g.getEdgeType(0));
+		assertEquals(44,g.getEdgeAge(0));
+		displayGraph = g.generateDisplayGraph();
+		assertTrue(displayGraph.consistent());
+
+	}
+
+	@Test
+	public void test128() throws Exception {
+		Graph displayGraph;
+		FastGraph g = FastGraph.nodeListEdgeListGraphFactory(3, 4, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "test4", false);
+
+		assertEquals(3,g.getNumberOfNodes());
+		assertEquals(4,g.getNumberOfEdges());
+		assertEquals("node label 3",g.getNodeLabel(2));
+		assertEquals(1,g.getNodeWeight(2));
+		assertEquals(2,g.getNodeType(2));
+		assertEquals(3,g.getNodeAge(2));
+		assertEquals(2,g.getEdgeNode1(3));
+		assertEquals(2,g.getEdgeNode2(3));
+		assertEquals("edge label 4",g.getEdgeLabel(3));
+		assertEquals(4,g.getEdgeWeight(3));
+		assertEquals(5,g.getEdgeType(3));
+		assertEquals(6,g.getEdgeAge(3));
+		displayGraph = g.generateDisplayGraph();
+		assertTrue(displayGraph.consistent());
+
+	}
+
+
+	
+	
 	
 	//TODO Add tests here
 
