@@ -44,6 +44,41 @@ public class Util {
 		return newArr;
 	}
 	
+	
+	/**
+	 * Rounds and a double[] to a less precise double[]
+	 * @param arr a double[] to be rounded
+	 * @param decimalPlaces the amount of decimal places to round each double in arr
+	 * @return The rounded double[]
+	 */
+	public static double[] roundArray(double[] arr, int decimalPlaces) {
+		double[] newArr = new double[arr.length];
+		for(int i = 0; i < arr.length; i++) {
+			newArr[i] = round(arr[i],decimalPlaces);
+		}
+		Arrays.sort(newArr);
+		return newArr;
+	}
+	
+	
+	/**
+	 * Round to the given number of decimal places.
+	 * @param d a double to be rounded
+	 * @param decimalPlaces the number of decimal places 
+	 * @return The rounded double
+	 */
+	public static double round(double d,int decimalPlaces) {
+
+		long divider = 1;
+		for(int i = 1; i<= decimalPlaces; i++) {
+			divider *= 10;
+		}
+		double largeAmount = Math.rint(d*divider);
+		return(largeAmount/divider);
+	}
+
+
+	
 	/**
 	 * Checks if a String is a positive integer.
 	 * 
