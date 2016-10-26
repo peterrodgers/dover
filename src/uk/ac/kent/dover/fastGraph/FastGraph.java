@@ -144,8 +144,8 @@ public class FastGraph {
 		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 */
-String name = "random-n-100-e-1000";
-//String name = "soc-pokec-relationships.txt";
+//String name = "random-n-100-e-1000";
+String name = "as-skitter.txt";
 //String name = "soc-LiveJournal1.txt";
 //String name = "twitter_combined.txt";
 //String name = "Wiki-Vote.txt";
@@ -165,8 +165,8 @@ String name = "random-n-100-e-1000";
 System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" seconds");
 */
 
-			AdjacencyMatrix am = new AdjacencyMatrix(g2);
-			int[][] matrix = am.buildIntAdjacencyMatrix();
+			//AdjacencyMatrix am = new AdjacencyMatrix(g2);
+			//int[][] matrix = am.buildIntAdjacencyMatrix();
 			//boolean[][] matrix = g2.buildBooleanAdjacencyMatrix();
 			//System.out.println("building matrix test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			//am.printMatrix(matrix);
@@ -177,10 +177,10 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
 			LinkedList<Integer> edges = new LinkedList<Integer>();
 			
-			g2.suggestNodesAndEdgesToRemove(nodes,edges,80,800);
+			//g2.suggestNodesAndEdgesToRemove(nodes,edges,80,800);
 			
-			
-			
+			long[] degrees = g2.countInstancesOfNodeDegrees(4);
+			System.out.println(Arrays.toString(degrees));
 			
 			
 			/**
@@ -2619,5 +2619,25 @@ if(edgeIndex%1000000==0 ) {
 		
 		return g;
 	}	
+	
+	/**
+	 * Counts the number of instances of nodes with various degrees.
+	 * 
+	 * @param maxDegrees The maximum number of degrees to look for. If given 3, will count all nodes with degrees 0,1,2.
+	 * @return The list of number of nodes at each degree.
+	 */
+	public long[] countInstancesOfNodeDegrees(int maxDegrees) {
+		long[] res = new long[maxDegrees];
+		
+		for(int n = 0; n < getNumberOfNodes(); n++) {
+			int deg = getNodeDegree(n);
+			if (deg < maxDegrees) {
+				System.out.print(deg + " ");
+				System.out.println(res[deg]);
+				res[deg]++;
+			}
+		}		
+		return res;
+	}
 	
 }
