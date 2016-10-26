@@ -476,7 +476,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 	 * @return the node degree (number of connecting edges)
 	 */
 	public int getNodeDegree(int nodeIndex) {
-		int degree = getNodeInDegree(nodeIndex)+getNodeOutDegree(nodeIndex);
+		int degree = Short.toUnsignedInt(getNodeInDegree(nodeIndex))+Short.toUnsignedInt(getNodeOutDegree(nodeIndex));
 		return degree;
 	}
 	
@@ -2632,8 +2632,8 @@ if(edgeIndex%1000000==0 ) {
 		for(int n = 0; n < getNumberOfNodes(); n++) {
 			int deg = getNodeDegree(n);
 			if (deg < maxDegrees) {
-				System.out.print(deg + " ");
-				System.out.println(res[deg]);
+				//System.out.print("node: " + n + " deg: " + deg + " ");
+				//System.out.println("Current total: " + res[deg]);
 				res[deg]++;
 			}
 		}		
