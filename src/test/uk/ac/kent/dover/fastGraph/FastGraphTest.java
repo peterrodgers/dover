@@ -1413,6 +1413,19 @@ public class FastGraphTest {
 
 	}
 
+	@Test
+	public void test129() throws Exception {
+		// bug with too small node degree. Fixed by changing node degrees to ints
+		int overMaxShort = Short.MAX_VALUE*2;
+		FastGraph g = FastGraph.randomGraphFactory(1, overMaxShort, false);
+		assertEquals(overMaxShort,g.getNodeOutDegree(0));
+		assertEquals(overMaxShort,g.getNodeInDegree(0));
+		assertEquals(overMaxShort*2,g.getNodeDegree(0));
+		assertEquals(overMaxShort-1,g.getNodeConnectingEdges(0)[overMaxShort-1]);
+		assertEquals(0,g.getNodeConnectingNodes(0)[overMaxShort-1]);
+
+	}
+
 
 	
 	
