@@ -77,6 +77,46 @@ public class Util {
 		return(largeAmount/divider);
 	}
 
+	/**
+	 * Rounds and Converts a double[].
+	 * Multiplies each value by 1,000,000,000 (10^9) and converts to an integer
+	 * 
+	 * @param toConvert The array to convert
+	 * @return The converted array
+	 */
+	public static int[] roundAndConvert(double[] toConvert) {
+		int[] res = new int[toConvert.length];
+		for(int i = 0; i < toConvert.length; i++) {
+			res[i] = roundAndConvert(toConvert[i]);
+		}
+		return res;
+	}
+	
+	/**
+	 * Rounds and Converts a double[].
+	 * Multiplies each value by 1,000,000,000 (10^9) and converts to an integer
+	 * 
+	 * @param res The array to be populated
+	 * @param toConvert The array to convert
+	 * @return The converted array
+	 */
+	public static int[] roundAndConvert(int[] res, double[] toConvert) {
+		for(int i = 0; i < toConvert.length; i++) {
+			res[i] = roundAndConvert(toConvert[i]);
+		}
+		return res;
+	}
+	
+	/**
+	 * Rounds and Converts a double.
+	 * Multiplies each value by 1,000,000,000 (10^9) and converts to an integer
+	 * 
+	 * @param toConvert The double to convert
+	 * @return The converted and rounded int
+	 */
+	public static int roundAndConvert(double toConvert) {
+		return (int) Math.round(toConvert*1000000000); //1,000,000,000		
+	}
 
 	
 	/**
