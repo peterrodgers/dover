@@ -110,7 +110,7 @@ public class FastGraph {
 	 */
 	public static void main(String[] args) throws Exception {
 		
-		//long time;
+		long time;
 		
 		
 //		FastGraph g1 = randomGraphFactory(1,0,false);
@@ -125,7 +125,7 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(4847571,68993773,1,false); // Size of LiveJournal1 example from SNAP
 //		FastGraph g1 = randomGraphFactory(10000000,100000000,1,false); // 10 million nodes, 100 million edges, close to edgeBuf limit, but fails on heap space with 14g, but pass with heap space of 30g
 
-//		time = System.currentTimeMillis();
+		time = System.currentTimeMillis();
 //		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false); // SNAP web page gives 1768149 edges
@@ -134,14 +134,14 @@ public class FastGraph {
 //		FastGraph g1 = adjacencyListGraphFactory(4847571,68993773,null,"soc-LiveJournal1.txt",false);
 
 		
-//System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-/*		
+System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+		
 		time = System.currentTimeMillis();
 		
-		g1.saveBuffers(null,g1.getName());
-		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+//		g1.saveBuffers(null,g1.getName());
+//		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
-*/
+
 //String name = "random-n-100-e-1000";
 String name = "as-skitter.txt";
 //String name = "soc-LiveJournal1.txt";
@@ -171,11 +171,15 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			//System.out.println(Arrays.toString(g2.findEigenvalues(matrix)));
 			//System.out.println(matrix.length);
 			
-			//time = System.currentTimeMillis();
-			//LinkedList<Integer> nodes = new LinkedList<Integer>();
-			//LinkedList<Integer> edges = new LinkedList<Integer>();
+			time = System.currentTimeMillis();
+			LinkedList<Integer> nodes = new LinkedList<Integer>();
+			LinkedList<Integer> edges = new LinkedList<Integer>();
 			
-			//g2.suggestNodesAndEdgesToRemove(nodes,edges,80,800);
+			FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1000000,10000000);
+			
+			System.out.println("suggestion test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+			
+			System.out.println("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
 			
 //			int[] degrees = g2.countInstancesOfNodeDegrees(4);
 //			System.out.println(Arrays.toString(degrees));
@@ -244,6 +248,189 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 	}	
 	
 	/**
+	 * This method creates a new FastGraph of the rough size given in targetNodes and targetEdges. <br>
+	 * The new graph will never be smaller, but may be larger on either the node or edge count. <br>
+	 * <b>Note: This may take some time to complete</b>
+	 * 
+	 * @param nodes The list of nodes to be removed
+	 * @param edges The list of edges to be removed
+	 * @param targetNodes The target number of nodes
+	 * @param targetEdges The target number of edges
+	 * @return A new FastGraph that is roughly the size of the target
+	 * @throws FastGraphException If there is an exception here, e.g. targetNodes is too big
+	 */
+	public FastGraph removeNodesAndEdgesFromGraph(LinkedList<Integer> nodes, LinkedList<Integer> edges, int targetNodes, int targetEdges) throws FastGraphException {
+		
+		System.out.println("Suggesting nodes and egdes to remove");
+		long time = System.currentTimeMillis();
+		
+		int currentTotalNodes = getNumberOfNodes();
+		int currentTotalEdges = getNumberOfEdges();
+		
+		//if a graph of the same size has been specified
+		if (targetNodes == currentTotalNodes && targetEdges == currentTotalEdges) {
+			return this;
+		}
+		
+		//if the node target is too big
+		if(targetNodes > currentTotalNodes) {
+			throw new FastGraphException("The target node size is too big");
+		}
+		//if the edge target is too big
+		if(targetEdges > currentTotalEdges) {
+			throw new FastGraphException("The target edge size is too big");
+		}
+		
+		
+		int nodeReductionAmount = currentTotalNodes - targetNodes; //how many nodes we need to remove
+		int edgeReductionAmount = currentTotalEdges - targetEdges; //how many edges we need to remove
+		LinkedHashSet<Integer> edgesToRemove = new LinkedHashSet<Integer>(); //edges that need removing
+		LinkedHashSet<Integer> nodesToRemove = new LinkedHashSet<Integer>(); //nodes that need removing
+		
+		System.out.println("Current Nodes: " + currentTotalNodes + " Target Nodes: " + targetNodes);
+		System.out.println("Current Edges: " + currentTotalEdges + " Target Edges: " + targetEdges);
+		
+		System.out.println("setup test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+		System.out.println();
+		
+		time = System.currentTimeMillis();
+		System.out.println("# Starting STEP ONE");
+		//STEP ONE:
+		//Find a subgraph with the required number of nodes. Remove it
+		InducedSubgraph is = new InducedSubgraph(this);
+		LinkedList<Integer> subNodes = new LinkedList<Integer>();
+		LinkedList<Integer> subEdges = new LinkedList<Integer>();
+		is.createInducedSubgraph(subNodes, subEdges, nodeReductionAmount);
+		
+		nodesToRemove.addAll(subNodes);
+		edgesToRemove.addAll(subEdges);
+		
+		System.out.println("After induction test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+		System.out.println("nodes to remove size: " + nodesToRemove.size() + " edges to remove size: " + edgesToRemove.size());
+		System.out.println();
+		
+		
+		//STEP TWO:
+		//if we haven't removed enough nodes
+		System.out.println("# Starting STEP TWO");
+		time = System.currentTimeMillis();
+		if(nodeReductionAmount > nodesToRemove.size()) { //could we thread these to make this quicker?
+			Random r = new Random(nodeBuf.getLong(1));
+			
+			//make local stores, as we might not want to remove these nodes if they are too big
+			LinkedHashSet<Integer> localEdgesToRemove = new LinkedHashSet<Integer>(); //edges that need removing
+			LinkedHashSet<Integer> localNodesToRemove = new LinkedHashSet<Integer>(); //nodes that need removing
+			
+			int chances = 10; //if a tree is too big, then skip it. But only do this 10 times, in case we are stuck
+			while(nodeReductionAmount > nodesToRemove.size() && chances > 0) {
+				//long time2 = System.currentTimeMillis();
+				localNodesToRemove.clear();
+				localEdgesToRemove.clear();
+				
+				int stillToRemove = nodeReductionAmount - nodesToRemove.size(); //what nodes are left to remove
+				this.buildTree(localNodesToRemove, localEdgesToRemove, r, 3);
+				
+				//System.out.println("Tree: " + localNodesToRemove);				
+				//System.out.println("nodeRA: " + nodeReductionAmount + " stillTR: " + stillToRemove + " localNodesToRemove: " + localNodesToRemove.size());
+				
+				if (localNodesToRemove.size() <= stillToRemove) {
+					nodesToRemove.addAll(localNodesToRemove);
+					edgesToRemove.addAll(localEdgesToRemove);
+				} else {
+					chances--; //Avoids getting stuck if there are no further options
+					continue;
+				}
+				
+				//System.out.println("After this tree test time " + (System.currentTimeMillis()-time2)/1000.0+" seconds");
+			}
+			
+		}
+		System.out.println("After tree test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+		System.out.println("nodes to remove size: " + nodesToRemove.size() + " edges to remove size: " + edgesToRemove.size());
+		System.out.println();
+		
+		
+		//STEP THREE:
+		//if we haven't removed enough nodes
+		//pick some at random
+		System.out.println("# Starting STEP THREE");
+		time = System.currentTimeMillis();
+		if(nodeReductionAmount > nodesToRemove.size()) {
+			Random r = new Random(nodeBuf.getLong(2));		
+			while(nodeReductionAmount > nodesToRemove.size()) {
+				int n = r.nextInt(this.getNumberOfNodes());
+				nodesToRemove.add(n);
+				edgesToRemove.addAll(Util.convertArray(this.getNodeConnectingEdges(n)));
+			}
+		}
+		System.out.println("After node removal test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+		System.out.println("nodes to remove size: " + nodesToRemove.size() + " edges to remove size: " + edgesToRemove.size());
+		System.out.println();
+		
+		
+		//STEP FOUR:
+		//if we haven't removed enough edges
+		//pick some at random
+		System.out.println("# Starting STEP FOUR");
+		time = System.currentTimeMillis();
+		if(edgeReductionAmount > edgesToRemove.size()) {
+			Random r = new Random(edgeBuf.getLong(2));
+			while(edgeReductionAmount > edgesToRemove.size()) {
+				int e = r.nextInt(this.getNumberOfEdges());
+				edgesToRemove.add(e);
+			}
+			
+		}
+		System.out.println("After edge removal test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+		System.out.println("nodes to remove size: " + nodesToRemove.size() + " edges to remove size: " + edgesToRemove.size());
+		System.out.println();
+		
+		nodes.addAll(nodesToRemove);
+		edges.addAll(edgesToRemove);
+
+		time = System.currentTimeMillis();
+		System.out.println("Building new FastGraph");
+		FastGraph g = this.generateGraphByDeletingItems(Util.convertLinkedList(nodes), Util.convertLinkedList(edges));
+		System.out.println("After FastGraph building test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+		return g;
+	}
+	
+	/**
+	 * Builds a tree like structure from a random node, to a particular depth
+	 * 
+	 * @param nodes A LinkedHashSet of nodes, ready to be populated with nodes to be removed
+	 * @param edges A LinkedHashSet of edges, ready to be populated with nodes to be removed
+	 * @param r A random number generator used to pick a starting place.
+	 * @param depth The depth of the tree. 1 would equal the starting node and it's children. 2 would be the same as 1, but with grandchildren.
+	 */
+	public void buildTree(LinkedHashSet<Integer> nodes, LinkedHashSet<Integer> edges, Random r, int depth) {
+		int startingNode = r.nextInt(this.getNumberOfNodes());
+		
+		nodes.add(startingNode);
+		edges.addAll(Util.convertArray(this.getNodeConnectingEdges(startingNode)));
+		
+		LinkedList<Integer> startingNodes = new LinkedList<>();
+		startingNodes.add(startingNode);
+
+		//while we are not at the required depth
+		while(depth != 0) {
+			//System.out.println("Starting Node: " + startingNode);
+			int[] cn = new int[0]; //get ready to store connecting nodes
+			for (int sn : startingNodes) { //for each of the starting nodes
+				cn = this.getNodeConnectingNodes(sn); //get this node's connecting nodes
+				//System.out.println("    Connecting Nodes: " + Arrays.toString(cn));
+				for(int n : cn) {
+					nodes.add(n); //add them all the the tree
+					edges.addAll(Util.convertArray(this.getNodeConnectingEdges(n))); //add the edges too
+				}
+			}
+			startingNodes = Util.convertArray(cn); // make the connections the starting nodes for the next loop
+			depth--; //"We need to go deeper"
+		}		
+	}
+	
+	
+	/**
 	 * Prototype method to generate a list of nodes and edges to remove from a graph. Doesn't pick anywhere near enough on dense graphs
 	 * 
 	 * @param nodes
@@ -251,7 +438,9 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 	 * @param targetNodes
 	 * @param targetEdges
 	 */
-	public void suggestNodesAndEdgesToRemove(LinkedList<Integer> nodes, LinkedList<Integer> edges, int targetNodes, int targetEdges) {
+	@Deprecated
+	public void oldsuggestNodesAndEdgesToRemove(LinkedList<Integer> nodes, LinkedList<Integer> edges, int targetNodes, int targetEdges) {
+		System.out.println("Suggesting nodes and egdes to remove");
 		
 		int currentTotalNodes = getNumberOfNodes();
 		int currentTotalEdges = getNumberOfEdges();
@@ -2349,8 +2538,8 @@ if(edgeIndex%1000000==0 ) {
 	 * edges connected to deleted nodes are also removed.
 	 *
 	 * 
-	 * @aparam nodesToDelete nodes in this graph that will not appear in the new graph
-	 * @aparam edgesToDelete edges in this graph that will not appear in the new graph
+	 * @param nodesToDelete nodes in this graph that will not appear in the new graph
+	 * @param edgesToDelete edges in this graph that will not appear in the new graph
 	 * @return the new FastGraph
 	 */
 	public FastGraph generateGraphByDeletingItems(int[] nodesToDelete, int[] edgesToDelete) {
@@ -2411,8 +2600,8 @@ if(edgeIndex%1000000==0 ) {
 	/**
 	 * Generates a new graph from the subgraph specified by the parameters. The nodes at the end of the edges must be in subgraphEdges.
 	 * 
-	 * @aparam subgraphNodes nodes in this graph that will appear in the new graph
-	 * @aparam subgraphEdges edges in this graph that will appear in the new graph, must connect only to subgraphNodes
+	 * @param subgraphNodes nodes in this graph that will appear in the new graph
+	 * @param subgraphEdges edges in this graph that will appear in the new graph, must connect only to subgraphNodes
 	 * @return the new FastGraph
 	 */
 	public FastGraph generateGraphFromSubgraph(int[] subgraphNodes, int[] subgraphEdges) {

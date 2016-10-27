@@ -181,9 +181,6 @@ public class Util {
 		list.addAll(IntStream.of(array).boxed().collect(Collectors.toList()));
 	}	
 	
-	
-	;
-	
 	/**
 	 * Adds all items in a primitive array to the given linked list
 	 * @param list The list to be added to
