@@ -3,6 +3,7 @@ package uk.ac.kent.dover.fastGraph;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -167,7 +168,7 @@ public class Util {
 	 * @return The newly created LinkedList
 	 */
 	public static LinkedList<Integer> convertArray(int[] array) {
-		return (LinkedList<Integer>) IntStream.of(array).boxed().collect(Collectors.toList());
+		return new LinkedList<Integer>(IntStream.of(array).boxed().collect(Collectors.toList()));
 	}
 	
 	/**
@@ -177,7 +178,7 @@ public class Util {
 	 * @param list The newly populated LinkedList
 	 */
 	public static void convertArray(int[] array, LinkedList<Integer> list) {
-		list = (LinkedList<Integer>) IntStream.of(array).boxed().collect(Collectors.toList());
+		list.addAll(IntStream.of(array).boxed().collect(Collectors.toList()));
 	}	
 	
 	
