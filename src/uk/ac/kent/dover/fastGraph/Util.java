@@ -3,6 +3,8 @@ package uk.ac.kent.dover.fastGraph;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.swing.JOptionPane;
 
@@ -157,6 +159,29 @@ public class Util {
 	public static void convertLinkedList(LinkedList<Integer> list, int[] array) {
 		array = list.stream().mapToInt(i->i).toArray();
 	}
+	
+	/**
+	 * Converts an int[] to a LinkedList of Integer using streams
+	 * 
+	 * @param array The array to convert
+	 * @return The newly created LinkedList
+	 */
+	public static LinkedList<Integer> convertArray(int[] array) {
+		return (LinkedList<Integer>) IntStream.of(array).boxed().collect(Collectors.toList());
+	}
+	
+	/**
+	 * Converts an int[] to a LinkedList of Integer using streams
+	 * 
+	 * @param array The array to convert
+	 * @param list The newly populated LinkedList
+	 */
+	public static void convertArray(int[] array, LinkedList<Integer> list) {
+		list = (LinkedList<Integer>) IntStream.of(array).boxed().collect(Collectors.toList());
+	}	
+	
+	
+	;
 	
 	/**
 	 * Adds all items in a primitive array to the given linked list

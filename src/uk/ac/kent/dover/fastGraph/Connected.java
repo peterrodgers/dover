@@ -25,7 +25,7 @@ public class Connected {
 	 * 
 	 * @return true if the graph is connected, false otherwise. Empty graphs are connected.
 	 */
-	public boolean connected(FastGraph g) {
+	public static boolean connected(FastGraph g) {
 
 		int numberOfNodes = g.getNumberOfNodes();
 		
