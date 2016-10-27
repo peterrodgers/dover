@@ -177,7 +177,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			
 			//g2.suggestNodesAndEdgesToRemove(nodes,edges,80,800);
 			
-			long[] degrees = g2.countInstancesOfNodeDegrees(4);
+			int[] degrees = g2.countInstancesOfNodeDegrees(4);
 			System.out.println(Arrays.toString(degrees));
 			
 			
@@ -2624,8 +2624,8 @@ if(edgeIndex%1000000==0 ) {
 	 * @param maxDegrees The maximum number of degrees to look for. If given 3, will count all nodes with degrees 0,1,2.
 	 * @return The list of number of nodes at each degree.
 	 */
-	public long[] countInstancesOfNodeDegrees(int maxDegrees) {
-		long[] res = new long[maxDegrees];
+	public int[] countInstancesOfNodeDegrees(int maxDegrees) {
+		int[] res = new int[maxDegrees];
 		
 		for(int n = 0; n < getNumberOfNodes(); n++) {
 			int deg = getNodeDegree(n);
