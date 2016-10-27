@@ -177,8 +177,8 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			
 			//g2.suggestNodesAndEdgesToRemove(nodes,edges,80,800);
 			
-			int[] degrees = g2.countInstancesOfNodeDegrees(4);
-			System.out.println(Arrays.toString(degrees));
+//			int[] degrees = g2.countInstancesOfNodeDegrees(4);
+//			System.out.println(Arrays.toString(degrees));
 			
 			
 			/**
@@ -2630,8 +2630,8 @@ if(edgeIndex%1000000==0 ) {
 		for(int n = 0; n < getNumberOfNodes(); n++) {
 			int deg = getNodeDegree(n);
 			if (deg < maxDegrees) {
-				System.out.print(deg + " ");
-				System.out.println(res[deg]);
+				//System.out.print(deg + " ");
+				//System.out.println(res[deg]);
 				res[deg]++;
 			}
 		}		
