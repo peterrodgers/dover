@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import javax.swing.BorderFactory;
@@ -413,7 +414,8 @@ public class LauncherGUI extends JFrame {
 							try {
 								FastGraph g = launcher.loadFromBuffers(null,graph);
 								status.setText("Loading Complete");
-						    	System.out.println(g.getNumberOfNodes());
+						    	System.out.println("Maximum Degree: " + g.maximumDegree());
+						    	System.out.println("Degree Counts: " + Arrays.toString(g.countInstancesOfNodeDegrees(5)));
 						    	
 						    	//stop the Progress Bar
 						    	progressBar.setIndeterminate(false);

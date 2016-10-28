@@ -129,14 +129,14 @@ public class LauncherCmd {
 				
 				//if the user is testing the command line
 			} else if(cmd.hasOption("t")) {
-				//FastGraph.main(args);
-			    try {
+				FastGraph.main(args);
+			   /* try {
 			    	NamePicker np = new NamePicker();
 			    	System.out.println(Arrays.toString(np.getNames(10)));
 			    } catch (Exception e) {
 			    	System.err.println(e.getMessage());
 			    	e.printStackTrace();
-			    }
+			    }*/
 				
 			    //if the user wants some help
 			} else if (cmd.hasOption("h")) {

@@ -222,7 +222,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			}
 			**/
 
-			//System.out.println("creating induced subgraph test time " + (System.currentTimeMillis()-time)+" milliseconds");
+			//System.out.println("creating induced subgraph test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			/*
 			System.out.println("nodes:");
 			System.out.println(nodes);
@@ -233,7 +233,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			edges.clear();
 			time = System.currentTimeMillis();
 			is.createInducedSubgraph(nodes, edges, 4);
-			System.out.println("creating induced subgraph test time " + (System.currentTimeMillis()-time)+" milliseconds");
+			System.out.println("creating induced subgraph test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			System.out.println("nodes:");
 			System.out.println(nodes);
 			System.out.println("edges:");
@@ -2543,9 +2543,14 @@ if(edgeIndex%1000000==0 ) {
 	 * @return the new FastGraph
 	 */
 	public FastGraph generateGraphByDeletingItems(int[] nodesToDelete, int[] edgesToDelete) {
+		
+		long time = System.currentTimeMillis();
 
 		LinkedList<Integer> allEdgesToDeleteList = new LinkedList<Integer>();
 		LinkedList<Integer> allNodesToDeleteList = new LinkedList<Integer>();
+		
+		System.out.println("Z setup " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+		time = System.currentTimeMillis();
 		
 		for(int e : edgesToDelete) {
 			allEdgesToDeleteList.add(e);
@@ -2561,7 +2566,8 @@ if(edgeIndex%1000000==0 ) {
 				}
 			}
 		}
-System.out.println("A Created the node and edge delete lists");
+System.out.println("A Created the node and edge delete lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+time = System.currentTimeMillis();
 		
 		// find the nodes that will remain
 		LinkedList<Integer> remainingNodeList = new LinkedList<Integer>();
@@ -2592,7 +2598,8 @@ System.out.println("A Created the node and edge delete lists");
 			remainingEdges[k] = e;
 			k++;
 		}
-System.out.println("B Created the node and edge remain lists");
+System.out.println("B Created the node and edge remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+time = System.currentTimeMillis();
 
 		FastGraph g = generateGraphFromSubgraph(remainingNodes,remainingEdges);
 		
@@ -2607,6 +2614,8 @@ System.out.println("B Created the node and edge remain lists");
 	 * @return the new FastGraph
 	 */
 	public FastGraph generateGraphFromSubgraph(int[] subgraphNodes, int[] subgraphEdges) {
+		
+		long time = System.currentTimeMillis();
 
 		FastGraph g = new FastGraph(subgraphNodes.length, subgraphEdges.length, getDirect());
 		
@@ -2633,10 +2642,12 @@ System.out.println("B Created the node and edge remain lists");
 			oldNodesToNew.put(n, index);
 			index++;
 		}
-System.out.println("C popluated the new node buffer");
+System.out.println("C popluated the new node buffer "  + (System.currentTimeMillis()-time)/1000.0+" seconds");
+time = System.currentTimeMillis();
 		
 		g.setAllNodeLabels(nodeLabels); // create the node label buffer
-System.out.println("D popluated the new node list buffer");
+System.out.println("D popluated the new node list buffer "  + (System.currentTimeMillis()-time)/1000.0+" seconds");
+time = System.currentTimeMillis();
 		
 		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(subgraphNodes.length); // temporary store of inward edges
 		for(int nodeIndex = 0; nodeIndex < subgraphNodes.length; nodeIndex++) {
@@ -2649,7 +2660,8 @@ System.out.println("D popluated the new node list buffer");
 			ArrayList<Integer> edges = new ArrayList<Integer>(100);
 			nodeOut.add(nodeIndex,edges);
 		}
-System.out.println("E created the neighbour store");
+System.out.println("E created the neighbour store " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+time = System.currentTimeMillis();
 				
 		String[] edgeLabels = new String[subgraphEdges.length]; // stores the labels for creating the edgeLabelBuffer
 		ArrayList<Integer> inEdgeList;	
@@ -2687,17 +2699,20 @@ System.out.println("E created the neighbour store");
 			outEdgeList.add(index);
 			index++;
 		}
-System.out.println("F populated the new edge buffer");
+System.out.println("F populated the new edge buffer " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+time = System.currentTimeMillis();
 
 		g.setAllEdgeLabels(edgeLabels);
-System.out.println("G populated the new edge label buffer");
+System.out.println("G populated the new edge label buffer " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+time = System.currentTimeMillis();
 		
 		// Initialise the connection buffer, modifying the node buffer connection data
 		//time = System.currentTimeMillis();
 		int offset = 0;
 		for(int node = 0; node < subgraphNodes.length; node++) {
 if(node%100000 == 0) {
-	System.out.println("H populated "+node+" nodes in connection buffer");
+	System.out.println("H populated "+node+" nodes in connection buffer " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+	time = System.currentTimeMillis();
 }
 			
 			// setting the in connection offset and length
