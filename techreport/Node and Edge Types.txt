@@ -1,0 +1,16 @@
+Nodes:
+0	Parent
+1	Child
+2	Grandparent
+
+Edges:
+0	Parent
+1	Sibling
+2	Married
+3	Relationship
+4	Friend
+5	Acquaintance
+6	Colleague
+7	Manager
+8	Customer
+9	Teammate
