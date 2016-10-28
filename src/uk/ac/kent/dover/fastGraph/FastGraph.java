@@ -142,8 +142,8 @@ System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+
 //		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 
-//String name = "random-n-100-e-1000";
-String name = "as-skitter.txt";
+String name = "random-n-100-e-1000";
+//String name = "as-skitter.txt";
 //String name = "soc-LiveJournal1.txt";
 //String name = "twitter_combined.txt";
 //String name = "Wiki-Vote.txt";
@@ -175,11 +175,14 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
 			LinkedList<Integer> edges = new LinkedList<Integer>();
 			
-			FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1000000,10000000);
+		//	FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1000000,10000000);
+			FastGraph g3 = g2;
 			
 			System.out.println("suggestion test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			
 			System.out.println("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
+			
+			g3.relabelFastGraph();
 			
 //			int[] degrees = g2.countInstancesOfNodeDegrees(4);
 //			System.out.println(Arrays.toString(degrees));
@@ -245,7 +248,46 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 		}
 
  		
-	}	
+	}
+	
+	/**
+	 * Relabels the current FastGraph with the family groups in subgraphs/families folder<br>
+	 * Any remaining nodes and edges are labelled randomly.
+	 * @throws Exception 
+	 */
+	public void relabelFastGraph() throws Exception{
+		System.out.println("Relabelling FastGraph");
+		long time = System.currentTimeMillis();
+		
+		FastGraph[] families = loadFamilies();
+		//for each fam
+			//gen g/10 number of induced subgraphs of size |N_fam|
+			//for each is
+				//is is iso to fam?
+					//if so, rename nodes and edges
+		//rename what's left
+		
+	}
+	
+	public FastGraph[] loadFamilies() throws Exception {
+		File folder = new File(Launcher.startingWorkingDirectory+File.separatorChar+"subgraphs"+File.separatorChar+"families");
+		File[] listOfFiles = folder.listFiles();
+		LinkedList<FastGraph> graphs = new LinkedList<>();
+		
+		for (File f : listOfFiles) {
+			String[] splits = f.getName().split("-");
+			int nodeCount = Integer.parseInt(splits[2]);
+			int edgeCount = Integer.parseInt(splits[4]);
+			System.out.println(f + " n" + nodeCount + "e" + edgeCount);
+			FastGraph g = nodeListEdgeListGraphFactory(nodeCount, edgeCount, folder.getPath() + File.separatorChar + f.getName(), f.getName(), direct);
+			System.out.println("new g nodes" + g.getNumberOfNodes());
+			
+		}
+		
+		//System.out.println(Arrays.toString(listOfFiles));
+		
+		return null;
+	}
 	
 	/**
 	 * This method creates a new FastGraph of the rough size given in targetNodes and targetEdges. <br>
@@ -390,7 +432,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 
 		time = System.currentTimeMillis();
 		System.out.println("Building new FastGraph");
-		FastGraph g = this.generateGraphByDeletingItems(Util.convertLinkedList(nodes), Util.convertLinkedList(edges));
+		FastGraph g = this.generateGraphByDeletingItems(Util.convertLinkedList(nodes), Util.convertLinkedList(edges), false);
 		System.out.println("After FastGraph building test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		return g;
 	}
@@ -483,7 +525,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 		System.out.println("edges  to remove:");
 		System.out.println(edges);
 		
-		FastGraph g3 = this.generateGraphByDeletingItems(Util.convertLinkedList(nodes),Util.convertLinkedList(edges));
+		FastGraph g3 = this.generateGraphByDeletingItems(Util.convertLinkedList(nodes),Util.convertLinkedList(edges), false);
 		//AdjacencyMatrix am3 = new AdjacencyMatrix(g3);
 		//int[][] matrix3 = am3.buildIntAdjacencyMatrix();
 		//am3.printMatrix(matrix3);
@@ -2540,9 +2582,10 @@ if(edgeIndex%1000000==0 ) {
 	 * 
 	 * @param nodesToDelete nodes in this graph that will not appear in the new graph
 	 * @param edgesToDelete edges in this graph that will not appear in the new graph
+	 * @param orphanEdgeCheckNeeded If the method calling this has already checked for orphan nodes, then false.
 	 * @return the new FastGraph
 	 */
-	public FastGraph generateGraphByDeletingItems(int[] nodesToDelete, int[] edgesToDelete) {
+	public FastGraph generateGraphByDeletingItems(int[] nodesToDelete, int[] edgesToDelete, boolean orphanEdgeCheckNeeded) {
 		
 		long time = System.currentTimeMillis();
 
@@ -2559,12 +2602,14 @@ if(edgeIndex%1000000==0 ) {
 		// delete the edges connecting to deleted nodes and create the node list
 		for(int n : nodesToDelete) {
 			allNodesToDeleteList.add(n);
-			int[] connectingEdges = getNodeConnectingEdges(n);
-			for(int e : connectingEdges) {
-				if(!allEdgesToDeleteList.contains(e)) {
-					allEdgesToDeleteList.add(e);
+			if(orphanEdgeCheckNeeded) {
+				int[] connectingEdges = getNodeConnectingEdges(n);
+				for(int e : connectingEdges) {
+					if(!allEdgesToDeleteList.contains(e)) {
+						allEdgesToDeleteList.add(e);
+					}
 				}
-			}
+			}			
 		}
 System.out.println("A Created the node and edge delete lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 time = System.currentTimeMillis();

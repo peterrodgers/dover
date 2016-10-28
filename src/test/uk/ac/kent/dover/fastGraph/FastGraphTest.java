@@ -1295,7 +1295,7 @@ public class FastGraphTest {
 		
 		nodes = new int[0];
 		edges = new int[0];
-		g1 = g.generateGraphByDeletingItems(nodes,edges);
+		g1 = g.generateGraphByDeletingItems(nodes,edges,true);
 		assertEquals(5,g1.getNumberOfNodes());
 		assertEquals(5,g1.getNumberOfEdges());
 		assertEquals(5,g1.getNumberOfEdges());
@@ -1305,7 +1305,7 @@ public class FastGraphTest {
 		nodes = new int[0];
 		edges = new int[1];
 		edges[0] = 1;
-		g1 = g.generateGraphByDeletingItems(nodes,edges);
+		g1 = g.generateGraphByDeletingItems(nodes,edges,true);
 		assertEquals(5,g1.getNumberOfNodes());
 		assertEquals(4,g1.getNumberOfEdges());
 		assertEquals("edge label 4",g1.getEdgeLabel(3));
@@ -1315,7 +1315,7 @@ public class FastGraphTest {
 		nodes = new int[1];
 		nodes[0] = 1;
 		edges = new int[0];
-		g1 = g.generateGraphByDeletingItems(nodes,edges);
+		g1 = g.generateGraphByDeletingItems(nodes,edges,true);
 		assertEquals(4,g1.getNumberOfNodes());
 		assertEquals(3,g1.getNumberOfEdges());
 		assertEquals("node label 2",g1.getNodeLabel(1));
@@ -1330,7 +1330,7 @@ public class FastGraphTest {
 		edges[2] = 4;
 		edges[3] = 3;
 		edges[4] = 2;
-		g1 = g.generateGraphByDeletingItems(nodes,edges);
+		g1 = g.generateGraphByDeletingItems(nodes,edges,true);
 		assertEquals(5,g1.getNumberOfNodes());
 		assertEquals(0,g1.getNumberOfEdges());
 		displayGraph = g1.generateDisplayGraph();
@@ -1343,7 +1343,7 @@ public class FastGraphTest {
 		nodes[3] = 3;
 		nodes[4] = 4;
 		edges = new int[0];
-		g1 = g.generateGraphByDeletingItems(nodes,edges);
+		g1 = g.generateGraphByDeletingItems(nodes,edges,true);
 		assertEquals(0,g1.getNumberOfNodes());
 		assertEquals(0,g1.getNumberOfEdges());
 		displayGraph = g1.generateDisplayGraph();
