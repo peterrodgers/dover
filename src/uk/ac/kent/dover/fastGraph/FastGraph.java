@@ -142,8 +142,8 @@ System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+
 //		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 
-String name = "random-n-100-e-1000";
-//String name = "as-skitter.txt";
+//String name = "random-n-100-e-1000";
+String name = "as-skitter.txt";
 //String name = "soc-LiveJournal1.txt";
 //String name = "twitter_combined.txt";
 //String name = "Wiki-Vote.txt";
@@ -175,14 +175,14 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
 			LinkedList<Integer> edges = new LinkedList<Integer>();
 			
-		//	FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1000000,10000000);
-			FastGraph g3 = g2;
+			FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1000000,10000000);
+		//	FastGraph g3 = g2;
 			
 			System.out.println("suggestion test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			
 			System.out.println("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
 			
-			g3.relabelFastGraph();
+		//	g3.relabelFastGraph();
 			
 //			int[] degrees = g2.countInstancesOfNodeDegrees(4);
 //			System.out.println(Arrays.toString(degrees));
