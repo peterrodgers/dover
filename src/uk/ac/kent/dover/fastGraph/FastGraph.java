@@ -269,6 +269,11 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 		
 	}
 	
+	/**
+	 * Loads the families subgraphs
+	 * @return A list of FastGraphs based on the family subgraphs
+	 * @throws Exception If the node or edge count can't be converted, or the file can't be loaded
+	 */
 	public FastGraph[] loadFamilies() throws Exception {
 		File folder = new File(Launcher.startingWorkingDirectory+File.separatorChar+"subgraphs"+File.separatorChar+"families");
 		File[] listOfFiles = folder.listFiles();
@@ -2602,7 +2607,7 @@ if(edgeIndex%1000000==0 ) {
 		// delete the edges connecting to deleted nodes and create the node list
 		for(int n : nodesToDelete) {
 			allNodesToDeleteList.add(n);
-			if(orphanEdgeCheckNeeded) {
+			if(orphanEdgeCheckNeeded) { //only check for orphan nodes if needed
 				int[] connectingEdges = getNodeConnectingEdges(n);
 				for(int e : connectingEdges) {
 					if(!allEdgesToDeleteList.contains(e)) {
@@ -2620,14 +2625,12 @@ time = System.currentTimeMillis();
 			if(!allNodesToDeleteList.contains(i)) {
 				remainingNodeList.add(i);
 			}
-		}
+		}		
 		// turn it into an array
-		int[] remainingNodes = new int[remainingNodeList.size()];
-		int j = 0;
-		for(Integer n : remainingNodeList) {
-			remainingNodes[j] = n;
-			j++;
-		}
+		int[] remainingNodes = Util.convertLinkedList(remainingNodeList);
+		
+		System.out.println("AA reated the node remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+		time = System.currentTimeMillis();
 
 		// find the edges that will remain
 		LinkedList<Integer> remainingEdgeList = new LinkedList<Integer>();
@@ -2637,13 +2640,9 @@ time = System.currentTimeMillis();
 			}
 		}
 		// turn it into an array
-		int[] remainingEdges = new int[remainingEdgeList.size()];
-		int k = 0;
-		for(Integer e : remainingEdgeList) {
-			remainingEdges[k] = e;
-			k++;
-		}
-System.out.println("B Created the node and edge remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+		int[] remainingEdges = Util.convertLinkedList(remainingEdgeList);
+
+System.out.println("B Created the edge remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 time = System.currentTimeMillis();
 
 		FastGraph g = generateGraphFromSubgraph(remainingNodes,remainingEdges);
