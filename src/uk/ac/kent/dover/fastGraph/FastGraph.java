@@ -2561,6 +2561,7 @@ if(edgeIndex%1000000==0 ) {
 				}
 			}
 		}
+System.out.println("A Created the node and edge delete lists");
 		
 		// find the nodes that will remain
 		LinkedList<Integer> remainingNodeList = new LinkedList<Integer>();
@@ -2591,6 +2592,7 @@ if(edgeIndex%1000000==0 ) {
 			remainingEdges[k] = e;
 			k++;
 		}
+System.out.println("B Created the node and edge remain lists");
 
 		FastGraph g = generateGraphFromSubgraph(remainingNodes,remainingEdges);
 		
@@ -2631,8 +2633,10 @@ if(edgeIndex%1000000==0 ) {
 			oldNodesToNew.put(n, index);
 			index++;
 		}
+System.out.println("C popluated the new node buffer");
 		
 		g.setAllNodeLabels(nodeLabels); // create the node label buffer
+System.out.println("D popluated the new node list buffer");
 		
 		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(subgraphNodes.length); // temporary store of inward edges
 		for(int nodeIndex = 0; nodeIndex < subgraphNodes.length; nodeIndex++) {
@@ -2645,6 +2649,7 @@ if(edgeIndex%1000000==0 ) {
 			ArrayList<Integer> edges = new ArrayList<Integer>(100);
 			nodeOut.add(nodeIndex,edges);
 		}
+System.out.println("E created the neighbour store");
 				
 		String[] edgeLabels = new String[subgraphEdges.length]; // stores the labels for creating the edgeLabelBuffer
 		ArrayList<Integer> inEdgeList;	
@@ -2682,13 +2687,19 @@ if(edgeIndex%1000000==0 ) {
 			outEdgeList.add(index);
 			index++;
 		}
+System.out.println("F populated the new edge buffer");
 
 		g.setAllEdgeLabels(edgeLabels);
+System.out.println("G populated the new edge label buffer");
 		
 		// Initialise the connection buffer, modifying the node buffer connection data
 		//time = System.currentTimeMillis();
 		int offset = 0;
 		for(int node = 0; node < subgraphNodes.length; node++) {
+if(node%100000 == 0) {
+	System.out.println("H populated "+node+" nodes in connection buffer");
+}
+			
 			// setting the in connection offset and length
 			ArrayList<Integer> inEdges = nodeIn.get(node);
 			int inEdgeLength = inEdges.size();
