@@ -142,8 +142,8 @@ System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+
 //		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 
-String name = "random-n-100-e-1000";
-//String name = "as-skitter.txt";
+//String name = "random-n-100-e-1000";
+String name = "as-skitter.txt";
 //String name = "soc-LiveJournal1.txt";
 //String name = "twitter_combined.txt";
 //String name = "Wiki-Vote.txt";
@@ -175,17 +175,22 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
 			LinkedList<Integer> edges = new LinkedList<Integer>();
 			
-		//	FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1000000,10000000);
-			FastGraph g3 = g2;
+			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,80,800);
+			FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1000000,10000000);
+			//FastGraph g3 = g2;
 			
-			System.out.println("suggestion test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+			long deletionTime = (long) ((System.currentTimeMillis()-time)/1000.0);
+			System.out.println("deletion test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			
 			System.out.println("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
 			
+			time = System.currentTimeMillis();
 			g3.relabelFastGraph();
-			
+			System.out.println("relabelling test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+			System.out.println("deletion test time (from before) " + deletionTime+" seconds");
 			//just for testing
 			System.out.println();
+			/*
 			System.out.println("graph now has the labels (taken from the buffer):");
 			FastGraphNodeType[] ntypes = FastGraphNodeType.values();
 			for(int j = 0; j < g3.getNumberOfNodes(); j++) {
@@ -198,7 +203,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 				byte type = g3.getEdgeType(j);
 				System.out.println("n1" + g3.getEdgeNode1(j) + " n2" + g3.getEdgeNode2(j) + " type " + type + " (" + types[type] + ")");
 			}
-			
+			*/
 //			int[] degrees = g2.countInstancesOfNodeDegrees(4);
 //			System.out.println(Arrays.toString(degrees));
 			
@@ -494,6 +499,13 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 				if (localNodesToRemove.size() <= stillToRemove) {
 					nodesToRemove.addAll(localNodesToRemove);
 					edgesToRemove.addAll(localEdgesToRemove);
+					
+					//delete all edges connecting to the nodes in this tree
+					for(int n : localNodesToRemove) {
+						Util.addAll(edgesToRemove, this.getNodeConnectingInEdges(n));
+						Util.addAll(edgesToRemove, this.getNodeConnectingOutEdges(n));
+					}
+					
 				} else {
 					chances--; //Avoids getting stuck if there are no further options
 					continue;
@@ -542,6 +554,13 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 		System.out.println("After edge removal test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		System.out.println("nodes to remove size: " + nodesToRemove.size() + " edges to remove size: " + edgesToRemove.size());
 		System.out.println();
+		
+		//delete all edges connecting to the nodes to be deleted
+		for(int n : nodesToRemove) {
+			Util.addAll(edgesToRemove, this.getNodeConnectingInEdges(n));
+			Util.addAll(edgesToRemove, this.getNodeConnectingOutEdges(n));
+		}
+		
 		
 		nodes.addAll(nodesToRemove);
 		edges.addAll(edgesToRemove);
@@ -2602,6 +2621,8 @@ if(edgeIndex%1000000==0 ) {
 	 */
 	public FastGraph generateGraphByDeletingItems(int[] nodesToDelete, int[] edgesToDelete, boolean orphanEdgeCheckNeeded) {
 		
+		System.out.println("Nodes to remove: " + Arrays.toString(nodesToDelete));
+		
 		long time = System.currentTimeMillis();
 
 		LinkedList<Integer> allEdgesToDeleteList = new LinkedList<Integer>();
@@ -2632,10 +2653,10 @@ time = System.currentTimeMillis();
 		// find the nodes that will remain
 		HashSet<Integer> remainingNodeList = new HashSet<Integer>(allNodesToDeleteList.size()*3);
 		for(int i = 0; i < getNumberOfNodes(); i++) {
-			if(!allNodesToDeleteList.contains(i)) {
-				remainingNodeList.add(i);
-			}
+			remainingNodeList.add(i);
 		}
+		remainingNodeList.removeAll(allNodesToDeleteList); //this is quicker than checking each entry
+		
 		System.out.println("AAA created the node remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 		// turn it into an array
@@ -2647,10 +2668,10 @@ time = System.currentTimeMillis();
 		// find the edges that will remain
 		HashSet<Integer> remainingEdgeList = new HashSet<Integer>(allEdgesToDeleteList.size()*3);
 		for(int i = 0; i < getNumberOfEdges(); i++) {
-			if(!allEdgesToDeleteList.contains(i)) {
-				remainingEdgeList.add(i);
-			}
+			remainingEdgeList.add(i);
 		}
+		remainingEdgeList.removeAll(allEdgesToDeleteList);
+		
 		System.out.println("AB Created the edge remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 		// turn it into an array
@@ -2720,7 +2741,10 @@ time = System.currentTimeMillis();
 		}
 System.out.println("E created the neighbour store " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 time = System.currentTimeMillis();
-				
+		
+//System.out.println(oldNodesToNew);
+
+
 		String[] edgeLabels = new String[subgraphEdges.length]; // stores the labels for creating the edgeLabelBuffer
 		ArrayList<Integer> inEdgeList;	
 		ArrayList<Integer> outEdgeList;	
@@ -2741,8 +2765,14 @@ time = System.currentTimeMillis();
 			int n1 = edgeBuf.getInt(EDGE_NODE1_OFFSET+e*EDGE_BYTE_SIZE);
 			int n2 = edgeBuf.getInt(EDGE_NODE2_OFFSET+e*EDGE_BYTE_SIZE);
 			
+			//System.out.print("old node n1: " + n1);
+			
 			int gn1 = oldNodesToNew.get(n1);
+			//System.out.print(", new node n1: " + gn1);
+			//System.out.print(", old node n2: " + n2);
 			int gn2 = oldNodesToNew.get(n2);
+			//System.out.print(", new node n2: " + gn2);
+			//System.out.println();
 			
 			g.edgeBuf.putInt(EDGE_NODE1_OFFSET+index*EDGE_BYTE_SIZE,gn1); // one end of edge
 			g.edgeBuf.putInt(EDGE_NODE2_OFFSET+index*EDGE_BYTE_SIZE,gn2); // other end of edge
