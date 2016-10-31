@@ -7,14 +7,14 @@ Edges:
 0	Unknown
 1	Sibling
 2	Married
-3	Relationship
-4	Friend
-5	Acquaintance
-6	Colleague
-7	Manager
-8	Customer
-9	Teammate
-10	Neighbour
-11	Business Partner
-12	Doctor
-13	Parent
+3	Parent
+4	Relationship
+5	Friend
+6	Acquaintance
+7	Colleague
+8	Manager
+9	Customer
+10	Teammate
+11	Neighbour
+12	Business Partner
+13	Doctor

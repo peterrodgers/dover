@@ -187,8 +187,16 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			//just for testing
 			System.out.println();
 			System.out.println("graph now has the labels (taken from the buffer):");
-			for(int j = 0; j < g2.getNumberOfNodes(); j++) {
-				System.out.println(g2.getNodeLabel(j) + " " + g2.getNodeType(j));
+			FastGraphNodeType[] ntypes = FastGraphNodeType.values();
+			for(int j = 0; j < g3.getNumberOfNodes(); j++) {
+				byte type = g3.getNodeType(j);
+				System.out.println(g3.getNodeLabel(j) + " " + type + " (" + ntypes[type] + ")");
+			}
+			System.out.println("edges now have the types (taken from the buffer):");
+			FastGraphEdgeType[] types = FastGraphEdgeType.values();
+			for(int j = 0; j < g3.getNumberOfEdges(); j++) {
+				byte type = g3.getEdgeType(j);
+				System.out.println("n1" + g3.getEdgeNode1(j) + " n2" + g3.getEdgeNode2(j) + " type " + type + " (" + types[type] + ")");
 			}
 			
 //			int[] degrees = g2.countInstancesOfNodeDegrees(4);
@@ -306,12 +314,12 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 					System.out.println("Family name: " + surname);
 					for(int n : subNodes) {
 						nodeLabels[n] = np.getForename() + " " + surname;
-						nodeTypes[n] = 1; //see techreport/Node and Edge Types.txt for details of these
+						nodeTypes[n] = FastGraphNodeType.CHILD.getValue(); //see techreport/Node and Edge Types.txt for details of these
 					}
 					
 					//set the parents
-					nodeTypes[subNodes.get(0)] = 2;
-					nodeTypes[subNodes.get(1)] = 2;
+					nodeTypes[subNodes.get(0)] = FastGraphNodeType.PARENT.getValue();
+					nodeTypes[subNodes.get(1)] = FastGraphNodeType.PARENT.getValue();
 										
 					//label the edges with types rather than names
 					for(int e : subEdges) {
@@ -319,16 +327,16 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 						//if this is the parent's relationship
 						if ((getEdgeNode1(e) == subNodes.get(0) && getEdgeNode2(e) == subNodes.get(1)) ||
 						(getEdgeNode1(e) == subNodes.get(1) && getEdgeNode2(e) == subNodes.get(0))) {
-							edgeTypes[e] = 2; //see techreport/Node and Edge Types.txt for details of these
+							edgeTypes[e] = FastGraphEdgeType.MARRIED.getValue(); //see techreport/Node and Edge Types.txt for details of these
 							
 							//if this is the parent child relationship
 						} else if (getEdgeNode1(e) == subNodes.get(0) || getEdgeNode1(e) == subNodes.get(1) ||
 								getEdgeNode2(e) == subNodes.get(0) || getEdgeNode2(e) == subNodes.get(1)) {
-							edgeTypes[e] = 13;
+							edgeTypes[e] = FastGraphEdgeType.PARENT.getValue();
 							
 							//otherwise these are siblings
 						} else {
-							edgeTypes[e] = 1;
+							edgeTypes[e] = FastGraphEdgeType.SIBLING.getValue();
 						}
 							
 					}
@@ -350,10 +358,10 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 		
 		Random r = new Random(nodeBuf.getLong(0));
 		//replace the blanks with other edge types
-		for(int j = 0; j < nodeTypes.length; j++) {						
-			if (edgeTypes[j] == 0) {
+		for(int j = 0; j < edgeTypes.length; j++) {						
+			if (edgeTypes[j] == FastGraphEdgeType.UNKNOWN.getValue()) {
 				//pick a random relationship
-				edgeTypes[j] = (byte) r.nextInt(13);
+				edgeTypes[j] = (byte) (r.nextInt(FastGraphEdgeType.values().length - 4)+4); //ignore the family relationships
 			}
 		}
 		
