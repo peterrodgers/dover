@@ -142,8 +142,8 @@ System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+
 //		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 
-//String name = "random-n-100-e-1000";
-String name = "as-skitter.txt";
+String name = "random-n-100-e-1000";
+//String name = "as-skitter.txt";
 //String name = "soc-LiveJournal1.txt";
 //String name = "twitter_combined.txt";
 //String name = "Wiki-Vote.txt";
@@ -175,14 +175,21 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
 			LinkedList<Integer> edges = new LinkedList<Integer>();
 			
-			FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1000000,10000000);
-		//	FastGraph g3 = g2;
+		//	FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1000000,10000000);
+			FastGraph g3 = g2;
 			
 			System.out.println("suggestion test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			
 			System.out.println("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
 			
-		//	g3.relabelFastGraph();
+			g3.relabelFastGraph();
+			
+			//just for testing
+			System.out.println();
+			System.out.println("graph now has the labels (taken from the buffer):");
+			for(int j = 0; j < g2.getNumberOfNodes(); j++) {
+				System.out.println(g2.getNodeLabel(j) + " " + g2.getNodeType(j));
+			}
 			
 //			int[] degrees = g2.countInstancesOfNodeDegrees(4);
 //			System.out.println(Arrays.toString(degrees));
@@ -259,13 +266,107 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 		System.out.println("Relabelling FastGraph");
 		long time = System.currentTimeMillis();
 		
+		//load node and egde labels arrays
+		String[] nodeLabels = new String[this.getNumberOfNodes()];
+		
+		//load node and egde Types arrays
+		byte[] nodeTypes = new byte[this.getNumberOfNodes()];
+		byte[] edgeTypes = new byte[this.getNumberOfEdges()];
+		
+		//create induction class
+		InducedSubgraph is = new InducedSubgraph(this);
+		
+		//create Name Picker class
+		NamePicker np = new NamePicker();
+		
+		//load family subgraphs
 		FastGraph[] families = loadFamilies();
-		//for each fam
-			//gen g/10 number of induced subgraphs of size |N_fam|
-			//for each is
-				//is is iso to fam?
-					//if so, rename nodes and edges
-		//rename what's left
+		for(FastGraph family : families) {
+			
+			ExactIsomorphism ei = new ExactIsomorphism(family);
+			
+			int familyNodesSize = family.getNumberOfNodes();			
+			
+			for (int i = 0; i < 100; i++) { //generate 1 hundred subgraphs to test
+				LinkedList<Integer> subNodes = new LinkedList<Integer>();
+				LinkedList<Integer> subEdges = new LinkedList<Integer>();
+				
+				//create a subgraph and build to a FastGraph
+				is.createInducedSubgraph(subNodes, subEdges, familyNodesSize);
+				FastGraph subgraph = this.generateGraphFromSubgraph(Util.convertLinkedList(subNodes), Util.convertLinkedList(subEdges));
+				
+				//is this FastGraph isomorphic to the one in the constructor (i.e. the family)
+				boolean isomorphic = ei.isomorphic(subgraph);
+				
+				if(isomorphic) {
+					//rename original graph
+					
+					//pick a surname, so all family members have the same surname
+					String surname = np.getSurname();
+					System.out.println("Family name: " + surname);
+					for(int n : subNodes) {
+						nodeLabels[n] = np.getForename() + " " + surname;
+						nodeTypes[n] = 1; //see techreport/Node and Edge Types.txt for details of these
+					}
+					
+					//set the parents
+					nodeTypes[subNodes.get(0)] = 2;
+					nodeTypes[subNodes.get(1)] = 2;
+										
+					//label the edges with types rather than names
+					for(int e : subEdges) {
+						
+						//if this is the parent's relationship
+						if ((getEdgeNode1(e) == subNodes.get(0) && getEdgeNode2(e) == subNodes.get(1)) ||
+						(getEdgeNode1(e) == subNodes.get(1) && getEdgeNode2(e) == subNodes.get(0))) {
+							edgeTypes[e] = 2; //see techreport/Node and Edge Types.txt for details of these
+							
+							//if this is the parent child relationship
+						} else if (getEdgeNode1(e) == subNodes.get(0) || getEdgeNode1(e) == subNodes.get(1) ||
+								getEdgeNode2(e) == subNodes.get(0) || getEdgeNode2(e) == subNodes.get(1)) {
+							edgeTypes[e] = 13;
+							
+							//otherwise these are siblings
+						} else {
+							edgeTypes[e] = 1;
+						}
+							
+					}
+					
+				}
+				
+			}
+			
+			
+		}
+		
+		//replace the blanks with other names
+		for(int j = 0; j < nodeLabels.length; j++) {						
+			if (nodeLabels[j] == null) {
+				nodeLabels[j] = np.getName();
+			}
+		}
+		//ignore other node types, as these aren't defined yet.
+		
+		Random r = new Random(nodeBuf.getLong(0));
+		//replace the blanks with other edge types
+		for(int j = 0; j < nodeTypes.length; j++) {						
+			if (edgeTypes[j] == 0) {
+				//pick a random relationship
+				edgeTypes[j] = (byte) r.nextInt(13);
+			}
+		}
+		
+		
+		//Set all node labels, and node and edge types
+		this.setAllNodeLabels(nodeLabels);
+		for(int i = 0; i < nodeTypes.length; i++) {
+			this.setNodeType(i, nodeTypes[i]);			
+		}
+		for(int i = 0; i < edgeTypes.length; i++) {
+			this.setEdgeType(i, edgeTypes[i]);			
+		}
+
 		
 	}
 	
@@ -286,12 +387,14 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			System.out.println(f + " n" + nodeCount + "e" + edgeCount);
 			FastGraph g = nodeListEdgeListGraphFactory(nodeCount, edgeCount, folder.getPath() + File.separatorChar + f.getName(), f.getName(), direct);
 			System.out.println("new g nodes" + g.getNumberOfNodes());
-			
+			graphs.add(g);
 		}
 		
 		//System.out.println(Arrays.toString(listOfFiles));
 		
-		return null;
+		FastGraph[] graphArray = new FastGraph[graphs.size()];
+		Util.convertLinkedListObject(graphs, graphArray);
+		return graphArray;
 	}
 	
 	/**
@@ -476,107 +579,6 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 		}		
 	}
 	
-	
-	/**
-	 * Prototype method to generate a list of nodes and edges to remove from a graph. Doesn't pick anywhere near enough on dense graphs
-	 * 
-	 * @param nodes
-	 * @param edges
-	 * @param targetNodes
-	 * @param targetEdges
-	 */
-	@Deprecated
-	public void oldsuggestNodesAndEdgesToRemove(LinkedList<Integer> nodes, LinkedList<Integer> edges, int targetNodes, int targetEdges) {
-		System.out.println("Suggesting nodes and egdes to remove");
-		
-		int currentTotalNodes = getNumberOfNodes();
-		int currentTotalEdges = getNumberOfEdges();
-		LinkedHashSet<Integer> edgesToRemove = new LinkedHashSet<Integer>();
-		
-		System.out.println("Current Nodes: " + currentTotalNodes + " Target Nodes: " + targetNodes);
-		System.out.println("Current Edges: " + currentTotalEdges + " Target Edges: " + targetEdges);
-		
-		//Any nodes to remove should have this number of edges - or close to this
-		int targetDensity = (currentTotalEdges - targetEdges) / (currentTotalNodes - targetNodes);	
-		
-		
-		//work backwards, as this makes it quicker deleting from the node buffer
-		for(int n = getNumberOfNodes()-1; n >= 0; n--) {
-			
-			int nodeDegree = getNodeDegree(n);
-			System.out.println("Current Density: " + nodeDegree + " Target Density: " + targetDensity);
-			//if this node has a similar degree to the density required
-			if (nodeDegree < targetDensity*1.6 && nodeDegree > targetDensity*0.4) {
-								
-				nodes.add(n);
-				Util.addAll(edgesToRemove,getNodeConnectingEdges(n));
-				
-				//adjust the target density if we've removed lots of edges
-				currentTotalNodes -= nodes.size();
-				currentTotalEdges -= edgesToRemove.size();
-				targetDensity = (currentTotalEdges - targetEdges) / (currentTotalNodes - targetNodes);
-				
-				//if the target nodes have been reached;
-				if(getNumberOfNodes() - nodes.size() <= targetNodes){
-					break;
-				}
-			}
-
-		}
-		edges.addAll(edgesToRemove);
-
-		System.out.println("nodes to remove:");
-		System.out.println(nodes);
-		System.out.println("edges  to remove:");
-		System.out.println(edges);
-		
-		FastGraph g3 = this.generateGraphByDeletingItems(Util.convertLinkedList(nodes),Util.convertLinkedList(edges), false);
-		//AdjacencyMatrix am3 = new AdjacencyMatrix(g3);
-		//int[][] matrix3 = am3.buildIntAdjacencyMatrix();
-		//am3.printMatrix(matrix3);
-		
-		System.out.println("Current Nodes in new FastGraph: " + g3.getNumberOfNodes());
-		System.out.println("Current Edges in new FastGraph: " + g3.getNumberOfEdges());
-		
-	}
-	
-	/**
-	 * Informal testing method for prototyping the code to change edge labels based on their connections
-	 * 
-	 * @param is The InducedSubgraph class for creating subgraphs
-	 * @param nodes The list of nodes ready to be populated
-	 * @param edges The list of edges ready to be populated
-	 * @param targetEigenString The target string
-	 * @return If a correct subgraph has been found
-	 * @throws FastGraphException
-	 */
-	public boolean displayAdjacencyMatrixOfInducedSubgraph(InducedSubgraph is, LinkedList<Integer> nodes, LinkedList<Integer> edges, String targetEigenString) throws FastGraphException {
-		nodes.clear();
-		edges.clear();
-		System.out.println("trying again");
-		is.createInducedSubgraph(nodes, edges, 4);
-		int[] ns = Util.convertLinkedList(nodes); //Useful way of converting a type list to a primitive array in Java 8
-		int[] es = Util.convertLinkedList(edges); //Apparently http://stackoverflow.com/questions/960431/how-to-convert-listinteger-to-int-in-java/23945015#23945015
-		
-		System.out.println("subgraph nodes: " + Arrays.toString(ns));
-		//System.out.println("subgraph edges: " + Arrays.toString(es));
-		
-		FastGraph g3 = this.generateGraphFromSubgraph(ns, es);
-		AdjacencyMatrix am = new AdjacencyMatrix(g3);
-		int[][] matrix = am.buildIntAdjacencyMatrix();
-		am.printMatrix(matrix);
-		double[] eigens = am.findEigenvalues(matrix);
-		System.out.println("Eigenvalues: " + Arrays.toString(eigens));
-		String eigenString = Arrays.toString(Util.roundArray(eigens));
-		
-		if(eigenString.equals(targetEigenString)) { //not an isomorphism test, but will do for this experiment
-			System.out.println("correct subgraph found");
-			return true;
-		}
-		
-		return false;
-	}
-
 
 	/**
 	 * @return the number of nodes in the graph
@@ -2620,7 +2622,7 @@ System.out.println("A Created the node and edge delete lists " + (System.current
 time = System.currentTimeMillis();
 		
 		// find the nodes that will remain
-		LinkedList<Integer> remainingNodeList = new LinkedList<Integer>();
+		HashSet<Integer> remainingNodeList = new HashSet<Integer>(allNodesToDeleteList.size()*3);
 		for(int i = 0; i < getNumberOfNodes(); i++) {
 			if(!allNodesToDeleteList.contains(i)) {
 				remainingNodeList.add(i);
@@ -2629,13 +2631,13 @@ time = System.currentTimeMillis();
 		System.out.println("AAA created the node remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 		// turn it into an array
-		int[] remainingNodes = Util.convertLinkedList(remainingNodeList);
+		int[] remainingNodes = Util.convertHashSet(remainingNodeList);
 		
 		System.out.println("AA converted the node remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 
 		// find the edges that will remain
-		LinkedList<Integer> remainingEdgeList = new LinkedList<Integer>();
+		HashSet<Integer> remainingEdgeList = new HashSet<Integer>(allEdgesToDeleteList.size()*3);
 		for(int i = 0; i < getNumberOfEdges(); i++) {
 			if(!allEdgesToDeleteList.contains(i)) {
 				remainingEdgeList.add(i);
@@ -2644,7 +2646,7 @@ time = System.currentTimeMillis();
 		System.out.println("AB Created the edge remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 		// turn it into an array
-		int[] remainingEdges = Util.convertLinkedList(remainingEdgeList);
+		int[] remainingEdges = Util.convertHashSet(remainingEdgeList);
 
 System.out.println("B converted the edge remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 time = System.currentTimeMillis();

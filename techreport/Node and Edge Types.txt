@@ -1,10 +1,10 @@
 Nodes:
-0	Parent
+0	Unknown
 1	Child
-2	Grandparent
+2	Parent
 
 Edges:
-0	Parent
+0	Unknown
 1	Sibling
 2	Married
 3	Relationship
@@ -14,3 +14,7 @@ Edges:
 7	Manager
 8	Customer
 9	Teammate
+10	Neighbour
+11	Business Partner
+12	Doctor
+13	Parent

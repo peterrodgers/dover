@@ -1,6 +1,7 @@
 package uk.ac.kent.dover.fastGraph;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -142,6 +143,16 @@ public class Util {
 	}
 	
 	/**
+	 * Converts a LinkedList of any given object into an array of that object
+	 * 
+	 * @param list The list to be converted
+	 * @param array The array to be populated with the new objects
+	 */
+	public static <T> void convertLinkedListObject(LinkedList<T> list, T[] array) {
+		list.toArray(array);
+	}
+	
+	/**
 	 * Converts a LinkedList of Integer to an int[] using streams
 	 * 
 	 * @param list The linked list to convert
@@ -170,6 +181,7 @@ public class Util {
 	public static LinkedList<Integer> convertArray(int[] array) {
 		return new LinkedList<Integer>(IntStream.of(array).boxed().collect(Collectors.toList()));
 	}
+	
 	
 	/**
 	 * Converts an int[] to a LinkedList of Integer using streams
@@ -202,4 +214,26 @@ public class Util {
 			set.add(i);
 		}
 	}
+	
+	/**
+	 * Converts a HashSet<Integer> to int[]
+	 * 
+	 * @param set The set to be converted
+	 * @return The newly converted array
+	 */
+	public static int[] convertHashSet(HashSet<Integer> set) {
+		return set.stream().mapToInt(i->i).toArray();
+	}
+	
+	/**
+	 * Converts a HashSet<Integer> to a given int[]
+	 * 
+	 * @param set The set to be converted
+	 * @param array The newly converted array
+	 */
+	public static void convertHashSet(int[] array, HashSet<Integer> set) {
+		array = set.stream().mapToInt(i->i).toArray();
+	}
+	
+	
 }
