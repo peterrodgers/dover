@@ -2625,11 +2625,13 @@ time = System.currentTimeMillis();
 			if(!allNodesToDeleteList.contains(i)) {
 				remainingNodeList.add(i);
 			}
-		}		
+		}
+		System.out.println("AAA created the node remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+		time = System.currentTimeMillis();
 		// turn it into an array
 		int[] remainingNodes = Util.convertLinkedList(remainingNodeList);
 		
-		System.out.println("AA reated the node remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+		System.out.println("AA converted the node remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 
 		// find the edges that will remain
@@ -2639,10 +2641,12 @@ time = System.currentTimeMillis();
 				remainingEdgeList.add(i);
 			}
 		}
+		System.out.println("AB Created the edge remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+		time = System.currentTimeMillis();
 		// turn it into an array
 		int[] remainingEdges = Util.convertLinkedList(remainingEdgeList);
 
-System.out.println("B Created the edge remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+System.out.println("B converted the edge remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 time = System.currentTimeMillis();
 
 		FastGraph g = generateGraphFromSubgraph(remainingNodes,remainingEdges);
