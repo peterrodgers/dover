@@ -4,6 +4,8 @@ package uk.ac.kent.dover.fastGraph;
  * Enum to hold the various node types in the data. <br>
  * Each has a byte value which is stored in the edge type area in the node buffer.
  * 
+ * Also stored in /techreport/Node and Edge Types.txt
+ * 
  * @author Rob Baker
  *
  */

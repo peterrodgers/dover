@@ -185,7 +185,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			System.out.println("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
 			
 			time = System.currentTimeMillis();
-			g3.relabelFastGraph(g3.getNumberOfNodes()/10000);
+			g3.relabelFastGraph(g3.getNumberOfNodes()/1000);
 			System.out.println("relabelling test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			System.out.println("deletion test time (from before) " + deletionTime+" seconds");
 			//just for testing
@@ -206,62 +206,6 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			*/
 //			int[] degrees = g2.countInstancesOfNodeDegrees(4);
 //			System.out.println(Arrays.toString(degrees));
-			
-			
-			/**
-			InducedSubgraph is = new InducedSubgraph(g2);
-			
-			for(int i = 0; i < 100; i++) {
-				System.out.println();
-				boolean res = g2.displayAdjacencyMatrixOfInducedSubgraph(is,nodes,edges,Arrays.toString(new int[]{-2,0,0,2}));	
-				if (res) {
-					String[] names = new String[g2.getNumberOfNodes()];
-					NamePicker np = new NamePicker();
-					//pick a surname, so all family members have the same surname
-					String surname = np.getSurname();
-					System.out.println("Family name: " + surname);
-					for(int n : nodes) {
-						names[n] = np.getForename() + " " + surname;
-					}
-					//replace the blanks with other names
-					for(int j = 0; j < names.length; j++) {						
-						if (names[j] == null) {
-							names[j] = np.getName();
-						}
-					}
-					//System.out.println(Arrays.toString(names));
-					g2.setAllNodeLabels(names);
-					
-					
-					//just for testing
-					System.out.println();
-					System.out.println("graph now has the labels (taken from the buffer):");
-					for(int j = 0; j < g2.getNumberOfNodes(); j++) {
-						System.out.println(g2.getNodeLabel(j));
-					}
-					
-					break;
-				}
-			}
-			**/
-
-			//System.out.println("creating induced subgraph test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-			/*
-			System.out.println("nodes:");
-			System.out.println(nodes);
-			System.out.println("edges:");
-			System.out.println(edges);
-			
-			nodes.clear();
-			edges.clear();
-			time = System.currentTimeMillis();
-			is.createInducedSubgraph(nodes, edges, 4);
-			System.out.println("creating induced subgraph test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-			System.out.println("nodes:");
-			System.out.println(nodes);
-			System.out.println("edges:");
-			System.out.println(edges);
-			*/
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -322,7 +266,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 					System.out.println("Family name: " + surname);
 					for(int n : subNodes) {
 						nodeLabels[n] = np.getForename() + " " + surname;
-						nodeTypes[n] = FastGraphNodeType.CHILD.getValue(); //see techreport/Node and Edge Types.txt for details of these
+						nodeTypes[n] = FastGraphNodeType.CHILD.getValue();
 					}
 					
 					//set the parents
@@ -335,7 +279,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 						//if this is the parent's relationship
 						if ((getEdgeNode1(e) == subNodes.get(0) && getEdgeNode2(e) == subNodes.get(1)) ||
 						(getEdgeNode1(e) == subNodes.get(1) && getEdgeNode2(e) == subNodes.get(0))) {
-							edgeTypes[e] = FastGraphEdgeType.MARRIED.getValue(); //see techreport/Node and Edge Types.txt for details of these
+							edgeTypes[e] = FastGraphEdgeType.MARRIED.getValue();
 							
 							//if this is the parent child relationship
 						} else if (getEdgeNode1(e) == subNodes.get(0) || getEdgeNode1(e) == subNodes.get(1) ||
