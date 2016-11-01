@@ -185,7 +185,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			System.out.println("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
 			
 			time = System.currentTimeMillis();
-			g3.relabelFastGraph();
+			g3.relabelFastGraph(g3.getNumberOfNodes()/10000);
 			System.out.println("relabelling test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			System.out.println("deletion test time (from before) " + deletionTime+" seconds");
 			//just for testing
@@ -273,9 +273,12 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 	/**
 	 * Relabels the current FastGraph with the family groups in subgraphs/families folder<br>
 	 * Any remaining nodes and edges are labelled randomly.
+	 * 
+	 * @param subgraphsToTest How many subgraphs will be generated for each family
+	 * 
 	 * @throws Exception 
 	 */
-	public void relabelFastGraph() throws Exception{
+	public void relabelFastGraph(int subgraphsToTest) throws Exception{
 		System.out.println("Relabelling FastGraph");
 		long time = System.currentTimeMillis();
 		
@@ -300,7 +303,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			
 			int familyNodesSize = family.getNumberOfNodes();			
 			
-			for (int i = 0; i < 100; i++) { //generate 1 hundred subgraphs to test
+			for (int i = 0; i < subgraphsToTest; i++) { //generate 1 hundred subgraphs to test
 				LinkedList<Integer> subNodes = new LinkedList<Integer>();
 				LinkedList<Integer> subEdges = new LinkedList<Integer>();
 				
