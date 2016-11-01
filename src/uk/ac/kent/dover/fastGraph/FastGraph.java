@@ -142,8 +142,8 @@ System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+
 //		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 
-//String name = "random-n-100-e-1000";
-String name = "as-skitter.txt";
+String name = "random-n-100-e-1000";
+//String name = "as-skitter.txt";
 //String name = "soc-LiveJournal1.txt";
 //String name = "twitter_combined.txt";
 //String name = "Wiki-Vote.txt";
@@ -175,8 +175,8 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
 			LinkedList<Integer> edges = new LinkedList<Integer>();
 			
-			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,80,800);
-			FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1000000,10000000);
+			FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,80,800);
+			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1000000,10000000);
 			//FastGraph g3 = g2;
 			
 			long deletionTime = (long) ((System.currentTimeMillis()-time)/1000.0);
@@ -185,25 +185,25 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			System.out.println("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
 			
 			time = System.currentTimeMillis();
-			g3.relabelFastGraph(g3.getNumberOfNodes()/1000);
+			g3.relabelFastGraph(g3.getNumberOfNodes()/10);
 			System.out.println("relabelling test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			System.out.println("deletion test time (from before) " + deletionTime+" seconds");
 			//just for testing
 			System.out.println();
-			/*
+	/*		
 			System.out.println("graph now has the labels (taken from the buffer):");
 			FastGraphNodeType[] ntypes = FastGraphNodeType.values();
 			for(int j = 0; j < g3.getNumberOfNodes(); j++) {
 				byte type = g3.getNodeType(j);
 				System.out.println(g3.getNodeLabel(j) + " " + type + " (" + ntypes[type] + ")");
 			}
+			System.out.println();
 			System.out.println("edges now have the types (taken from the buffer):");
-			FastGraphEdgeType[] types = FastGraphEdgeType.values();
 			for(int j = 0; j < g3.getNumberOfEdges(); j++) {
 				byte type = g3.getEdgeType(j);
-				System.out.println("n1" + g3.getEdgeNode1(j) + " n2" + g3.getEdgeNode2(j) + " type " + type + " (" + types[type] + ")");
+				System.out.println("n1" + g3.getEdgeNode1(j) + " n2" + g3.getEdgeNode2(j) + " type " + type + " (" + g3.getEdgeLabel(j) + ")");
 			}
-			*/
+		*/	
 //			int[] degrees = g2.countInstancesOfNodeDegrees(4);
 //			System.out.println(Arrays.toString(degrees));
 			
@@ -215,21 +215,23 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 	}
 	
 	/**
-	 * Relabels the current FastGraph with the family groups in subgraphs/families folder<br>
+	 * Relabels the current FastGraph with the family groups in subgraphs/families folder.<br>
 	 * Any remaining nodes and edges are labelled randomly.
+	 * Each family is tested against each of the induced subgraphs and will be relabeled if the two are isomorphic
 	 * 
-	 * @param subgraphsToTest How many subgraphs will be generated for each family
+	 * @param subgraphsToTest How many subgraphs will be induced for each family.
 	 * 
-	 * @throws Exception 
+	 * @throws Exception If there is a problem loading the family subgraphs, or if there is a problem inducing a subgraph
 	 */
 	public void relabelFastGraph(int subgraphsToTest) throws Exception{
 		System.out.println("Relabelling FastGraph");
 		long time = System.currentTimeMillis();
 		
-		//load node and egde labels arrays
+		//load node and edge labels arrays
 		String[] nodeLabels = new String[this.getNumberOfNodes()];
+		String[] edgeLabels = new String[this.getNumberOfEdges()];
 		
-		//load node and egde Types arrays
+		//load node and edge Types arrays
 		byte[] nodeTypes = new byte[this.getNumberOfNodes()];
 		byte[] edgeTypes = new byte[this.getNumberOfEdges()];
 		
@@ -239,6 +241,9 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 		//create Name Picker class
 		NamePicker np = new NamePicker();
 		
+		//number of families found
+		int fams = 0;
+		
 		//load family subgraphs
 		FastGraph[] families = loadFamilies();
 		for(FastGraph family : families) {
@@ -247,7 +252,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 			
 			int familyNodesSize = family.getNumberOfNodes();			
 			
-			for (int i = 0; i < subgraphsToTest; i++) { //generate 1 hundred subgraphs to test
+			for (int i = 0; i < subgraphsToTest; i++) { //induce subgraphs to test
 				LinkedList<Integer> subNodes = new LinkedList<Integer>();
 				LinkedList<Integer> subEdges = new LinkedList<Integer>();
 				
@@ -259,11 +264,12 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 				boolean isomorphic = ei.isomorphic(subgraph);
 				
 				if(isomorphic) {
+					fams++;
 					//rename original graph
 					
 					//pick a surname, so all family members have the same surname
 					String surname = np.getSurname();
-					System.out.println("Family name: " + surname);
+				//	System.out.println("Family name: " + surname);
 					for(int n : subNodes) {
 						nodeLabels[n] = np.getForename() + " " + surname;
 						nodeTypes[n] = FastGraphNodeType.CHILD.getValue();
@@ -280,25 +286,23 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 						if ((getEdgeNode1(e) == subNodes.get(0) && getEdgeNode2(e) == subNodes.get(1)) ||
 						(getEdgeNode1(e) == subNodes.get(1) && getEdgeNode2(e) == subNodes.get(0))) {
 							edgeTypes[e] = FastGraphEdgeType.MARRIED.getValue();
-							
+							edgeLabels[e] = FastGraphEdgeType.MARRIED.toString();
 							//if this is the parent child relationship
 						} else if (getEdgeNode1(e) == subNodes.get(0) || getEdgeNode1(e) == subNodes.get(1) ||
 								getEdgeNode2(e) == subNodes.get(0) || getEdgeNode2(e) == subNodes.get(1)) {
 							edgeTypes[e] = FastGraphEdgeType.PARENT.getValue();
-							
+							edgeLabels[e] = FastGraphEdgeType.PARENT.toString();
 							//otherwise these are siblings
 						} else {
 							edgeTypes[e] = FastGraphEdgeType.SIBLING.getValue();
-						}
-							
-					}
-					
-				}
-				
-			}
-			
-			
-		}
+							edgeLabels[e] = FastGraphEdgeType.SIBLING.toString();
+						}		
+					}//end for each subEdge	
+				} //end if isomorphic
+			}//end for each subgraph to test	
+		}//end foreach family
+		
+		System.out.println("## Number of families found: " + fams);
 		
 		//replace the blanks with other names
 		for(int j = 0; j < nodeLabels.length; j++) {						
@@ -306,20 +310,24 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 				nodeLabels[j] = np.getName();
 			}
 		}
-		//ignore other node types, as these aren't defined yet.
+		
+		//Leave node types as they are - these are not used
 		
 		Random r = new Random(nodeBuf.getLong(0));
 		//replace the blanks with other edge types
+		FastGraphEdgeType[] values = FastGraphEdgeType.values();
 		for(int j = 0; j < edgeTypes.length; j++) {						
 			if (edgeTypes[j] == FastGraphEdgeType.UNKNOWN.getValue()) {
 				//pick a random relationship
-				edgeTypes[j] = (byte) (r.nextInt(FastGraphEdgeType.values().length - 4)+4); //ignore the family relationships
+				byte relationship = (byte) (r.nextInt(values.length - 4)+4); //ignore the family relationships
+				edgeTypes[j] = relationship;
+				edgeLabels[j] = values[relationship].toString();
 			}
-		}
+		}		
 		
-		
-		//Set all node labels, and node and edge types
+		//Set all node & edge labels, and node & edge types
 		this.setAllNodeLabels(nodeLabels);
+		this.setAllEdgeLabels(edgeLabels);
 		for(int i = 0; i < nodeTypes.length; i++) {
 			this.setNodeType(i, nodeTypes[i]);			
 		}
