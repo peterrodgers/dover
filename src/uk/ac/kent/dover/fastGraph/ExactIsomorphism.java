@@ -120,9 +120,9 @@ public class ExactIsomorphism {
 		System.out.println(ExactIsomorphism.isomorphic(fg1,fg2));
 */
 		
-		int comparisons = 10000;
-		int numNodes = 5;
-		int numEdges = 8;
+		int comparisons = 100000;
+		int numNodes = 6;
+		int numEdges = 10;
 		
 //int i = 1; {
 		try {
@@ -131,19 +131,20 @@ public class ExactIsomorphism {
 				g1 = FastGraph.randomGraphFactory(numNodes,numEdges,i,true,false);
 				ExactIsomorphism ei = new ExactIsomorphism(g1);
 				FastGraph g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i+comparisons*2,true,false);
-				int ack = succeed;
+				int ack = failOnBruteForce;
 				boolean res = ei.isomorphic(g2);
-				if(ack != succeed) {
-					System.out.println("FAIL");
+				if(ack != failOnBruteForce) {
+					System.out.println("NEW CASE");
+					System.out.println(g1.generateDisplayGraph());
+					System.out.println(g2.generateDisplayGraph());
+					System.out.println(Arrays.toString(ei.getLastMatch()));
+				}
+				boolean comp = ei.isomorphicOld(g2);
+				if(res != comp) {
+					System.out.println("PROBLEM with isomorphism of random graphs with seed "+i+" two algorithms do not agree. New: "+res+", old: "+comp);
 					System.out.println(g1.generateDisplayGraph());
 					System.out.println(g2.generateDisplayGraph());
 				}
-	//			boolean comp = ei.isomorphicOld(g2);
-	//			if(res != comp) {
-	//				System.out.println("PROBLEM with isomorphism of random graphs with seed "+i+" two algorithms do not agree. New: "+res+", old: "+comp);
-	//				System.out.println(g1.generateDisplayGraph());
-	//				System.out.println(g2.generateDisplayGraph());
-	//			}
 	
 			}
 			FastGraph g1 = FastGraph.randomGraphFactory(numNodes,numEdges,0,true,false);
@@ -569,7 +570,7 @@ timeForSubgraphsGenerated += System.currentTimeMillis()-startTime;
 		} else {
 			System.out.println("Isomorphism total tests "+numberOfIsomorphismTests);
 		}
-		if(numberOfOldIsomorphismTests > 0) {
+/*		if(numberOfOldIsomorphismTests > 0) {
 			System.out.println("Old Isomorphism test average "+(timeForOldIsomorphismTests/(1000.0*numberOfOldIsomorphismTests))+" seconds total tests "+numberOfOldIsomorphismTests+" total time "+(timeForOldIsomorphismTests/1000.0)+" seconds");
 		}
 		if(numberOfEigenvalueTests > 0) {
@@ -580,7 +581,7 @@ timeForSubgraphsGenerated += System.currentTimeMillis()-startTime;
 		if(numberOfSubgraphsGenerated > 0) {
 			System.out.println("Subgraph generation average "+(timeForSubgraphsGenerated/(1000.0*numberOfSubgraphsGenerated))+" seconds total generated "+numberOfSubgraphsGenerated+" total time "+(timeForSubgraphsGenerated/1000.0)+" seconds");
 		}
-	}
+*/	}
 
 	
 	/**

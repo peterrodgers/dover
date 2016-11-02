@@ -507,6 +507,52 @@ public class ExactIsomorphismTest {
 	}
 	
 	
+	@Test
+	public void test011() {
+		/*
+		 * g1
+		 * Nodes:[n0, n1, n2, n3, n4, n5]
+		 * Edges:[(n0:n3,e0), (n1:n2,e1), (n2:n3,e2), (n5:n2,e3), (n2:n1,e4), (n5:n0,e5), (n5:n3,e6), (n1:n4,e7), (n1:n5,e8), (n0:n5,e9)]
+		 * g2
+		 * Nodes:[n0, n1, n2, n3, n4, n5]
+		 * Edges:[(n2:n0,e0), (n2:n5,e1), (n1:n2,e2), (n1:n5,e3), (n0:n4,e4), (n3:n0,e5), (n5:n1,e6), (n5:n3,e7), (n0:n2,e8), (n3:n2,e9)]
+			
+		* Not Isomorphic, fails only on brute force check
+
+		 */
+		Graph dg1 = new Graph("dg1");
+		dg1.addAdjacencyEdge("n0", "n3");
+		dg1.addAdjacencyEdge("n1", "n2");
+		dg1.addAdjacencyEdge("n2", "n3");
+		dg1.addAdjacencyEdge("n5", "n2");
+		dg1.addAdjacencyEdge("n2", "n1");
+		dg1.addAdjacencyEdge("n5", "n0");
+		dg1.addAdjacencyEdge("n5", "n3");
+		dg1.addAdjacencyEdge("n1", "n4");
+		dg1.addAdjacencyEdge("n1", "n5");
+		dg1.addAdjacencyEdge("n0", "n5");
+		
+		Graph dg2 = new Graph("dg2");
+		dg2.addAdjacencyEdge("n2", "n0");
+		dg2.addAdjacencyEdge("n2", "n5");
+		dg2.addAdjacencyEdge("n1", "n2");
+		dg2.addAdjacencyEdge("n1", "n5");
+		dg2.addAdjacencyEdge("n0", "n4");
+		dg2.addAdjacencyEdge("n3", "n0");
+		dg2.addAdjacencyEdge("n5", "n1");
+		dg2.addAdjacencyEdge("n5", "n3");
+		dg2.addAdjacencyEdge("n0", "n2");
+		dg2.addAdjacencyEdge("n3", "n2");
+		
+		assertFalse(dg1.isomorphic(dg2));
+
+		FastGraph g1 = FastGraph.displayGraphFactory(dg1, false);
+		FastGraph g2 = FastGraph.displayGraphFactory(dg2, false);
+		assertFalse(ExactIsomorphism.isomorphic(g1,g2));
+		
+	}
+	
+	
 	
 	
 	/*
