@@ -144,6 +144,7 @@ System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+
 
 //String name = "random-n-100-e-1000";
 String name = "as-skitter.txt";
+//String name = "soc-pokec-relationships.txt";
 //String name = "soc-LiveJournal1.txt";
 //String name = "twitter_combined.txt";
 //String name = "Wiki-Vote.txt";
