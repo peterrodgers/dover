@@ -3,7 +3,7 @@ package uk.ac.kent.dover.fastGraph;
 import java.nio.*;
 import java.util.*;
 
-import uk.ac.kent.displayGraph.Graph;
+import uk.ac.kent.displayGraph.*;
 
 /**
  * Testing the structural similarity of two FastGraphs
@@ -16,10 +16,43 @@ public class ExactIsomorphism {
 	private int DECIMAL_PLACES = 6; // number of decimal places to round to
 	
 	private FastGraph fastGraph;
-	private int[][] matrix;
-	private double[] eigenvalues;
+	AdjacencyMatrix am1;
+	AdjacencyMatrix am2;
+	private int[][] matrix1;
+	private int[][] matrix2;
+	private double[] eigenvalues1;
+	private double[] eigenvalues2;
 
 	
+	private int[] matches1;
+	private int[] matches2;
+
+//	private int[] scores1;
+//	private int[] scores2;
+
+	private int[] degrees1;
+	private int[] degrees2;
+
+	private ArrayList<HashSet<Integer>> neighbours1;  // Non self-sourcing neighbour nodes for each node
+	private ArrayList<HashSet<Integer>> neighbours2;  // Non self-sourcing neighbour nodes for each node
+	
+	
+	private static int numberOfIsomorphismTests = 0;
+	private static int numberOfOldIsomorphismTests = 0;
+	private static int numberOfEigenvalueTests = 0;
+	private static int numberOfSubgraphsGenerated = 0;
+	
+	private static long timeForIsomorphismTests = 0;
+	private static long timeForOldIsomorphismTests = 0;
+	private static long timeForEigenvalueTests = 0;
+	private static long timeForSubgraphsGenerated = 0;
+	
+	private static int failOnNodeCount = 0;
+	private static int failOnEdgeCount = 0;
+	private static int failOnEigenvalues = 0;
+	private static int failOnNodeMatches = 0;
+	private static int failOnBruteForce = 0;
+	private static int succeed = 0;
 	
 	
 	
@@ -29,100 +62,96 @@ public class ExactIsomorphism {
 	public static void main(String[] args) {
 		FastGraph g1;
 		FastGraph g2;
-		int comparisons = 10000;
-		long time;
-
-		int numNodes = 3;
-		int numEdges= 2;
-
-		time = System.currentTimeMillis();
-		for(int i = 0; i < comparisons; i++) {
-			g1 = FastGraph.randomGraphFactory(numNodes,numEdges,i,false);
-			ExactIsomorphism ei = new ExactIsomorphism(g1);
-			g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i,false);
-			boolean res = ei.isomorphic(g2);
-			if(!res) {
-				System.out.println("PROBLEM with isomorphism with seed "+i+" fails, should succeed");
-			}
-		}
-		System.out.println("time for "+comparisons+" equal graph isomorphism test "+((System.currentTimeMillis()-time)/1000.0)+" seconds "+ " time for one "+((1.0*System.currentTimeMillis()-time)/comparisons)+" milliseconds");
-
-		time = System.currentTimeMillis();
-		g1 = FastGraph.randomGraphFactory(numNodes,numEdges,-1,false);
-		ExactIsomorphism ei = new ExactIsomorphism(g1);
-		for(int i = 0; i < comparisons; i++) {
-			g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i,false);
-			boolean res = ei.isomorphic(g2);
-			if(res) {
-				System.out.println("PROBLEM with isomorphism with seed "+i+" succeeds, should fail");
-			}
-			boolean comp = ei.compareByEigenvalues(g2);
-			if(comp) {
-				System.out.println("Equal by eigenvalues "+i);
-				System.out.println();
-			}
-			if(res && !comp) {
-				System.out.println("Not equal by eigenvalues but equal by isomorphism");
-				System.out.println("Graph 1");
-				for(int e = 0; e < numEdges; e++) {
-					System.out.println(g1.getEdgeNode1(e)+ " "+g1.getEdgeNode1(e));
-				}
-				AdjacencyMatrix am = new AdjacencyMatrix(g1);
-				int[][] gMatrix = am.buildIntAdjacencyMatrix();
-				double[] gEigenvalues = am.findEigenvalues(gMatrix);
-				for(double d : gEigenvalues) {
-					System.out.print(d+" ");
-				}
-				System.out.println();
-				System.out.println("Graph 2");
-				for(int e = 0; e < numEdges; e++) {
-					System.out.println(g1.getEdgeNode1(e)+ " "+g1.getEdgeNode1(e));
-				}
-				am = new AdjacencyMatrix(g1);
-				gMatrix = am.buildIntAdjacencyMatrix();
-				gEigenvalues = am.findEigenvalues(gMatrix);
-				for(double d : gEigenvalues) {
-					System.out.print(d+" ");
-				}
-				System.out.println();
-			}
-		}
-		System.out.println("time for "+comparisons+" random graph isomorphism test "+((System.currentTimeMillis()-time)/1000.0)+" seconds "+ " time for one "+((1.0*System.currentTimeMillis()-time)/comparisons)+" milliseconds");
-
-
-		int c = 100000;
-		g1 = FastGraph.randomGraphFactory(16,32,1,false);
-		int[] edges = {0,2,4,7,8,9,10,11,13,14,15,17,19,20,23,27,28,31};
-//		int[] edges = {0,2,4,7,8,9,10,11,13,14,15,17};
-		ArrayList<Integer> nodeList = new ArrayList<Integer>();
-		for(int i = 0; i < edges.length; i++) {
-			int n1 = g1.getEdgeNode1(edges[i]);
-			if(!nodeList.contains(n1)) {
-				nodeList.add(n1);
-			}
-			int n2 = g1.getEdgeNode2(edges[i]);
-			if(!nodeList.contains(n2)) {
-				nodeList.add(n2);
-			}
-		}
-		int[] nodes = new int[nodeList.size()+1];
-		int b = 0;
-		for(int a : nodeList) {
-			nodes[b] = a;
-			b++;
-		}
+/*
+		Graph dg1 = new Graph("dg1");
+		Node n0 = new Node("n0");
+		Node n1 = new Node("n1");
+		Node n2 = new Node("n2");
+		dg1.addNode(n0);
+		dg1.addNode(n1);
+		dg1.addNode(n2);
+		Edge e0 = new Edge(n2, n0, "e0");
+		Edge e1 = new Edge(n0, n1, "e1");
+		Edge e2 = new Edge(n0, n2, "e2");
+		Edge e3 = new Edge(n0, n1, "e3");
+		Edge e4 = new Edge(n2, n2, "e4");
+		dg1.addEdge(e0);
+		dg1.addEdge(e1);
+		dg1.addEdge(e2);
+		dg1.addEdge(e3);
+		dg1.addEdge(e4);
 		
-		time = System.currentTimeMillis();
-		for(int i = 0; i < c; i++) {
-			FastGraph subGraph = g1.generateGraphFromSubgraph(nodes,edges);
-			if(i%2 == 0) { 
-				edges[0] = 0;
-			} else {
-//System.out.println(i);
-				edges[0] = 3; // this has nodes that are in the list
+		Graph dg2 = new Graph("dg2");
+		n0 = new Node("n0");
+		n1 = new Node("n1");
+		n2 = new Node("n2");
+		dg2.addNode(n0);
+		dg2.addNode(n1);
+		dg2.addNode(n2);
+		e0 = new Edge(n0, n0, "e0");
+		e1 = new Edge(n2, n0, "e1");
+		e2 = new Edge(n2, n0, "e2");
+		e3 = new Edge(n2, n1, "e3");
+		e4 = new Edge(n2, n1, "e4");
+		dg2.addEdge(e0);
+		dg2.addEdge(e1);
+		dg2.addEdge(e2);
+		dg2.addEdge(e3);
+		dg2.addEdge(e4);
+*/		
+/*		
+		Graph dg1 = new Graph("dg1");
+		Node n0 = new Node("n0");
+		Node n1 = new Node("n1");
+		Node n2 = new Node("n2");
+		dg1.addNode(n0);
+		dg1.addNode(n1);
+		dg1.addNode(n2);
+		Edge e0 = new Edge(n2, n1, "e0");
+		Edge e1 = new Edge(n0, n1, "e1");
+		dg1.addEdge(e0);
+		dg1.addEdge(e1);
+		
+		Graph dg2 = new Graph("dg2");
+		n0 = new Node("n0");
+		n1 = new Node("n1");
+		n2 = new Node("n2");
+		dg2.addNode(n0);
+		dg2.addNode(n1);
+		dg2.addNode(n2);
+		e0 = new Edge(n0, n1, "e0");
+		e1 = new Edge(n0, n2, "e1");
+		dg2.addEdge(e0);
+		dg2.addEdge(e1);
+
+		
+		System.out.println(dg1.isomorphic(dg2));
+		
+		FastGraph fg1 = FastGraph.displayGraphFactory(dg1, false);
+		FastGraph fg2 = FastGraph.displayGraphFactory(dg2, false);
+		System.out.println(ExactIsomorphism.isomorphic(fg1,fg2));
+*/
+		
+		int comparisons = 100000;
+		int numNodes = 5;
+		int numEdges = 5;
+		
+		g1 = FastGraph.randomGraphFactory(numNodes,numEdges,0,false);
+		ExactIsomorphism ei = new ExactIsomorphism(g1);
+//int i = 1; {
+		for(int i = 1; i <= comparisons; i++) {
+			g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i,false);
+			boolean res = ei.isomorphic(g2);
+/*			boolean comp = ei.isomorphicOld(g2);
+			if(res != comp) {
+				System.out.println("PROBLEM with isomorphism of random graphs with seed "+i+" two algorithms do not agree. New: "+res+", old: "+comp);
+				System.out.println(g1.generateDisplayGraph());
+				System.out.println(g2.generateDisplayGraph());
 			}
+*/
 		}
-		System.out.println("time for "+c+" subgraph creations "+((System.currentTimeMillis()-time)/1000.0)+" seconds "+" time for one "+((1.0*System.currentTimeMillis()-time)/c)+" milliseconds");
+		ei.reportTimes();
+		ei.reportFailRatios();
 
 	}
 
@@ -140,19 +169,296 @@ public class ExactIsomorphism {
 
 		this.fastGraph = fastGraph;
 
+		AdjacencyMatrix am = new AdjacencyMatrix(fastGraph);
 		if(fastGraph.getNumberOfNodes() == 0) {
-			matrix = new int[0][0];
-			eigenvalues = new double[0];
+			matrix1 = new int[0][0];
+			eigenvalues1 = new double[0];
 		} else {
-			AdjacencyMatrix am = new AdjacencyMatrix(fastGraph);
-			matrix = am.buildIntAdjacencyMatrix();
-			eigenvalues = am.findEigenvalues(matrix);
-			eigenvalues = Util.roundArray(eigenvalues,DECIMAL_PLACES);
+			matrix1 = am.buildIntAdjacencyMatrix();
+			eigenvalues1 = am.findEigenvalues(matrix1);
+			eigenvalues1 = Util.roundArray(eigenvalues1,DECIMAL_PLACES);
 		}
-
+		
+		matches1 = new int[fastGraph.getNumberOfNodes()];
+		matches2 = new int[fastGraph.getNumberOfNodes()];
+		
+		degrees1 = findDegrees(fastGraph);
+		
+		neighbours1 = findNeighbours(fastGraph);
 	}
 	
 	
+	
+
+	/**
+	 * gives the neighbours of nodes in g, without duplicates and without self sourcing. The returned array may be larger than
+	 * strictly necessary.
+	 * 
+	 * @param g the graph
+	 * @return the neighbours for each node in the graph
+	 */
+	private ArrayList<HashSet<Integer>> findNeighbours(FastGraph g) {
+		
+		int maxDegree = g.maximumDegree();
+		ArrayList<HashSet<Integer>> ret = new ArrayList<HashSet<Integer>>(g.getNumberOfNodes());
+		for(int n = 0; n < g.getNumberOfNodes(); n++) {
+			HashSet<Integer> neighbours = new HashSet<Integer>(maxDegree);
+			int[] connections = g.getNodeConnectingNodes(n);
+			for(int i = 0; i < connections.length; i++) {
+				Integer connectingNode = connections[i];
+				if(n == connectingNode) {
+					continue;
+				}
+				if(!neighbours.contains(connectingNode)) {
+					neighbours.add(connectingNode);
+				}
+			}
+			ret.add(neighbours);
+		}
+		return ret;
+	}
+
+
+
+	/**
+	 * Finds the the degrees of each node.
+	 * 
+	 * @param g the graph with the nodes
+	 * @return an array containing the degrees
+	 */
+	private int[] findDegrees(FastGraph g) {
+		int[] degrees = new int[g.getNumberOfNodes()];
+		for(int i = 0; i < g.getNumberOfNodes(); i++) {
+			degrees[i] = g.getNodeDegree(i);
+		}
+		
+		return degrees;
+	}
+
+
+
+	/**
+	 * Equality of graphs. Returns a mapping if this graph is equal
+	 * to the given graph.
+	 *
+	 * @return true if there is an equality with the
+	 * given graph, null if is not.
+	 */
+	public boolean isomorphic(FastGraph g) {
+numberOfIsomorphismTests++;
+long startTime = System.currentTimeMillis();
+
+		FastGraph g1 = fastGraph;
+		FastGraph g2 = g;
+		
+		int numberOfNodes1 = g1.getNumberOfNodes();
+		int numberOfNodes2 = g2.getNumberOfNodes();
+
+		int numberOfEdges1 = g1.getNumberOfEdges();
+		int numberOfEdges2 = g2.getNumberOfEdges();
+
+		// ensure that the same graph returns true
+		if(g1 == g2) {
+			return(true);
+		}
+		
+		if(numberOfNodes1 == 0 && numberOfNodes2 == 0) {
+//System.out.println("Isomorphic: empty graphs");
+succeed++;
+timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+			return true;
+		}
+				
+		if(numberOfNodes1 != numberOfNodes2) {
+//System.out.println("Not isomorphic: different number of edges");
+failOnNodeCount++;
+timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+			return false;
+		}
+				
+		if(numberOfEdges1 != numberOfEdges2) {
+//System.out.println("Not isomorphic: different number of nodes");
+failOnEdgeCount++;
+timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+			return false;
+		}
+		
+		
+		am2 = new AdjacencyMatrix(g);
+		matrix2 = am2.buildIntAdjacencyMatrix();
+		eigenvalues2 = am2.findEigenvalues(matrix2);
+		eigenvalues2 = Util.roundArray(eigenvalues2, DECIMAL_PLACES);
+//System.out.println(Arrays.toString(eigenvalues));
+//System.out.println(Arrays.toString(eigenvalues2));
+		if(!compareEigenValues(eigenvalues2)) {
+//System.out.println("Not isomorphic: eigenvalues are different");
+failOnEigenvalues++;
+timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+			return false;
+		}
+
+		degrees2 = findDegrees(g);
+
+		neighbours2 = findNeighbours(g);
+		
+		
+		int[] numberOfMatches = new int[numberOfNodes1]; // gives the number of relevant elements in the second array of possibleMatches 
+		int[][] possibleMatches = new int[numberOfNodes1][numberOfNodes1]; // first element is the node, second is a list of potential matches
+		
+		for(int n1 = 0; n1 < numberOfNodes1; n1++) {
+			int i = 0;
+			for(int n2 = 0; n2 < numberOfNodes2; n2++) {
+				if(matrix1[n1][n1] != matrix2[n2][n2]) { // check that they have the same number of self sourcing edges
+					continue;
+				}
+				if(degrees1[n1] != degrees2[n2]) { // make sure the number of connecting edges is equal
+					continue;
+				}
+				possibleMatches[n1][i] = n2;
+				i++;
+			}
+			if(i == 0) {
+//System.out.println("Not isomorphic: no possible match for a node");
+failOnNodeMatches++;
+timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+				return false;
+			}
+			numberOfMatches[n1] = i;
+		}
+
+		
+		int[] matchesIndex = new int[numberOfNodes1]; // current indexes for the search
+		Arrays.fill(matchesIndex,-1);
+		Arrays.fill(matches1,-1);
+		Arrays.fill(matches2,-1);
+
+		// backtracking search here
+		int currentNode = 0;
+		matchesIndex[currentNode] = 0;
+		while(currentNode < numberOfNodes1) {
+//System.out.println("current progress "+Arrays.toString(matchesIndex));
+
+			if(matchesIndex[currentNode] == numberOfMatches[currentNode]) { // backtrack here to previous node if all nodes have been tried
+//System.out.println("Backtracking from node "+ currentNode+ " matched node "+matches1[currentNode]);
+				if(matches1[currentNode] != -1) {
+					matches2[matches1[currentNode]] = -1;
+				}
+				matches1[currentNode] = -1;
+				matchesIndex[currentNode] = -1;
+				matchesIndex[currentNode]= 0;
+				currentNode--;
+				if(currentNode == -1) {
+//System.out.println("Not isomorphic: brute force");
+failOnBruteForce++;
+timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+					return false;
+				}
+				matchesIndex[currentNode]++; // increment to the next node of the previous
+				continue; // might have to happen multiple times
+			}
+
+			
+			int possibleMatch = possibleMatches[currentNode][matchesIndex[currentNode]];
+			if(isAMatch(currentNode,possibleMatch)) { // successful match, try the next node
+//System.out.println("Successful match node "+ currentNode+" with node "+possibleMatch);
+				matches1[currentNode] = possibleMatch;
+				matches2[possibleMatch] = currentNode;
+				currentNode++;
+				if(currentNode == numberOfNodes1) {
+//System.out.println("Isomorphic");
+succeed++;
+timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+					return true;
+				}
+				matchesIndex[currentNode] = 0;
+			} else {
+//System.out.println("Not a successful match node "+ currentNode+" with node "+possibleMatch);
+				matchesIndex[currentNode]++; // fail so try the next node
+			}
+
+		}
+
+// Never gets to here
+System.out.println("Isomorphic - Should never get to here");
+succeed++;
+timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+		return true;
+		
+	}
+
+	
+	
+
+	/**
+	 * Check to see if the matched neighbours of n1 are neigbours of n2.
+	 * Checks number of connecting edges, assumes checks on number of neighbours for each node has been performed.
+	 * 
+	 * @param n1 node in fastGraph
+	 * @param n2 node in g
+	 * @return true if the neighbours match, false otherwise
+	 */
+	private boolean isAMatch(int n1, int n2) {
+		if(matches1[n1] != -1) {
+			return false;
+		}
+		if(matches2[n2] != -1) {
+			return false;
+		}
+		
+		HashSet<Integer> n1Neighbours = neighbours1.get(n1);
+		HashSet<Integer> n2Neighbours = neighbours2.get(n2);
+
+		int numberOfn1NeigboursMatched = 0;
+		for(int node : n1Neighbours) {
+			
+			
+			int matchNode = matches1[node];
+			if(matchNode == -1) { // no match, so nothing to do here
+				continue;
+			}
+			if(!n2Neighbours.contains(matchNode)) { // a neighbour of n1 has a matched node that is not a neigbour of n2
+				return false;
+			}
+			
+			/*
+			// removed edges Count check, never seems to be used
+			int edgeCount = matrix1[n1][node];
+			int matchedEdgeCount = matrix2[n2][matchNode];
+			if(edgeCount != matchedEdgeCount) { // different number of edge between the nodes and the matched nodes
+//System.out.println("edge counts differ");
+				return false;
+			}
+			*/
+			
+			numberOfn1NeigboursMatched++;
+		}
+
+		// now test it the other way - are all matched neighbours of n2 neigbours of n1
+		int numberOfn2NeigboursMatched = 0;
+		for(int node : n2Neighbours) {
+			int matchNode = matches2[node];
+			if(matchNode == -1) { // no match, so nothing to do here
+				continue;
+			}
+			if(!n1Neighbours.contains(matchNode)) { // a neighbour of n2 has a matched node that is not a neigbour of n1
+
+				return false;
+			}
+			numberOfn2NeigboursMatched++;
+		}
+		
+		// test the same number of matches
+		if(numberOfn1NeigboursMatched != numberOfn2NeigboursMatched) {
+
+			return false;
+		}
+
+
+		return true;
+	}
+
+
+
 	/**
 	 * Check if the two graphs have the same structure.
 	 * 
@@ -163,7 +469,10 @@ public class ExactIsomorphism {
 	 */
 	public boolean isomorphic(FastGraph g, int[] nodes, int[] edges) {
 
+numberOfSubgraphsGenerated++;
+long startTime = System.currentTimeMillis();
 		FastGraph subGraph = g.generateGraphFromSubgraph(nodes,edges);
+timeForSubgraphsGenerated += System.currentTimeMillis()-startTime;
 		
 		boolean iso = isomorphic(subGraph);
 
@@ -171,14 +480,15 @@ public class ExactIsomorphism {
 	}
 
 
+		
+
 	/**
 	 * Check if the given graph has the same structure as the graph passed to the constructor.
 	 * 
 	 * @param g the FastGraph to be tested
 	 * @return true if the two graphs are isomorphic, false otherwise
 	 */
-	public boolean isomorphic(FastGraph g) {
-		// TODO This is seriously ugly, fix with code here
+	public boolean isomorphicOld(FastGraph g) {
 		
 		Graph displayGraph = fastGraph.generateDisplayGraph();
 		Graph dg = g.generateDisplayGraph();
@@ -202,25 +512,77 @@ public class ExactIsomorphism {
 	}
 	
 
+	/**
+	 * Compare graphs by their eigenvalues
+	 * @param g the graph to compare
+	 * @return true if they are equal by eigenvalue, false otherwise
+	 */
 	public boolean compareByEigenvalues(FastGraph g) {
-		AdjacencyMatrix am = new AdjacencyMatrix(g);
-		int[][] gMatrix = am.buildIntAdjacencyMatrix();
-		double[] gEigenvalues = am.findEigenvalues(gMatrix);
-		gEigenvalues = Util.roundArray(gEigenvalues,DECIMAL_PLACES);
-		boolean ret = Arrays.equals(eigenvalues,gEigenvalues);
-/*
-System.out.println("QWERTY");
-for(double d : eigenvalues) {
-	System.out.print(d+" ");
-}
-System.out.println();
-for(double d : gEigenvalues) {
-	System.out.print(d+" ");
-}
-System.out.println("\nresult "+ret);
-*/	
+		AdjacencyMatrix gam = new AdjacencyMatrix(g);
+		int[][] gMatrix = gam.buildIntAdjacencyMatrix();
+		double[] gEigenvalues = gam.findEigenvalues(gMatrix);
+
+		return compareEigenValues(gEigenvalues);
+	}
+	
+	
+	/**
+	 * Compare eigenvalues
+	 * @param values the values to compare
+	 * @return true if the eigenvalues are equal, false otherwise
+	 */
+	public boolean compareEigenValues(double[] values) {
+		boolean ret = Arrays.equals(eigenvalues1,values);
+
 		return ret;
 	}
+
+	
+	
+	
+	
+
+	/**
+	 * Output timing
+	 */
+	public void reportTimes() {
+		if(numberOfIsomorphismTests > 0) {
+			System.out.println("Isomorphism test average "+(timeForIsomorphismTests/(1000.0*numberOfIsomorphismTests))+" seconds total tests "+numberOfIsomorphismTests+" total time "+(timeForIsomorphismTests/1000.0)+" seconds");
+		} else {
+			System.out.println("Isomorphism total tests "+numberOfIsomorphismTests);
+		}
+		if(numberOfOldIsomorphismTests > 0) {
+			System.out.println("Old Isomorphism test average "+(timeForOldIsomorphismTests/(1000.0*numberOfOldIsomorphismTests))+" seconds total tests "+numberOfOldIsomorphismTests+" total time "+(timeForOldIsomorphismTests/1000.0)+" seconds");
+		}
+		if(numberOfEigenvalueTests > 0) {
+			System.out.println("Eigenvalue test average "+(timeForEigenvalueTests/(1000.0*numberOfEigenvalueTests))+" total tests "+numberOfEigenvalueTests+" total time "+(timeForEigenvalueTests/1000.0)+" seconds");
+		} else {
+			System.out.println("Eigenvalue total tests "+numberOfEigenvalueTests);
+		}
+		if(numberOfSubgraphsGenerated > 0) {
+			System.out.println("Subgraph generation average "+(timeForSubgraphsGenerated/(1000.0*numberOfSubgraphsGenerated))+" seconds total generated "+numberOfSubgraphsGenerated+" total time "+(timeForSubgraphsGenerated/1000.0)+" seconds");
+		}
+	}
+
+	
+	/**
+	 * Output counts
+	 */
+	public void reportFailRatios() {
+		
+		double total = failOnNodeCount+failOnEdgeCount+failOnEigenvalues+failOnNodeMatches+failOnBruteForce+succeed;
+		
+		System.out.println("fail on Node Count "+failOnNodeCount+" "+(100.0*failOnNodeCount/total)+" % of calls");
+		System.out.println("fail on Edge Count "+failOnEdgeCount+" "+(100.0*failOnEdgeCount/total)+" % of calls");
+		System.out.println("fail on Eigenvalues "+failOnEigenvalues+" "+(100.0*failOnEigenvalues/total)+" % of calls");
+		System.out.println("fail on NodeMatches "+failOnNodeMatches+" "+(100.0*failOnNodeMatches/total)+" % of calls");
+		System.out.println("fail on Brute Force "+failOnBruteForce+" "+(100.0*failOnBruteForce/total)+" % of calls");
+		System.out.println("succeed "+succeed+" "+(100.0*succeed/total)+" "+" % of calls");
+
+	}
+
+	
+
 
 
 }

@@ -59,6 +59,10 @@ public class Util {
 		double[] newArr = new double[arr.length];
 		for(int i = 0; i < arr.length; i++) {
 			newArr[i] = round(arr[i],decimalPlaces);
+			if(newArr[i] == -0.0) {
+				newArr[i] = 0.0;
+			}
+				
 		}
 		Arrays.sort(newArr);
 		return newArr;
