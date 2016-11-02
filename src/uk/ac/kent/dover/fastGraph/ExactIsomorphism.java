@@ -129,19 +129,22 @@ public class ExactIsomorphism {
 		
 //int i = 1; {
 		try {
+			long isoTime = 0;
 			for(int i = 1; i <= comparisons; i++) {
 				FastGraph g1;
 				g1 = FastGraph.randomGraphFactory(numNodes,numEdges,i,true,false);
-				ExactIsomorphism ei = new ExactIsomorphism(g1);
 				FastGraph g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i+comparisons*2,true,false);
+				long time = System.currentTimeMillis();
+				ExactIsomorphism ei = new ExactIsomorphism(g1);
 				int ack = succeed;
 				boolean res = ei.isomorphic(g2);
-				if(ack != succeed) {
-					System.out.println("NEW CASE");
-					System.out.println(g1.generateDisplayGraph());
-					System.out.println(g2.generateDisplayGraph());
-					System.out.println(Arrays.toString(ei.getLastMatch()));
-				}
+				isoTime += System.currentTimeMillis()-time; 
+//				if(ack != succeed) {
+//					System.out.println("NEW CASE");
+//					System.out.println(g1.generateDisplayGraph());
+//					System.out.println(g2.generateDisplayGraph());
+//					System.out.println(Arrays.toString(ei.getLastMatch()));
+//				}
 //				boolean comp = ei.isomorphicOld(g2);
 //				if(res != comp) {
 //					System.out.println("PROBLEM with isomorphism of random graphs with seed "+i+" two algorithms do not agree. New: "+res+", old: "+comp);
@@ -154,6 +157,7 @@ public class ExactIsomorphism {
 			ExactIsomorphism ei = new ExactIsomorphism(g1);
 			ei.reportTimes();
 			ei.reportFailRatios();
+			System.out.println("Full isomorphism time "+isoTime/1000.0+" seconds, "+isoTime/(comparisons*1000.0)+" seconds per test");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
