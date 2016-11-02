@@ -123,9 +123,9 @@ public class ExactIsomorphism {
 		System.out.println(ExactIsomorphism.isomorphic(fg1,fg2));
 */
 		
-		int comparisons = 100000;
-		int numNodes = 7;
-		int numEdges = 10;
+		int comparisons = 1000000;
+		int numNodes = 8;
+		int numEdges = 15;
 		
 //int i = 1; {
 		try {
@@ -134,22 +134,20 @@ public class ExactIsomorphism {
 				g1 = FastGraph.randomGraphFactory(numNodes,numEdges,i,true,false);
 				ExactIsomorphism ei = new ExactIsomorphism(g1);
 				FastGraph g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i+comparisons*2,true,false);
-				int ack = failOnBruteForce;
+				int ack = succeed;
 				boolean res = ei.isomorphic(g2);
-				if(ack != failOnBruteForce) {
+				if(ack != succeed) {
 					System.out.println("NEW CASE");
 					System.out.println(g1.generateDisplayGraph());
 					System.out.println(g2.generateDisplayGraph());
-					System.out.println(g1.maximumDegree()+" "+g2.maximumDegree());
-					System.out.println(Arrays.toString(ei.degreeBuckets1));
-					System.out.println(Arrays.toString(ei.degreeBuckets2));
+					System.out.println(Arrays.toString(ei.getLastMatch()));
 				}
-				boolean comp = ei.isomorphicOld(g2);
-				if(res != comp) {
-					System.out.println("PROBLEM with isomorphism of random graphs with seed "+i+" two algorithms do not agree. New: "+res+", old: "+comp);
-					System.out.println(g1.generateDisplayGraph());
-					System.out.println(g2.generateDisplayGraph());
-				}
+//				boolean comp = ei.isomorphicOld(g2);
+//				if(res != comp) {
+//					System.out.println("PROBLEM with isomorphism of random graphs with seed "+i+" two algorithms do not agree. New: "+res+", old: "+comp);
+//					System.out.println(g1.generateDisplayGraph());
+//					System.out.println(g2.generateDisplayGraph());
+//				}
 	
 			}
 			FastGraph g1 = FastGraph.randomGraphFactory(numNodes,numEdges,0,true,false);
