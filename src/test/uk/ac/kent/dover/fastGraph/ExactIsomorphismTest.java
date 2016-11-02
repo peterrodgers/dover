@@ -441,6 +441,7 @@ public class ExactIsomorphismTest {
 		
 	}
 	
+
 	
 	@Test
 	public void test010() {
@@ -506,7 +507,7 @@ public class ExactIsomorphismTest {
 		
 	}
 	
-	
+
 	@Test
 	public void test011() {
 		/*
@@ -545,14 +546,58 @@ public class ExactIsomorphismTest {
 		dg2.addAdjacencyEdge("n3", "n2");
 		
 		assertFalse(dg1.isomorphic(dg2));
-
 		FastGraph g1 = FastGraph.displayGraphFactory(dg1, false);
 		FastGraph g2 = FastGraph.displayGraphFactory(dg2, false);
 		assertFalse(ExactIsomorphism.isomorphic(g1,g2));
 		
 	}
 	
+	@Test
+	public void test012() {
+		/*
+		 * g1
+		 * Nodes:[n0, n1, n2, n3, n4, n5, n6]
+		 * Edges:[(n6:n2,e0), (n0:n1,e1), (n6:n0,e2), (n1:n4,e3), (n5:n2,e4), (n6:n1,e5), (n2:n0,e6), (n0:n3,e7), (n3:n6,e8), (n3:n1,e9)]
+		 * random-n-7-e-10
+		 * Nodes:[n0, n1, n2, n3, n4, n5, n6]
+		 * Edges:[(n2:n1,e0), (n5:n4,e1), (n0:n3,e2), (n6:n2,e3), (n6:n0,e4), (n3:n2,e5), (n5:n0,e6), (n2:n0,e7), (n1:n6,e8), (n0:n1,e9)]
+		 * 
+		 * Not Isomorphic, fails only on brute force check
+		 */
+		Graph dg1 = new Graph("dg1");
+		dg1.addAdjacencyEdge("n6", "n2");
+		dg1.addAdjacencyEdge("n0", "n1");
+		dg1.addAdjacencyEdge("n6", "n0");
+		dg1.addAdjacencyEdge("n1", "n4");
+		dg1.addAdjacencyEdge("n5", "n2");
+		dg1.addAdjacencyEdge("n6", "n1");
+		dg1.addAdjacencyEdge("n2", "n0");
+		dg1.addAdjacencyEdge("n0", "n3");
+		dg1.addAdjacencyEdge("n3", "n6");
+		dg1.addAdjacencyEdge("n3", "n1");
+		
+		Graph dg2 = new Graph("dg2");
+		dg2.addAdjacencyEdge("n2", "n1");
+		dg2.addAdjacencyEdge("n5", "n4");
+		dg2.addAdjacencyEdge("n0", "n3");
+		dg2.addAdjacencyEdge("n6", "n2");
+		dg2.addAdjacencyEdge("n6", "n0");
+		dg2.addAdjacencyEdge("n3", "n2");
+		dg2.addAdjacencyEdge("n5", "n0");
+		dg2.addAdjacencyEdge("n2", "n0");
+		dg2.addAdjacencyEdge("n1", "n6");
+		dg2.addAdjacencyEdge("n0", "n1");
+		
+		assertFalse(dg1.isomorphic(dg2));
+new uk.ac.kent.displayGraph.display.GraphWindow(dg1);
+new uk.ac.kent.displayGraph.display.GraphWindow(dg2);
+		FastGraph g1 = FastGraph.displayGraphFactory(dg1, false);
+		FastGraph g2 = FastGraph.displayGraphFactory(dg2, false);
+		assertFalse(ExactIsomorphism.isomorphic(g1,g2));
+		
+	}
 	
+
 	
 	
 	/*

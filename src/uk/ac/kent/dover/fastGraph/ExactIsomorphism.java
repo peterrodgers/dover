@@ -35,10 +35,12 @@ public class ExactIsomorphism {
 	private int[] degrees1;
 	private int[] degrees2;
 
+	private int[] degreeBuckets1; // how many of nodes each degree
+	private int[] degreeBuckets2; // how many of nodes each degree
+
 	private ArrayList<HashSet<Integer>> neighbours1;  // Non self-sourcing neighbour nodes for each node
 	private ArrayList<HashSet<Integer>> neighbours2;  // Non self-sourcing neighbour nodes for each node
-	
-	
+
 	private static int numberOfIsomorphismTests = 0;
 	private static int numberOfOldIsomorphismTests = 0;
 	private static int numberOfEigenvalueTests = 0;
@@ -52,6 +54,7 @@ public class ExactIsomorphism {
 	private static int failOnNodeCount = 0;
 	private static int failOnEdgeCount = 0;
 	private static int failOnEigenvalues = 0;
+	private static int failOnDegreeComparison = 0;
 	private static int failOnNodeMatches = 0;
 	private static int failOnBruteForce = 0;
 	private static int succeed = 0;
@@ -121,7 +124,7 @@ public class ExactIsomorphism {
 */
 		
 		int comparisons = 100000;
-		int numNodes = 6;
+		int numNodes = 7;
 		int numEdges = 10;
 		
 //int i = 1; {
@@ -137,7 +140,9 @@ public class ExactIsomorphism {
 					System.out.println("NEW CASE");
 					System.out.println(g1.generateDisplayGraph());
 					System.out.println(g2.generateDisplayGraph());
-					System.out.println(Arrays.toString(ei.getLastMatch()));
+					System.out.println(g1.maximumDegree()+" "+g2.maximumDegree());
+					System.out.println(Arrays.toString(ei.degreeBuckets1));
+					System.out.println(Arrays.toString(ei.degreeBuckets2));
 				}
 				boolean comp = ei.isomorphicOld(g2);
 				if(res != comp) {
@@ -152,7 +157,6 @@ public class ExactIsomorphism {
 			ei.reportTimes();
 			ei.reportFailRatios();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -195,11 +199,29 @@ public class ExactIsomorphism {
 		
 		degrees1 = findDegrees(fastGraph);
 		
-		neighbours1 = findNeighbours(fastGraph);
+		int maxDegree1 = fastGraph.maximumDegree();
+
+		degreeBuckets1 = new int[maxDegree1+1];
+		findDegreeBuckets(degreeBuckets1,degrees1);
+		
+		neighbours1 = findNeighbours(fastGraph,maxDegree1);
 	}
 	
 	
 	
+
+	/**
+	 * populate buckets index with the number of nodes that have degree index
+	 * @param buckets big enough to hold all degrees, should be at least maxDegree+1
+	 * @param degrees from findDegrees
+	 */
+	private void findDegreeBuckets(int[] buckets, int[] degrees) {
+		for(int i = 0; i < degrees.length; i++) {
+			buckets[degrees[i]]++;
+		}
+		
+	}
+
 
 	/**
 	 * gives the neighbours of nodes in g, without duplicates and without self sourcing. The returned array may be larger than
@@ -208,9 +230,8 @@ public class ExactIsomorphism {
 	 * @param g the graph
 	 * @return the neighbours for each node in the graph
 	 */
-	private ArrayList<HashSet<Integer>> findNeighbours(FastGraph g) {
+	private ArrayList<HashSet<Integer>> findNeighbours(FastGraph g, int maxDegree) {
 		
-		int maxDegree = g.maximumDegree();
 		ArrayList<HashSet<Integer>> ret = new ArrayList<HashSet<Integer>>(g.getNumberOfNodes());
 		for(int n = 0; n < g.getNumberOfNodes(); n++) {
 			HashSet<Integer> neighbours = new HashSet<Integer>(maxDegree);
@@ -309,8 +330,21 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 		}
 
 		degrees2 = findDegrees(g);
+		
+		int maxDegree2 = g.maximumDegree();
 
-		neighbours2 = findNeighbours(g);
+		// check the number of nodes at each degree
+		degreeBuckets2 = new int[maxDegree2+1];
+		findDegreeBuckets(degreeBuckets2,degrees2);
+		if(!Arrays.equals(degreeBuckets1, degreeBuckets2)) {
+//System.out.println("Not isomorphic: different quantities of nodes with the same degree");
+failOnDegreeComparison++;
+timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+			return false;
+		}
+
+
+		neighbours2 = findNeighbours(g,maxDegree2);
 		
 		
 		int[] numberOfMatches = new int[numberOfNodes1]; // gives the number of relevant elements in the second array of possibleMatches 
@@ -589,12 +623,13 @@ timeForSubgraphsGenerated += System.currentTimeMillis()-startTime;
 	 */
 	public void reportFailRatios() {
 		
-		double total = failOnNodeCount+failOnEdgeCount+failOnEigenvalues+failOnNodeMatches+failOnBruteForce+succeed;
+		double total = failOnNodeCount+failOnEdgeCount+failOnEigenvalues+failOnDegreeComparison+failOnNodeMatches+failOnBruteForce+succeed;
 		
 		System.out.println("fail on Node Count "+failOnNodeCount+" "+(100.0*failOnNodeCount/total)+" % of calls");
 		System.out.println("fail on Edge Count "+failOnEdgeCount+" "+(100.0*failOnEdgeCount/total)+" % of calls");
 		System.out.println("fail on Eigenvalues "+failOnEigenvalues+" "+(100.0*failOnEigenvalues/total)+" % of calls");
-		System.out.println("fail on NodeMatches "+failOnNodeMatches+" "+(100.0*failOnNodeMatches/total)+" % of calls");
+		System.out.println("fail on Degree Comparison "+failOnDegreeComparison+" "+(100.0*failOnDegreeComparison/total)+" % of calls");
+		System.out.println("fail on Node Matches "+failOnNodeMatches+" "+(100.0*failOnNodeMatches/total)+" % of calls");
 		System.out.println("fail on Brute Force "+failOnBruteForce+" "+(100.0*failOnBruteForce/total)+" % of calls");
 		System.out.println("succeed "+succeed+" "+(100.0*succeed/total)+" "+" % of calls");
 

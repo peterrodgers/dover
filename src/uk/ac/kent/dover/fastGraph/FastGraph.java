@@ -2343,21 +2343,23 @@ if(edgeIndex%1000000==0 ) {
 			node2 = r.nextInt(numberOfNodes);
 			if(simple) {
 				boolean parallel = false;
-				String pairString = Integer.toString(node1)+" "+Integer.toString(node2);
-				if(nodePairs.contains(pairString)) {
+				String pairString1 = Integer.toString(node1)+" "+Integer.toString(node2);
+				String pairString2 = Integer.toString(node2)+" "+Integer.toString(node1);
+				if(nodePairs.contains(pairString1) || nodePairs.contains(pairString2) ) {
 					parallel = true;
 				}
 				while(node2 == node1 || parallel) {
 					node1 = r.nextInt(numberOfNodes);
 					node2 = r.nextInt(numberOfNodes);
-					pairString = Integer.toString(node1)+" "+Integer.toString(node2);
-					if(nodePairs.contains(pairString)) {
+					pairString1 = Integer.toString(node1)+" "+Integer.toString(node2);
+					pairString2 = Integer.toString(node2)+" "+Integer.toString(node1);
+					if(nodePairs.contains(pairString1) || nodePairs.contains(pairString2) ) {
 						parallel = true;
 					} else {
 						parallel = false;
 					}
 				}
-				nodePairs.add(pairString);
+				nodePairs.add(pairString1);
 			}
 			
 			edgeBuf.putInt(EDGE_NODE1_OFFSET+i*EDGE_BYTE_SIZE,node1); // one end of edge
