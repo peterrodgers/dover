@@ -1,8 +1,5 @@
 package uk.ac.kent.dover.fastGraph;
 
-import static org.junit.Assert.assertTrue;
-
-import java.nio.*;
 import java.util.*;
 
 import uk.ac.kent.displayGraph.*;
@@ -18,8 +15,8 @@ public class ExactIsomorphism {
 	private int DECIMAL_PLACES = 6; // number of decimal places to round to
 	
 	private FastGraph fastGraph;
-	AdjacencyMatrix am1;
-	AdjacencyMatrix am2;
+	private AdjacencyMatrix am1;
+	private AdjacencyMatrix am2;
 	private int[][] matrix1;
 	private int[][] matrix2;
 	private double[] eigenvalues1;
@@ -28,9 +25,6 @@ public class ExactIsomorphism {
 	
 	private int[] matches1;
 	private int[] matches2;
-
-//	private int[] scores1;
-//	private int[] scores2;
 
 	private int[] degrees1;
 	private int[] degrees2;
@@ -44,12 +38,10 @@ public class ExactIsomorphism {
 	private static int numberOfIsomorphismTests = 0;
 	private static int numberOfOldIsomorphismTests = 0;
 	private static int numberOfEigenvalueTests = 0;
-	private static int numberOfSubgraphsGenerated = 0;
 	
 	private static long timeForIsomorphismTests = 0;
 	private static long timeForOldIsomorphismTests = 0;
 	private static long timeForEigenvalueTests = 0;
-	private static long timeForSubgraphsGenerated = 0;
 	
 	private static int failOnNodeCount = 0;
 	private static int failOnEdgeCount = 0;
@@ -123,7 +115,7 @@ public class ExactIsomorphism {
 		System.out.println(ExactIsomorphism.isomorphic(fg1,fg2));
 */
 		
-		int comparisons = 1000000;
+		int comparisons = 100000;
 		int numNodes = 8;
 		int numEdges = 15;
 		
@@ -179,7 +171,7 @@ public class ExactIsomorphism {
 	 * Create an ExactIsomorphism before running isomorphic. This makes multiple tests against
 	 * one graph to be more efficient as data for that graph does not need to be recreated.
 	 * 
-	 * @ param one graph to be tested.
+	 * @param one graph to be tested.
 	 *
 	 */
 	public ExactIsomorphism(FastGraph fastGraph) {
@@ -336,7 +328,7 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 		matrix2 = am2.buildIntAdjacencyMatrix();
 		eigenvalues2 = am2.findEigenvalues(matrix2);
 		eigenvalues2 = Util.roundArray(eigenvalues2, DECIMAL_PLACES);
-//System.out.println(Arrays.toString(eigenvalues));
+//System.out.println(Arrays.toString(eigenvalues1));
 //System.out.println(Arrays.toString(eigenvalues2));
 		if(!compareEigenValues(eigenvalues2)) {
 //System.out.println("Not isomorphic: eigenvalues are different");
@@ -524,10 +516,7 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 	 */
 	public boolean isomorphic(FastGraph g, int[] nodes, int[] edges) {
 
-numberOfSubgraphsGenerated++;
-long startTime = System.currentTimeMillis();
 		FastGraph subGraph = g.generateGraphFromSubgraph(nodes,edges);
-timeForSubgraphsGenerated += System.currentTimeMillis()-startTime;
 		
 		boolean iso = isomorphic(subGraph);
 
