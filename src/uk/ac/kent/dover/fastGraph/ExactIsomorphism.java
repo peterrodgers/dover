@@ -57,69 +57,11 @@ public class ExactIsomorphism {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-/*
-		Graph dg1 = new Graph("dg1");
-		Node n0 = new Node("n0");
-		Node n1 = new Node("n1");
-		Node n2 = new Node("n2");
-		Node n3 = new Node("n3");
-		Node n4 = new Node("n4");
-		dg1.addNode(n0);
-		dg1.addNode(n1);
-		dg1.addNode(n2);
-		dg1.addNode(n3);
-		dg1.addNode(n4);
-		Edge e0 = new Edge(n1, n1, "e0");
-		Edge e1 = new Edge(n4, n2, "e1");
-		Edge e2 = new Edge(n3, n2, "e2");
-		Edge e3 = new Edge(n4, n4, "e3");
-		Edge e4 = new Edge(n1, n0, "e4");
-		dg1.addEdge(e0);
-		dg1.addEdge(e1);
-		dg1.addEdge(e2);
-		dg1.addEdge(e3);
-		dg1.addEdge(e4);
-		
-		Graph dg2 = new Graph("dg2");
-		n0 = new Node("n0");
-		n1 = new Node("n1");
-		n2 = new Node("n2");
-		n3 = new Node("n3");
-		n4 = new Node("n4");
-		dg2.addNode(n0);
-		dg2.addNode(n1);
-		dg2.addNode(n2);
-		dg2.addNode(n3);
-		dg2.addNode(n4);
-		e0 = new Edge(n0, n0, "e0");
-		e1 = new Edge(n3, n3, "e1");
-		e2 = new Edge(n2, n1, "e2");
-		e3 = new Edge(n0, n1, "e3");
-		e4 = new Edge(n3, n4, "e4");
-		dg2.addEdge(e0);
-		dg2.addEdge(e1);
-		dg2.addEdge(e2);
-		dg2.addEdge(e3);
-		dg2.addEdge(e4);
-		
-		FastGraph g1 = FastGraph.displayGraphFactory(dg1, false);
-		FastGraph g2 = FastGraph.displayGraphFactory(dg2, false);
-		
-		System.out.println(ExactIsomorphism.isomorphic(g1,g2));
-		
-		System.out.println(dg1.isomorphic(dg2));
-
-	
-		FastGraph fg1 = FastGraph.displayGraphFactory(dg1, false);
-		FastGraph fg2 = FastGraph.displayGraphFactory(dg2, false);
-		System.out.println(ExactIsomorphism.isomorphic(fg1,fg2));
-*/
 		
 		int comparisons = 100000;
 		int numNodes = 8;
 		int numEdges = 15;
 		
-//int i = 1; {
 		try {
 			long isoTime = 0;
 			for(int i = 1; i <= comparisons; i++) {
@@ -178,13 +120,13 @@ public class ExactIsomorphism {
 
 		this.fastGraph = fastGraph;
 
-		AdjacencyMatrix am = new AdjacencyMatrix(fastGraph);
+		am1 = new AdjacencyMatrix(fastGraph);
 		if(fastGraph.getNumberOfNodes() == 0) {
 			matrix1 = new int[0][0];
 			eigenvalues1 = new double[0];
 		} else {
-			matrix1 = am.buildIntAdjacencyMatrix();
-			eigenvalues1 = am.findEigenvalues(matrix1);
+			matrix1 = am1.buildIntAdjacencyMatrix();
+			eigenvalues1 = am1.findEigenvalues(matrix1);
 			eigenvalues1 = Util.roundArray(eigenvalues1,DECIMAL_PLACES);
 		}
 		
