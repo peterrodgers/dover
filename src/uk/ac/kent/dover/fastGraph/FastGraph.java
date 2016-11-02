@@ -1313,9 +1313,25 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 	 * @param numberOfEdges the number of edges in the graph
 	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
 	 * @return the created FastGraph
+	 * @throws Exception 
 	 */
-	public static FastGraph randomGraphFactory(int numberOfNodes, int numberOfEdges, boolean direct) {
-		FastGraph graph = randomGraphFactory(numberOfNodes, numberOfEdges, -1, direct);
+	public static FastGraph randomGraphFactory(int numberOfNodes, int numberOfEdges, boolean direct) throws Exception {
+		FastGraph graph = randomGraphFactory(numberOfNodes, numberOfEdges, -1, false, direct);
+		return graph;
+	}
+	
+	/**
+	 * Generate a random graph of the desired size. Self sourcing edges and parallel edges may exist.
+	 * 
+	 * @param numberOfNodes the number of nodes in the graph
+	 * @param numberOfEdges the number of edges in the graph
+	 * @param seed random number seed, -1 for current time
+	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
+	 * @return the created FastGraph
+	 * @throws Exception 
+	 */
+	public static FastGraph randomGraphFactory(int numberOfNodes, int numberOfEdges, long seed, boolean direct) throws Exception {
+		FastGraph graph = randomGraphFactory(numberOfNodes, numberOfEdges, seed, false, direct);
 		return graph;
 	}
 	
@@ -1328,11 +1344,12 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 	 * @param seed random number seed, -1 for current time
 	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
 	 * @return the created FastGraph
+	 * @throws Exception
 	 */
-	public static FastGraph randomGraphFactory(int numberOfNodes, int numberOfEdges, long seed, boolean direct) {
+	public static FastGraph randomGraphFactory(int numberOfNodes, int numberOfEdges, long seed, boolean simple, boolean direct) throws Exception {
 		FastGraph g = new FastGraph(numberOfNodes,numberOfEdges,direct);
 		g.setName("random-n-"+numberOfNodes+"-e-"+numberOfEdges);
-		g.populateRandomGraph(seed);
+		g.populateRandomGraph(simple, seed);
 		return g;
 	}
 	
@@ -2247,11 +2264,20 @@ if(edgeIndex%1000000==0 ) {
 
 
 	/**
-	 * Creates a graph with the size specified by numberOfNodes and numberOfEdges. Possibly includes parallel edges and self sourcing nodes
+	 * Creates a graph with the size specified by numberOfNodes and numberOfEdges. Possibly includes parallel edges and self sourcing nodes.
+	 * If the graph is simple, and there are too many edges for the nodes, an exception is thrown
 	 * 
 	 * @param seed the random number generator seed, -1 for current time
+	 * @param simple if true then no selfsourcing edges or parallel edges
+	 * @throws FastGraphException If the desired number of edges is more than a complete graph for when simple is true
 	 */
-	public void populateRandomGraph(long seed) {
+	public void populateRandomGraph(boolean simple, long seed) throws FastGraphException {
+		
+		if(simple) {
+			if((numberOfNodes*(numberOfNodes-1))/2 < numberOfEdges) {
+				throw new FastGraphException("Too many edges to generate a simple graph.");
+			}
+		}
 
 		//long time;
 		if(seed == -1) {
@@ -2298,7 +2324,7 @@ if(edgeIndex%1000000==0 ) {
 			ArrayList<Integer> edges = new ArrayList<Integer>(100);
 			nodeOut.add(i,edges);
 		}
-				
+
 		ArrayList<Integer> inEdgeList;	
 		ArrayList<Integer> outEdgeList;	
 		int node1;
@@ -2306,11 +2332,34 @@ if(edgeIndex%1000000==0 ) {
 		weight = -101;
 		type = -103;
 		age = -105;
-		//generate the edges, with random node connections, possibly including parallel edges and self sourcing nodes
+		//generate the edges, with random node connections
+		HashSet<String> nodePairs = new HashSet<String>();
+		if(simple) {
+			nodePairs = new HashSet<String>(numberOfEdges);
+		}
 		for(int i = 0; i < numberOfEdges; i++) {
 			weight = r.nextInt(100);
 			node1 = r.nextInt(numberOfNodes);
 			node2 = r.nextInt(numberOfNodes);
+			if(simple) {
+				boolean parallel = false;
+				String pairString = Integer.toString(node1)+" "+Integer.toString(node2);
+				if(nodePairs.contains(pairString)) {
+					parallel = true;
+				}
+				while(node2 == node1 || parallel) {
+					node1 = r.nextInt(numberOfNodes);
+					node2 = r.nextInt(numberOfNodes);
+					pairString = Integer.toString(node1)+" "+Integer.toString(node2);
+					if(nodePairs.contains(pairString)) {
+						parallel = true;
+					} else {
+						parallel = false;
+					}
+				}
+				nodePairs.add(pairString);
+			}
+			
 			edgeBuf.putInt(EDGE_NODE1_OFFSET+i*EDGE_BYTE_SIZE,node1); // one end of edge
 			edgeBuf.putInt(EDGE_NODE2_OFFSET+i*EDGE_BYTE_SIZE,node2); // other end of edge
 			edgeBuf.putInt(EDGE_WEIGHT_OFFSET+i*EDGE_BYTE_SIZE,weight); // weight

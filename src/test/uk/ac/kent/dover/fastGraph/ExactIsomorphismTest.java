@@ -2,6 +2,8 @@ package test.uk.ac.kent.dover.fastGraph;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 
 import uk.ac.kent.displayGraph.*;
@@ -12,7 +14,7 @@ public class ExactIsomorphismTest {
 	
 	
 	@Test
-	public void test001() {
+	public void test001() throws Exception {
 		FastGraph g1,g2;
 		ExactIsomorphism ei;
 		g1 = FastGraph.randomGraphFactory(10,20,1,false);
@@ -84,7 +86,7 @@ public class ExactIsomorphismTest {
 	
 	
 	@Test
-	public void test003() {
+	public void test003() throws Exception {
 		FastGraph g2;
 		FastGraph g1;
 
@@ -118,7 +120,7 @@ public class ExactIsomorphismTest {
 	
 	
 	@Test
-	public void test004() {
+	public void test004() throws Exception {
 		FastGraph g1,g2;
 		ExactIsomorphism ei;
 		g1 = FastGraph.randomGraphFactory(10,20,1,false);
@@ -190,7 +192,11 @@ public class ExactIsomorphismTest {
 		assertTrue(dg1.isomorphic(dg2));
 		FastGraph g1 = FastGraph.displayGraphFactory(dg1, false);
 		FastGraph g2 = FastGraph.displayGraphFactory(dg2, false);
-		assertTrue(ExactIsomorphism.isomorphic(g1,g2));
+		ExactIsomorphism ei = new ExactIsomorphism(g1);
+		assertTrue(ei.isomorphic(g2));
+		int[] mapping = {0,2,1};
+		assertTrue(Arrays.equals(mapping, ei.getLastMatch()));
+
 		
 	}
 	
@@ -435,7 +441,73 @@ public class ExactIsomorphismTest {
 		
 	}
 	
+	
+	@Test
+	public void test010() {
+		/*
+		 * 	Nodes:[n0, n1, n2, n3, n4]
+			Edges:[(n1:n1,e0), (n4:n2,e1), (n3:n2,e2), (n4:n4,e3), (n1:n0,e4)]
+			random-n-5-e-5
+			Nodes:[n0, n1, n2, n3, n4]
+			Edges:[(n0:n0,e0), (n3:n3,e1), (n2:n1,e2), (n0:n1,e3), (n3:n4,e4)]
+			
+		* Isomorphic, disconnected
 
+		 */
+		Graph dg1 = new Graph("dg1");
+		Node n0 = new Node("n0");
+		Node n1 = new Node("n1");
+		Node n2 = new Node("n2");
+		Node n3 = new Node("n3");
+		Node n4 = new Node("n4");
+		dg1.addNode(n0);
+		dg1.addNode(n1);
+		dg1.addNode(n2);
+		dg1.addNode(n3);
+		dg1.addNode(n4);
+		Edge e0 = new Edge(n1, n1, "e0");
+		Edge e1 = new Edge(n4, n2, "e1");
+		Edge e2 = new Edge(n3, n2, "e2");
+		Edge e3 = new Edge(n4, n4, "e3");
+		Edge e4 = new Edge(n1, n0, "e4");
+		dg1.addEdge(e0);
+		dg1.addEdge(e1);
+		dg1.addEdge(e2);
+		dg1.addEdge(e3);
+		dg1.addEdge(e4);
+		
+		Graph dg2 = new Graph("dg2");
+		n0 = new Node("n0");
+		n1 = new Node("n1");
+		n2 = new Node("n2");
+		n3 = new Node("n3");
+		n4 = new Node("n4");
+		dg2.addNode(n0);
+		dg2.addNode(n1);
+		dg2.addNode(n2);
+		dg2.addNode(n3);
+		dg2.addNode(n4);
+		e0 = new Edge(n0, n0, "e0");
+		e1 = new Edge(n3, n3, "e1");
+		e2 = new Edge(n2, n1, "e2");
+		e3 = new Edge(n0, n1, "e3");
+		e4 = new Edge(n3, n4, "e4");
+		dg2.addEdge(e0);
+		dg2.addEdge(e1);
+		dg2.addEdge(e2);
+		dg2.addEdge(e3);
+		dg2.addEdge(e4);
+		
+		assertTrue(dg1.isomorphic(dg2));
+
+		FastGraph g1 = FastGraph.displayGraphFactory(dg1, false);
+		FastGraph g2 = FastGraph.displayGraphFactory(dg2, false);
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2));
+		
+	}
+	
+	
+	
 	
 	/*
 	 * 0-1\

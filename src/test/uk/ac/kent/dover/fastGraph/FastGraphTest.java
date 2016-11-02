@@ -476,7 +476,7 @@ public class FastGraphTest {
 	}
 	
 	@Test
-	public void test076() {
+	public void test076() throws Exception {
 		FastGraph g = FastGraph.randomGraphFactory(0, 0, false);
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
@@ -484,7 +484,7 @@ public class FastGraphTest {
 	}
 	
 	@Test
-	public void test077() {
+	public void test077() throws Exception {
 		FastGraph g = FastGraph.randomGraphFactory(0, 0, true);
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
@@ -492,15 +492,15 @@ public class FastGraphTest {
 	}
 	
 	@Test
-	public void test078() {
-		FastGraph g = FastGraph.randomGraphFactory(10, 5, false);
+	public void test078() throws Exception {
+		FastGraph g = FastGraph.randomGraphFactory(10, 5, -1, true, false);
 		assertEquals(10,g.getNumberOfNodes());
 		assertEquals(5,g.getNumberOfEdges());
 		assertFalse(c.connected(g));
 	}
 	
 	@Test
-	public void test079() {
+	public void test079() throws Exception {
 		FastGraph g = FastGraph.randomGraphFactory(10, 5, true);
 		assertEquals(10,g.getNumberOfNodes());
 		assertEquals(5,g.getNumberOfEdges());

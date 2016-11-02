@@ -1,5 +1,7 @@
 package uk.ac.kent.dover.fastGraph;
 
+import static org.junit.Assert.assertTrue;
+
 import java.nio.*;
 import java.util.*;
 
@@ -60,21 +62,23 @@ public class ExactIsomorphism {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		FastGraph g1;
-		FastGraph g2;
 /*
 		Graph dg1 = new Graph("dg1");
 		Node n0 = new Node("n0");
 		Node n1 = new Node("n1");
 		Node n2 = new Node("n2");
+		Node n3 = new Node("n3");
+		Node n4 = new Node("n4");
 		dg1.addNode(n0);
 		dg1.addNode(n1);
 		dg1.addNode(n2);
-		Edge e0 = new Edge(n2, n0, "e0");
-		Edge e1 = new Edge(n0, n1, "e1");
-		Edge e2 = new Edge(n0, n2, "e2");
-		Edge e3 = new Edge(n0, n1, "e3");
-		Edge e4 = new Edge(n2, n2, "e4");
+		dg1.addNode(n3);
+		dg1.addNode(n4);
+		Edge e0 = new Edge(n1, n1, "e0");
+		Edge e1 = new Edge(n4, n2, "e1");
+		Edge e2 = new Edge(n3, n2, "e2");
+		Edge e3 = new Edge(n4, n4, "e3");
+		Edge e4 = new Edge(n1, n0, "e4");
 		dg1.addEdge(e0);
 		dg1.addEdge(e1);
 		dg1.addEdge(e2);
@@ -85,77 +89,83 @@ public class ExactIsomorphism {
 		n0 = new Node("n0");
 		n1 = new Node("n1");
 		n2 = new Node("n2");
+		n3 = new Node("n3");
+		n4 = new Node("n4");
 		dg2.addNode(n0);
 		dg2.addNode(n1);
 		dg2.addNode(n2);
+		dg2.addNode(n3);
+		dg2.addNode(n4);
 		e0 = new Edge(n0, n0, "e0");
-		e1 = new Edge(n2, n0, "e1");
-		e2 = new Edge(n2, n0, "e2");
-		e3 = new Edge(n2, n1, "e3");
-		e4 = new Edge(n2, n1, "e4");
+		e1 = new Edge(n3, n3, "e1");
+		e2 = new Edge(n2, n1, "e2");
+		e3 = new Edge(n0, n1, "e3");
+		e4 = new Edge(n3, n4, "e4");
 		dg2.addEdge(e0);
 		dg2.addEdge(e1);
 		dg2.addEdge(e2);
 		dg2.addEdge(e3);
 		dg2.addEdge(e4);
-*/		
-/*		
-		Graph dg1 = new Graph("dg1");
-		Node n0 = new Node("n0");
-		Node n1 = new Node("n1");
-		Node n2 = new Node("n2");
-		dg1.addNode(n0);
-		dg1.addNode(n1);
-		dg1.addNode(n2);
-		Edge e0 = new Edge(n2, n1, "e0");
-		Edge e1 = new Edge(n0, n1, "e1");
-		dg1.addEdge(e0);
-		dg1.addEdge(e1);
 		
-		Graph dg2 = new Graph("dg2");
-		n0 = new Node("n0");
-		n1 = new Node("n1");
-		n2 = new Node("n2");
-		dg2.addNode(n0);
-		dg2.addNode(n1);
-		dg2.addNode(n2);
-		e0 = new Edge(n0, n1, "e0");
-		e1 = new Edge(n0, n2, "e1");
-		dg2.addEdge(e0);
-		dg2.addEdge(e1);
-
+		FastGraph g1 = FastGraph.displayGraphFactory(dg1, false);
+		FastGraph g2 = FastGraph.displayGraphFactory(dg2, false);
+		
+		System.out.println(ExactIsomorphism.isomorphic(g1,g2));
 		
 		System.out.println(dg1.isomorphic(dg2));
-		
+
+	
 		FastGraph fg1 = FastGraph.displayGraphFactory(dg1, false);
 		FastGraph fg2 = FastGraph.displayGraphFactory(dg2, false);
 		System.out.println(ExactIsomorphism.isomorphic(fg1,fg2));
 */
 		
-		int comparisons = 100000;
+		int comparisons = 10000;
 		int numNodes = 5;
-		int numEdges = 5;
+		int numEdges = 8;
 		
-		g1 = FastGraph.randomGraphFactory(numNodes,numEdges,0,false);
-		ExactIsomorphism ei = new ExactIsomorphism(g1);
 //int i = 1; {
-		for(int i = 1; i <= comparisons; i++) {
-			g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i,false);
-			boolean res = ei.isomorphic(g2);
-/*			boolean comp = ei.isomorphicOld(g2);
-			if(res != comp) {
-				System.out.println("PROBLEM with isomorphism of random graphs with seed "+i+" two algorithms do not agree. New: "+res+", old: "+comp);
-				System.out.println(g1.generateDisplayGraph());
-				System.out.println(g2.generateDisplayGraph());
+		try {
+			for(int i = 1; i <= comparisons; i++) {
+				FastGraph g1;
+				g1 = FastGraph.randomGraphFactory(numNodes,numEdges,i,true,false);
+				ExactIsomorphism ei = new ExactIsomorphism(g1);
+				FastGraph g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i+comparisons*2,true,false);
+				int ack = succeed;
+				boolean res = ei.isomorphic(g2);
+				if(ack != succeed) {
+					System.out.println("FAIL");
+					System.out.println(g1.generateDisplayGraph());
+					System.out.println(g2.generateDisplayGraph());
+				}
+	//			boolean comp = ei.isomorphicOld(g2);
+	//			if(res != comp) {
+	//				System.out.println("PROBLEM with isomorphism of random graphs with seed "+i+" two algorithms do not agree. New: "+res+", old: "+comp);
+	//				System.out.println(g1.generateDisplayGraph());
+	//				System.out.println(g2.generateDisplayGraph());
+	//			}
+	
 			}
-*/
+			FastGraph g1 = FastGraph.randomGraphFactory(numNodes,numEdges,0,true,false);
+			ExactIsomorphism ei = new ExactIsomorphism(g1);
+			ei.reportTimes();
+			ei.reportFailRatios();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		ei.reportTimes();
-		ei.reportFailRatios();
 
 	}
 
 	
+	/**
+	 * Call this after getting true from a call to isomorphism().
+	 * 
+	 * @return the nodes matched from graph if the last call to isomorphism() returned true, undefined otherwise
+	 */
+	public int[] getLastMatch() {
+		return matches1;
+	}
 	
 	/**
 	 *
@@ -324,6 +334,7 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 				return false;
 			}
 			numberOfMatches[n1] = i;
+//System.out.println("node "+n1+" number of matches "+numberOfMatches[n1]+" possibleMatches "+Arrays.toString(possibleMatches[n1]));
 		}
 
 		
@@ -353,6 +364,10 @@ failOnBruteForce++;
 timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 					return false;
 				}
+				if(matches1[currentNode] != -1) { // reset the previous match
+					matches2[matches1[currentNode]] = -1;
+				}
+				matches1[currentNode] = -1; // reset the previous match
 				matchesIndex[currentNode]++; // increment to the next node of the previous
 				continue; // might have to happen multiple times
 			}
@@ -360,7 +375,7 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 			
 			int possibleMatch = possibleMatches[currentNode][matchesIndex[currentNode]];
 			if(isAMatch(currentNode,possibleMatch)) { // successful match, try the next node
-//System.out.println("Successful match node "+ currentNode+" with node "+possibleMatch);
+//System.out.println("SUCCESSFUL match node "+ currentNode+" with node "+possibleMatch);
 				matches1[currentNode] = possibleMatch;
 				matches2[possibleMatch] = currentNode;
 				currentNode++;
@@ -398,6 +413,11 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 	 * @return true if the neighbours match, false otherwise
 	 */
 	private boolean isAMatch(int n1, int n2) {
+		
+		
+//if(n1 == 2 && n2 == 1) {
+//System.out.println("AAA");
+//}
 		if(matches1[n1] != -1) {
 			return false;
 		}
@@ -433,15 +453,14 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 			numberOfn1NeigboursMatched++;
 		}
 
-		// now test it the other way - are all matched neighbours of n2 neigbours of n1
+		// now test it the other way - are all matched neighbours of n2 neighbours of n1
 		int numberOfn2NeigboursMatched = 0;
 		for(int node : n2Neighbours) {
 			int matchNode = matches2[node];
 			if(matchNode == -1) { // no match, so nothing to do here
 				continue;
 			}
-			if(!n1Neighbours.contains(matchNode)) { // a neighbour of n2 has a matched node that is not a neigbour of n1
-
+			if(!n1Neighbours.contains(matchNode)) { // a neighbour of n2 has a matched node that is not a neighbour of n1
 				return false;
 			}
 			numberOfn2NeigboursMatched++;
@@ -449,7 +468,6 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 		
 		// test the same number of matches
 		if(numberOfn1NeigboursMatched != numberOfn2NeigboursMatched) {
-
 			return false;
 		}
 
