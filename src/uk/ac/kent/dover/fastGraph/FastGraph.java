@@ -135,16 +135,16 @@ public class FastGraph {
 
 		
 System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-		
+/*		
 		time = System.currentTimeMillis();
 		
-//		g1.saveBuffers(null,g1.getName());
-//		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+		g1.saveBuffers(null,g1.getName());
+		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
-
-String name = "random-n-100-e-1000";
+*/
+//String name = "random-n-100-e-1000";
 //String name = "as-skitter.txt";
-//String name = "soc-LiveJournal1.txt";
+String name = "soc-pokec-relationships.txt-short";
 //String name = "twitter_combined.txt";
 //String name = "Wiki-Vote.txt";
 //		String name = g1.getName();
@@ -152,56 +152,46 @@ String name = "random-n-100-e-1000";
 		try {
 			//time = System.currentTimeMillis();
 			g2 = loadBuffersGraphFactory(null,name);
-/*			System.out.println("create graph from file test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-			int[] deleteNodes = {0,456,766,6123,6422,7,9,111,7000,11,22,33,44,55};
-			deleteNodes[1] = g2.numberOfNodes-1;
-			//int[] deleteEdges = {};
-			int[] deleteEdges = {0,456,8766,60123,65422,7,9,111,7777,77,55,44,99,344,1115};
-			deleteEdges[1] = g2.numberOfEdges-1;
-			g2.generateGraphByDeletingItems(deleteNodes,deleteEdges);
-			//g2.generateGraphFromSubgraph(deleteNodes,deleteEdges);
-System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" seconds");
-*/
 
-			//AdjacencyMatrix am = new AdjacencyMatrix(g2);
-			//int[][] matrix = am.buildIntAdjacencyMatrix();
-			//boolean[][] matrix = g2.buildBooleanAdjacencyMatrix();
-			//System.out.println("building matrix test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-			//am.printMatrix(matrix);
-			//System.out.println(Arrays.toString(g2.findEigenvalues(matrix)));
-			//System.out.println(matrix.length);
 			
 			time = System.currentTimeMillis();
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
 			LinkedList<Integer> edges = new LinkedList<Integer>();
 			
-			FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,80,800);
-			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1000000,10000000);
-			//FastGraph g3 = g2;
+			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,90,800);
+			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1500000,10000000);
+			FastGraph g3 = g2;
 			
 			long deletionTime = (long) ((System.currentTimeMillis()-time)/1000.0);
 			System.out.println("deletion test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-			
-			System.out.println("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
 			
 			time = System.currentTimeMillis();
 			g3.relabelFastGraph(g3.getNumberOfNodes()/10);
 			System.out.println("relabelling test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			System.out.println("deletion test time (from before) " + deletionTime+" seconds");
+			System.out.println("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
+	
+			time = System.currentTimeMillis();
+			//g3.setName(g2.getName()+"-short");
+			g3.saveBuffers(null,g3.getName());
+			System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+				
+			FastGraph g4 = loadBuffersGraphFactory(null,g3.getName());
+			
 			//just for testing
 			System.out.println();
 	/*		
 			System.out.println("graph now has the labels (taken from the buffer):");
 			FastGraphNodeType[] ntypes = FastGraphNodeType.values();
-			for(int j = 0; j < g3.getNumberOfNodes(); j++) {
-				byte type = g3.getNodeType(j);
-				System.out.println(g3.getNodeLabel(j) + " " + type + " (" + ntypes[type] + ")");
+			for(int j = 0; j < g4.getNumberOfNodes(); j++) {
+				byte type = g4.getNodeType(j);
+				System.out.println(g4.getNodeLabel(j) + " " + type + " (" + ntypes[type] + ")");
 			}
 			System.out.println();
 			System.out.println("edges now have the types (taken from the buffer):");
-			for(int j = 0; j < g3.getNumberOfEdges(); j++) {
-				byte type = g3.getEdgeType(j);
-				System.out.println("n1" + g3.getEdgeNode1(j) + " n2" + g3.getEdgeNode2(j) + " type " + type + " (" + g3.getEdgeLabel(j) + ")");
+			for(int j = 0; j < g4.getNumberOfEdges(); j++) {
+				byte type = g4.getEdgeType(j);
+				System.out.println("n1" + g4.getEdgeNode1(j) + " n2" + g4.getEdgeNode2(j) + " type " + type + " (" + g4.getEdgeLabel(j) + ")");
 			}
 		*/	
 //			int[] degrees = g2.countInstancesOfNodeDegrees(4);
@@ -247,12 +237,18 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 		//load family subgraphs
 		FastGraph[] families = loadFamilies();
 		for(FastGraph family : families) {
+			System.out.println("Testing family " + family.getName());
 			
 			ExactIsomorphism ei = new ExactIsomorphism(family);
 			
 			int familyNodesSize = family.getNumberOfNodes();			
 			
 			for (int i = 0; i < subgraphsToTest; i++) { //induce subgraphs to test
+				
+				if(i%10000 == 0) {
+					System.out.println("Testing subgraph " + i);
+				}
+				
 				LinkedList<Integer> subNodes = new LinkedList<Integer>();
 				LinkedList<Integer> subEdges = new LinkedList<Integer>();
 				
@@ -367,7 +363,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 	
 	/**
 	 * This method creates a new FastGraph of the rough size given in targetNodes and targetEdges. <br>
-	 * The new graph will never be smaller, but may be larger on either the node or edge count. <br>
+	 * The new graph will never have fewer nodes than the target, but may have fewer edges. <br>
 	 * <b>Note: This may take some time to complete</b>
 	 * 
 	 * @param nodes The list of nodes to be removed
@@ -422,6 +418,12 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 		
 		nodesToRemove.addAll(subNodes);
 		edgesToRemove.addAll(subEdges);
+		
+		//delete all edges connecting to the nodes to be deleted
+		for(int n : nodesToRemove) {
+			Util.addAll(edgesToRemove, this.getNodeConnectingInEdges(n));
+			Util.addAll(edgesToRemove, this.getNodeConnectingOutEdges(n));
+		}
 		
 		System.out.println("After induction test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		System.out.println("nodes to remove size: " + nodesToRemove.size() + " edges to remove size: " + edgesToRemove.size());
@@ -508,14 +510,7 @@ System.out.println("delete time "+(System.currentTimeMillis()-time)/1000.0+" sec
 		}
 		System.out.println("After edge removal test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		System.out.println("nodes to remove size: " + nodesToRemove.size() + " edges to remove size: " + edgesToRemove.size());
-		System.out.println();
-		
-		//delete all edges connecting to the nodes to be deleted
-		for(int n : nodesToRemove) {
-			Util.addAll(edgesToRemove, this.getNodeConnectingInEdges(n));
-			Util.addAll(edgesToRemove, this.getNodeConnectingOutEdges(n));
-		}
-		
+		System.out.println();		
 		
 		nodes.addAll(nodesToRemove);
 		edges.addAll(edgesToRemove);
@@ -2727,11 +2722,11 @@ time = System.currentTimeMillis();
 			oldNodesToNew.put(n, index);
 			index++;
 		}
-System.out.println("C popluated the new node buffer "  + (System.currentTimeMillis()-time)/1000.0+" seconds");
+//System.out.println("C popluated the new node buffer "  + (System.currentTimeMillis()-time)/1000.0+" seconds");
 time = System.currentTimeMillis();
 		
 		g.setAllNodeLabels(nodeLabels); // create the node label buffer
-System.out.println("D popluated the new node list buffer "  + (System.currentTimeMillis()-time)/1000.0+" seconds");
+//System.out.println("D popluated the new node list buffer "  + (System.currentTimeMillis()-time)/1000.0+" seconds");
 time = System.currentTimeMillis();
 		
 		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(subgraphNodes.length); // temporary store of inward edges
@@ -2745,7 +2740,7 @@ time = System.currentTimeMillis();
 			ArrayList<Integer> edges = new ArrayList<Integer>(100);
 			nodeOut.add(nodeIndex,edges);
 		}
-System.out.println("E created the neighbour store " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+//System.out.println("E created the neighbour store " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 time = System.currentTimeMillis();
 		
 //System.out.println(oldNodesToNew);
@@ -2793,11 +2788,11 @@ time = System.currentTimeMillis();
 			outEdgeList.add(index);
 			index++;
 		}
-System.out.println("F populated the new edge buffer " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+//System.out.println("F populated the new edge buffer " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 time = System.currentTimeMillis();
 
 		g.setAllEdgeLabels(edgeLabels);
-System.out.println("G populated the new edge label buffer " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+//System.out.println("G populated the new edge label buffer " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 time = System.currentTimeMillis();
 		
 		// Initialise the connection buffer, modifying the node buffer connection data
@@ -2805,7 +2800,7 @@ time = System.currentTimeMillis();
 		int offset = 0;
 		for(int node = 0; node < subgraphNodes.length; node++) {
 if(node%100000 == 0) {
-	System.out.println("H populated "+node+" nodes in connection buffer " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+	//System.out.println("H populated "+node+" nodes in connection buffer " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 	time = System.currentTimeMillis();
 }
 			
