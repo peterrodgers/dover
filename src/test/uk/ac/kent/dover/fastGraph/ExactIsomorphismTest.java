@@ -562,7 +562,7 @@ public class ExactIsomorphismTest {
 		 * Nodes:[n0, n1, n2, n3, n4, n5, n6]
 		 * Edges:[(n2:n1,e0), (n5:n4,e1), (n0:n3,e2), (n6:n2,e3), (n6:n0,e4), (n3:n2,e5), (n5:n0,e6), (n2:n0,e7), (n1:n6,e8), (n0:n1,e9)]
 		 * 
-		 * Not Isomorphic, fails only on brute force check
+		 * Not Isomorphic, fails only on brute force check [not true after nodes with degree check]
 		 */
 		Graph dg1 = new Graph("dg1");
 		dg1.addAdjacencyEdge("n6", "n2");
@@ -589,8 +589,8 @@ public class ExactIsomorphismTest {
 		dg2.addAdjacencyEdge("n0", "n1");
 		
 		assertFalse(dg1.isomorphic(dg2));
-new uk.ac.kent.displayGraph.display.GraphWindow(dg1);
-new uk.ac.kent.displayGraph.display.GraphWindow(dg2);
+//new uk.ac.kent.displayGraph.display.GraphWindow(dg1);
+//new uk.ac.kent.displayGraph.display.GraphWindow(dg2);
 		FastGraph g1 = FastGraph.displayGraphFactory(dg1, false);
 		FastGraph g2 = FastGraph.displayGraphFactory(dg2, false);
 		assertFalse(ExactIsomorphism.isomorphic(g1,g2));

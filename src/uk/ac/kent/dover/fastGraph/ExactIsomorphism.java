@@ -315,20 +315,6 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 			return false;
 		}
 		
-		
-		am2 = new AdjacencyMatrix(g);
-		matrix2 = am2.buildIntAdjacencyMatrix();
-		eigenvalues2 = am2.findEigenvalues(matrix2);
-		eigenvalues2 = Util.roundArray(eigenvalues2, DECIMAL_PLACES);
-//System.out.println(Arrays.toString(eigenvalues));
-//System.out.println(Arrays.toString(eigenvalues2));
-		if(!compareEigenValues(eigenvalues2)) {
-//System.out.println("Not isomorphic: eigenvalues are different");
-failOnEigenvalues++;
-timeForIsomorphismTests += System.currentTimeMillis()-startTime;
-			return false;
-		}
-
 		degrees2 = findDegrees(g);
 		
 		int maxDegree2 = g.maximumDegree();
@@ -339,6 +325,20 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 		if(!Arrays.equals(degreeBuckets1, degreeBuckets2)) {
 //System.out.println("Not isomorphic: different quantities of nodes with the same degree");
 failOnDegreeComparison++;
+timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+			return false;
+		}
+
+		
+		am2 = new AdjacencyMatrix(g);
+		matrix2 = am2.buildIntAdjacencyMatrix();
+		eigenvalues2 = am2.findEigenvalues(matrix2);
+		eigenvalues2 = Util.roundArray(eigenvalues2, DECIMAL_PLACES);
+//System.out.println(Arrays.toString(eigenvalues));
+//System.out.println(Arrays.toString(eigenvalues2));
+		if(!compareEigenValues(eigenvalues2)) {
+//System.out.println("Not isomorphic: eigenvalues are different");
+failOnEigenvalues++;
 timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 			return false;
 		}
@@ -627,8 +627,8 @@ timeForSubgraphsGenerated += System.currentTimeMillis()-startTime;
 		
 		System.out.println("fail on Node Count "+failOnNodeCount+" "+(100.0*failOnNodeCount/total)+" % of calls");
 		System.out.println("fail on Edge Count "+failOnEdgeCount+" "+(100.0*failOnEdgeCount/total)+" % of calls");
-		System.out.println("fail on Eigenvalues "+failOnEigenvalues+" "+(100.0*failOnEigenvalues/total)+" % of calls");
 		System.out.println("fail on Degree Comparison "+failOnDegreeComparison+" "+(100.0*failOnDegreeComparison/total)+" % of calls");
+		System.out.println("fail on Eigenvalues "+failOnEigenvalues+" "+(100.0*failOnEigenvalues/total)+" % of calls");
 		System.out.println("fail on Node Matches "+failOnNodeMatches+" "+(100.0*failOnNodeMatches/total)+" % of calls");
 		System.out.println("fail on Brute Force "+failOnBruteForce+" "+(100.0*failOnBruteForce/total)+" % of calls");
 		System.out.println("succeed "+succeed+" "+(100.0*succeed/total)+" "+" % of calls");
