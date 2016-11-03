@@ -4,6 +4,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+/**
+ * Algorithm to generate subgraphs for motif detection, based on: A Faster Algorithm for Detecting Network Motifs, Sebastian Wernicke (2005)
+ * 
+ * @author Rob Baker
+ *
+ */
 public class EnumerateSubgraph {
 	
 	private FastGraph g;
