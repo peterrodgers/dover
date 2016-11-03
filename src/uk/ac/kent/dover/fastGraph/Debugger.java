@@ -23,6 +23,15 @@ public class Debugger {
 	    }           
 	}
 	
+    /**
+     * Prints a empty line to the console, if debugging is switched on
+     */
+	public static void log(){
+	    if(enabled) {
+	        System.out.println();
+	    }           
+	}
+	
 	/**
 	 * Resets the timing system
 	 */

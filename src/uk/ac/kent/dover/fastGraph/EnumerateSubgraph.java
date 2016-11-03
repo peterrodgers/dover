@@ -26,24 +26,33 @@ public class EnumerateSubgraph {
 	 */
 	public FastGraph[] enumerateSubgraphs(int k) {
 		Debugger.log("testing enumerateSubgraph");
+		Debugger.log("k " + k);
 		Debugger.resetTime();
 		
 		LinkedList<FastGraph> subs = new LinkedList<FastGraph>();
 		for (int v = 0; v < g.getNumberOfNodes(); v++) {
+			Debugger.log("v " + v);
 			HashSet<Integer> extension = new HashSet<Integer>();
 			
 			//ad all nodes connection to v that have a bigger index
-			int[] connections = g.getNodeConnectingNodes(v);
+			HashSet<Integer> vSet = new HashSet<Integer>();
+			vSet.add(v);
+			int[] connections = Util.convertHashSet(neighbourhood(vSet));
+			//Debugger.log("connections " + Arrays.toString(connections));
 			for(int u : connections) {
 				if (u > v) {
-					extension.add(v);
+					extension.add(u);
 				}
 			}
 			HashSet<Integer> vSubgraph = new HashSet<Integer>();
 			vSubgraph.add(v);
 			
+			Debugger.log("extension " + extension);
+			Debugger.log("vSubgraph " + vSubgraph);
+			
 			//extend Subgraph
 			HashSet<Integer> nodes = extendSubgraph(vSubgraph,extension,v,k);
+			Debugger.log("adding subgraph nodes " + nodes);
 			if (nodes != null) {
 				HashSet<Integer> edges = new HashSet<Integer>();
 				
@@ -55,7 +64,7 @@ public class EnumerateSubgraph {
 						}
 					}
 				}
-				
+				Debugger.log("adding subgraph " + (subs.size()+1));
 				//convert and add FastGraph
 				subs.add(g.generateGraphFromSubgraph(Util.convertHashSet(nodes), Util.convertHashSet(edges)));
 			}
@@ -81,9 +90,14 @@ public class EnumerateSubgraph {
 	 * @return The extended subgraph (in the form of a set of nodes)
 	 */
 	private HashSet<Integer> extendSubgraph(HashSet<Integer> vSubgraph, HashSet<Integer> vExtension, int v, int k) {
+		Debugger.log();
+		Debugger.log("extend k " + k);
+		Debugger.log("extend vExtension " + vExtension);
+		Debugger.log("extend vSubgraph " + vSubgraph);
 		
 		//if the correct size already exists
 		if(vSubgraph.size() == k) {
+			Debugger.log("### extend vSubgraph size match");
 			return vSubgraph;
 		}
 		
@@ -97,11 +111,12 @@ public class EnumerateSubgraph {
 				break;
 			}
 			
-			HashSet<Integer> neighboursToW = new HashSet<Integer>(Util.convertArray(g.getNodeConnectingNodes(w)));
-			HashSet<Integer> neighboursToVsub = new HashSet<Integer>();
-			for (int i : vSubgraph) {
+			HashSet<Integer> wSet = new HashSet<Integer>();			
+			HashSet<Integer> neighboursToW = neighbourhood(wSet);			
+			HashSet<Integer> neighboursToVsub = neighbourhood(vSubgraph);
+			/*for (int i : vSubgraph) {
 				neighboursToVsub.addAll(Util.convertArray(g.getNodeConnectingNodes(i)));
-			}
+			}*/
 			neighboursToW.removeAll(neighboursToVsub);
 			
 			HashSet<Integer> vDashExtension = new HashSet<Integer>(vExtension);
@@ -113,12 +128,24 @@ public class EnumerateSubgraph {
 			
 			vSubgraph.add(w);
 			
-			extendSubgraph(vSubgraph, vDashExtension, v, k);
+			HashSet<Integer> res = extendSubgraph(vSubgraph, vDashExtension, v, k);
+			if (res != null) {
+				return res;
+			}
 			
 		}
 		
 		
 		return null;
+	}
+	
+	private HashSet<Integer> neighbourhood(HashSet<Integer> v) {
+		HashSet<Integer> set = new HashSet<Integer>();
+		for(int i : v) {
+			set.addAll(Util.convertArray(g.getNodeConnectingNodes(i)));
+		}
+		set.removeAll(v);
+		return set;
 	}
 
 }
