@@ -25,6 +25,9 @@ public class EnumerateSubgraph {
 	 * @return All size-k subgraphs in the FastGraph
 	 */
 	public FastGraph[] enumerateSubgraphs(int k) {
+		Debugger.log("testing enumerateSubgraph");
+		Debugger.resetTime();
+		
 		LinkedList<FastGraph> subs = new LinkedList<FastGraph>();
 		for (int v = 0; v < g.getNumberOfNodes(); v++) {
 			HashSet<Integer> extension = new HashSet<Integer>();
@@ -62,6 +65,9 @@ public class EnumerateSubgraph {
 		//convert HashMap to array
 		FastGraph[] arr = new FastGraph[subs.size()];
 		Util.convertLinkedListObject(subs, arr);
+		
+		Debugger.outputTime("finishing enumerate Subgraphs");
+		
 		return arr;
 	}
 	
