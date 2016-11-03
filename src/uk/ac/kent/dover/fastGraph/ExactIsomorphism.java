@@ -31,6 +31,9 @@ public class ExactIsomorphism {
 
 	private int[] degreeBuckets1; // how many of nodes each degree
 	private int[] degreeBuckets2; // how many of nodes each degree
+	
+	private int maxDegree1;
+	private int maxDegree2;
 
 	private ArrayList<HashSet<Integer>> neighbours1;  // Non self-sourcing neighbour nodes for each node
 	private ArrayList<HashSet<Integer>> neighbours2;  // Non self-sourcing neighbour nodes for each node
@@ -70,6 +73,7 @@ public class ExactIsomorphism {
 				FastGraph g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i+comparisons*2,true,false);
 				long time = System.currentTimeMillis();
 				ExactIsomorphism ei = new ExactIsomorphism(g1);
+//System.out.println(ei.generateStringForHash().hashCode()+" "+ei.generateStringForHash());
 				int ack = succeed;
 				boolean res = ei.isomorphic(g2);
 				isoTime += System.currentTimeMillis()-time; 
@@ -135,7 +139,7 @@ public class ExactIsomorphism {
 		
 		degrees1 = findDegrees(fastGraph);
 		
-		int maxDegree1 = fastGraph.maximumDegree();
+		maxDegree1 = fastGraph.maximumDegree();
 
 		degreeBuckets1 = new int[maxDegree1+1];
 		findDegreeBuckets(degreeBuckets1,degrees1);
@@ -148,6 +152,7 @@ public class ExactIsomorphism {
 
 	/**
 	 * populate buckets index with the number of nodes that have degree index
+	 * 
 	 * @param buckets big enough to hold all degrees, should be at least maxDegree+1
 	 * @param degrees from findDegrees
 	 */
@@ -155,7 +160,25 @@ public class ExactIsomorphism {
 		for(int i = 0; i < degrees.length; i++) {
 			buckets[degrees[i]]++;
 		}
+	}
+
+
+	/**
+	 * Generate a string that can be used to put graph in buckets before final brute force comparison.
+	 * 
+	 * @return a string based on calculated values
+	 */
+	protected String generateStringForHash() {
 		
+		StringBuffer sb = new StringBuffer();
+		sb.append(Integer.toString(fastGraph.getNumberOfNodes()));
+		sb.append(",");
+		sb.append(Integer.toString(fastGraph.getNumberOfEdges()));
+		sb.append(Arrays.toString(degreeBuckets1));
+		sb.append(Arrays.toString(eigenvalues1));
+
+		return sb.toString();
+
 	}
 
 
@@ -203,18 +226,18 @@ public class ExactIsomorphism {
 		return degrees;
 	}
 
-
+private long startTime = -1;
 
 	/**
 	 * Equality of graphs. Returns a mapping if this graph is equal
 	 * to the given graph.
 	 *
-	 * @return true if there is an equality with the
-	 * given graph, null if is not.
+	 * @param g the graph to compare
+	 * @return true if there is an equality with the given graph, null if is not.
 	 */
 	public boolean isomorphic(FastGraph g) {
 numberOfIsomorphismTests++;
-long startTime = System.currentTimeMillis();
+startTime = System.currentTimeMillis();
 
 		FastGraph g1 = fastGraph;
 		FastGraph g2 = g;
@@ -234,6 +257,7 @@ long startTime = System.currentTimeMillis();
 //System.out.println("Isomorphic: empty graphs");
 succeed++;
 timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+startTime = -1;		
 			return true;
 		}
 				
@@ -241,6 +265,7 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 //System.out.println("Not isomorphic: different number of edges");
 failOnNodeCount++;
 timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+startTime = -1;		
 			return false;
 		}
 				
@@ -248,12 +273,13 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 //System.out.println("Not isomorphic: different number of nodes");
 failOnEdgeCount++;
 timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+startTime = -1;		
 			return false;
 		}
 		
 		degrees2 = findDegrees(g);
 		
-		int maxDegree2 = g.maximumDegree();
+		maxDegree2 = g.maximumDegree();
 
 		// check the number of nodes at each degree
 		degreeBuckets2 = new int[maxDegree2+1];
@@ -262,6 +288,7 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 //System.out.println("Not isomorphic: different quantities of nodes with the same degree");
 failOnDegreeComparison++;
 timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+startTime = -1;		
 			return false;
 		}
 
@@ -276,12 +303,32 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 //System.out.println("Not isomorphic: eigenvalues are different");
 failOnEigenvalues++;
 timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+startTime = -1;		
 			return false;
 		}
+		
+		boolean result = bruteForceComparison(g);
+		
+		return result;
+		
+	}
 
+
+	/**
+	 * Assumes that the nodes and edge lists are of equal size.
+	 * 
+	 * @param g the graph to compare
+	 * @return true if isomorphic, false if not
+	 */
+	private boolean bruteForceComparison(FastGraph g) {
+if(startTime == -1) {
+	startTime = System.currentTimeMillis();
+}
+		
+		int numberOfNodes1 = fastGraph.getNumberOfNodes();
+		int numberOfNodes2 = g.getNumberOfNodes();
 
 		neighbours2 = findNeighbours(g,maxDegree2);
-		
 		
 		int[] numberOfMatches = new int[numberOfNodes1]; // gives the number of relevant elements in the second array of possibleMatches 
 		int[][] possibleMatches = new int[numberOfNodes1][numberOfNodes1]; // first element is the node, second is a list of potential matches
@@ -302,6 +349,7 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 //System.out.println("Not isomorphic: no possible match for a node");
 failOnNodeMatches++;
 timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+startTime = -1;		
 				return false;
 			}
 			numberOfMatches[n1] = i;
@@ -333,6 +381,7 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 //System.out.println("Not isomorphic: brute force");
 failOnBruteForce++;
 timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+startTime = -1;		
 					return false;
 				}
 				if(matches1[currentNode] != -1) { // reset the previous match
@@ -354,6 +403,7 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 //System.out.println("Isomorphic");
 succeed++;
 timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+startTime = -1;		
 					return true;
 				}
 				matchesIndex[currentNode] = 0;
@@ -368,6 +418,7 @@ timeForIsomorphismTests += System.currentTimeMillis()-startTime;
 System.out.println("Isomorphic - Should never get to here");
 succeed++;
 timeForIsomorphismTests += System.currentTimeMillis()-startTime;
+startTime = -1;		
 		return true;
 		
 	}
