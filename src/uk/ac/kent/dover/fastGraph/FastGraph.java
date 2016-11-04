@@ -110,6 +110,8 @@ public class FastGraph {
 	 */
 	public static void main(String[] args) throws Exception {
 		
+		Debugger.enabled = true;
+		
 		long time;
 		
 		
@@ -142,23 +144,34 @@ System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+
 		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 */
-//String name = "random-n-100-e-1000";
+String name = "random-n-100-e-1000";
 //String name = "as-skitter.txt";
-String name = "soc-pokec-relationships.txt-short";
-//String name = "twitter_combined.txt";
+//String name = "soc-pokec-relationships.txt-short";
+//String name = "soc-pokec-relationships.txt-veryshort-veryshort";
 //String name = "Wiki-Vote.txt";
 //		String name = g1.getName();
 		FastGraph g2;
 		try {
 			//time = System.currentTimeMillis();
 			g2 = loadBuffersGraphFactory(null,name);
-
 			
+			Debugger.log("Number of nodes: " + g2.getNumberOfNodes());
+			Debugger.log("Number of edges: " + g2.getNumberOfEdges());
+			
+			Debugger.resetTime();
+			
+			EnumerateSubgraph es = new EnumerateSubgraph(g2);
+			FastGraph[] gs = es.enumerateSubgraphs(4);
+			
+			Debugger.outputTime("Time for enumeration");			
+			Debugger.log("number of subgraphs " + gs.length);
+			
+	/*		
 			time = System.currentTimeMillis();
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
 			LinkedList<Integer> edges = new LinkedList<Integer>();
 			
-			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,90,800);
+			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1500,100);
 			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1500000,10000000);
 			FastGraph g3 = g2;
 			
@@ -166,17 +179,22 @@ String name = "soc-pokec-relationships.txt-short";
 			System.out.println("deletion test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			
 			time = System.currentTimeMillis();
-			g3.relabelFastGraph(g3.getNumberOfNodes()/10);
+			//g3.relabelFastGraph(g3.getNumberOfNodes()/10);
 			System.out.println("relabelling test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			System.out.println("deletion test time (from before) " + deletionTime+" seconds");
 			System.out.println("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
 	
 			time = System.currentTimeMillis();
-			//g3.setName(g2.getName()+"-short");
-			g3.saveBuffers(null,g3.getName());
+			//g3.setName(g2.getName()+"-relabelled");
+			//g3.saveBuffers(null,g3.getName());
 			System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 				
-			FastGraph g4 = loadBuffersGraphFactory(null,g3.getName());
+			//FastGraph g4 = loadBuffersGraphFactory(null,g3.getName());
+			
+			Graph dg = g2.generateDisplayGraph();
+			boolean consistent = dg.consistent();
+			System.out.println("consistent: " + consistent);
+		*/	
 			
 			//just for testing
 			System.out.println();
