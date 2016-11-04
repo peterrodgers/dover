@@ -40,6 +40,15 @@ public class Debugger {
 	}
 	
 	/**
+	 * Resets the timing system from a given timing variable
+	 * 
+	 * @param time A given timing variable
+	 */
+	public static void resetTime(long time) {
+		time = System.currentTimeMillis();
+	}
+	
+	/**
 	 * Outputs the time difference between this call and the last resetTime() call
 	 */
 	public static void outputTime() {
@@ -52,6 +61,25 @@ public class Debugger {
 	 * @param Object o The object to to be printed
 	 */
 	public static void outputTime(Object o) {
+		log(o.toString() + " " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+	}
+	
+	/**
+	 * Outputs the time difference between this call and the last resetTime() call for the given time
+	 * 
+	 * @param time A given timing variable
+	 */
+	public static void outputTime(long time) {
+		log((System.currentTimeMillis()-time)/1000.0+" seconds");
+	}
+	
+	/**
+	 * Outputs the time difference between this call and the last resetTime() call for the given time with a message
+	 * 
+	 * @param Object o The object to to be printed
+ 	 * @param time A given timing variable
+	 */
+	public static void outputTime(Object o, long time) {
 		log(o.toString() + " " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 	}
 }

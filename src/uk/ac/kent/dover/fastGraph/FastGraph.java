@@ -112,7 +112,7 @@ public class FastGraph {
 		
 		Debugger.enabled = true;
 		
-		long time;
+		long time = 0;
 		
 		
 //		FastGraph g1 = randomGraphFactory(1,0,false);
@@ -127,7 +127,7 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(4847571,68993773,1,false); // Size of LiveJournal1 example from SNAP
 //		FastGraph g1 = randomGraphFactory(10000000,100000000,1,false); // 10 million nodes, 100 million edges, close to edgeBuf limit, but fails on heap space with 14g, but pass with heap space of 30g
 
-		time = System.currentTimeMillis();
+		Debugger.resetTime(time);
 //		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false); // SNAP web page gives 1768149 edges
@@ -136,13 +136,13 @@ public class FastGraph {
 //		FastGraph g1 = adjacencyListGraphFactory(4847571,68993773,null,"soc-LiveJournal1.txt",false);
 
 		
-System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+Debugger.outputTime("snap load time ");
 /*		
-		time = System.currentTimeMillis();
+		Debugger.resetTime(time);
 		
 		g1.saveBuffers(null,g1.getName());
-		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-		time = System.currentTimeMillis();
+		Debugger.outputTime("saveBuffers test time ");
+		Debugger.resetTime(time);
 */
 //String name = "random-n-100-e-1000";
 //String name = "as-skitter.txt";
@@ -152,7 +152,7 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 //		String name = g1.getName();
 		FastGraph g2;
 		try {
-			//time = System.currentTimeMillis();
+			//Debugger.resetTime(time);
 			g2 = loadBuffersGraphFactory(null,name);
 			
 			Debugger.log("Number of nodes: " + g2.getNumberOfNodes());
@@ -167,7 +167,7 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 			Debugger.log("number of subgraphs " + gs.length);
 			
 	/*		
-			time = System.currentTimeMillis();
+			Debugger.resetTime(time);
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
 			LinkedList<Integer> edges = new LinkedList<Integer>();
 			
@@ -175,45 +175,44 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1500000,10000000);
 			FastGraph g3 = g2;
 			
-			//long deletionTime = (long) ((System.currentTimeMillis()-time)/1000.0);
-			//System.out.println("deletion test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+			//Debugger.outputTime("deletion test time ");
 			
-			time = System.currentTimeMillis();
+			Debugger.resetTime(time);
 			g3.relabelFastGraph(g3.getNumberOfNodes()/10);
-			System.out.println("relabelling test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-			//System.out.println("deletion test time (from before) " + deletionTime+" seconds");
-			System.out.println("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
+			Debugger.log("relabelling test time ");
+			//Debugger.log("deletion test time (from before) " + deletionTime+" seconds");
+			Debugger.outputTime("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
 	
-			time = System.currentTimeMillis();
+			Debugger.resetTime(time);
 			g3.setName(g2.getName()+"-relabelled");
 			g3.saveBuffers(null,g3.getName());
-			System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+			Debugger.outputTime("saveBuffers test time ");
 				
 			FastGraph g4 = loadBuffersGraphFactory(null,g3.getName());
 			
 		//	Graph dg = g2.generateDisplayGraph();
 		//	boolean consistent = dg.consistent();
-		//	System.out.println("consistent: " + consistent);
+		//	Debugger.log("consistent: " + consistent);
 			
 	*/		
 			//just for testing
-			System.out.println();
+			Debugger.log();
 	/*		
-			System.out.println("graph now has the labels (taken from the buffer):");
+			Debugger.log("graph now has the labels (taken from the buffer):");
 			FastGraphNodeType[] ntypes = FastGraphNodeType.values();
 			for(int j = 0; j < g4.getNumberOfNodes(); j++) {
 				byte type = g4.getNodeType(j);
-				System.out.println(g4.getNodeLabel(j) + " " + type + " (" + ntypes[type] + ")");
+				Debugger.log(g4.getNodeLabel(j) + " " + type + " (" + ntypes[type] + ")");
 			}
-			System.out.println();
-			System.out.println("edges now have the types (taken from the buffer):");
+			Debugger.log();
+			Debugger.log("edges now have the types (taken from the buffer):");
 			for(int j = 0; j < g4.getNumberOfEdges(); j++) {
 				byte type = g4.getEdgeType(j);
-				System.out.println("n1" + g4.getEdgeNode1(j) + " n2" + g4.getEdgeNode2(j) + " type " + type + " (" + g4.getEdgeLabel(j) + ")");
+				Debugger.log("n1" + g4.getEdgeNode1(j) + " n2" + g4.getEdgeNode2(j) + " type " + type + " (" + g4.getEdgeLabel(j) + ")");
 			}
 		*/	
 //			int[] degrees = g2.countInstancesOfNodeDegrees(4);
-//			System.out.println(Arrays.toString(degrees));
+//			Debugger.log(Arrays.toString(degrees));
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -232,8 +231,9 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 	 * @throws Exception If there is a problem loading the family subgraphs, or if there is a problem inducing a subgraph
 	 */
 	public void relabelFastGraph(int subgraphsToTest) throws Exception{
-		System.out.println("Relabelling FastGraph");
-		long time = System.currentTimeMillis();
+		Debugger.log("Relabelling FastGraph");
+		long time = 0;
+		Debugger.resetTime(time);
 		
 		//load node and edge labels arrays
 		String[] nodeLabels = new String[this.getNumberOfNodes()];
@@ -255,7 +255,7 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 		//load family subgraphs
 		FastGraph[] families = loadFamilies();
 		for(FastGraph family : families) {
-			System.out.println("Testing family " + family.getName());
+			Debugger.log("Testing family " + family.getName());
 			
 			ExactIsomorphism ei = new ExactIsomorphism(family);
 			
@@ -264,7 +264,7 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 			for (int i = 0; i < subgraphsToTest; i++) { //induce subgraphs to test
 				
 				if(i%10000 == 0) {
-					System.out.println("Testing subgraph " + i);
+					Debugger.log("Testing subgraph " + i);
 				}
 				
 				LinkedList<Integer> subNodes = new LinkedList<Integer>();
@@ -283,7 +283,7 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 					
 					//pick a surname, so all family members have the same surname
 					String surname = np.getSurname();
-				//	System.out.println("Family name: " + surname);
+				//	Debugger.log("Family name: " + surname);
 					for(int n : subNodes) {
 						nodeLabels[n] = np.getForename() + " " + surname;
 						nodeTypes[n] = FastGraphNodeType.CHILD.getValue();
@@ -316,7 +316,7 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 			}//end for each subgraph to test	
 		}//end foreach family
 		
-		System.out.println("## Number of families found: " + fams);
+		Debugger.log("## Number of families found: " + fams);
 		
 		//replace the blanks with other names
 		for(int j = 0; j < nodeLabels.length; j++) {						
@@ -366,13 +366,13 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 			String[] splits = f.getName().split("-");
 			int nodeCount = Integer.parseInt(splits[2]);
 			int edgeCount = Integer.parseInt(splits[4]);
-			System.out.println(f + " n" + nodeCount + "e" + edgeCount);
+			Debugger.log(f + " n" + nodeCount + "e" + edgeCount);
 			FastGraph g = nodeListEdgeListGraphFactory(nodeCount, edgeCount, folder.getPath() + File.separatorChar + f.getName(), f.getName(), direct);
-			System.out.println("new g nodes" + g.getNumberOfNodes());
+			Debugger.log("new g nodes" + g.getNumberOfNodes());
 			graphs.add(g);
 		}
 		
-		//System.out.println(Arrays.toString(listOfFiles));
+		//Debugger.log(Arrays.toString(listOfFiles));
 		
 		FastGraph[] graphArray = new FastGraph[graphs.size()];
 		Util.convertLinkedListObject(graphs, graphArray);
@@ -393,8 +393,8 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 	 */
 	public FastGraph removeNodesAndEdgesFromGraph(LinkedList<Integer> nodes, LinkedList<Integer> edges, int targetNodes, int targetEdges) throws FastGraphException {
 		
-		System.out.println("Suggesting nodes and egdes to remove");
-		long time = System.currentTimeMillis();
+		Debugger.log("Suggesting nodes and egdes to remove");
+		long time = 0; Debugger.resetTime(time);
 		
 		int currentTotalNodes = getNumberOfNodes();
 		int currentTotalEdges = getNumberOfEdges();
@@ -419,14 +419,14 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 		LinkedHashSet<Integer> edgesToRemove = new LinkedHashSet<Integer>(); //edges that need removing
 		LinkedHashSet<Integer> nodesToRemove = new LinkedHashSet<Integer>(); //nodes that need removing
 		
-		System.out.println("Current Nodes: " + currentTotalNodes + " Target Nodes: " + targetNodes);
-		System.out.println("Current Edges: " + currentTotalEdges + " Target Edges: " + targetEdges);
+		Debugger.log("Current Nodes: " + currentTotalNodes + " Target Nodes: " + targetNodes);
+		Debugger.log("Current Edges: " + currentTotalEdges + " Target Edges: " + targetEdges);
 		
-		System.out.println("setup test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-		System.out.println();
+		Debugger.outputTime("setup test time ");
+		Debugger.log();
 		
-		time = System.currentTimeMillis();
-		System.out.println("# Starting STEP ONE");
+		Debugger.resetTime(time);
+		Debugger.log("# Starting STEP ONE");
 		//STEP ONE:
 		//Find a subgraph with the required number of nodes. Remove it
 		InducedSubgraph is = new InducedSubgraph(this);
@@ -443,15 +443,15 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 			Util.addAll(edgesToRemove, this.getNodeConnectingOutEdges(n));
 		}
 		
-		System.out.println("After induction test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-		System.out.println("nodes to remove size: " + nodesToRemove.size() + " edges to remove size: " + edgesToRemove.size());
-		System.out.println();
+		Debugger.outputTime("After induction test time ");
+		Debugger.log("nodes to remove size: " + nodesToRemove.size() + " edges to remove size: " + edgesToRemove.size());
+		Debugger.log();
 		
 		
 		//STEP TWO:
 		//if we haven't removed enough nodes
-		System.out.println("# Starting STEP TWO");
-		time = System.currentTimeMillis();
+		Debugger.log("# Starting STEP TWO");
+		Debugger.resetTime(time);
 		if(nodeReductionAmount > nodesToRemove.size()) { //could we thread these to make this quicker?
 			Random r = new Random(nodeBuf.getLong(1));
 			
@@ -468,8 +468,8 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 				int stillToRemove = nodeReductionAmount - nodesToRemove.size(); //what nodes are left to remove
 				this.buildTree(localNodesToRemove, localEdgesToRemove, r, 3);
 				
-				//System.out.println("Tree: " + localNodesToRemove);				
-				//System.out.println("nodeRA: " + nodeReductionAmount + " stillTR: " + stillToRemove + " localNodesToRemove: " + localNodesToRemove.size());
+				//Debugger.log("Tree: " + localNodesToRemove);				
+				//Debugger.log("nodeRA: " + nodeReductionAmount + " stillTR: " + stillToRemove + " localNodesToRemove: " + localNodesToRemove.size());
 				
 				if (localNodesToRemove.size() <= stillToRemove) {
 					nodesToRemove.addAll(localNodesToRemove);
@@ -486,20 +486,20 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 					continue;
 				}
 				
-				//System.out.println("After this tree test time " + (System.currentTimeMillis()-time2)/1000.0+" seconds");
+				//Debugger.log("After this tree test time " + (System.currentTimeMillis()-time2)/1000.0+" seconds");
 			}
 			
 		}
-		System.out.println("After tree test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-		System.out.println("nodes to remove size: " + nodesToRemove.size() + " edges to remove size: " + edgesToRemove.size());
-		System.out.println();
+		Debugger.outputTime("After tree test time ");
+		Debugger.log("nodes to remove size: " + nodesToRemove.size() + " edges to remove size: " + edgesToRemove.size());
+		Debugger.log();
 		
 		
 		//STEP THREE:
 		//if we haven't removed enough nodes
 		//pick some at random
-		System.out.println("# Starting STEP THREE");
-		time = System.currentTimeMillis();
+		Debugger.log("# Starting STEP THREE");
+		Debugger.resetTime(time);
 		if(nodeReductionAmount > nodesToRemove.size()) {
 			Random r = new Random(nodeBuf.getLong(2));		
 			while(nodeReductionAmount > nodesToRemove.size()) {
@@ -508,16 +508,16 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 				edgesToRemove.addAll(Util.convertArray(this.getNodeConnectingEdges(n)));
 			}
 		}
-		System.out.println("After node removal test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-		System.out.println("nodes to remove size: " + nodesToRemove.size() + " edges to remove size: " + edgesToRemove.size());
-		System.out.println();
+		Debugger.outputTime("After node removal test time ");
+		Debugger.log("nodes to remove size: " + nodesToRemove.size() + " edges to remove size: " + edgesToRemove.size());
+		Debugger.log();
 		
 		
 		//STEP FOUR:
 		//if we haven't removed enough edges
 		//pick some at random
-		System.out.println("# Starting STEP FOUR");
-		time = System.currentTimeMillis();
+		Debugger.log("# Starting STEP FOUR");
+		Debugger.resetTime(time);
 		if(edgeReductionAmount > edgesToRemove.size()) {
 			Random r = new Random(edgeBuf.getLong(2));
 			while(edgeReductionAmount > edgesToRemove.size()) {
@@ -526,17 +526,17 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 			}
 			
 		}
-		System.out.println("After edge removal test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-		System.out.println("nodes to remove size: " + nodesToRemove.size() + " edges to remove size: " + edgesToRemove.size());
-		System.out.println();		
+		Debugger.outputTime("After edge removal test time ");
+		Debugger.log("nodes to remove size: " + nodesToRemove.size() + " edges to remove size: " + edgesToRemove.size());
+		Debugger.log();		
 		
 		nodes.addAll(nodesToRemove);
 		edges.addAll(edgesToRemove);
 
-		time = System.currentTimeMillis();
-		System.out.println("Building new FastGraph");
+		Debugger.resetTime(time);
+		Debugger.log("Building new FastGraph");
 		FastGraph g = this.generateGraphByDeletingItems(Util.convertLinkedList(nodes), Util.convertLinkedList(edges), false);
-		System.out.println("After FastGraph building test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+		Debugger.outputTime("After FastGraph building test time ");
 		return g;
 	}
 	
@@ -559,11 +559,11 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 
 		//while we are not at the required depth
 		while(depth != 0) {
-			//System.out.println("Starting Node: " + startingNode);
+			//Debugger.log("Starting Node: " + startingNode);
 			int[] cn = new int[0]; //get ready to store connecting nodes
 			for (int sn : startingNodes) { //for each of the starting nodes
 				cn = this.getNodeConnectingNodes(sn); //get this node's connecting nodes
-				//System.out.println("    Connecting Nodes: " + Arrays.toString(cn));
+				//Debugger.log("    Connecting Nodes: " + Arrays.toString(cn));
 				for(int n : cn) {
 					nodes.add(n); //add them all the the tree
 					edges.addAll(Util.convertArray(this.getNodeConnectingEdges(n))); //add the edges too
@@ -1451,7 +1451,7 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 		weight = -101;
 		type = -103;
 		age = -105;
-		//time = System.currentTimeMillis();
+		//Debugger.resetTime(time);
 		
 		//populate the edges
 		JSONArray edges = jsonObj.getJSONArray("edges");
@@ -1505,7 +1505,7 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 				} else if(n2 == i) {
 					n = n1;
 				} else {
-					System.out.println("ERROR When finding connections for node "+i+" connecting edge "+edgeIndex+ " has connecting nodes "+n1+" "+n2);
+					Debugger.log("ERROR When finding connections for node "+i+" connecting edge "+edgeIndex+ " has connecting nodes "+n1+" "+n2);
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeIndex);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,n);
@@ -1528,7 +1528,7 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 				} else if(n2 == i) {
 					n = n1;
 				} else {
-					System.out.println("ERROR When finding connections for node "+i+" connecting edge "+edgeIndex+ " has connecting nodes "+n1+" "+n2);
+					Debugger.log("ERROR When finding connections for node "+i+" connecting edge "+edgeIndex+ " has connecting nodes "+n1+" "+n2);
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeIndex);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,n);
@@ -1578,7 +1578,7 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 			writer.close();
 			fos.close();
 		} catch(Exception e) {
-			System.out.println("ERROR executing info file save in saveBuffers("+directory+","+fileBaseName+")");
+			Debugger.log("ERROR executing info file save in saveBuffers("+directory+","+fileBaseName+")");
 			e.printStackTrace();
 		}
 			
@@ -1589,7 +1589,7 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 			writeBuf(directoryAndBaseName+".nodeLabelBuf",nodeLabelBuf);
 			writeBuf(directoryAndBaseName+".edgeLabelBuf",edgeLabelBuf);
 		} catch(Exception e) {
-			System.out.println("ERROR executing buffer save in saveBuffers("+directory+","+fileBaseName+")");
+			Debugger.log("ERROR executing buffer save in saveBuffers("+directory+","+fileBaseName+")");
 			e.printStackTrace();
 		}
 			
@@ -1615,7 +1615,7 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 			wChannel.close();
 			fos.close();
 		} catch(Exception e) {
-			System.out.println("ERROR executing writeBuf("+fileName+","+buf+")");
+			Debugger.log("ERROR executing writeBuf("+fileName+","+buf+")");
 			e.printStackTrace();
 		}
 
@@ -1690,7 +1690,7 @@ String name = "soc-pokec-relationships.txt-short-relabelled";
 		String[] splitLine;
 		
 		String line = "";
-long time = System.currentTimeMillis();			
+long time = 0; Debugger.resetTime(time);			
 		while(line != null) {
 			line = br.readLine();
 			if(line == null) {
@@ -1706,7 +1706,7 @@ long time = System.currentTimeMillis();
 			if(splitLine.length < 2) {
 				splitLine = line.split("\t");
 				if(splitLine.length < 2) {
-					System.out.println("FAILED TO RECOGNISE LINE:"+line+" in loadAdjacencyListGraph("+directory+","+fileName+")");
+					Debugger.log("FAILED TO RECOGNISE LINE:"+line+" in loadAdjacencyListGraph("+directory+","+fileName+")");
 					continue;
 				}
 			}
@@ -1729,7 +1729,7 @@ long time = System.currentTimeMillis();
 				
 			edgeIndex++;
 if(edgeIndex%1000000==0 ) {
-	System.out.println("edgesLoaded "+edgeIndex+" time "+(System.currentTimeMillis()-time)/1000.0);
+	Debugger.outputTime("edgesLoaded "+edgeIndex+" time ");
 }
 		}
 
@@ -1803,7 +1803,7 @@ if(edgeIndex%1000000==0 ) {
 
 
 		// Initialise the connection buffer, modifying the node buffer connection data
-		//time = System.currentTimeMillis();
+		//Debugger.resetTime(time);
 		int offset = 0;
 		for(int i = 0; i < numberOfNodes; i++) {
 			// setting the in connection offset and length
@@ -1822,7 +1822,7 @@ if(edgeIndex%1000000==0 ) {
 				} else if(n2 == i) {
 					n = n1;
 				} else {
-					System.out.println("ERROR When finding connections for node "+i+" connecting edge "+e+ " has connecting nodes "+n1+" "+n2);
+					Debugger.log("ERROR When finding connections for node "+i+" connecting edge "+e+ " has connecting nodes "+n1+" "+n2);
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,e);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,n);
@@ -1845,7 +1845,7 @@ if(edgeIndex%1000000==0 ) {
 				} else if(n2 == i) {
 					n = n1;
 				} else {
-					System.out.println("ERROR When finding connections for node "+i+" connecting edge "+e+ " has connecting nodes "+n1+" "+n2);
+					Debugger.log("ERROR When finding connections for node "+i+" connecting edge "+e+ " has connecting nodes "+n1+" "+n2);
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,e);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,n);
@@ -2131,7 +2131,7 @@ if(edgeIndex%1000000==0 ) {
 
 
 		// Initialise the connection buffer, modifying the node buffer connection data
-		//time = System.currentTimeMillis();
+		//Debugger.resetTime(time);
 		int offset = 0;
 		for(int i = 0; i < numberOfNodes; i++) {
 			// setting the in connection offset and length
@@ -2150,7 +2150,7 @@ if(edgeIndex%1000000==0 ) {
 				} else if(n2 == i) {
 					n = n1;
 				} else {
-					System.out.println("ERROR When finding connections for node "+i+" connecting edge "+e+ " has connecting nodes "+n1+" "+n2);
+					Debugger.log("ERROR When finding connections for node "+i+" connecting edge "+e+ " has connecting nodes "+n1+" "+n2);
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,e);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,n);
@@ -2173,7 +2173,7 @@ if(edgeIndex%1000000==0 ) {
 				} else if(n2 == i) {
 					n = n1;
 				} else {
-					System.out.println("ERROR When finding connections for node "+i+" connecting edge "+e+ " has connecting nodes "+n1+" "+n2);
+					Debugger.log("ERROR When finding connections for node "+i+" connecting edge "+e+ " has connecting nodes "+n1+" "+n2);
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,e);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,n);
@@ -2417,7 +2417,7 @@ if(edgeIndex%1000000==0 ) {
 				} else if(n2 == i) {
 					n = n1;
 				} else {
-					System.out.println("ERROR When finding connections for node "+i+" connecting edge "+e+ " has connecting nodes "+n1+" "+n2);
+					Debugger.log("ERROR When finding connections for node "+i+" connecting edge "+e+ " has connecting nodes "+n1+" "+n2);
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,e);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,n);
@@ -2440,7 +2440,7 @@ if(edgeIndex%1000000==0 ) {
 				} else if(n2 == i) {
 					n = n1;
 				} else {
-					System.out.println("ERROR When finding connections for node "+i+" connecting edge "+e+ " has connecting nodes "+n1+" "+n2);
+					Debugger.log("ERROR When finding connections for node "+i+" connecting edge "+e+ " has connecting nodes "+n1+" "+n2);
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,e);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,n);
@@ -2449,7 +2449,7 @@ if(edgeIndex%1000000==0 ) {
 			
 		
 		}
-		//System.out.println("connection put time " + (System.currentTimeMillis()-time)/1000.0+" seconds, direct "+edgeBuf.isDirect());
+		//Debugger.outputTime("connection put time, direct "+edgeBuf.isDirect());
 
 	}
 	
@@ -2577,7 +2577,7 @@ if(edgeIndex%1000000==0 ) {
 		setAllEdgeLabels(edgeLabels);
 
 		// Initialise the connection buffer, modifying the node buffer connection data
-		//time = System.currentTimeMillis();
+		//Debugger.resetTime(time);
 		int offset = 0;
 		for(int i = 0; i < numberOfNodes; i++) {
 			// setting the in connection offset and length
@@ -2596,7 +2596,7 @@ if(edgeIndex%1000000==0 ) {
 				} else if(n2 == i) {
 					nodeIndex = n1;
 				} else {
-					System.out.println("ERROR When finding connections for node "+i+" connecting edge "+edgeIndex+ " has connecting nodes "+n1+" "+n2);
+					Debugger.log("ERROR When finding connections for node "+i+" connecting edge "+edgeIndex+ " has connecting nodes "+n1+" "+n2);
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeIndex);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeIndex);
@@ -2619,7 +2619,7 @@ if(edgeIndex%1000000==0 ) {
 				} else if(n2 == i) {
 					nodeIndex = n1;
 				} else {
-					System.out.println("ERROR When finding connections for node "+i+" connecting edge "+edgeIndex+ " has connecting nodes "+n1+" "+n2);
+					Debugger.log("ERROR When finding connections for node "+i+" connecting edge "+edgeIndex+ " has connecting nodes "+n1+" "+n2);
 				}
 				connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeIndex);
 				connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeIndex);
@@ -2643,15 +2643,15 @@ if(edgeIndex%1000000==0 ) {
 	 */
 	public FastGraph generateGraphByDeletingItems(int[] nodesToDelete, int[] edgesToDelete, boolean orphanEdgeCheckNeeded) {
 		
-		System.out.println("Nodes to remove: " + Arrays.toString(nodesToDelete));
+		Debugger.log("Nodes to remove: " + Arrays.toString(nodesToDelete));
 		
-		long time = System.currentTimeMillis();
+		long time = 0; Debugger.resetTime(time);
 
 		LinkedList<Integer> allEdgesToDeleteList = new LinkedList<Integer>();
 		LinkedList<Integer> allNodesToDeleteList = new LinkedList<Integer>();
 		
-		System.out.println("Z setup " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-		time = System.currentTimeMillis();
+		Debugger.outputTime("Z setup ");
+		Debugger.resetTime(time);
 		
 		for(int e : edgesToDelete) {
 			allEdgesToDeleteList.add(e);
@@ -2669,8 +2669,8 @@ if(edgeIndex%1000000==0 ) {
 				}
 			}			
 		}
-System.out.println("A Created the node and edge delete lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-time = System.currentTimeMillis();
+Debugger.outputTime("A Created the node and edge delete lists ");
+Debugger.resetTime(time);
 		
 		// find the nodes that will remain
 		HashSet<Integer> remainingNodeList = new HashSet<Integer>(allNodesToDeleteList.size()*3);
@@ -2679,13 +2679,13 @@ time = System.currentTimeMillis();
 		}
 		remainingNodeList.removeAll(allNodesToDeleteList); //this is quicker than checking each entry
 		
-		System.out.println("AAA created the node remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-		time = System.currentTimeMillis();
+		Debugger.outputTime("AAA created the node remain lists ");
+		Debugger.resetTime(time);
 		// turn it into an array
 		int[] remainingNodes = Util.convertHashSet(remainingNodeList);
 		
-		System.out.println("AA converted the node remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-		time = System.currentTimeMillis();
+		Debugger.outputTime("AA converted the node remain lists ");
+		Debugger.resetTime(time);
 
 		// find the edges that will remain
 		HashSet<Integer> remainingEdgeList = new HashSet<Integer>(allEdgesToDeleteList.size()*3);
@@ -2694,13 +2694,13 @@ time = System.currentTimeMillis();
 		}
 		remainingEdgeList.removeAll(allEdgesToDeleteList);
 		
-		System.out.println("AB Created the edge remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-		time = System.currentTimeMillis();
+		Debugger.outputTime("AB Created the edge remain lists ");
+		Debugger.resetTime(time);
 		// turn it into an array
 		int[] remainingEdges = Util.convertHashSet(remainingEdgeList);
 
-System.out.println("B converted the edge remain lists " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-time = System.currentTimeMillis();
+Debugger.outputTime("B converted the edge remain lists ");
+Debugger.resetTime(time);
 
 		FastGraph g = generateGraphFromSubgraph(remainingNodes,remainingEdges);
 		
@@ -2716,7 +2716,7 @@ time = System.currentTimeMillis();
 	 */
 	public FastGraph generateGraphFromSubgraph(int[] subgraphNodes, int[] subgraphEdges) {
 		
-		long time = System.currentTimeMillis();
+		long time = 0; Debugger.resetTime(time);
 
 		FastGraph g = new FastGraph(subgraphNodes.length, subgraphEdges.length, getDirect());
 		
@@ -2743,12 +2743,12 @@ time = System.currentTimeMillis();
 			oldNodesToNew.put(n, index);
 			index++;
 		}
-//System.out.println("C popluated the new node buffer "  + (System.currentTimeMillis()-time)/1000.0+" seconds");
-time = System.currentTimeMillis();
+//Debugger.outputTime("C popluated the new node buffer ");
+Debugger.resetTime(time);
 		
 		g.setAllNodeLabels(nodeLabels); // create the node label buffer
-//System.out.println("D popluated the new node list buffer "  + (System.currentTimeMillis()-time)/1000.0+" seconds");
-time = System.currentTimeMillis();
+//Debugger.outputTime("D popluated the new node list buffer ");
+Debugger.resetTime(time);
 		
 		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(subgraphNodes.length); // temporary store of inward edges
 		for(int nodeIndex = 0; nodeIndex < subgraphNodes.length; nodeIndex++) {
@@ -2761,10 +2761,10 @@ time = System.currentTimeMillis();
 			ArrayList<Integer> edges = new ArrayList<Integer>(100);
 			nodeOut.add(nodeIndex,edges);
 		}
-//System.out.println("E created the neighbour store " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-time = System.currentTimeMillis();
+//Debugger.outputTime("E created the neighbour store ");
+Debugger.resetTime(time);
 		
-//System.out.println(oldNodesToNew);
+//Debugger.log(oldNodesToNew);
 
 
 		String[] edgeLabels = new String[subgraphEdges.length]; // stores the labels for creating the edgeLabelBuffer
@@ -2794,7 +2794,7 @@ time = System.currentTimeMillis();
 			//System.out.print(", old node n2: " + n2);
 			int gn2 = oldNodesToNew.get(n2);
 			//System.out.print(", new node n2: " + gn2);
-			//System.out.println();
+			//Debugger.log();
 			
 			g.edgeBuf.putInt(EDGE_NODE1_OFFSET+index*EDGE_BYTE_SIZE,gn1); // one end of edge
 			g.edgeBuf.putInt(EDGE_NODE2_OFFSET+index*EDGE_BYTE_SIZE,gn2); // other end of edge
@@ -2809,20 +2809,20 @@ time = System.currentTimeMillis();
 			outEdgeList.add(index);
 			index++;
 		}
-//System.out.println("F populated the new edge buffer " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-time = System.currentTimeMillis();
+//Debugger.outputTime("F populated the new edge buffer ");
+Debugger.resetTime(time);
 
 		g.setAllEdgeLabels(edgeLabels);
-//System.out.println("G populated the new edge label buffer " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-time = System.currentTimeMillis();
+//Debugger.outputTime("G populated the new edge label buffer ");
+Debugger.resetTime(time);
 		
 		// Initialise the connection buffer, modifying the node buffer connection data
-		//time = System.currentTimeMillis();
+		//Debugger.resetTime(time);
 		int offset = 0;
 		for(int node = 0; node < subgraphNodes.length; node++) {
 if(node%100000 == 0) {
-	//System.out.println("H populated "+node+" nodes in connection buffer " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-	time = System.currentTimeMillis();
+	//Debugger.outputTime("H populated "+node+" nodes in connection buffer ");
+	Debugger.resetTime(time);
 }
 			
 			// setting the in connection offset and length
@@ -2841,7 +2841,7 @@ if(node%100000 == 0) {
 				} else if(n2 == node) {
 					nodeIndex = n1;
 				} else {
-					System.out.println("ERROR A When finding connections for node "+node+" connecting edge "+edgeIndex+ " has connecting nodes "+n1+" "+n2);
+					Debugger.log("ERROR A When finding connections for node "+node+" connecting edge "+edgeIndex+ " has connecting nodes "+n1+" "+n2);
 				}
 				g.connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeIndex);
 				g.connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeIndex);
@@ -2865,7 +2865,7 @@ if(node%100000 == 0) {
 				} else if(n2 == node) {
 					nodeIndex = n1;
 				} else {
-					System.out.println("ERROR B When finding connections for node "+node+" connecting edge "+edgeIndex+ " has connecting nodes "+n1+" "+n2);
+					Debugger.log("ERROR B When finding connections for node "+node+" connecting edge "+edgeIndex+ " has connecting nodes "+n1+" "+n2);
 				}
 				g.connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeIndex);
 				g.connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeIndex);
@@ -2956,7 +2956,7 @@ if(node%100000 == 0) {
 			int deg = getNodeDegree(n);
 			if (deg < maxDegrees) {
 				//System.out.print(deg + " ");
-				//System.out.println(res[deg]);
+				//Debugger.log(res[deg]);
 				res[deg]++;
 			}
 		}		

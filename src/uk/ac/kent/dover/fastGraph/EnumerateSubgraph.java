@@ -1,13 +1,13 @@
 package uk.ac.kent.dover.fastGraph;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 
 /**
  * Algorithm to generate subgraphs for motif detection, based on: A Faster Algorithm for Detecting Network Motifs, Sebastian Wernicke (2005)
- * 
+ * Variable names in this class are an attempt to match those in the algorithm in the paper
+ *  
  * @author Rob Baker
  *
  */
