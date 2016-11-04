@@ -110,6 +110,8 @@ public class FastGraph {
 	 */
 	public static void main(String[] args) throws Exception {
 		
+		Debugger.enabled = true;
+		
 		long time;
 		
 		
@@ -132,16 +134,9 @@ public class FastGraph {
 //		FastGraph g1 = adjacencyListGraphFactory(1696415,11095298,null,"as-skitter.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(4847571,68993773,null,"soc-LiveJournal1.txt",false);
-/*
-for(int n = 0; n < g1.getNumberOfNodes(); n++) {
-	System.out.println(n +" "+g1.getNodeLabel(n)+" outEdgelist "+Util.convertArray(g1.getNodeConnectingOutEdges(n))+" inEdgelist "+Util.convertArray(g1.getNodeConnectingInEdges(n)));
-}
-for(int e = 0; e < g1.getNumberOfEdges(); e++) {
-	System.out.println(e +" "+g1.getEdgeLabel(e)+" node1 "+g1.getEdgeNode1(e)+" node2 "+g1.getEdgeNode2(e));
-}
-*/
+
 		
-//System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 /*		
 		time = System.currentTimeMillis();
 		
@@ -149,45 +144,57 @@ for(int e = 0; e < g1.getNumberOfEdges(); e++) {
 		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 */
-//String name = "random-n-100-e-1000";
+String name = "random-n-100-e-1000";
 //String name = "as-skitter.txt";
 //String name = "soc-pokec-relationships.txt-short";
-String name = "soc-pokec-relationships.txt-veryshort-veryshort";
-//String name = "twitter_combined.txt";
+//String name = "soc-pokec-relationships.txt-veryshort-veryshort";
 //String name = "Wiki-Vote.txt";
 //		String name = g1.getName();
 		FastGraph g2;
 		try {
 			//time = System.currentTimeMillis();
 			g2 = loadBuffersGraphFactory(null,name);
-			System.out.println("CONSISTENT g2 "+g2.checkConsistency());
-
 			
+			Debugger.log("Number of nodes: " + g2.getNumberOfNodes());
+			Debugger.log("Number of edges: " + g2.getNumberOfEdges());
+			
+			Debugger.resetTime();
+			
+			EnumerateSubgraph es = new EnumerateSubgraph(g2);
+			FastGraph[] gs = es.enumerateSubgraphs(4);
+			
+			Debugger.outputTime("Time for enumeration");			
+			Debugger.log("number of subgraphs " + gs.length);
+			
+	/*		
 			time = System.currentTimeMillis();
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
 			LinkedList<Integer> edges = new LinkedList<Integer>();
 			
-			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,90,800);
+			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1500,100);
 			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1500000,10000000);
 			FastGraph g3 = g2;
 			
 			long deletionTime = (long) ((System.currentTimeMillis()-time)/1000.0);
-//			System.out.println("deletion test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-			System.out.println("CONSISTENT g3 a "+g3.checkConsistency());
+			System.out.println("deletion test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			
 			time = System.currentTimeMillis();
-			g3.relabelFastGraph(g3.getNumberOfNodes()/10);
-//			System.out.println("relabelling test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-//			System.out.println("deletion test time (from before) " + deletionTime+" seconds");
-//			System.out.println("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
+			//g3.relabelFastGraph(g3.getNumberOfNodes()/10);
+			System.out.println("relabelling test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+			System.out.println("deletion test time (from before) " + deletionTime+" seconds");
+			System.out.println("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
+	
 			time = System.currentTimeMillis();
-			g3.setName(g2.getName()+"-short");
-			g3.saveBuffers(null,g3.getName()+"-pjr");
-			System.out.println("CONSISTENT g3 b "+g3.checkConsistency());
-//			System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+			//g3.setName(g2.getName()+"-relabelled");
+			//g3.saveBuffers(null,g3.getName());
+			System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 				
-			FastGraph g4 = loadBuffersGraphFactory(null,g3.getName()+"-pjr");
-			System.out.println("CONSISTENT g4 "+g4.checkConsistency());
+			//FastGraph g4 = loadBuffersGraphFactory(null,g3.getName());
+			
+			Graph dg = g2.generateDisplayGraph();
+			boolean consistent = dg.consistent();
+			System.out.println("consistent: " + consistent);
+		*/	
 			
 			//just for testing
 			System.out.println();
@@ -1540,7 +1547,6 @@ String name = "soc-pokec-relationships.txt-veryshort-veryshort";
 	 * @param directory where the files are to be stored, or if null fileBaseName under data under the current working directory
 	 * @param fileBaseName the name of the files, to which extensions are added
 	 */
-//	@SuppressWarnings("resource")
 	public void saveBuffers(String directory, String fileBaseName) {
 		
 		String directoryAndBaseName = "";
@@ -1593,8 +1599,8 @@ String name = "soc-pokec-relationships.txt-veryshort-veryshort";
 	/**
 	 * Save a ByteBuffer to a file.
 	 * 
-	 * @param file to write to
-	 * @param buf to be written
+	 * @param file name to write to
+	 * @param buf buffer to be written
 	 * @throws Exception if file save fails
 	 */
 	private void writeBuf(String fileName, ByteBuffer buf) throws Exception {
@@ -1615,7 +1621,7 @@ String name = "soc-pokec-relationships.txt-veryshort-veryshort";
 
 	}
 
-
+	
 	/**
 	 * Creates a graph from a SNAP .txt adjacency list file. Number of nodes and edges are given
 	 * by the <a href="https://snap.stanford.edu/data/">SNAP website</a>. Assumes edges
@@ -2955,86 +2961,6 @@ if(node%100000 == 0) {
 			}
 		}		
 		return res;
-	}
-	
-
-	/**
-	 * Check the consistency of a graph. Checks: <ul>
-	 * <li> If edges link to node indexes outside of the current range</li>
-	 * <li> If all edges are reflected in the connection lists</li>
-	 * <li> If the connection list data points to the correct edges</li>
-	 * <li> If the nodes and edges in the connection list are correct</li>
-	 * </ul>
-	 * 
-	 * @return true if the graph is consistent, false otherwise
-	 */
-	public boolean checkConsistency() {
-
-		// consistency of edges
-		for(int e = 0; e < getNumberOfEdges(); e++) {
-			int node1 = getEdgeNode1(e);
-			int node2 = getEdgeNode2(e);
-			if(node1 < 0 || node1 >= getNumberOfNodes()) {
-System.out.println("INCONSISTENT. Edge "+e+" has node1 "+node1+ " but there are only "+getNumberOfNodes()+" nodes");
-				return false;
-			}
-			if(node2 < 0 || node2 >= getNumberOfNodes()) {
-System.out.println("INCONSISTENT. Edge "+e+" has node2 "+node2+ " but there are only "+getNumberOfNodes()+" nodes");
-				return false;
-			}
-			if(!Util.convertArray(getNodeConnectingOutEdges(node1)).contains(e)) {
-System.out.println("INCONSISTENT. Edge "+e+" has node1 "+node1+ " but it is not in the node out list");
-				return false;
-			}
-			if(!Util.convertArray(getNodeConnectingInEdges(node2)).contains(e)) {
-System.out.println("INCONSISTENT. Edge "+e+" has node2 "+node2+ " but it is not in the node in list");
-				return false;
-			}
-		}
-		
-		// consistency of nodes and connection lists
-		for(int n = 0; n < getNumberOfNodes(); n++) {
-			if(getNodeConnectingOutEdges(n).length != getNodeConnectingOutNodes(n).length) {
-System.out.println("INCONSISTENT. Node "+n+" has different number of out edges to out nodes");
-				return false;
-			}
-			if(getNodeConnectingInEdges(n).length != getNodeConnectingInNodes(n).length) {
-System.out.println("INCONSISTENT. Node "+n+" has different number of in edges to in nodes");
-				return false;
-			}
-			for(int i = 0; i < getNodeConnectingOutEdges(n).length; i++) {
-				int connectingEdge = getNodeConnectingOutEdges(n)[i];
-				int otherEnd = oppositeEnd(connectingEdge, n);
-				int connectingNode = getNodeConnectingOutNodes(n)[i];
-				if(otherEnd != connectingNode) {
-System.out.println("INCONSISTENT. Node "+n+" has inconsitent edge and node in connecting out list");
-					return false;
-				}
-				if(n != oppositeEnd(connectingEdge, otherEnd)) {
-System.out.println("INCONSISTENT. Node "+n+" has edge in connecting  out list that does not point to the node");
-					return false;
-				}
-			}
-				
-				for(int i = 0; i < getNodeConnectingInEdges(n).length; i++) {
-					int connectingEdge = getNodeConnectingInEdges(n)[i];
-					int otherEnd = oppositeEnd(connectingEdge, n);
-					int connectingNode = getNodeConnectingInNodes(n)[i];
-					if(otherEnd != connectingNode) {
-System.out.println("INCONSISTENT. Node "+n+" has inconsitent edge and node in connecting in list");
-					return false;
-				}
-				if(n != oppositeEnd(connectingEdge, otherEnd)) {
-System.out.println("INCONSISTENT. Node "+n+" has edge in connecting in list that does not point to the node");
-					return false;
-				}
-
-			}
-		}
-		
-
-		
-		return true;
 	}
 	
 }
