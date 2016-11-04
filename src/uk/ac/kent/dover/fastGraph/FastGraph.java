@@ -1589,8 +1589,16 @@ String name = "soc-pokec-relationships.txt-veryshort-veryshort";
 			
 	}
 	
-	
+
+	/**
+	 * Save a ByteBuffer to a file.
+	 * 
+	 * @param file to write to
+	 * @param buf to be written
+	 * @throws Exception if file save fails
+	 */
 	private void writeBuf(String fileName, ByteBuffer buf) throws Exception {
+		
 		try {
 			buf.rewind();
 			File file = new File(fileName);
