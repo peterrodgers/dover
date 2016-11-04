@@ -144,9 +144,9 @@ System.out.println("snap load time " + (System.currentTimeMillis()-time)/1000.0+
 		System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 		time = System.currentTimeMillis();
 */
-String name = "random-n-100-e-1000";
+//String name = "random-n-100-e-1000";
 //String name = "as-skitter.txt";
-//String name = "soc-pokec-relationships.txt-short";
+String name = "soc-pokec-relationships.txt-short-relabelled";
 //String name = "soc-pokec-relationships.txt-veryshort-veryshort";
 //String name = "Wiki-Vote.txt";
 //		String name = g1.getName();
@@ -161,7 +161,7 @@ String name = "random-n-100-e-1000";
 			Debugger.resetTime();
 			
 			EnumerateSubgraph es = new EnumerateSubgraph(g2);
-			FastGraph[] gs = es.enumerateSubgraphs(4);
+			FastGraph[] gs = es.enumerateSubgraphs(4,0.5);
 			
 			Debugger.outputTime("Time for enumeration");			
 			Debugger.log("number of subgraphs " + gs.length);
@@ -175,27 +175,27 @@ String name = "random-n-100-e-1000";
 			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1500000,10000000);
 			FastGraph g3 = g2;
 			
-			long deletionTime = (long) ((System.currentTimeMillis()-time)/1000.0);
-			System.out.println("deletion test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
+			//long deletionTime = (long) ((System.currentTimeMillis()-time)/1000.0);
+			//System.out.println("deletion test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 			
 			time = System.currentTimeMillis();
-			//g3.relabelFastGraph(g3.getNumberOfNodes()/10);
+			g3.relabelFastGraph(g3.getNumberOfNodes()/10);
 			System.out.println("relabelling test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
-			System.out.println("deletion test time (from before) " + deletionTime+" seconds");
+			//System.out.println("deletion test time (from before) " + deletionTime+" seconds");
 			System.out.println("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
 	
 			time = System.currentTimeMillis();
-			//g3.setName(g2.getName()+"-relabelled");
-			//g3.saveBuffers(null,g3.getName());
+			g3.setName(g2.getName()+"-relabelled");
+			g3.saveBuffers(null,g3.getName());
 			System.out.println("saveBuffers test time " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 				
-			//FastGraph g4 = loadBuffersGraphFactory(null,g3.getName());
+			FastGraph g4 = loadBuffersGraphFactory(null,g3.getName());
 			
-			Graph dg = g2.generateDisplayGraph();
-			boolean consistent = dg.consistent();
-			System.out.println("consistent: " + consistent);
-		*/	
+		//	Graph dg = g2.generateDisplayGraph();
+		//	boolean consistent = dg.consistent();
+		//	System.out.println("consistent: " + consistent);
 			
+	*/		
 			//just for testing
 			System.out.println();
 	/*		

@@ -3,6 +3,7 @@ package uk.ac.kent.dover.fastGraph;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Random;
 
 /**
  * Algorithm to generate subgraphs for motif detection, based on: A Faster Algorithm for Detecting Network Motifs, Sebastian Wernicke (2005)
@@ -13,6 +14,8 @@ import java.util.LinkedList;
 public class EnumerateSubgraph {
 	
 	private FastGraph g;
+	private Random r;
+	private double q;
 	
 	public EnumerateSubgraph(FastGraph g) {
 		this.g = g;
@@ -22,9 +25,12 @@ public class EnumerateSubgraph {
 	 * ESU - Returns all size-k subgraphs in the FastGraph.
 	 * 
 	 * @param k The size of subgraph to find
+	 * @param q The percentage of nodes to sample, i.e. 50% = 0.5
 	 * @return All size-k subgraphs in the FastGraph
 	 */
-	public FastGraph[] enumerateSubgraphs(int k) {
+	public FastGraph[] enumerateSubgraphs(int k, double q) {
+		this.q = q;
+		r = new Random(g.getNodeBuf().getLong(0));
 		Debugger.log("testing enumerateSubgraph");
 		Debugger.log("k " + k);
 		Debugger.resetTime();
@@ -52,11 +58,15 @@ public class EnumerateSubgraph {
 			//Debugger.log("vSubgraph " + vSubgraph);
 			
 			//extend Subgraph
-			extendSubgraph(vSubgraph,extension,v,k, subs, 1);
+			if(r.nextDouble() > q) {
+				extendSubgraph(vSubgraph,extension,v,k, subs, 1);
+			}
 			
 			if(v % 1000 == 0) {
 				Debugger.log("v " + v);
 				Debugger.log("subgraphs found " + subs.size());
+				Debugger.outputTime("Taken so far:");
+				Debugger.log();
 			}
 			
 		}
@@ -108,25 +118,29 @@ public class EnumerateSubgraph {
 				break;
 			}
 			
-			HashSet<Integer> wSet = new HashSet<Integer>();			
-			HashSet<Integer> neighboursToW = neighbourhood(wSet);			
-			HashSet<Integer> neighboursToVsub = neighbourhood(vSubgraph);
-			/*for (int i : vSubgraph) {
-				neighboursToVsub.addAll(Util.convertArray(g.getNodeConnectingNodes(i)));
-			}*/
-			neighboursToW.removeAll(neighboursToVsub);
 			
-			HashSet<Integer> vDashExtension = new HashSet<Integer>(vExtension);
-			for (int u : neighboursToW) {
-				if (u > v) {
-					vDashExtension.add(u);
+			//sampling
+			double prob = 1-Math.pow(q,1/depth);
+			if(r.nextDouble() > prob) {
+				HashSet<Integer> wSet = new HashSet<Integer>();			
+				HashSet<Integer> neighboursToW = neighbourhood(wSet);			
+				HashSet<Integer> neighboursToVsub = neighbourhood(vSubgraph);
+				/*for (int i : vSubgraph) {
+					neighboursToVsub.addAll(Util.convertArray(g.getNodeConnectingNodes(i)));
+				}*/
+				neighboursToW.removeAll(neighboursToVsub);
+				
+				HashSet<Integer> vDashExtension = new HashSet<Integer>(vExtension);
+				for (int u : neighboursToW) {
+					if (u > v) {
+						vDashExtension.add(u);
+					}
 				}
-			}
-			
-			vSubgraph.add(w);
-			
-			extendSubgraph(new HashSet<Integer>(vSubgraph), new HashSet<Integer>(vDashExtension), v, k, subs, depth+1);
-			
+				
+				vSubgraph.add(w);
+				
+				extendSubgraph(new HashSet<Integer>(vSubgraph), new HashSet<Integer>(vDashExtension), v, k, subs, depth+1);
+			}			
 		}
 		
 		
