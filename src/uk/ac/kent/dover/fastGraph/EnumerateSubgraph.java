@@ -32,7 +32,7 @@ public class EnumerateSubgraph {
 		LinkedList<FastGraph> subs = new LinkedList<FastGraph>();
 		
 		for (int v = 0; v < g.getNumberOfNodes(); v++) {
-			Debugger.log("v " + v);
+			
 			HashSet<Integer> extension = new HashSet<Integer>();
 			
 			//ad all nodes connection to v that have a bigger index
@@ -48,12 +48,16 @@ public class EnumerateSubgraph {
 			HashSet<Integer> vSubgraph = new HashSet<Integer>();
 			vSubgraph.add(v);
 			
-			Debugger.log("extension " + extension);
-			Debugger.log("vSubgraph " + vSubgraph);
+			//Debugger.log("extension " + extension);
+			//Debugger.log("vSubgraph " + vSubgraph);
 			
 			//extend Subgraph
-			extendSubgraph(vSubgraph,extension,v,k, subs);
+			extendSubgraph(vSubgraph,extension,v,k, subs, 1);
 			
+			if(v % 1000 == 0) {
+				Debugger.log("v " + v);
+				Debugger.log("subgraphs found " + subs.size());
+			}
 			
 		}
 		
@@ -76,16 +80,21 @@ public class EnumerateSubgraph {
 	 * @param subs The list of subgraphs found
 	 * @return The extended subgraph (in the form of a set of nodes)
 	 */
-	private void extendSubgraph(HashSet<Integer> vSubgraph, HashSet<Integer> vExtension, int v, int k, LinkedList<FastGraph> subs) {
-		Debugger.log();
-		Debugger.log("extend k " + k);
-		Debugger.log("extend vExtension " + vExtension);
-		Debugger.log("extend vSubgraph " + vSubgraph);
+	private void extendSubgraph(HashSet<Integer> vSubgraph, HashSet<Integer> vExtension, int v, int k, LinkedList<FastGraph> subs, int depth) {
+		//Debugger.log();
+		//Debugger.log("extend k " + k + " v" + v);
+		//Debugger.log("extend vExtension " + vExtension);
+		//Debugger.log("extend vSubgraph " + vSubgraph);
+		//Debugger.log("depth " + depth);
 		
 		//if the correct size already exists
 		if(vSubgraph.size() == k) {
-			Debugger.log("### extend vSubgraph size match");
+		//	Debugger.log("### extend vSubgraph size match");
 			addFoundSubgraph(subs, vSubgraph);
+			return;
+		}
+		
+		if(vSubgraph.size() > k) {
 			return;
 		}
 		
@@ -116,7 +125,7 @@ public class EnumerateSubgraph {
 			
 			vSubgraph.add(w);
 			
-			extendSubgraph(vSubgraph, vDashExtension, v, k, subs);
+			extendSubgraph(new HashSet<Integer>(vSubgraph), new HashSet<Integer>(vDashExtension), v, k, subs, depth+1);
 			
 		}
 		
@@ -147,7 +156,7 @@ public class EnumerateSubgraph {
 	 * @param nodes The set of nodes in a new subgraph
 	 */
 	private void addFoundSubgraph(LinkedList<FastGraph> subs, HashSet<Integer> nodes) {
-		Debugger.log("adding subgraph nodes " + nodes);
+	//	Debugger.log("adding subgraph nodes " + nodes);
 		HashSet<Integer> edges = new HashSet<Integer>();
 		
 		//add all edges connecting to only the nodes in the subgraph. Might be slow
@@ -158,7 +167,7 @@ public class EnumerateSubgraph {
 				}
 			}
 		}
-		Debugger.log("adding subgraph " + (subs.size()+1));
+		//Debugger.log("adding subgraph " + (subs.size()+1));
 		//convert and add FastGraph
 		subs.add(g.generateGraphFromSubgraph(Util.convertHashSet(nodes), Util.convertHashSet(edges)));
 	}
