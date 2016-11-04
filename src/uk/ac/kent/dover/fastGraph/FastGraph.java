@@ -1534,9 +1534,9 @@ String name = "soc-pokec-relationships.txt-veryshort-veryshort";
 
 
 	/**
-	 * saves the current graph to several files, in directory given to base name given  (i.e. fileBaseName should have no extension).
-	 * If directory is null, then to a directory named data under current working directory. Directory should
-	 * already exist.
+	 * saves the current graph to several files, in directory given to base name given (i.e. fileBaseName should have no extension).
+	 * If directory is null, then to a directory named data under current working directory. data directory should
+	 * already exist, new directory is created.
 	 * @param directory where the files are to be stored, or if null fileBaseName under data under the current working directory
 	 * @param fileBaseName the name of the files, to which extensions are added
 	 */
