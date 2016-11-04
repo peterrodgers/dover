@@ -30,8 +30,9 @@ public class EnumerateSubgraph {
 		Debugger.resetTime();
 		
 		LinkedList<FastGraph> subs = new LinkedList<FastGraph>();
+		
 		for (int v = 0; v < g.getNumberOfNodes(); v++) {
-			Debugger.log("v " + v);
+			
 			HashSet<Integer> extension = new HashSet<Integer>();
 			
 			//ad all nodes connection to v that have a bigger index
@@ -47,26 +48,15 @@ public class EnumerateSubgraph {
 			HashSet<Integer> vSubgraph = new HashSet<Integer>();
 			vSubgraph.add(v);
 			
-			Debugger.log("extension " + extension);
-			Debugger.log("vSubgraph " + vSubgraph);
+			//Debugger.log("extension " + extension);
+			//Debugger.log("vSubgraph " + vSubgraph);
 			
 			//extend Subgraph
-			HashSet<Integer> nodes = extendSubgraph(vSubgraph,extension,v,k);
-			Debugger.log("adding subgraph nodes " + nodes);
-			if (nodes != null) {
-				HashSet<Integer> edges = new HashSet<Integer>();
-				
-				//add all edges connecting to only the nodes in the subgraph. Might be slow
-				for(int n : nodes) {
-					for (int edge : g.getNodeConnectingEdges(n)) {
-						if (nodes.contains(g.oppositeEnd(edge,n))) {
-							edges.add(edge);
-						}
-					}
-				}
-				Debugger.log("adding subgraph " + (subs.size()+1));
-				//convert and add FastGraph
-				subs.add(g.generateGraphFromSubgraph(Util.convertHashSet(nodes), Util.convertHashSet(edges)));
+			extendSubgraph(vSubgraph,extension,v,k, subs, 1);
+			
+			if(v % 1000 == 0) {
+				Debugger.log("v " + v);
+				Debugger.log("subgraphs found " + subs.size());
 			}
 			
 		}
@@ -87,18 +77,25 @@ public class EnumerateSubgraph {
 	 * @param vExtension The extension to the subgraph
 	 * @param v The starting node
 	 * @param k The size of subgraph to be found
+	 * @param subs The list of subgraphs found
 	 * @return The extended subgraph (in the form of a set of nodes)
 	 */
-	private HashSet<Integer> extendSubgraph(HashSet<Integer> vSubgraph, HashSet<Integer> vExtension, int v, int k) {
-		Debugger.log();
-		Debugger.log("extend k " + k);
-		Debugger.log("extend vExtension " + vExtension);
-		Debugger.log("extend vSubgraph " + vSubgraph);
+	private void extendSubgraph(HashSet<Integer> vSubgraph, HashSet<Integer> vExtension, int v, int k, LinkedList<FastGraph> subs, int depth) {
+		//Debugger.log();
+		//Debugger.log("extend k " + k + " v" + v);
+		//Debugger.log("extend vExtension " + vExtension);
+		//Debugger.log("extend vSubgraph " + vSubgraph);
+		//Debugger.log("depth " + depth);
 		
 		//if the correct size already exists
 		if(vSubgraph.size() == k) {
-			Debugger.log("### extend vSubgraph size match");
-			return vSubgraph;
+		//	Debugger.log("### extend vSubgraph size match");
+			addFoundSubgraph(subs, vSubgraph);
+			return;
+		}
+		
+		if(vSubgraph.size() > k) {
+			return;
 		}
 		
 		while(vExtension.size() != 0) {
@@ -128,17 +125,21 @@ public class EnumerateSubgraph {
 			
 			vSubgraph.add(w);
 			
-			HashSet<Integer> res = extendSubgraph(vSubgraph, vDashExtension, v, k);
-			if (res != null) {
-				return res;
-			}
+			extendSubgraph(new HashSet<Integer>(vSubgraph), new HashSet<Integer>(vDashExtension), v, k, subs, depth+1);
 			
 		}
 		
 		
-		return null;
+		return;
 	}
 	
+	
+	/**
+	 * Creates a set of all nodes connecting to all those in v, but not those in v.
+	 * 
+	 * @param v The set to build the neighbourhood from
+	 * @return A set of connecting nodes (but not the starting nodes themselves)
+	 */
 	private HashSet<Integer> neighbourhood(HashSet<Integer> v) {
 		HashSet<Integer> set = new HashSet<Integer>();
 		for(int i : v) {
@@ -146,6 +147,29 @@ public class EnumerateSubgraph {
 		}
 		set.removeAll(v);
 		return set;
+	}
+	
+	/**
+	 * Saves a subgraph. Builds the edges between the nodes given
+	 * 
+	 * @param subs The list of subgraphs
+	 * @param nodes The set of nodes in a new subgraph
+	 */
+	private void addFoundSubgraph(LinkedList<FastGraph> subs, HashSet<Integer> nodes) {
+	//	Debugger.log("adding subgraph nodes " + nodes);
+		HashSet<Integer> edges = new HashSet<Integer>();
+		
+		//add all edges connecting to only the nodes in the subgraph. Might be slow
+		for(int n : nodes) {
+			for (int edge : g.getNodeConnectingEdges(n)) {
+				if (nodes.contains(g.oppositeEnd(edge,n))) {
+					edges.add(edge);
+				}
+			}
+		}
+		//Debugger.log("adding subgraph " + (subs.size()+1));
+		//convert and add FastGraph
+		subs.add(g.generateGraphFromSubgraph(Util.convertHashSet(nodes), Util.convertHashSet(edges)));
 	}
 
 }
