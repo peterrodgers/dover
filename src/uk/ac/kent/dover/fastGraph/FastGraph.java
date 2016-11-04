@@ -2963,4 +2963,83 @@ if(node%100000 == 0) {
 		return res;
 	}
 	
+	
+	/**
+	 * Check the consistency of a graph. Checks: <ul>
+	 * <li> If edges link to node indexes outside of the current range</li>
+	 * <li> If all edges are reflected in the connection lists</li>
+	 * <li> If the connection list data points to the correct edges</li>
+	 * <li> If the nodes and edges in the connection list are correct</li>
+	 * </ul>
+	 * 
+	 * @return true if the graph is consistent, false otherwise
+	 */
+	public boolean checkConsistency() {
+
+		// consistency of edges
+		for(int e = 0; e < getNumberOfEdges(); e++) {
+			int node1 = getEdgeNode1(e);
+			int node2 = getEdgeNode2(e);
+			if(node1 < 0 || node1 >= getNumberOfNodes()) {
+				Debugger.log("INCONSISTENT. Edge "+e+" has node1 "+node1+ " but there are only "+getNumberOfNodes()+" nodes");
+				return false;
+			}
+			if(node2 < 0 || node2 >= getNumberOfNodes()) {
+				Debugger.log("INCONSISTENT. Edge "+e+" has node2 "+node2+ " but there are only "+getNumberOfNodes()+" nodes");
+				return false;
+			}
+			if(!Util.convertArray(getNodeConnectingOutEdges(node1)).contains(e)) {
+				Debugger.log("INCONSISTENT. Edge "+e+" has node1 "+node1+ " but it is not in the node out list");
+				return false;
+			}
+			if(!Util.convertArray(getNodeConnectingInEdges(node2)).contains(e)) {
+				Debugger.log("INCONSISTENT. Edge "+e+" has node2 "+node2+ " but it is not in the node in list");
+				return false;
+			}
+		}
+		
+		// consistency of nodes and connection lists
+		for(int n = 0; n < getNumberOfNodes(); n++) {
+			if(getNodeConnectingOutEdges(n).length != getNodeConnectingOutNodes(n).length) {
+				Debugger.log("INCONSISTENT. Node "+n+" has different number of out edges to out nodes");
+				return false;
+			}
+			if(getNodeConnectingInEdges(n).length != getNodeConnectingInNodes(n).length) {
+				Debugger.log("INCONSISTENT. Node "+n+" has different number of in edges to in nodes");
+				return false;
+			}
+			for(int i = 0; i < getNodeConnectingOutEdges(n).length; i++) {
+				int connectingEdge = getNodeConnectingOutEdges(n)[i];
+				int otherEnd = oppositeEnd(connectingEdge, n);
+				int connectingNode = getNodeConnectingOutNodes(n)[i];
+				if(otherEnd != connectingNode) {
+					Debugger.log("INCONSISTENT. Node "+n+" has inconsitent edge and node in connecting out list");
+					return false;
+				}
+				if(n != oppositeEnd(connectingEdge, otherEnd)) {
+					Debugger.log("INCONSISTENT. Node "+n+" has edge in connecting  out list that does not point to the node");
+					return false;
+				}
+			}
+				
+				for(int i = 0; i < getNodeConnectingInEdges(n).length; i++) {
+					int connectingEdge = getNodeConnectingInEdges(n)[i];
+					int otherEnd = oppositeEnd(connectingEdge, n);
+					int connectingNode = getNodeConnectingInNodes(n)[i];
+					if(otherEnd != connectingNode) {
+						Debugger.log("INCONSISTENT. Node "+n+" has inconsitent edge and node in connecting in list");
+					return false;
+				}
+				if(n != oppositeEnd(connectingEdge, otherEnd)) {
+					Debugger.log("INCONSISTENT. Node "+n+" has edge in connecting in list that does not point to the node");
+					return false;
+				}
+
+			}
+		}
+		
+		return true;
+	}
+		
+	
 }
