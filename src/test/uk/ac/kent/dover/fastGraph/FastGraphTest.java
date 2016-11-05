@@ -2,9 +2,8 @@ package test.uk.ac.kent.dover.fastGraph;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.nio.*;
+import java.io.*;
 
 import uk.ac.kent.displayGraph.*;
 import uk.ac.kent.dover.fastGraph.*;
@@ -20,8 +19,6 @@ import org.junit.*;
  */
 public class FastGraphTest {
 	
-	private Connected c = new Connected();
-
 	@Test
 	public void test001() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get0Node0Edge(),false);
@@ -37,7 +34,7 @@ public class FastGraphTest {
 	@Test
 	public void test003() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get0Node0Edge(),false);
-		assertTrue(c.connected(g));
+		assertTrue(Connected.connected(g));
 	}
 	
 	@Test
@@ -57,7 +54,7 @@ public class FastGraphTest {
 	@Test
 	public void test006() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get0Node0Edge(),true);
-		assertTrue(c.connected(g));
+		assertTrue(Connected.connected(g));
 	}
 	
 	@Test
@@ -75,7 +72,7 @@ public class FastGraphTest {
 	@Test
 	public void test009() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get1Node0Edge(),false);
-		assertTrue(c.connected(g));
+		assertTrue(Connected.connected(g));
 	}
 	
 	@Test
@@ -93,7 +90,7 @@ public class FastGraphTest {
 	@Test
 	public void test012() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get1Node0Edge(),true);
-		assertTrue(c.connected(g));
+		assertTrue(Connected.connected(g));
 	}
 	
 	@Test
@@ -111,7 +108,7 @@ public class FastGraphTest {
 	@Test
 	public void test015() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get2Node0Edge(),false);
-		assertFalse(c.connected(g));
+		assertFalse(Connected.connected(g));
 	}
 	
 	@Test
@@ -177,7 +174,7 @@ public class FastGraphTest {
 	@Test
 	public void test026() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get2Node0Edge(),true);
-		assertFalse(c.connected(g));
+		assertFalse(Connected.connected(g));
 	}
 	
 	@Test
@@ -243,7 +240,7 @@ public class FastGraphTest {
 	@Test
 	public void test037() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get2Node1Edge(),false);
-		assertTrue(c.connected(g));
+		assertTrue(Connected.connected(g));
 	}
 	
 	@Test
@@ -262,7 +259,7 @@ public class FastGraphTest {
 	public void test040() {
 		
 		FastGraph g = FastGraph.jsonStringGraphFactory(get2Node1Edge(),true);
-		assertTrue(c.connected(g));
+		assertTrue(Connected.connected(g));
 	}
 	
 	@Test
@@ -280,7 +277,7 @@ public class FastGraphTest {
 	@Test
 	public void test043() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get2Node2Edge(),true);
-		assertTrue(c.connected(g));
+		assertTrue(Connected.connected(g));
 	}
 	
 	@Test
@@ -480,7 +477,7 @@ public class FastGraphTest {
 		FastGraph g = FastGraph.randomGraphFactory(0, 0, false);
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
-		assertTrue(c.connected(g));
+		assertTrue(Connected.connected(g));
 	}
 	
 	@Test
@@ -488,7 +485,7 @@ public class FastGraphTest {
 		FastGraph g = FastGraph.randomGraphFactory(0, 0, true);
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
-		assertTrue(c.connected(g));
+		assertTrue(Connected.connected(g));
 	}
 	
 	@Test
@@ -496,7 +493,7 @@ public class FastGraphTest {
 		FastGraph g = FastGraph.randomGraphFactory(10, 5, -1, true, false);
 		assertEquals(10,g.getNumberOfNodes());
 		assertEquals(5,g.getNumberOfEdges());
-		assertFalse(c.connected(g));
+		assertFalse(Connected.connected(g));
 	}
 	
 	@Test
@@ -504,13 +501,13 @@ public class FastGraphTest {
 		FastGraph g = FastGraph.randomGraphFactory(10, 5, true);
 		assertEquals(10,g.getNumberOfNodes());
 		assertEquals(5,g.getNumberOfEdges());
-		assertFalse(c.connected(g));
+		assertFalse(Connected.connected(g));
 	}
 	
 	@Test
 	public void test080() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(get5Node4Edge(),true);
-		assertFalse(c.connected(g));
+		assertFalse(Connected.connected(g));
 	}
 	
 	@Test
@@ -616,7 +613,7 @@ public class FastGraphTest {
 		assertEquals(45,g2.getEdgeWeight(4));
 		assertEquals(46,g2.getEdgeType(4));
 		assertEquals(47,g2.getEdgeAge(4));
-		assertTrue(c.connected(g2));
+		assertTrue(Connected.connected(g2));
 	}
 
 	@Test
@@ -751,7 +748,7 @@ public class FastGraphTest {
 		FastGraph g = FastGraph.adjacencyListGraphFactory(0, 0, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "testAdj1.txt", false);
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
-		assertTrue(c.connected(g));
+		assertTrue(Connected.connected(g));
 	}
 
 	@Test
@@ -769,7 +766,7 @@ public class FastGraphTest {
 		assertEquals(0,connections[0]);
 		assertEquals("45",g.getNodeLabel(0));
 		assertEquals("76",g.getNodeLabel(1));
-		assertTrue(c.connected(g));
+		assertTrue(Connected.connected(g));
 	}
 
 
@@ -783,7 +780,7 @@ public class FastGraphTest {
 		connections = g.getNodeConnectingInEdges(2);
 		assertEquals(1,connections.length);
 		assertEquals(1,connections[0]);
-		assertTrue(c.connected(g));
+		assertTrue(Connected.connected(g));
 	}
 
 	@Test
@@ -1426,6 +1423,50 @@ public class FastGraphTest {
 
 	}
 
+	@Test
+	public void test130() {
+		FastGraph g;
+		ByteBuffer nodeBuf, connectionBuf, edgeBuf;
+		int offset;
+		
+		g= FastGraph.jsonStringGraphFactory(get0Node0Edge(),false);
+		assertTrue(g.checkConsistency());
+		
+		g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
+		assertTrue(g.checkConsistency());
+		
+		g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
+		nodeBuf = g.getNodeBuf();
+		offset = FastGraph.NODE_IN_CONNECTION_START_OFFSET+2*FastGraph.NODE_BYTE_SIZE;
+		nodeBuf.putInt(offset,5);
+		assertFalse(g.checkConsistency());
+		
+		g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
+		nodeBuf = g.getNodeBuf();
+		offset = FastGraph.NODE_OUT_CONNECTION_START_OFFSET+1*FastGraph.NODE_BYTE_SIZE;
+		nodeBuf.putInt(offset,3);
+		assertFalse(g.checkConsistency());
+		
+		g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
+		connectionBuf = g.getConnectionBuf();
+		offset = 55;
+		connectionBuf.putInt(offset,3);
+		assertFalse(g.checkConsistency());
+		
+		g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
+		edgeBuf = g.getEdgeBuf();
+		offset = FastGraph.EDGE_NODE1_OFFSET+3*FastGraph.EDGE_BYTE_SIZE;
+		edgeBuf.putInt(offset,1);
+		assertFalse(g.checkConsistency());
+		
+		g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
+		edgeBuf = g.getEdgeBuf();
+		offset = FastGraph.EDGE_NODE2_OFFSET+0*FastGraph.EDGE_BYTE_SIZE;
+		edgeBuf.putInt(offset,0);
+		assertFalse(g.checkConsistency());
+		
+	}
+		
 
 	
 	

@@ -39,32 +39,32 @@ import uk.ac.kent.displayGraph.*;
  */
 public class FastGraph {
 
-	protected static final int NODE_LABEL_START_OFFSET = 0; // integer
-	protected static final int NODE_LABEL_LENGTH_OFFSET = 4; // short
-	protected static final int NODE_IN_CONNECTION_START_OFFSET = 6; // integer
-	protected static final int NODE_IN_DEGREE_OFFSET = 10; // integer
-	protected static final int NODE_OUT_CONNECTION_START_OFFSET = 14; // integer
-	protected  static final int NODE_OUT_DEGREE_OFFSET = 18; // integer
-	protected  static final int NODE_WEIGHT_OFFSET = 22; // integer
-	protected  static final int NODE_TYPE_OFFSET = 26; // byte
-	protected  static final int NODE_AGE_OFFSET = 27; // byte
+	public static final int NODE_LABEL_START_OFFSET = 0; // integer
+	public static final int NODE_LABEL_LENGTH_OFFSET = 4; // short
+	public static final int NODE_IN_CONNECTION_START_OFFSET = 6; // integer
+	public static final int NODE_IN_DEGREE_OFFSET = 10; // integer
+	public static final int NODE_OUT_CONNECTION_START_OFFSET = 14; // integer
+	public static final int NODE_OUT_DEGREE_OFFSET = 18; // integer
+	public static final int NODE_WEIGHT_OFFSET = 22; // integer
+	public static final int NODE_TYPE_OFFSET = 26; // byte
+	public static final int NODE_AGE_OFFSET = 27; // byte
 	
-	protected  static final int EDGE_NODE1_OFFSET = 0; // integer
-	protected  static final int EDGE_NODE2_OFFSET = 4; // integer
-	protected  static final int EDGE_LABEL_START_OFFSET = 8; // integer
-	protected  static final int EDGE_LABEL_LENGTH_OFFSET = 12; // short
-	protected  static final int EDGE_WEIGHT_OFFSET = 14; // integer
-	protected  static final int EDGE_TYPE_OFFSET = 18; // byte
-	protected  static final int EDGE_AGE_OFFSET = 19; // byte
+	public static final int EDGE_NODE1_OFFSET = 0; // integer
+	public static final int EDGE_NODE2_OFFSET = 4; // integer
+	public static final int EDGE_LABEL_START_OFFSET = 8; // integer
+	public static final int EDGE_LABEL_LENGTH_OFFSET = 12; // short
+	public static final int EDGE_WEIGHT_OFFSET = 14; // integer
+	public static final int EDGE_TYPE_OFFSET = 18; // byte
+	public static final int EDGE_AGE_OFFSET = 19; // byte
 	
-	protected  static final int CONNECTION_EDGE_OFFSET = 0; // integer, edge is first of the pair
-	protected  static final int CONNECTION_NODE_OFFSET = 4; // integer, node is straight after the edge
+	public static final int CONNECTION_EDGE_OFFSET = 0; // integer, edge is first of the pair
+	public static final int CONNECTION_NODE_OFFSET = 4; // integer, node is straight after the edge
 	
 	public static final int DEFAULT_AVERAGE_LABEL_LENGTH = 20;
 	
-	protected  static final int NODE_BYTE_SIZE = 28;
-	protected  static final int EDGE_BYTE_SIZE = 20;
-	protected  static final int CONNECTION_PAIR_SIZE = 8; // this is an edge index plus an node index
+	public static final int NODE_BYTE_SIZE = 28;
+	public static final int EDGE_BYTE_SIZE = 20;
+	public static final int CONNECTION_PAIR_SIZE = 8; // this is an edge index plus an node index
 	
 	public static final String INFO_SPLIT_STRING = "~";
 	
