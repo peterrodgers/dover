@@ -34,6 +34,7 @@ public class EnumerateSubgraph {
 		Debugger.log("testing enumerateSubgraph");
 		Debugger.log("k " + k);
 		Debugger.resetTime();
+		long time = Debugger.createTime();
 		
 		LinkedList<FastGraph> subs = new LinkedList<FastGraph>();
 		
@@ -65,8 +66,10 @@ public class EnumerateSubgraph {
 			if(v % 1000 == 0) {
 				Debugger.log("v " + v);
 				Debugger.log("subgraphs found " + subs.size());
+				Debugger.outputTime("Taken for this step:", time);
 				Debugger.outputTime("Taken so far:");
 				Debugger.log();
+				time = Debugger.createTime();
 			}
 			
 		}
@@ -117,17 +120,14 @@ public class EnumerateSubgraph {
 				vExtension.remove(i);
 				break;
 			}
-			
-			
+
 			//sampling
-			double prob = 1-Math.pow(q,1/depth);
+			//double prob = Math.pow(q,1/depth);
+			double prob = (q / depth);
 			if(r.nextDouble() > prob) {
 				HashSet<Integer> wSet = new HashSet<Integer>();			
 				HashSet<Integer> neighboursToW = neighbourhood(wSet);			
 				HashSet<Integer> neighboursToVsub = neighbourhood(vSubgraph);
-				/*for (int i : vSubgraph) {
-					neighboursToVsub.addAll(Util.convertArray(g.getNodeConnectingNodes(i)));
-				}*/
 				neighboursToW.removeAll(neighboursToVsub);
 				
 				HashSet<Integer> vDashExtension = new HashSet<Integer>(vExtension);
@@ -139,6 +139,7 @@ public class EnumerateSubgraph {
 				
 				vSubgraph.add(w);
 				
+				//create new HashSets as the previous ones shouldn't be modified
 				extendSubgraph(new HashSet<Integer>(vSubgraph), new HashSet<Integer>(vDashExtension), v, k, subs, depth+1);
 			}			
 		}
