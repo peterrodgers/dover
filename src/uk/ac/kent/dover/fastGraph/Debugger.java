@@ -40,12 +40,12 @@ public class Debugger {
 	}
 	
 	/**
-	 * Resets the timing system from a given timing variable
+	 * Returns the current time for time keeping
 	 * 
-	 * @param time A given timing variable
+	 * @return The current time
 	 */
-	public static void resetTime(long time) {
-		time = System.currentTimeMillis();
+	public static long createTime() {
+		return System.currentTimeMillis();
 	}
 	
 	/**
@@ -65,7 +65,7 @@ public class Debugger {
 	}
 	
 	/**
-	 * Outputs the time difference between this call and the last resetTime() call for the given time
+	 * Outputs the time difference between this call and the last createTime() call for the given time
 	 * 
 	 * @param time A given timing variable
 	 */
@@ -74,7 +74,7 @@ public class Debugger {
 	}
 	
 	/**
-	 * Outputs the time difference between this call and the last resetTime() call for the given time with a message
+	 * Outputs the time difference between this call and the last createTime() call for the given time with a message
 	 * 
 	 * @param Object o The object to to be printed
  	 * @param time A given timing variable

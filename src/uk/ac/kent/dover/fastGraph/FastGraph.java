@@ -127,7 +127,7 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(4847571,68993773,1,false); // Size of LiveJournal1 example from SNAP
 //		FastGraph g1 = randomGraphFactory(10000000,100000000,1,false); // 10 million nodes, 100 million edges, close to edgeBuf limit, but fails on heap space with 14g, but pass with heap space of 30g
 
-		Debugger.resetTime(time);
+		time = Debugger.createTime();
 //		FastGraph g1 = adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false); // SNAP web page gives 1768149 edges
@@ -138,21 +138,21 @@ public class FastGraph {
 		
 Debugger.outputTime("snap load time ");
 /*		
-		Debugger.resetTime(time);
+		time = Debugger.createTime();
 		
 		g1.saveBuffers(null,g1.getName());
 		Debugger.outputTime("saveBuffers test time ");
-		Debugger.resetTime(time);
+		time = Debugger.createTime();
 */
 //String name = "random-n-100-e-1000";
 //String name = "as-skitter.txt";
-String name = "soc-pokec-relationships-reduced";
+String name = "soc-pokec-relationships.txt-reduced";
 //String name = "soc-pokec-relationships.txt-veryshort-veryshort";
 //String name = "Wiki-Vote.txt";
 //		String name = g1.getName();
 		FastGraph g2;
 		try {
-			//Debugger.resetTime(time);
+			//time = Debugger.createTime();
 			g2 = loadBuffersGraphFactory(null,name);
 			
 			Debugger.log("Number of nodes: " + g2.getNumberOfNodes());
@@ -167,7 +167,7 @@ String name = "soc-pokec-relationships-reduced";
 			Debugger.log("number of subgraphs " + gs.length);
 			
 	/*		
-			Debugger.resetTime(time);
+			time = Debugger.createTime();
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
 			LinkedList<Integer> edges = new LinkedList<Integer>();
 			
@@ -177,13 +177,13 @@ String name = "soc-pokec-relationships-reduced";
 			
 			//Debugger.outputTime("deletion test time ");
 			
-			Debugger.resetTime(time);
+			time = Debugger.createTime();
 			g3.relabelFastGraph(g3.getNumberOfNodes()/10);
 			Debugger.log("relabelling test time ");
 			//Debugger.log("deletion test time (from before) " + deletionTime+" seconds");
 			Debugger.outputTime("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
 	
-			Debugger.resetTime(time);
+			time = Debugger.createTime();
 			g3.setName(g2.getName()+"-relabelled");
 			g3.saveBuffers(null,g3.getName());
 			Debugger.outputTime("saveBuffers test time ");
@@ -233,7 +233,7 @@ String name = "soc-pokec-relationships-reduced";
 	public void relabelFastGraph(int subgraphsToTest) throws Exception{
 		Debugger.log("Relabelling FastGraph");
 		long time = 0;
-		Debugger.resetTime(time);
+		time = Debugger.createTime();
 		
 		//load node and edge labels arrays
 		String[] nodeLabels = new String[this.getNumberOfNodes()];
@@ -394,7 +394,7 @@ String name = "soc-pokec-relationships-reduced";
 	public FastGraph removeNodesAndEdgesFromGraph(LinkedList<Integer> nodes, LinkedList<Integer> edges, int targetNodes, int targetEdges) throws FastGraphException {
 		
 		Debugger.log("Suggesting nodes and egdes to remove");
-		long time = 0; Debugger.resetTime(time);
+		long time = 0; time = Debugger.createTime();
 		
 		int currentTotalNodes = getNumberOfNodes();
 		int currentTotalEdges = getNumberOfEdges();
@@ -425,7 +425,7 @@ String name = "soc-pokec-relationships-reduced";
 		Debugger.outputTime("setup test time ");
 		Debugger.log();
 		
-		Debugger.resetTime(time);
+		time = Debugger.createTime();
 		Debugger.log("# Starting STEP ONE");
 		//STEP ONE:
 		//Find a subgraph with the required number of nodes. Remove it
@@ -451,7 +451,7 @@ String name = "soc-pokec-relationships-reduced";
 		//STEP TWO:
 		//if we haven't removed enough nodes
 		Debugger.log("# Starting STEP TWO");
-		Debugger.resetTime(time);
+		time = Debugger.createTime();
 		if(nodeReductionAmount > nodesToRemove.size()) { //could we thread these to make this quicker?
 			Random r = new Random(nodeBuf.getLong(1));
 			
@@ -499,7 +499,7 @@ String name = "soc-pokec-relationships-reduced";
 		//if we haven't removed enough nodes
 		//pick some at random
 		Debugger.log("# Starting STEP THREE");
-		Debugger.resetTime(time);
+		time = Debugger.createTime();
 		if(nodeReductionAmount > nodesToRemove.size()) {
 			Random r = new Random(nodeBuf.getLong(2));		
 			while(nodeReductionAmount > nodesToRemove.size()) {
@@ -517,7 +517,7 @@ String name = "soc-pokec-relationships-reduced";
 		//if we haven't removed enough edges
 		//pick some at random
 		Debugger.log("# Starting STEP FOUR");
-		Debugger.resetTime(time);
+		time = Debugger.createTime();
 		if(edgeReductionAmount > edgesToRemove.size()) {
 			Random r = new Random(edgeBuf.getLong(2));
 			while(edgeReductionAmount > edgesToRemove.size()) {
@@ -533,7 +533,7 @@ String name = "soc-pokec-relationships-reduced";
 		nodes.addAll(nodesToRemove);
 		edges.addAll(edgesToRemove);
 
-		Debugger.resetTime(time);
+		time = Debugger.createTime();
 		Debugger.log("Building new FastGraph");
 		FastGraph g = this.generateGraphByDeletingItems(Util.convertLinkedList(nodes), Util.convertLinkedList(edges), false);
 		Debugger.outputTime("After FastGraph building test time ");
@@ -1451,7 +1451,7 @@ String name = "soc-pokec-relationships-reduced";
 		weight = -101;
 		type = -103;
 		age = -105;
-		//Debugger.resetTime(time);
+		//time = Debugger.createTime();
 		
 		//populate the edges
 		JSONArray edges = jsonObj.getJSONArray("edges");
@@ -1690,7 +1690,7 @@ String name = "soc-pokec-relationships-reduced";
 		String[] splitLine;
 		
 		String line = "";
-long time = 0; Debugger.resetTime(time);			
+long time = 0; time = Debugger.createTime();			
 		while(line != null) {
 			line = br.readLine();
 			if(line == null) {
@@ -1803,7 +1803,7 @@ if(edgeIndex%1000000==0 ) {
 
 
 		// Initialise the connection buffer, modifying the node buffer connection data
-		//Debugger.resetTime(time);
+		//time = Debugger.createTime();
 		int offset = 0;
 		for(int i = 0; i < numberOfNodes; i++) {
 			// setting the in connection offset and length
@@ -2131,7 +2131,7 @@ if(edgeIndex%1000000==0 ) {
 
 
 		// Initialise the connection buffer, modifying the node buffer connection data
-		//Debugger.resetTime(time);
+		//time = Debugger.createTime();
 		int offset = 0;
 		for(int i = 0; i < numberOfNodes; i++) {
 			// setting the in connection offset and length
@@ -2577,7 +2577,7 @@ if(edgeIndex%1000000==0 ) {
 		setAllEdgeLabels(edgeLabels);
 
 		// Initialise the connection buffer, modifying the node buffer connection data
-		//Debugger.resetTime(time);
+		//time = Debugger.createTime();
 		int offset = 0;
 		for(int i = 0; i < numberOfNodes; i++) {
 			// setting the in connection offset and length
@@ -2645,13 +2645,13 @@ if(edgeIndex%1000000==0 ) {
 		
 		Debugger.log("Nodes to remove: " + Arrays.toString(nodesToDelete));
 		
-		long time = 0; Debugger.resetTime(time);
+		long time = 0; time = Debugger.createTime();
 
 		LinkedList<Integer> allEdgesToDeleteList = new LinkedList<Integer>();
 		LinkedList<Integer> allNodesToDeleteList = new LinkedList<Integer>();
 		
 		Debugger.outputTime("Z setup ");
-		Debugger.resetTime(time);
+		time = Debugger.createTime();
 		
 		for(int e : edgesToDelete) {
 			allEdgesToDeleteList.add(e);
@@ -2670,7 +2670,7 @@ if(edgeIndex%1000000==0 ) {
 			}			
 		}
 Debugger.outputTime("A Created the node and edge delete lists ");
-Debugger.resetTime(time);
+time = Debugger.createTime();
 		
 		// find the nodes that will remain
 		HashSet<Integer> remainingNodeList = new HashSet<Integer>(allNodesToDeleteList.size()*3);
@@ -2680,12 +2680,12 @@ Debugger.resetTime(time);
 		remainingNodeList.removeAll(allNodesToDeleteList); //this is quicker than checking each entry
 		
 		Debugger.outputTime("AAA created the node remain lists ");
-		Debugger.resetTime(time);
+		time = Debugger.createTime();
 		// turn it into an array
 		int[] remainingNodes = Util.convertHashSet(remainingNodeList);
 		
 		Debugger.outputTime("AA converted the node remain lists ");
-		Debugger.resetTime(time);
+		time = Debugger.createTime();
 
 		// find the edges that will remain
 		HashSet<Integer> remainingEdgeList = new HashSet<Integer>(allEdgesToDeleteList.size()*3);
@@ -2695,12 +2695,12 @@ Debugger.resetTime(time);
 		remainingEdgeList.removeAll(allEdgesToDeleteList);
 		
 		Debugger.outputTime("AB Created the edge remain lists ");
-		Debugger.resetTime(time);
+		time = Debugger.createTime();
 		// turn it into an array
 		int[] remainingEdges = Util.convertHashSet(remainingEdgeList);
 
 Debugger.outputTime("B converted the edge remain lists ");
-Debugger.resetTime(time);
+time = Debugger.createTime();
 
 		FastGraph g = generateGraphFromSubgraph(remainingNodes,remainingEdges);
 		
@@ -2716,7 +2716,7 @@ Debugger.resetTime(time);
 	 */
 	public FastGraph generateGraphFromSubgraph(int[] subgraphNodes, int[] subgraphEdges) {
 		
-		long time = 0; Debugger.resetTime(time);
+		long time = 0; time = Debugger.createTime();
 
 		FastGraph g = new FastGraph(subgraphNodes.length, subgraphEdges.length, getDirect());
 		
@@ -2744,11 +2744,11 @@ Debugger.resetTime(time);
 			index++;
 		}
 //Debugger.outputTime("C popluated the new node buffer ");
-Debugger.resetTime(time);
+time = Debugger.createTime();
 		
 		g.setAllNodeLabels(nodeLabels); // create the node label buffer
 //Debugger.outputTime("D popluated the new node list buffer ");
-Debugger.resetTime(time);
+time = Debugger.createTime();
 		
 		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(subgraphNodes.length); // temporary store of inward edges
 		for(int nodeIndex = 0; nodeIndex < subgraphNodes.length; nodeIndex++) {
@@ -2762,7 +2762,7 @@ Debugger.resetTime(time);
 			nodeOut.add(nodeIndex,edges);
 		}
 //Debugger.outputTime("E created the neighbour store ");
-Debugger.resetTime(time);
+time = Debugger.createTime();
 		
 //Debugger.log(oldNodesToNew);
 
@@ -2810,19 +2810,19 @@ Debugger.resetTime(time);
 			index++;
 		}
 //Debugger.outputTime("F populated the new edge buffer ");
-Debugger.resetTime(time);
+time = Debugger.createTime();
 
 		g.setAllEdgeLabels(edgeLabels);
 //Debugger.outputTime("G populated the new edge label buffer ");
-Debugger.resetTime(time);
+time = Debugger.createTime();
 		
 		// Initialise the connection buffer, modifying the node buffer connection data
-		//Debugger.resetTime(time);
+		//time = Debugger.createTime();
 		int offset = 0;
 		for(int node = 0; node < subgraphNodes.length; node++) {
 if(node%100000 == 0) {
 	//Debugger.outputTime("H populated "+node+" nodes in connection buffer ");
-	Debugger.resetTime(time);
+	time = Debugger.createTime();
 }
 			
 			// setting the in connection offset and length
