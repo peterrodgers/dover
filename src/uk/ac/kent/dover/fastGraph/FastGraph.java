@@ -146,7 +146,7 @@ Debugger.outputTime("snap load time ");
 */
 //String name = "random-n-100-e-1000";
 //String name = "as-skitter.txt";
-String name = "soc-pokec-relationships.txt-short-relabelled";
+String name = "soc-pokec-relationships-reduced";
 //String name = "soc-pokec-relationships.txt-veryshort-veryshort";
 //String name = "Wiki-Vote.txt";
 //		String name = g1.getName();
