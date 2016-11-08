@@ -170,7 +170,7 @@ public class EnumerateSubgraph {
 	 * @param subs The list of subgraphs
 	 * @param nodes The set of nodes in a new subgraph
 	 */
-	private void addFoundSubgraph(LinkedList<FastGraph> subs, HashSet<Integer> nodes) {
+	private void addFoundSubgraph(HashSet<FastGraph> subs, HashSet<Integer> nodes) {
 	//	Debugger.log("adding subgraph nodes " + nodes);
 		HashSet<Integer> edges = new HashSet<Integer>();
 		

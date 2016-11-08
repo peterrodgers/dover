@@ -161,10 +161,10 @@ String name = "soc-pokec-relationships.txt-reduced";
 			Debugger.resetTime();
 			
 			EnumerateSubgraph es = new EnumerateSubgraph(g2);
-			FastGraph[] gs = es.enumerateSubgraphs(4,0.5);
+			HashSet gs = es.enumerateSubgraphs(4,0.5);
 			
 			Debugger.outputTime("Time for enumeration");			
-			Debugger.log("number of subgraphs " + gs.length);
+			Debugger.log("number of subgraphs " + gs.size());
 			
 	/*		
 			time = Debugger.createTime();
