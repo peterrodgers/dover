@@ -27,7 +27,7 @@ public class GraphWindow extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
 	public GraphWindow(Graph g) {
-		super("Graph Editor");
+		super("Graph Editor "+g.getLabel());
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		String startDirectoryName = System.getProperty("user.dir");

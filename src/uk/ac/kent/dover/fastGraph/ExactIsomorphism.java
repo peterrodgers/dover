@@ -307,27 +307,10 @@ startTime = -1;
 			return false;
 		}
 		
-		boolean result = bruteForceComparison(g);
-		
-		return result;
-		
-	}
-
-
-	/**
-	 * Assumes that the nodes and edge lists are of equal size.
-	 * 
-	 * @param g the graph to compare
-	 * @return true if isomorphic, false if not
-	 */
-	private boolean bruteForceComparison(FastGraph g) {
 if(startTime == -1) {
 	startTime = System.currentTimeMillis();
 }
 		
-		int numberOfNodes1 = fastGraph.getNumberOfNodes();
-		int numberOfNodes2 = g.getNumberOfNodes();
-
 		neighbours2 = findNeighbours(g,maxDegree2);
 		
 		int[] numberOfMatches = new int[numberOfNodes1]; // gives the number of relevant elements in the second array of possibleMatches 
