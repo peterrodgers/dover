@@ -170,7 +170,7 @@ public class ExactMotifFinder {
 			}
 
 if(subgraphsFound == subgraphsWanted || discards%10000 == 0) {
-System.out.println("wanted "+subgraphsWanted+" found "+subgraphsFound+" discards "+discards);
+Debugger.log("wanted "+subgraphsWanted+" found "+subgraphsFound+" discards "+discards);
 }
 
 		}
