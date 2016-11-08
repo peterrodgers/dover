@@ -28,7 +28,7 @@ public class EnumerateSubgraph {
 	 * @param q The percentage of nodes to sample, i.e. 50% = 0.5
 	 * @return All size-k subgraphs in the FastGraph
 	 */
-	public FastGraph[] enumerateSubgraphs(int k, double q) {
+	public HashSet<FastGraph> enumerateSubgraphs(int k, double q) {
 		this.q = q;
 		r = new Random(g.getNodeBuf().getLong(0));
 		Debugger.log("testing enumerateSubgraph");
@@ -36,7 +36,7 @@ public class EnumerateSubgraph {
 		Debugger.resetTime();
 		long time = Debugger.createTime();
 		
-		LinkedList<FastGraph> subs = new LinkedList<FastGraph>();
+		HashSet<FastGraph> subs = new HashSet<FastGraph>();
 		
 		for (int v = 0; v < g.getNumberOfNodes(); v++) {
 			
@@ -75,12 +75,12 @@ public class EnumerateSubgraph {
 		}
 		
 		//convert HashMap to array
-		FastGraph[] arr = new FastGraph[subs.size()];
-		Util.convertLinkedListObject(subs, arr);
+		//FastGraph[] arr = new FastGraph[subs.size()];
+		//Util.convertLinkedListObject(subs, arr);
 		
 		Debugger.outputTime("finishing enumerate Subgraphs");
 		
-		return arr;
+		return subs;
 	}
 	
 	/**
@@ -93,7 +93,7 @@ public class EnumerateSubgraph {
 	 * @param subs The list of subgraphs found
 	 * @return The extended subgraph (in the form of a set of nodes)
 	 */
-	private void extendSubgraph(HashSet<Integer> vSubgraph, HashSet<Integer> vExtension, int v, int k, LinkedList<FastGraph> subs, int depth) {
+	private void extendSubgraph(HashSet<Integer> vSubgraph, HashSet<Integer> vExtension, int v, int k, HashSet<FastGraph> subs, int depth) {
 		//Debugger.log();
 		//Debugger.log("extend k " + k + " v" + v);
 		//Debugger.log("extend vExtension " + vExtension);
