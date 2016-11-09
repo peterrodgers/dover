@@ -50,6 +50,7 @@ public class EnumerateSubgraphNeighbourhood {
 				Debugger.log("Node: " + n);
 				Debugger.log("Subgraphs found so far: " + subgraphs.size());
 				Debugger.outputTime("Time since last: ", time);
+				time = Debugger.createTime();
 				Debugger.outputTime("Time so far");
 				Debugger.log();
 				
