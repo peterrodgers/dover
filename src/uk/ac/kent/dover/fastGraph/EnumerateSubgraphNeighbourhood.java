@@ -4,14 +4,36 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 
+/**
+ * Creates subgraphs based on neighbourhood sampling
+ * 
+ * @author Rob Baker
+ *
+ */
 public class EnumerateSubgraphNeighbourhood {
 	
-	FastGraph g;
+	private FastGraph g;
 	
+	/**
+	 * Trivial constructor
+	 * @param g The FastGraph the subgraphs will be generated from
+	 */
 	public EnumerateSubgraphNeighbourhood(FastGraph g) {
 		this.g = g;
 	}
 	
+	/**
+	 * Generates a set of subgraphs based on neighbourhoods.<br>
+	 * The system will generate a neighbourhood for each node.
+	 * Each connecting node will be added until minNumOfNodes is met, when the current depth is added.
+	 * This avoids always sampling those that appear numerically first.<br>
+	 * For each node, a certain number of subgraphs will be generated.
+	 * 
+	 * @param subgraphSize The number of nodes in each subgraph
+	 * @param minNumOfNodes The minimum number of nodes in each neighbourhood
+	 * @param subgraphsPerNode The number of subgraphs per node
+	 * @return
+	 */
 	public HashSet<FastGraph> enumerateSubgraphs(int subgraphSize, int minNumOfNodes, int subgraphsPerNode) {
 		Random r = new Random(g.getNodeBuf().getLong(0));
 		HashSet<FastGraph> subgraphs = new HashSet<FastGraph>();
