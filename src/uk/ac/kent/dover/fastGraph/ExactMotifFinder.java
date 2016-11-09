@@ -16,7 +16,8 @@ public class ExactMotifFinder {
 	private HashMap<String,LinkedList<LinkedList<FastGraph>>> hashBuckets;
 	
 	private FastGraph g;
-	private EnumerateSubgraph enumerator;
+	private EnumerateSubgraphFanmod enumerator;
+	private EnumerateSubgraphRandom enumeratorRandom;
 	private HashSet<FastGraph> subgraphs; // subgraphs found by the enumerator
 	
 
@@ -84,8 +85,8 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 	 */
 	public ExactMotifFinder(FastGraph g) {
 		this.g = g;
-		enumerator = new EnumerateSubgraph(g);
-
+		enumerator = new EnumerateSubgraphFanmod(g);
+		enumeratorRandom = new EnumerateSubgraphRandom(g);
 	}
 	
 
@@ -100,7 +101,7 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 		hashBuckets = new HashMap<String,LinkedList<LinkedList<FastGraph>>> (g.getNumberOfNodes());
 		
 //		subgraphs = enumerator.enumerateSubgraphs(k, q);
-		subgraphs = randomSampleSubgraph(k,10000);		
+		subgraphs = enumeratorRandom.randomSampleSubgraph(k,10000);		
 		for(FastGraph subgraph : subgraphs) {
 			ExactIsomorphism ei = new ExactIsomorphism(subgraph);
 			String hashString = ei.generateStringForHash();
@@ -134,56 +135,5 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 		}
 		
 	}
-	
-	
-	public HashSet<FastGraph> randomSampleSubgraph(int numOfNodes, int subgraphsWanted) {
-
-		int discards = 0;
-		int maxNodes = g.getNumberOfNodes();
-		HashSet<FastGraph> ret = new HashSet<FastGraph>(subgraphsWanted*3);
-		
-		Random r = new Random(1);
-		
-		int subgraphsFound = 0;
-		while(subgraphsFound < subgraphsWanted) {
-			LinkedList<Integer> nodes = new LinkedList<Integer>();
-			for(int nextNode = 0; nextNode < numOfNodes; nextNode++) {
-				Integer node = r.nextInt(maxNodes);
-				nodes.add(node);
-			}
-			
-			
-			HashSet<Integer> edges = new HashSet<Integer>();
-			
-			//add all edges connecting to only the nodes in the subgraph. Might be slow
-			for(int n : nodes) {
-				for (int edge : g.getNodeConnectingEdges(n)) {
-					if (nodes.contains(g.oppositeEnd(edge,n))) {
-						edges.add(edge);
-					}
-				}
-			}
-			//Debugger.log("adding subgraph " + (subs.size()+1));
-			//convert and add FastGraph
-			FastGraph sub = g.generateGraphFromSubgraph(Util.convertLinkedList(nodes), Util.convertHashSet(edges));
-			
-			if(Connected.connected(sub)) {
-				ret.add(sub);
-				subgraphsFound++;
-			} else {
-				discards++;
-			}
-
-if(subgraphsFound == subgraphsWanted || discards%100000 == 0) {
-Debugger.log("wanted "+subgraphsWanted+" found "+subgraphsFound+" discards "+discards);
-}
-
-		}
-		
-		
-		return ret;
-		
-	}
-
 
 }

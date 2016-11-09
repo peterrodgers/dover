@@ -11,13 +11,13 @@ import java.util.Random;
  * @author Rob Baker
  *
  */
-public class EnumerateSubgraph {
+public class EnumerateSubgraphFanmod {
 	
 	private FastGraph g;
 	private Random r;
 	private double q;
 	
-	public EnumerateSubgraph(FastGraph g) {
+	public EnumerateSubgraphFanmod(FastGraph g) {
 		this.g = g;
 	}
 	
