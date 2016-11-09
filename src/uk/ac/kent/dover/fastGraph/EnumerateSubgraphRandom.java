@@ -4,10 +4,20 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 
+/**
+ * Generates subgraphs randomly
+ * 
+ * @author Peter Rodgers and Rob Baker
+ *
+ */
 public class EnumerateSubgraphRandom {
 
 	FastGraph g;
 	
+	/**
+	 * Trivial constructor
+	 * @param g The Fast Graph
+	 */
 	public EnumerateSubgraphRandom(FastGraph g) {
 		this.g = g;
 	}

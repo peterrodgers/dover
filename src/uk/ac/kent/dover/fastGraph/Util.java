@@ -239,5 +239,14 @@ public class Util {
 		array = set.stream().mapToInt(i->i).toArray();
 	}
 	
+	/**
+	 * Converts an int[] to a HashSet of Integer using streams
+	 * 
+	 * @param array The array to convert
+	 * @param list The newly populated HashSet
+	 */
+	public static void convertArray(int[] array, HashSet<Integer> set) {
+		set.addAll(IntStream.of(array).boxed().collect(Collectors.toList()));
+	}	
 	
 }
