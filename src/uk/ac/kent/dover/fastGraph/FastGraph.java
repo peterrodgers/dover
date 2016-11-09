@@ -155,13 +155,16 @@ String name = "soc-pokec-relationships.txt-reduced";
 			//time = Debugger.createTime();
 			g2 = loadBuffersGraphFactory(null,name);
 			
+			Debugger.log("Connected: " + Connected.connected(g2));
+			
 			Debugger.log("Number of nodes: " + g2.getNumberOfNodes());
 			Debugger.log("Number of edges: " + g2.getNumberOfEdges());
 			
 			Debugger.resetTime();
 			
-			EnumerateSubgraphFanmod es = new EnumerateSubgraphFanmod(g2);
-			HashSet<FastGraph> gs = es.enumerateSubgraphs(4,0.5);
+			//EnumerateSubgraphFanmod es = new EnumerateSubgraphFanmod(g2);
+			EnumerateSubgraphNeighbourhood es = new EnumerateSubgraphNeighbourhood(g2);
+			HashSet<FastGraph> gs = es.enumerateSubgraphs(4,200,3);
 			
 			Debugger.outputTime("Time for enumeration");			
 			Debugger.log("number of subgraphs " + gs.size());

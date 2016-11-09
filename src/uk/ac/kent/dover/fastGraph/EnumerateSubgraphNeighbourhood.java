@@ -35,21 +35,49 @@ public class EnumerateSubgraphNeighbourhood {
 	 * @return
 	 */
 	public HashSet<FastGraph> enumerateSubgraphs(int subgraphSize, int minNumOfNodes, int subgraphsPerNode) {
+		
+		Debugger.resetTime();
+		long time = Debugger.createTime();
+		
 		Random r = new Random(g.getNodeBuf().getLong(0));
 		HashSet<FastGraph> subgraphs = new HashSet<FastGraph>();
 		
 		//for each node
 		for(int n = 0; n < g.getNumberOfNodes(); n++) {
 			
+			if(n % 10000 == 0) {
+				
+				Debugger.log("Node: " + n);
+				Debugger.log("Subgraphs found so far: " + subgraphs.size());
+				Debugger.outputTime("Time since last: ", time);
+				Debugger.outputTime("Time so far");
+				Debugger.log();
+				
+			}
+			
 			//build nodes to pick from
 			HashSet<Integer> startingNodes = new HashSet<Integer>();
 			HashSet<Integer> nodes = new HashSet<Integer>();
 			startingNodes.add(n);
 			
-			buildNeighbourhood(startingNodes, nodes, minNumOfNodes);			
+			buildNeighbourhood(startingNodes, nodes, minNumOfNodes);
+			
+			if(nodes.size() < minNumOfNodes) {
+			//	Debugger.log("neighbourhood too small: " + nodes.size());
+				continue;
+			}
+			
+			//Debugger.log("neighbourhood size: " + nodes.size());
+			//Debugger.log("neighbourhood: " + nodes);
+			
 			//for each subgraph at this neighbourhood
 			int foundSubgraphs = 0;
+			int attempts = 0;
 			while(foundSubgraphs < subgraphsPerNode) {
+				
+				//if(attempts % 500000 == 0) {
+				//	Debugger.log("Attempt number: " + attempts);
+				//}
 				
 				//pick nodes to add
 				HashSet<Integer> pickedNodes = new HashSet<Integer>();
@@ -62,9 +90,15 @@ public class EnumerateSubgraphNeighbourhood {
 				addMissingEdges(pickedNodes, pickedEdges);
 				FastGraph subgraph = g.generateGraphFromSubgraph(Util.convertHashSet(pickedNodes), Util.convertHashSet(pickedEdges));
 				if(Connected.connected(subgraph)) {
+					
 					foundSubgraphs++;
 					subgraphs.add(subgraph);
+					//Debugger.log("found connected subgraph: " + foundSubgraphs);
 				}				
+				attempts++;
+				if (attempts > 1000000) {
+					break;
+				}
 				
 			}
 			
@@ -98,8 +132,10 @@ public class EnumerateSubgraphNeighbourhood {
 					return;
 				}
 				//if not, go one step deeper
-				startingNodes.clear();
-				Util.convertArray(g.getNodeConnectingNodes(sn), startingNodes);
+				//startingNodes.clear();
+				HashSet<Integer> newSN = new HashSet<Integer>();
+				Util.convertArray(g.getNodeConnectingNodes(sn), newSN);
+				startingNodes = newSN;
 			}			
 		}
 		//addMissingEdges(nodes, edges);
