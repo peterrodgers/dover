@@ -92,9 +92,8 @@ public class ExactIsomorphism {
 	
 			}
 			FastGraph g1 = FastGraph.randomGraphFactory(numNodes,numEdges,0,true,false);
-			ExactIsomorphism ei = new ExactIsomorphism(g1);
-			ei.reportTimes();
-			ei.reportFailRatios();
+			ExactIsomorphism.reportTimes();
+			ExactIsomorphism.reportFailRatios();
 			System.out.println("Full isomorphism time "+isoTime/1000.0+" seconds, "+isoTime/(comparisons*1000.0)+" seconds per test");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -565,7 +564,7 @@ startTime = -1;
 	/**
 	 * Output timing
 	 */
-	public void reportTimes() {
+	public static void reportTimes() {
 		if(numberOfIsomorphismTests > 0) {
 			System.out.println("Isomorphism test average "+(timeForIsomorphismTests/(1000.0*numberOfIsomorphismTests))+" seconds total tests "+numberOfIsomorphismTests+" total time "+(timeForIsomorphismTests/1000.0)+" seconds");
 		} else {
@@ -588,7 +587,7 @@ startTime = -1;
 	/**
 	 * Output counts
 	 */
-	public void reportFailRatios() {
+	public static void reportFailRatios() {
 		
 		double total = failOnNodeCount+failOnEdgeCount+failOnEigenvalues+failOnDegreeComparison+failOnNodeMatches+failOnBruteForce+succeed;
 		

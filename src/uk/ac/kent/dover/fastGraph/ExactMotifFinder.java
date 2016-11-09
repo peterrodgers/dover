@@ -28,6 +28,8 @@ public class ExactMotifFinder {
 		try {
 			
 			g = FastGraph.randomGraphFactory(100,1000,1,true,false); // 1 hundred nodes, 1 thousand edges
+//			g = FastGraph.randomGraphFactory(200,2000,1,true,false); // 1 hundred nodes, 1 thousand edges
+//			g = FastGraph.randomGraphFactory(300,3000,1,true,false); // 1 hundred nodes, 1 thousand edges
 //			g = FastGraph.randomGraphFactory(1000,10000,1,true,false); // 1 thousand nodes, 10 thousand edges
 //			g = FastGraph.randomGraphFactory(10000,100000,1,true,false); //10 thousand nodes 100 thousand edges
 //			g = FastGraph.randomGraphFactory(6,9,1,true,false); // 5 nodes, 6 edges
@@ -36,7 +38,7 @@ public class ExactMotifFinder {
 			e.printStackTrace();
 		}
 
-		int nodes = 4;
+		int nodes = 5;
 		long time = Debugger.createTime();		
 		ExactMotifFinder emf = new ExactMotifFinder(g);
 		emf.findMotifs(nodes, 0);
@@ -49,26 +51,29 @@ public class ExactMotifFinder {
 		int count = 0;
 		for(String key : emf.hashBuckets.keySet()) {
 			LinkedList<LinkedList<FastGraph>> sameHashList = emf.hashBuckets.get(key);
-			System.out.println("hash string \""+key+"\" number of different isomorphic groups "+sameHashList.size());
+//			System.out.println("hash string \""+key+"\" number of different isomorphic groups "+sameHashList.size());
 			for(LinkedList<FastGraph> isoList: sameHashList) {
-				System.out.println("    number of nodes in iso list "+isoList.size());
+System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups\t"+sameHashList.size()+"\tnumber of nodes in iso list\t"+isoList.size());
 				count += isoList.size();
 				
 				uk.ac.kent.displayGraph.Graph dg = isoList.get(0).generateDisplayGraph();
 				dg.randomizeNodePoints(new Point(20,20),300,300);
 				dg.setLabel(key);
-				uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg);
-				uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
-				GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
-				se.setAnimateFlag(false);
-				se.setIterations(1000);
-				se.setTimeLimit(2000);
-				se.setGraphPanel(gw.getGraphPanel());
-				se.layout();
-
+//				uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg);
+//				uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
+//				GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
+//				se.setAnimateFlag(false);
+//				se.setIterations(1000);
+//				se.setTimeLimit(2000);
+//				se.setGraphPanel(gw.getGraphPanel());
+//				se.layout();
+				
 			}
 		}
 		System.out.println("stored subgraphs "+count);
+		ExactIsomorphism.reportFailRatios();
+		ExactIsomorphism.reportTimes();
+		
 
 	}
 
@@ -95,7 +100,7 @@ public class ExactMotifFinder {
 		hashBuckets = new HashMap<String,LinkedList<LinkedList<FastGraph>>> (g.getNumberOfNodes());
 		
 //		subgraphs = enumerator.enumerateSubgraphs(k, q);
-		subgraphs = randomSampleSubgraph(k,1000);		
+		subgraphs = randomSampleSubgraph(k,10000);		
 		for(FastGraph subgraph : subgraphs) {
 			ExactIsomorphism ei = new ExactIsomorphism(subgraph);
 			String hashString = ei.generateStringForHash();
@@ -169,7 +174,7 @@ public class ExactMotifFinder {
 				discards++;
 			}
 
-if(subgraphsFound == subgraphsWanted || discards%10000 == 0) {
+if(subgraphsFound == subgraphsWanted || discards%100000 == 0) {
 Debugger.log("wanted "+subgraphsWanted+" found "+subgraphsFound+" discards "+discards);
 }
 
