@@ -141,6 +141,7 @@ public class LauncherCmd {
 			    //if the user wants some help
 			} else if (cmd.hasOption("h")) {
 				// automatically generate the help statement
+				System.out.println("More data is available at: " + launcher.DATA_URL);
 				HelpFormatter formatter = new HelpFormatter();
 				formatter.printHelp("java -jar -Xmx14g dover.jar", options);
 			}

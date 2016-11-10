@@ -13,6 +13,7 @@ import java.util.Arrays;
 public class Launcher {
 	
 	public static final String startingWorkingDirectory = System.getProperty("user.dir");
+	public final String DATA_URL = "https://www.cs.kent.ac.uk/projects/dover/"; //the URL for extra data
 	
 	/**
 	 * Main method

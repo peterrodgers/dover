@@ -2,6 +2,7 @@ package uk.ac.kent.dover.fastGraph;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -11,10 +12,15 @@ import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,6 +40,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -55,11 +64,14 @@ import javax.swing.UIManager;
 @SuppressWarnings("serial")
 public class LauncherGUI extends JFrame {
 	
-	private String DEFAULT_STATUS_MESSAGE = "Ready"; //The default message displayed to a user
+	private final String DEFAULT_STATUS_MESSAGE = "Ready"; //The default message displayed to a user
+	
 	private Launcher launcher;
 	private DefaultListModel model = new DefaultListModel();
 	private double screenWidth; //size of the user's screen
 	private double screenHeight;
+	private double textHeight;
+	
 	
 	/**
 	 * The main builder for the GUI
@@ -79,6 +91,7 @@ public class LauncherGUI extends JFrame {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		screenWidth = screenSize.getWidth();
 		screenHeight = screenSize.getHeight();
+		textHeight = screenHeight / 100;
 		
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		
@@ -86,6 +99,7 @@ public class LauncherGUI extends JFrame {
 		JPanel northPanel = new JPanel(new BorderLayout());
 		JList graphList = buildSourceGraphList();
 		northPanel.add(graphList, BorderLayout.NORTH);
+				
 		northPanel.add(new JSeparator(JSeparator.HORIZONTAL), BorderLayout.SOUTH);
 		
 		Border blackline = BorderFactory.createLineBorder(Color.black);
@@ -138,6 +152,8 @@ public class LauncherGUI extends JFrame {
 		mainPanel.add(tabbedPane, BorderLayout.CENTER);
 		mainPanel.add(statusArea, BorderLayout.SOUTH);
 		
+		setJMenuBar(buildMenuBar(mainPanel));
+		
 		//Builds, Packs and Displays the GUI
 		this.setContentPane(mainPanel);
 		setTitle("Dover");
@@ -147,6 +163,46 @@ public class LauncherGUI extends JFrame {
 		setVisible(true);
 	}
 	
+	
+	private JMenuBar buildMenuBar(JPanel panel) {
+		JMenuBar menuBar = new JMenuBar();
+		
+		JMenu fileMenu = new JMenu("File");
+		
+		JMenuItem exit = new JMenuItem("Exit");
+		exit.getAccessibleContext().setAccessibleDescription("Exit the program");
+		exit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				System.exit(0);	
+			}
+		});
+		fileMenu.add(exit);
+		
+		menuBar.add(fileMenu);
+		
+		JMenu dataMenu = new JMenu("Data");
+		
+		JMenuItem data = new JMenuItem("Get More Data");
+		data.getAccessibleContext().setAccessibleDescription("Allows the user to get more data");
+		data.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+		        try {
+		            Desktop.getDesktop().browse(new URI(launcher.DATA_URL));
+		        } catch(Exception e) {
+		        	JOptionPane.showMessageDialog(panel, "Browser loading is not supported. \nInstead, please visit:\n" + launcher.DATA_URL, "Browser Loading not supported", JOptionPane.WARNING_MESSAGE);
+		            e.printStackTrace();
+		        }
+			}
+		});
+		dataMenu.add(data);
+		
+		menuBar.add(dataMenu);
+		
+		return menuBar;
+	}
+
 	/**
 	 * Build the main graph list.
 	 * This allows the user to choose which graph they wish to perform things on
