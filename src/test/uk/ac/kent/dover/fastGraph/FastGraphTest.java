@@ -3,6 +3,7 @@ package test.uk.ac.kent.dover.fastGraph;
 import static org.junit.Assert.*;
 
 import java.nio.*;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.io.*;
 
@@ -789,14 +790,24 @@ public class FastGraphTest {
 		FastGraph g;
 		g = FastGraph.jsonStringGraphFactory(get0Node0Edge(),false);
 		assertEquals(0,g.maximumDegree());
+		assertEquals(0,g.maximumInDegree());
+		assertEquals(0,g.maximumOutDegree());
 		g = FastGraph.jsonStringGraphFactory(get1Node0Edge(),false);
 		assertEquals(0,g.maximumDegree());
+		assertEquals(0,g.maximumInDegree());
+		assertEquals(0,g.maximumOutDegree());
 		g = FastGraph.jsonStringGraphFactory(get2Node1Edge(),false);
 		assertEquals(1,g.maximumDegree());
+		assertEquals(1,g.maximumInDegree());
+		assertEquals(1,g.maximumOutDegree());
 		g = FastGraph.jsonStringGraphFactory(get2Node2Edge(),true);
 		assertEquals(3,g.maximumDegree());
+		assertEquals(1,g.maximumInDegree());
+		assertEquals(2,g.maximumOutDegree());
 		g = FastGraph.jsonStringGraphFactory(get4Node5Edge(),true);
 		assertEquals(3,g.maximumDegree());
+		assertEquals(2,g.maximumInDegree());
+		assertEquals(2,g.maximumOutDegree());
 	}
 	
 	@Test
@@ -1514,6 +1525,60 @@ public class FastGraphTest {
 		assertEquals(3,g2.getEdgeNode1(1));
 		assertEquals(1,g2.getEdgeNode2(1));
 	}
+
+	
+	@Test
+	public void test132() {
+		FastGraph g;
+		int[] arr;
+		g = FastGraph.jsonStringGraphFactory(get0Node0Edge(),false);
+		arr = g.degreeProfile();
+		int[] correct1 = new int[0];
+		Assert.assertArrayEquals(correct1,arr);
+		arr = g.inDegreeProfile();
+		int[] correct1a = new int[0];
+		Assert.assertArrayEquals(correct1a,arr);
+		arr = g.outDegreeProfile();
+		int[] correct1b = new int[0];
+		Assert.assertArrayEquals(correct1b,arr);
+		
+		g = FastGraph.jsonStringGraphFactory(get1Node0Edge(),false);
+		arr = g.degreeProfile();
+		int[] correct2 = {1};
+		Assert.assertArrayEquals(correct2,arr);
+		arr = g.inDegreeProfile();
+		int[] correct2a = {1};
+		Assert.assertArrayEquals(correct2a,arr);
+		arr = g.outDegreeProfile();
+		int[] correct2b = {1};
+		Assert.assertArrayEquals(correct2b,arr);
+		
+		g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
+		arr = g.degreeProfile();
+		int[] correct3 = {0,1,3,1};
+		Assert.assertArrayEquals(correct3,arr);
+		arr = g.inDegreeProfile();
+		int[] correct3a = {1,3,1};
+		Assert.assertArrayEquals(correct3a,arr);
+		arr = g.outDegreeProfile();
+		int[] correct3b = {1,3,1};
+		Assert.assertArrayEquals(correct3b,arr);
+		
+		g = FastGraph.jsonStringGraphFactory(get2Node2Edge(),false);
+		arr = g.degreeProfile();
+		int[] correct4 = {0,1,0,1};
+		Assert.assertArrayEquals(correct4,arr);
+		arr = g.inDegreeProfile();
+		int[] correct4a = {0,2};
+		Assert.assertArrayEquals(correct4a,arr);
+		arr = g.outDegreeProfile();
+		int[] correct4b = {1,0,1};
+		Assert.assertArrayEquals(correct4b,arr);
+		
+	}
+
+	
+	
 	
 	
 	
@@ -1750,7 +1815,7 @@ public class FastGraphTest {
 		json += "\"edgeAge\": \"3\"\n";
 		json += "},\n";
 		json += "{\n";
-		json += "\"edgeIndex\": \"4\",\n";
+		json += "\"edgeIndex\": \"4\",\n"; 
 		json += "\"node1\": \"3\",\n";
 		json += "\"node2\": \"4\",\n";
 		json += "\"edgeLabel\": \"edge label 4\",\n";

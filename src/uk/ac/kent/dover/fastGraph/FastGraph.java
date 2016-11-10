@@ -135,7 +135,7 @@ public class FastGraph {
 //		FastGraph g1 = adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
 //		FastGraph g1 = adjacencyListGraphFactory(4847571,68993773,null,"soc-LiveJournal1.txt",false);
 
-		
+
 //Debugger.outputTime("snap load time ");
 /*		
 		time = Debugger.createTime();
@@ -3016,6 +3016,79 @@ if(node%100000 == 0) {
 		
 		return g;
 	}
+	
+
+	/**
+	 * Create an integer array, length of maximum degree in the graph. Each element arr[i] of the array contains a count of the number
+	 * of nodes with degree i.
+	 * 		
+	 * @return the degree profile of the graph. each index contains the number of nodes with that degree
+	 */
+	public int[] degreeProfile() {
+		int maxDegree = maximumDegree();
+		
+		if(getNumberOfNodes() == 0) {
+			return new int[0];
+		}
+		
+		int[] ret = new int[maxDegree+1];
+		Arrays.fill(ret, 0);
+		for(int i = 0; i < getNumberOfNodes(); i++) {
+			int degree = getNodeDegree(i);
+			ret[degree]++;
+		}
+		
+		return ret;
+	}
+
+
+	/**
+	 * Create an integer array, length of maximum in degree in the graph. Each element arr[i] of the array contains a count of the number
+	 * of nodes with in degree i.
+	 * 		
+	 * @return the in degree profile of the graph. each index contains the number of nodes with that in degree
+	 */
+	public int[] inDegreeProfile() {
+		int maxDegree = maximumInDegree();
+		
+		if(getNumberOfNodes() == 0) {
+			return new int[0];
+		}
+		
+		int[] ret = new int[maxDegree+1];
+		Arrays.fill(ret, 0);
+		for(int i = 0; i < getNumberOfNodes(); i++) {
+			int degree = getNodeInDegree(i);
+			ret[degree]++;
+		}
+		
+		return ret;
+	}
+
+
+	
+	/**
+	 * Create an integer array, length of maximum in degree in the graph. Each element arr[i] of the array contains a count of the number
+	 * of nodes with in degree i.
+	 * 		
+	 * @return the in degree profile of the graph. each index contains the number of nodes with that in degree
+	 */
+	public int[] outDegreeProfile() {
+		int maxDegree = maximumOutDegree();
+		
+		if(getNumberOfNodes() == 0) {
+			return new int[0];
+		}
+		
+		int[] ret = new int[maxDegree+1];
+		Arrays.fill(ret, 0);
+		for(int i = 0; i < getNumberOfNodes(); i++) {
+			int degree = getNodeOutDegree(i);
+			ret[degree]++;
+		}
+		
+		return ret;
+	}
 
 
 	
@@ -3026,16 +3099,49 @@ if(node%100000 == 0) {
 		
 		int max = 0;
 		for(int i = 0; i < numberOfNodes; i++) {
-				int inDegree = nodeBuf.getInt(NODE_IN_DEGREE_OFFSET+i*NODE_BYTE_SIZE);
-				int outDegree = nodeBuf.getInt(NODE_OUT_DEGREE_OFFSET+i*NODE_BYTE_SIZE);
-				int degree = inDegree+outDegree;
-				if(degree > max) {
-					max = degree;
-				}
+			int inDegree = nodeBuf.getInt(NODE_IN_DEGREE_OFFSET+i*NODE_BYTE_SIZE);
+			int outDegree = nodeBuf.getInt(NODE_OUT_DEGREE_OFFSET+i*NODE_BYTE_SIZE);
+			int degree = inDegree+outDegree;
+			if(degree > max) {
+				max = degree;
+			}
 		}
 		return max;
 	}
 	
+	
+	/**
+	 * @return the largest degree for a node in the graph.
+	 */
+	public int maximumInDegree() {
+		
+		int max = 0;
+		for(int i = 0; i < numberOfNodes; i++) {
+			int inDegree = nodeBuf.getInt(NODE_IN_DEGREE_OFFSET+i*NODE_BYTE_SIZE);
+			if(inDegree > max) {
+				max = inDegree;
+			}
+		}
+		return max;
+	}
+	
+	
+	/**
+	 * @return the largest degree for a node in the graph.
+	 */
+	public int maximumOutDegree() {
+		
+		int max = 0;
+		for(int i = 0; i < numberOfNodes; i++) {
+			int outDegree = nodeBuf.getInt(NODE_OUT_DEGREE_OFFSET+i*NODE_BYTE_SIZE);
+			if(outDegree > max) {
+				max = outDegree;
+			}
+		}
+		return max;
+	}
+	
+
 	/**
 	 * Creates a displayGraph.Graph which can then be accessed, manipulated and visualized
 	 * using that package. displayGraph.Graph name becomes this FastGraph label
@@ -3180,6 +3286,203 @@ if(node%100000 == 0) {
 		}
 		
 		return true;
+	}
+
+
+	
+	/**
+	 * This generates a new random graph based on the existing graph, but with rewired edges. The node degrees are maintained.
+	 * It performs multiple rewrites 
+	 * 
+	 * @param iterations the number of times to rewire, more means better chance of a truly random graph
+	 * @param seed random number generator seed
+	 * @return a new graph, based on g, but rewired graph
+	 */
+	public FastGraph generateRandomRewiredGraph(int iterations, long seed) {
+		
+		long theSeed = seed;
+		FastGraph g = this;
+		for(int i = 0; i< iterations; i++) {
+			g = g.oneIterationGenerateRandomRewiredGraph(theSeed);
+			if(g == null) {
+				return null;
+			}
+			theSeed += g.getNumberOfEdges();
+Debugger.log(theSeed);
+		}
+		
+		return g;
+	}
+			
+
+	/**
+	 * This generates a new random graph based on the existing graph, but with rewired edges. The node degrees are maintained.
+	 * 
+	 * 
+
+	 * @param seed random number generator seed
+	 * @return a new graph, based on g, but rewired graph
+	 */
+	private FastGraph oneIterationGenerateRandomRewiredGraph(long seed) {
+			
+		final int ITERATIONS_TIME_OUT = 10000;
+
+		Random r = new Random(seed);
+		
+		ArrayList<Integer> remainingNodes = new ArrayList<Integer>(getNumberOfNodes()*3);
+		for(Integer i = 0; i < getNumberOfNodes(); i++) {
+			remainingNodes.add(i);
+		}
+		
+		int startNode = -1;
+		int startEdge = -1;
+		
+		boolean foundStart = false;
+		int count = 0;
+		while(!foundStart) {
+			count++;
+			if(count > ITERATIONS_TIME_OUT) {
+				// graph is too sparse for rewiring
+				return null;
+			}
+			// need at least 2 in edges, 1 out edge
+			// leaving 1 out edge and 1 in edge to finish the rewiring with
+			int testNode = r.nextInt(getNumberOfNodes());
+			if(getNodeInDegree(testNode) > 1 && getNodeOutDegree(testNode) > 0) {
+				startNode = testNode;
+				startEdge = getNodeConnectingInEdges(startNode)[0];
+				foundStart = true;
+			}
+		}
+
+		remainingNodes.remove(startNode);
+		
+		LinkedList<int[]> rewireEdges = new LinkedList<int[]>();
+		int[] rewire = new int[3];
+		int nextNode = oppositeEnd(startEdge, startNode);
+		rewire[0] = startEdge;
+		rewire[1] = nextNode;
+		rewire[2] = startNode;
+		rewireEdges.add(rewire);
+//Debugger.log("first rewire "+rewire[0]+" "+rewire[1]+" "+rewire[2]);
+		
+		boolean in = false;
+
+		boolean loop = true;
+		while(loop) {
+			rewire = new int[3];
+			
+			if(in) {
+				// next is an in edge
+				count = 0;
+				boolean foundEdge = false;
+				while(!foundEdge) {
+					count++;
+					if(count > ITERATIONS_TIME_OUT) { // end here and attach to start node
+						rewire[1] = nextNode;
+						rewire[2] = startNode;
+						int[] connectingEdges = getNodeConnectingInEdges(startNode);
+					
+						int pos = r.nextInt(connectingEdges.length);
+						int edge = connectingEdges[pos];
+						while(edge == startEdge) {
+							pos = r.nextInt(connectingEdges.length);
+							edge = connectingEdges[pos];
+						}
+						rewire[0] = edge;
+						foundEdge = true;
+						loop = false;
+//Debugger.log("in finish on no more nodes "+rewire[0]+" "+rewire[1]+" "+rewire[2]);
+					}
+					
+					int testInd = r.nextInt(remainingNodes.size());
+					int testNode = remainingNodes.get(testInd);
+					if(getNodeInDegree(testNode) > 0) { // found a suitable node
+						rewire[1] = nextNode;
+						rewire[2] = testNode;
+						int[] connectingEdges = getNodeConnectingInEdges(testNode);
+						int pos = r.nextInt(connectingEdges.length);
+						int edge = connectingEdges[pos];
+						rewire[0] = edge;
+						nextNode = testNode;
+						remainingNodes.remove(testInd);
+						in = false;
+						foundEdge = true;
+//Debugger.log("in rewire "+rewire[0]+" "+rewire[1]+" "+rewire[2]+" remaining "+remainingNodes.size());
+					}
+				}
+			} else {
+				// next is an out edge
+				count = 0;
+				boolean foundEdge = false;
+				while(!foundEdge) {
+					count++;
+					if(count > ITERATIONS_TIME_OUT) { // end here and attach to start node
+						rewire[1] = startNode;
+						rewire[2] = nextNode;
+						int[] connectingEdges = getNodeConnectingOutEdges(startNode);
+						int pos = r.nextInt(connectingEdges.length);
+						int edge = connectingEdges[pos];
+						while(edge == startEdge) {
+							pos = r.nextInt(connectingEdges.length);
+							edge = connectingEdges[pos];
+						}
+						rewire[0] = edge;
+						foundEdge = true;
+						loop = false;
+//Debugger.log("out finish on no more nodes "+rewire[0]+" "+rewire[1]+" "+rewire[2]);
+					}
+					int testInd = r.nextInt(remainingNodes.size());
+					int testNode = remainingNodes.get(testInd);
+					if(getNodeOutDegree(testNode) > 0) { // found a suitable node
+						rewire[1] = testNode;
+						rewire[2] = nextNode;
+						int[] connectingEdges = getNodeConnectingOutEdges(testNode);
+						int pos = r.nextInt(connectingEdges.length);
+						int edge = connectingEdges[pos];
+						rewire[0] = edge;
+						nextNode = testNode;
+						remainingNodes.remove(testInd);
+						in = true;
+						foundEdge = true;
+//Debugger.log("out rewire "+rewire[0]+" "+rewire[1]+" "+rewire[2]+" remaining "+remainingNodes.size());
+					}
+				}
+			}
+			if(remainingNodes.size() == 0) { // connect back to the start node and finish
+				if(in) {
+					rewire[1] = nextNode;
+					rewire[2] = startNode;
+					int[] connectingEdges = getNodeConnectingInEdges(startNode);
+					int pos = r.nextInt(connectingEdges.length);
+					int edge = connectingEdges[pos];
+					while(edge == startEdge) {
+						pos = r.nextInt(connectingEdges.length);
+						edge = connectingEdges[pos];
+					}
+//Debugger.log("in finish on empty "+rewire[0]+" "+rewire[1]+" "+rewire[2]);
+				} else {
+					rewire[1] = startNode;
+					rewire[2] = nextNode;
+					int[] connectingEdges = getNodeConnectingOutEdges(startNode);
+					int pos = r.nextInt(connectingEdges.length);
+					int edge = connectingEdges[pos];
+					while(edge == startEdge) {
+						pos = r.nextInt(connectingEdges.length);
+						edge = connectingEdges[pos];
+					}
+//Debugger.log("out finish on empty "+rewire[0]+" "+rewire[1]+" "+rewire[2]);
+				}
+
+				loop = false;
+			}
+		}
+		
+		
+		FastGraph ret = generateRewiredGraph(rewireEdges);
+		
+		return ret;
+		
 	}
 		
 	
