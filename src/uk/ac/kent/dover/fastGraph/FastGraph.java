@@ -3307,7 +3307,7 @@ if(node%100000 == 0) {
 			if(g == null) {
 				return null;
 			}
-			theSeed += g.getNumberOfEdges();
+			theSeed += g.getNumberOfEdges()*10;
 Debugger.log(theSeed);
 		}
 		
