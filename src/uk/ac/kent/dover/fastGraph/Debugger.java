@@ -82,4 +82,14 @@ public class Debugger {
 	public static void outputTime(Object o, long time) {
 		log(o.toString() + " " + (System.currentTimeMillis()-time)/1000.0+" seconds");
 	}
+	
+	/**
+	 * Outputs the difference between the current time and the one given
+	 * 
+	 * @param time The given time
+	 * @return The difference between now and the current time
+	 */
+	public static long getTimeSinceInSeconds(long time) {
+		return (long) ((System.currentTimeMillis()-time)/1000.0);
+	}
 }

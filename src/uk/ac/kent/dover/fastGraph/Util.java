@@ -221,6 +221,17 @@ public class Util {
 	}
 	
 	/**
+	 * Adds all items in a primitive array to the given  hash set
+	 * @param set The set to be added to
+	 * @param array The array of items to add
+	 */
+	public static void addAll(HashSet<Integer> set, int[] array) {
+		for(int i : array) {
+			set.add(i);
+		}
+	}
+	
+	/**
 	 * Converts a HashSet<Integer> to int[]
 	 * 
 	 * @param set The set to be converted

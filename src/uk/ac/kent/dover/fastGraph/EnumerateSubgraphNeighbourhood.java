@@ -27,14 +27,19 @@ public class EnumerateSubgraphNeighbourhood {
 	 * The system will generate a neighbourhood for each node.
 	 * Each connecting node will be added until minNumOfNodes is met, when the current depth is added.
 	 * This avoids always sampling those that appear numerically first.<br>
-	 * For each node, a certain number of subgraphs will be generated.
+	 * For each node, a certain number of connected subgraphs (subgraphsPerNode) will be generated.<br>
+	 * If this number of subgraphs cannot be generated in attemptsToFindSubgraph attempts, the node will be skipped.
 	 * 
 	 * @param subgraphSize The number of nodes in each subgraph
 	 * @param minNumOfNodes The minimum number of nodes in each neighbourhood
 	 * @param subgraphsPerNode The number of subgraphs per node
-	 * @return
+	 * @param attemptsToFindSubgraph The number of attempts to find a connected subgraph.
+	 * @return A set of FastGraphs
 	 */
-	public HashSet<FastGraph> enumerateSubgraphs(int subgraphSize, int minNumOfNodes, int subgraphsPerNode) {
+	public HashSet<FastGraph> enumerateSubgraphs(int subgraphSize, int minNumOfNodes, int subgraphsPerNode, int attemptsToFindSubgraph) {
+		
+		int failuresNeighbourhoodTooSmall = 0;
+		int failuresAttemptsMaxedOut = 0;
 		
 		Debugger.resetTime();
 		long time = Debugger.createTime();
@@ -44,15 +49,25 @@ public class EnumerateSubgraphNeighbourhood {
 		
 		//for each node
 		for(int n = 0; n < g.getNumberOfNodes(); n++) {
+		//for(int n = 0; n < 6002; n++) {
 			
-			if(n % 10000 == 0) {
-				
+			if(n % 1000 == 0 && n!=0) {
+				Debugger.log();
 				Debugger.log("Node: " + n);
 				Debugger.log("Subgraphs found so far: " + subgraphs.size());
+				double smallHoodPercentage = ( (double) failuresNeighbourhoodTooSmall/n)*100;
+				Debugger.log("Failures due to small hood so far: " + failuresNeighbourhoodTooSmall + " (" + String.format( "%.2f", smallHoodPercentage ) + "%)");
+				double maxedOutPercentage = ( (double) failuresAttemptsMaxedOut/n)*100;
+				Debugger.log("Failures due to attempts maxed out so far: " + failuresAttemptsMaxedOut + " (" + String.format( "%.2f", maxedOutPercentage ) + "%)");
+				double fullySuccessNodesPercentage = ((double) (n-(failuresNeighbourhoodTooSmall+failuresAttemptsMaxedOut))/n)*100;
+				Debugger.log("Fully sucessful nodes: " + String.format( "%.2f", fullySuccessNodesPercentage ) + "%"); 
 				Debugger.outputTime("Time since last: ", time);
+				
+				long timeLeft = Debugger.getTimeSinceInSeconds(time)*(g.getNumberOfNodes()-n)/1000;
+				Debugger.log("Estimated time left: " + timeLeft + " seconds (" + timeLeft/60 + " mins)");
+				
 				time = Debugger.createTime();
 				Debugger.outputTime("Time so far");
-				Debugger.log();
 				
 			}
 			
@@ -61,14 +76,22 @@ public class EnumerateSubgraphNeighbourhood {
 			HashSet<Integer> nodes = new HashSet<Integer>();
 			startingNodes.add(n);
 			
-			buildNeighbourhood(startingNodes, nodes, minNumOfNodes);
+			long time2 = Debugger.createTime();
+
 			
-			if(nodes.size() < minNumOfNodes) {
-			//	Debugger.log("neighbourhood too small: " + nodes.size());
+			buildNeighbourhood(startingNodes, nodes, minNumOfNodes);
+		//	if(n > 5000 && n < 6000) {
+		//		Debugger.outputTime("buildNeighbourhood: ", time2);
+		//		Debugger.log("neighbourhood size: " + nodes.size());
+		//	}
+				
+			if(nodes.size() < subgraphSize) {
+				failuresNeighbourhoodTooSmall++;
+				//Debugger.log("neighbourhood too small: " + nodes.size());
 				continue;
 			}
 			
-			//Debugger.log("neighbourhood size: " + nodes.size());
+			
 			//Debugger.log("neighbourhood: " + nodes);
 			
 			//for each subgraph at this neighbourhood
@@ -76,9 +99,9 @@ public class EnumerateSubgraphNeighbourhood {
 			int attempts = 0;
 			while(foundSubgraphs < subgraphsPerNode) {
 				
-				//if(attempts % 500000 == 0) {
-				//	Debugger.log("Attempt number: " + attempts);
-				//}
+				if(attempts % 500000 == 0) {
+					//Debugger.log("Attempt number: " + attempts);
+				}
 				
 				//pick nodes to add
 				HashSet<Integer> pickedNodes = new HashSet<Integer>();
@@ -97,7 +120,9 @@ public class EnumerateSubgraphNeighbourhood {
 					//Debugger.log("found connected subgraph: " + foundSubgraphs);
 				}				
 				attempts++;
-				if (attempts > 1000000) {
+				if (attempts > attemptsToFindSubgraph) {
+					failuresAttemptsMaxedOut++;
+					//Debugger.log("Attempts failed for node: " + n);
 					break;
 				}
 				
@@ -109,37 +134,42 @@ public class EnumerateSubgraphNeighbourhood {
 	}
 	
 	
-	private void buildNeighbourhood(HashSet<Integer> startingNodes, HashSet<Integer> nodes, int minNumOfNodes) {
+	public void buildNeighbourhood(HashSet<Integer> startingNodes, HashSet<Integer> nodes, int minNumOfNodes) {
+		
 		//while there are starting Nodes (incase the graph isn't big enough)
-		boolean neverAdded = false; //this ensures that if there are no nodes to add, quit. Useful for small disconnected subgraphs
-		while(startingNodes.size() != 0 && !neverAdded) {
-			neverAdded = true;
+		boolean someAdded = true; //this ensures that if there are no nodes to add, quit. Useful for small disconnected subgraphs
+		while(startingNodes.size() != 0 && someAdded) {
+			//someAdded = true;
+			
+		//	Debugger.log("starting Nodes " + startingNodes);
+		//	Debugger.log("current Nodes " + nodes);
+			
+			HashSet<Integer> nextStartingNodes = new HashSet<Integer>();
+			
 			//for each of these
 			for(int sn : startingNodes) {
-				//find every edge that connects to this node
-				int[] edgeConnections = g.getNodeConnectingEdges(sn);
-				for(int fe : edgeConnections) {
-					
-					//find the other end of the node
-					int fn = g.oppositeEnd(fe,sn);
+				int[] connectingNodes = g.getNodeConnectingNodes(sn);
+				Util.addAll(nextStartingNodes, connectingNodes);
+				//for each connecting Node
+				for(int fn : connectingNodes) {
 					int nSize = nodes.size();
+				//	Debugger.log("nodes size before " + nodes.size());
 					nodes.add(fn);
-					//edges.add(fe);
-					neverAdded = nSize != nodes.size();
+				//	Debugger.log("nodes size before " + nSize);
+				//	Debugger.log("nodes size after " + nodes.size());
+				//	Debugger.log("some added " + (nSize != nodes.size()));
+					someAdded = nSize != nodes.size(); //check that nodes are actually being added. Quicker than contains()
 				}
-				//if we've found enough nodes (or more nodes than needed), then induce the rest of the graph and quit
-				if (nodes.size() >= minNumOfNodes) {
-					//addMissingEdges(nodes, edges);
-					return;
-				}
-				//if not, go one step deeper
-				//startingNodes.clear();
-				HashSet<Integer> newSN = new HashSet<Integer>();
-				Util.convertArray(g.getNodeConnectingNodes(sn), newSN);
-				startingNodes = newSN;
-			}			
+			}	
+			//if we've found enough nodes (or more nodes than needed), then quit
+			if (nodes.size() >= minNumOfNodes) {
+				return;
+			}
+			
+			//if not, go one step deeper
+			startingNodes = nextStartingNodes;
+			
 		}
-		//addMissingEdges(nodes, edges);
 		return;
 	}
 	

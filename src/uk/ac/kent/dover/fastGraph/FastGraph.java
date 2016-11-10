@@ -160,16 +160,22 @@ String name = "soc-pokec-relationships.txt-reduced";
 			
 			Debugger.log("Number of nodes: " + g2.getNumberOfNodes());
 			Debugger.log("Number of edges: " + g2.getNumberOfEdges());
-/*			
+			
 			Debugger.resetTime();
 			
 			//EnumerateSubgraphFanmod es = new EnumerateSubgraphFanmod(g2);
 			EnumerateSubgraphNeighbourhood es = new EnumerateSubgraphNeighbourhood(g2);
-			HashSet<FastGraph> gs = es.enumerateSubgraphs(4,200,3);
+			HashSet<FastGraph> gs = es.enumerateSubgraphs(4,20,3,10000);
+		//	HashSet<Integer> startingNodes = new HashSet<Integer>();
+		//	HashSet<Integer> nodes = new HashSet<Integer>();
+		//	startingNodes.add(5490);
+		//	Debugger.log("startingNodes: " + startingNodes);
+		//	Debugger.log("nodes: " + nodes);
+		//	es.buildNeighbourhood(startingNodes, nodes, 20);
+		//	Debugger.log("neighbourhood size: " + nodes.size());
 			
 			Debugger.outputTime("Time for enumeration");			
-			Debugger.log("number of subgraphs " + gs.size());
-*/			
+			Debugger.log("number of subgraphs " + gs.size());	
 	/*		
 			time = Debugger.createTime();
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
@@ -200,7 +206,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 			
 	*/		
 			//just for testing
-			Debugger.log();
+		//	Debugger.log();
 	/*		
 			Debugger.log("graph now has the labels (taken from the buffer):");
 			FastGraphNodeType[] ntypes = FastGraphNodeType.values();
@@ -218,7 +224,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 //			int[] degrees = g2.countInstancesOfNodeDegrees(4);
 //			Debugger.log(Arrays.toString(degrees));
 			
-			
+	/*		
 			LinkedList<int[]> rewiring = new LinkedList<int[]>();
 			Random rand = new Random(78);
 			for(int i = 0; i < g2.numberOfEdges; i++) {
@@ -228,6 +234,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 			FastGraph h = g2.generateRewiredGraph(rewiring);
 Debugger.log("g2 "+g2.checkConsistency());
 Debugger.log("h "+h.checkConsistency());
+*/
 			
 		} catch (Exception e) {
 			e.printStackTrace();
