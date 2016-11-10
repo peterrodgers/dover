@@ -163,7 +163,12 @@ public class LauncherGUI extends JFrame {
 		setVisible(true);
 	}
 	
-	
+	/**
+	 * Builds the menu bar
+	 * 
+	 * @param panel The panel which the menu bar is attached to - used for error messages
+	 * @return The menu bar
+	 */
 	private JMenuBar buildMenuBar(JPanel panel) {
 		JMenuBar menuBar = new JMenuBar();
 		
