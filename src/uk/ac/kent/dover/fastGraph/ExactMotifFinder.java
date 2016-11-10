@@ -39,18 +39,18 @@ public class ExactMotifFinder {
 			e.printStackTrace();
 		}
 
-		int nodes = 5;
+		int numOfNodes = 4;
 		long time = Debugger.createTime();		
 		ExactMotifFinder emf = new ExactMotifFinder(g);
-		emf.findMotifs(nodes, 0);
+		emf.findMotifs(numOfNodes, 0);
 		
 		System.out.println("number of subgraphs "+emf.subgraphs.size());
 		System.out.println("graph with "+g.getNumberOfNodes()+" nodes and "+g.getNumberOfEdges()+" edges");
-		Debugger.outputTime("time for motifs with "+nodes+" nodes",time);
+		Debugger.outputTime("time for motifs with "+numOfNodes+" nodes",time);
 		
 		
 		int count = 0;
-		for(String key : emf.hashBuckets.keySet()) {
+/*		for(String key : emf.hashBuckets.keySet()) {
 			LinkedList<LinkedList<FastGraph>> sameHashList = emf.hashBuckets.get(key);
 //			System.out.println("hash string \""+key+"\" number of different isomorphic groups "+sameHashList.size());
 			for(LinkedList<FastGraph> isoList: sameHashList) {
@@ -71,6 +71,25 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 				
 			}
 		}
+*/		
+		HashMap<String,LinkedList<FastGraph>> isoLists = emf.extractGraphLists();
+		for(String key : isoLists.keySet()) {
+			LinkedList<FastGraph> isoList = isoLists.get(key);
+			System.out.println(key+" "+isoList.size());
+			
+/*			uk.ac.kent.displayGraph.Graph dg = isoList.get(0).generateDisplayGraph();
+			dg.randomizeNodePoints(new Point(20,20),300,300);
+			dg.setLabel(key);
+			uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg);
+			uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
+			GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
+			se.setAnimateFlag(false);
+			se.setIterations(100);
+			se.setTimeLimit(200);
+			se.setGraphPanel(gw.getGraphPanel());
+			se.layout();
+*/		}
+		
 		System.out.println("stored subgraphs "+count);
 		ExactIsomorphism.reportFailRatios();
 		ExactIsomorphism.reportTimes();
@@ -90,6 +109,32 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 	}
 	
 
+	/**
+	 * This extracts the lists of isomorphic graphs. Each element in a list is isomorphic.
+	 * Call after running findMotifs.
+	 * 
+	 * @return collection of lists, all graphs in a single list are isomorphic
+	 */
+	public HashMap<String,LinkedList<FastGraph>> extractGraphLists() {
+		
+		HashMap<String,LinkedList<FastGraph>> ret = new HashMap<String,LinkedList<FastGraph>>(hashBuckets.size()*2);
+		
+		for(String key : hashBuckets.keySet()) {
+			LinkedList<LinkedList<FastGraph>> bucket = hashBuckets.get(key);
+			int count = 0;
+			for(LinkedList<FastGraph> list : bucket) {
+				count++;
+				
+				String retKey = key+"-"+count;
+				ret.put(retKey,list);
+			}
+		}
+		
+		return ret;
+	}
+
+	
+	
 	/**
 	 * Run the motif finder.
 	 * 

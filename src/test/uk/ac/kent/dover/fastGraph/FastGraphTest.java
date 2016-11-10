@@ -1089,10 +1089,17 @@ public class FastGraphTest {
 		g.setAllNodeLabels(nodeLabels);
 		assertEquals(g.getNodeLabel(0),nodeLabels[0]);
 		assertEquals(g.getNodeLabel(1),nodeLabels[1]);
+		String[] nodeLabels2 = {"label1","test 2","three","-four-","5,5"};
+		g.setAllNodeLabels(nodeLabels2);
+		assertEquals(g.getNodeLabel(0),nodeLabels2[0]);
+		assertEquals(g.getNodeLabel(1),nodeLabels2[1]);
 		
 		String[] edgeLabels = {"","edge label 2"};
 		g.setAllEdgeLabels(edgeLabels);
 		assertEquals(g.getEdgeLabel(0),edgeLabels[0]);
+		String[] edgeLabels2 = {"e1","e2.2"};
+		g.setAllEdgeLabels(edgeLabels2);
+		assertEquals(g.getEdgeLabel(0),edgeLabels2[0]);
 
 	}
 	
