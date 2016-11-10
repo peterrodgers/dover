@@ -1,5 +1,6 @@
 package uk.ac.kent.dover.fastGraph;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -249,4 +250,18 @@ public class Util {
 		set.addAll(IntStream.of(array).boxed().collect(Collectors.toList()));
 	}	
 	
+	
+	/**
+	 * Deep copy of ByteBuffer.
+	 * @param original the ByteBuffer to copy
+	 * @return new ByteBuffer with a copy of the content of original.
+	 */
+	public static ByteBuffer cloneByteBuffer(ByteBuffer original) {
+	       ByteBuffer clone = ByteBuffer.allocate(original.capacity());
+	       original.rewind();//copy from the beginning
+	       clone.put(original);
+	       original.rewind();
+	       clone.flip();
+	       return clone;
+	}
 }

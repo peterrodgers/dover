@@ -292,6 +292,7 @@ startTime = -1;
 		}
 
 		
+		
 		am2 = new AdjacencyMatrix(g);
 		matrix2 = am2.buildIntAdjacencyMatrix();
 		eigenvalues2 = am2.findEigenvalues(matrix2);
