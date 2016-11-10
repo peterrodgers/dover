@@ -136,7 +136,7 @@ public class FastGraph {
 //		FastGraph g1 = adjacencyListGraphFactory(4847571,68993773,null,"soc-LiveJournal1.txt",false);
 
 		
-Debugger.outputTime("snap load time ");
+//Debugger.outputTime("snap load time ");
 /*		
 		time = Debugger.createTime();
 		
@@ -145,6 +145,7 @@ Debugger.outputTime("snap load time ");
 		time = Debugger.createTime();
 */
 //String name = "random-n-100-e-1000";
+//String name = "random-n-2-e-1";
 //String name = "as-skitter.txt";
 String name = "soc-pokec-relationships.txt-reduced";
 //String name = "soc-pokec-relationships.txt-veryshort-veryshort";
@@ -159,7 +160,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 			
 			Debugger.log("Number of nodes: " + g2.getNumberOfNodes());
 			Debugger.log("Number of edges: " + g2.getNumberOfEdges());
-			
+/*			
 			Debugger.resetTime();
 			
 			//EnumerateSubgraphFanmod es = new EnumerateSubgraphFanmod(g2);
@@ -168,7 +169,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 			
 			Debugger.outputTime("Time for enumeration");			
 			Debugger.log("number of subgraphs " + gs.size());
-			
+*/			
 	/*		
 			time = Debugger.createTime();
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
@@ -216,6 +217,17 @@ String name = "soc-pokec-relationships.txt-reduced";
 		*/	
 //			int[] degrees = g2.countInstancesOfNodeDegrees(4);
 //			Debugger.log(Arrays.toString(degrees));
+			
+			
+			LinkedList<int[]> rewiring = new LinkedList<int[]>();
+			Random rand = new Random(78);
+			for(int i = 0; i < g2.numberOfEdges; i++) {
+				int[] r = {i,rand.nextInt(g2.getNumberOfNodes()),rand.nextInt(g2.getNumberOfNodes())};
+				rewiring.add(r);
+			}
+			FastGraph h = g2.generateRewiredGraph(rewiring);
+Debugger.log("g2 "+g2.checkConsistency());
+Debugger.log("h "+h.checkConsistency());
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -397,7 +409,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 	public FastGraph removeNodesAndEdgesFromGraph(LinkedList<Integer> nodes, LinkedList<Integer> edges, int targetNodes, int targetEdges) throws FastGraphException {
 		
 		Debugger.log("Suggesting nodes and egdes to remove");
-		long time = 0; time = Debugger.createTime();
+		long time = Debugger.createTime();
 		
 		int currentTotalNodes = getNumberOfNodes();
 		int currentTotalEdges = getNumberOfEdges();
@@ -1693,7 +1705,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 		String[] splitLine;
 		
 		String line = "";
-long time = 0; time = Debugger.createTime();			
+long time = Debugger.createTime();			
 		while(line != null) {
 			line = br.readLine();
 			if(line == null) {
@@ -2648,7 +2660,7 @@ if(edgeIndex%1000000==0 ) {
 		
 		Debugger.log("Nodes to remove: " + Arrays.toString(nodesToDelete));
 		
-		long time = 0; time = Debugger.createTime();
+		long time = Debugger.createTime();
 
 		LinkedList<Integer> allEdgesToDeleteList = new LinkedList<Integer>();
 		LinkedList<Integer> allNodesToDeleteList = new LinkedList<Integer>();
@@ -2719,7 +2731,7 @@ time = Debugger.createTime();
 	 */
 	public FastGraph generateGraphFromSubgraph(int[] subgraphNodes, int[] subgraphEdges) {
 		
-		long time = 0; time = Debugger.createTime();
+		long time = Debugger.createTime();
 
 		FastGraph g = new FastGraph(subgraphNodes.length, subgraphEdges.length, getDirect());
 		
@@ -2875,6 +2887,132 @@ if(node%100000 == 0) {
 				offset += CONNECTION_PAIR_SIZE;
 			}
 		}
+		
+		return g;
+	}
+
+
+	/**
+	 * Generates a new graph from the changes in edge wiring specified.
+	 * 
+	 * @param rewireEdges list of 3 element arrays, rewireEdges[0] is the edge, rewireEdges[1] is the new node1, rewireEdges[2] is the new node2
+	 * @return the new FastGraph
+	 */
+	public FastGraph generateRewiredGraph(List<int[]> rewireEdges) {
+		
+//Debugger.resetTime();
+
+		FastGraph g = new FastGraph(getNumberOfNodes(), getNumberOfEdges(), getDirect());
+		
+		g.nodeBuf = Util.cloneByteBuffer(nodeBuf);
+		g.nodeLabelBuf = Util.cloneByteBuffer(nodeLabelBuf);
+		g.edgeBuf = Util.cloneByteBuffer(edgeBuf);
+		g.edgeLabelBuf = Util.cloneByteBuffer(edgeLabelBuf);
+
+		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(g.getNumberOfNodes()); // temporary store of inward edges
+		for(int nodeIndex = 0; nodeIndex < g.getNumberOfNodes(); nodeIndex++) {
+			ArrayList<Integer> edges = new ArrayList<Integer>(100);
+			nodeIn.add(nodeIndex,edges);
+		}
+		
+		ArrayList<ArrayList<Integer>> nodeOut = new ArrayList<ArrayList<Integer>>(g.getNumberOfNodes()); // temporary store of outward edges
+		for(int nodeIndex = 0; nodeIndex < g.getNumberOfNodes(); nodeIndex++) {
+			ArrayList<Integer> edges = new ArrayList<Integer>(100);
+			nodeOut.add(nodeIndex,edges);
+		}
+
+		ArrayList<Integer> inEdgeList;	
+		ArrayList<Integer> outEdgeList;	
+		
+		// create the edges
+		edgeBuf.position(0);
+		g.edgeBuf.position(0);
+
+		for(int[] eArray : rewireEdges) {
+			
+			int e = eArray[0];
+			
+			int gn1 = eArray[1];
+			int gn2 = eArray[2];
+			
+			
+			g.edgeBuf.putInt(EDGE_NODE1_OFFSET+e*EDGE_BYTE_SIZE,gn1); // one end of edge
+			g.edgeBuf.putInt(EDGE_NODE2_OFFSET+e*EDGE_BYTE_SIZE,gn2); // other end of edge
+		}
+//Debugger.outputTime("A Changed the edge connections");
+			
+		// the edge connections have been changed, now change the connection lists
+		for(int e = 0; e < g.numberOfEdges; e++) {
+			
+			int gn1 = g.getEdgeNode1(e);
+			int gn2 = g.getEdgeNode2(e);
+			
+			// store connecting edges
+			inEdgeList = nodeIn.get(gn2);
+			inEdgeList.add(e);
+			outEdgeList = nodeOut.get(gn1);
+			outEdgeList.add(e);
+		}
+		
+//for(int i = 0; i < g.numberOfNodes; i++) {
+//	Debugger.log("node "+i+" in "+nodeIn.get(i)+" out "+nodeOut.get(i));
+//}
+		
+		// Initialise the connection buffer, modifying the node buffer connection data
+		//time = Debugger.createTime();
+		int offset = 0;
+		for(int node = 0; node < g.getNumberOfNodes(); node++) {
+//if(node%100000 == 0) {
+//	Debugger.outputTime("B populated "+node+" nodes in connection buffer");
+//}
+			
+			// setting the in connection offset and length
+			ArrayList<Integer> inEdges = nodeIn.get(node);
+			int inEdgeLength = inEdges.size();
+			g.nodeBuf.putInt(node*NODE_BYTE_SIZE+NODE_IN_CONNECTION_START_OFFSET,offset);
+			g.nodeBuf.putInt(node*NODE_BYTE_SIZE+NODE_IN_DEGREE_OFFSET,inEdgeLength);
+			
+			// now put the in edge/node pairs
+			for(int edgeIndex : inEdges) {
+				int nodeIndex = -1;
+				int n1 = g.edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeIndex*EDGE_BYTE_SIZE);
+				int n2 = g.edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeIndex*EDGE_BYTE_SIZE);
+				if(n1 == node) {
+					nodeIndex = n2;
+				} else if(n2 == node) {
+					nodeIndex = n1;
+				} else {
+					Debugger.log("ERROR A When finding connections for node "+node+" connecting edge "+edgeIndex+ " has connecting nodes "+n1+" "+n2);
+				}
+				g.connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeIndex);
+				g.connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeIndex);
+				offset += CONNECTION_PAIR_SIZE;
+			}
+			// setting the out connection offset and length
+			ArrayList<Integer> outEdges = nodeOut.get(node);
+			int outEdgeLength = outEdges.size();
+			g.nodeBuf.putInt(node*NODE_BYTE_SIZE+NODE_OUT_CONNECTION_START_OFFSET,offset);
+			g.nodeBuf.putInt(node*NODE_BYTE_SIZE+NODE_OUT_DEGREE_OFFSET,outEdgeLength);
+			
+			// now put the out edge/node pairs
+			for(int edgeIndex : outEdges) {
+				int nodeIndex = -1;
+				int n1 = g.edgeBuf.getInt(EDGE_NODE1_OFFSET+edgeIndex*EDGE_BYTE_SIZE);
+				int n2 = g.edgeBuf.getInt(EDGE_NODE2_OFFSET+edgeIndex*EDGE_BYTE_SIZE);
+
+				if(n1 == node) {
+					nodeIndex = n2;
+				} else if(n2 == node) {
+					nodeIndex = n1;
+				} else {
+					Debugger.log("ERROR B When finding connections for node "+node+" connecting edge "+edgeIndex+ " has connecting nodes "+n1+" "+n2);
+				}
+				g.connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,edgeIndex);
+				g.connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,nodeIndex);
+				offset += CONNECTION_PAIR_SIZE;
+			}
+		}
+//Debugger.outputTime("C finished");
 		
 		return g;
 	}

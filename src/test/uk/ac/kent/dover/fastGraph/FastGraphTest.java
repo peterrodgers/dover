@@ -3,6 +3,7 @@ package test.uk.ac.kent.dover.fastGraph;
 import static org.junit.Assert.*;
 
 import java.nio.*;
+import java.util.LinkedList;
 import java.io.*;
 
 import uk.ac.kent.displayGraph.*;
@@ -1475,6 +1476,44 @@ public class FastGraphTest {
 	}
 		
 
+	
+	@Test
+	public void test131() {
+		FastGraph g, g2;
+		LinkedList<int[]> rewiring;
+		g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
+		rewiring = new LinkedList<int[]>();
+		g2 = g.generateRewiredGraph(rewiring);
+		assertTrue(g.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		
+		g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
+		rewiring = new LinkedList<int[]>();
+		int[] r1 = {3,1,2};
+		rewiring.add(r1);
+		g2 = g.generateRewiredGraph(rewiring);
+		assertTrue(g.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		assertEquals(1,g2.getEdgeNode1(3));
+		assertEquals(2,g2.getEdgeNode2(3));
+		
+		g = FastGraph.jsonStringGraphFactory(get5Node5Edge(),false);
+		rewiring = new LinkedList<int[]>();
+		int[] r2 = {0,0,0};
+		int[] r3 = {1,3,1};
+		rewiring.add(r1);
+		rewiring.add(r2);
+		rewiring.add(r3);
+		g2 = g.generateRewiredGraph(rewiring);
+		assertTrue(g.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		assertEquals(1,g2.getEdgeNode1(3));
+		assertEquals(2,g2.getEdgeNode2(3));
+		assertEquals(0,g2.getEdgeNode1(0));
+		assertEquals(0,g2.getEdgeNode2(0));
+		assertEquals(3,g2.getEdgeNode1(1));
+		assertEquals(1,g2.getEdgeNode2(1));
+	}
 	
 	
 	
