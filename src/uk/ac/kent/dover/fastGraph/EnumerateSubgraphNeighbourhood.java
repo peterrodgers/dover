@@ -52,7 +52,8 @@ public class EnumerateSubgraphNeighbourhood {
 		for(int n = 0; n < g.getNumberOfNodes(); n++) {
 		//for(int n = 0; n < 6002; n++) {
 			
-			if(n % 1000 == 0 && n!=0) {
+			int step = 100000;
+			if(n % step == 0 && n!=0) {
 				Debugger.log();
 				Debugger.log("Node: " + n);
 				Debugger.log("Subgraphs found so far: " + subgraphs.size());
@@ -64,10 +65,10 @@ public class EnumerateSubgraphNeighbourhood {
 				Debugger.log("Fully sucessful nodes: " + String.format( "%.2f", fullySuccessNodesPercentage ) + "%"); 
 				double avgNeighbourhoodSize = neighbourhoodTotal / n;
 				Debugger.log("Average neighbourhood size: " + String.format( "%.2f",avgNeighbourhoodSize));
-				
+				long timeLeft = Debugger.getTimeSinceInSeconds(time)*((g.getNumberOfNodes()-n)/step);
 				Debugger.outputTime("Time since last: ", time);
 				
-				long timeLeft = Debugger.getTimeSinceInSeconds(time)*(g.getNumberOfNodes()-n)/1000;
+				
 				Debugger.log("Estimated time left: " + timeLeft + " seconds (" + timeLeft/60 + " mins)");
 				
 				time = Debugger.createTime();
@@ -75,6 +76,41 @@ public class EnumerateSubgraphNeighbourhood {
 				
 			}
 			
+			//for each subgraph at this neighbourhood
+			int foundSubgraphs = 0;
+			while(foundSubgraphs < subgraphsPerNode) {
+				//build neighbourhood
+				HashSet<Integer> nodes = new HashSet<Integer>();
+				nodes.add(n);
+				int attempts = 0; //in case we happen to pick one already in the list, but also to stop when there are no more to pick
+				while(nodes.size() < subgraphSize && attempts < attemptsToFindSubgraph) {
+					int nextNode = r.nextInt(nodes.size());
+					int[] cn = g.getNodeConnectingNodes(nextNode);
+					int nextToAdd = cn[r.nextInt(cn.length)];
+					int nSize = nodes.size();
+					nodes.add(nextToAdd);
+					if(nSize == nodes.size()) {
+						//no nodes added
+						attempts++;
+					}
+				}
+
+				//Are there enough nodes found?
+				if(nodes.size() < subgraphSize) {
+					failuresNeighbourhoodTooSmall++;
+					//Debugger.log("neighbourhood too small: " + nodes.size());
+					break; //don't check this node again
+				} else {
+					//add subgraph
+					HashSet<Integer> edges = new HashSet<Integer>();
+					addMissingEdges(nodes, edges);
+					FastGraph subgraph = g.generateGraphFromSubgraph(Util.convertHashSet(nodes), Util.convertHashSet(edges));
+					foundSubgraphs++;
+					subgraphs.add(subgraph);
+				}
+			}
+			
+			/*
 			//build nodes to pick from
 			HashSet<Integer> startingNodes = new HashSet<Integer>();
 			HashSet<Integer> nodes = new HashSet<Integer>();
@@ -85,10 +121,6 @@ public class EnumerateSubgraphNeighbourhood {
 			
 			buildNeighbourhood(startingNodes, nodes, minNumOfNodes);
 			neighbourhoodTotal += nodes.size();
-		//	if(n > 5000 && n < 6000) {
-		//		Debugger.outputTime("buildNeighbourhood: ", time2);
-		//		Debugger.log("neighbourhood size: " + nodes.size());
-		//	}
 				
 			if(nodes.size() < subgraphSize) {
 				failuresNeighbourhoodTooSmall++;
@@ -132,9 +164,10 @@ public class EnumerateSubgraphNeighbourhood {
 				}
 				
 			}
+			*/
 			
 		}	
-		
+		Debugger.log();
 		return subgraphs;
 	}
 	

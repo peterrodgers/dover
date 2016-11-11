@@ -165,7 +165,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 			
 			//EnumerateSubgraphFanmod es = new EnumerateSubgraphFanmod(g2);
 			EnumerateSubgraphNeighbourhood es = new EnumerateSubgraphNeighbourhood(g2);
-			HashSet<FastGraph> gs = es.enumerateSubgraphs(4,20,3,10000);
+			HashSet<FastGraph> gs = es.enumerateSubgraphs(8,20,5,10);
 		//	HashSet<Integer> startingNodes = new HashSet<Integer>();
 		//	HashSet<Integer> nodes = new HashSet<Integer>();
 		//	startingNodes.add(5490);

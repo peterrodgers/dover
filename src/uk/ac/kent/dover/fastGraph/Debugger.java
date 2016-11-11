@@ -90,6 +90,6 @@ public class Debugger {
 	 * @return The difference between now and the current time
 	 */
 	public static long getTimeSinceInSeconds(long time) {
-		return (long) ((System.currentTimeMillis()-time)/1000.0);
+		return (System.currentTimeMillis()-time)/(long) 1000.0;
 	}
 }
