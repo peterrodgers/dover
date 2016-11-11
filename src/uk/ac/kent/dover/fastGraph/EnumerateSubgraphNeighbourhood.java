@@ -40,6 +40,7 @@ public class EnumerateSubgraphNeighbourhood {
 		
 		int failuresNeighbourhoodTooSmall = 0;
 		int failuresAttemptsMaxedOut = 0;
+		double neighbourhoodTotal = 0;
 		
 		Debugger.resetTime();
 		long time = Debugger.createTime();
@@ -61,6 +62,9 @@ public class EnumerateSubgraphNeighbourhood {
 				Debugger.log("Failures due to attempts maxed out so far: " + failuresAttemptsMaxedOut + " (" + String.format( "%.2f", maxedOutPercentage ) + "%)");
 				double fullySuccessNodesPercentage = ((double) (n-(failuresNeighbourhoodTooSmall+failuresAttemptsMaxedOut))/n)*100;
 				Debugger.log("Fully sucessful nodes: " + String.format( "%.2f", fullySuccessNodesPercentage ) + "%"); 
+				double avgNeighbourhoodSize = neighbourhoodTotal / n;
+				Debugger.log("Average neighbourhood size: " + String.format( "%.2f",avgNeighbourhoodSize));
+				
 				Debugger.outputTime("Time since last: ", time);
 				
 				long timeLeft = Debugger.getTimeSinceInSeconds(time)*(g.getNumberOfNodes()-n)/1000;
@@ -80,6 +84,7 @@ public class EnumerateSubgraphNeighbourhood {
 
 			
 			buildNeighbourhood(startingNodes, nodes, minNumOfNodes);
+			neighbourhoodTotal += nodes.size();
 		//	if(n > 5000 && n < 6000) {
 		//		Debugger.outputTime("buildNeighbourhood: ", time2);
 		//		Debugger.log("neighbourhood size: " + nodes.size());
