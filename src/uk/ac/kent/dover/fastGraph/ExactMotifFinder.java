@@ -27,29 +27,28 @@ public class ExactMotifFinder {
 		
 		FastGraph g = null;
 		try {
-//			g = FastGraph.loadBuffersGraphFactory(null,"soc-pokec-relationships.txt-reduced");
+			g = FastGraph.loadBuffersGraphFactory(null,"soc-pokec-relationships.txt-reduced");
 			
 //			g = FastGraph.randomGraphFactory(2,1,1000,true,false); // 1 hundred nodes, 1 thousand edges
 //			g = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
 //			g = FastGraph.randomGraphFactory(200,2000,1,true,false); // 3 hundred nodes, 3 thousand edges
 //			g = FastGraph.randomGraphFactory(300,3000,1,true,false); // 3 hundred nodes, 3 thousand edges
-			g = FastGraph.randomGraphFactory(1000,10000,1,true,false); // 1 thousand nodes, 10 thousand edges
+//			g = FastGraph.randomGraphFactory(1000,10000,1,true,false); // 1 thousand nodes, 10 thousand edges
 //			g = FastGraph.randomGraphFactory(10000,100000,1,true,false); //10 thousand nodes 100 thousand edges
 //			g = FastGraph.randomGraphFactory(6,9,1,true,false); // 5 nodes, 6 edges
 			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-Debugger.resetTime();		
+Debugger.resetTime();
 		FastGraph h = g.generateRandomRewiredGraph(10,1);
-Debugger.outputTime("time for rewiring");
-System.out.println(h.checkConsistency());
-System.out.println(g.checkConsistency());
+System.out.println("h consistent "+h.checkConsistency());
+System.out.println("g consistent "+g.checkConsistency());
 System.out.println(Arrays.equals(h.degreeProfile(), g.degreeProfile())+" "+Arrays.toString(h.degreeProfile()));
 System.out.println(Arrays.equals(h.inDegreeProfile(), g.inDegreeProfile())+" "+Arrays.toString(h.inDegreeProfile()));
 System.out.println(Arrays.equals(h.outDegreeProfile(), g.outDegreeProfile())+" "+Arrays.toString(h.outDegreeProfile()));
 
-
+System.exit(0);
 
 		int numOfNodes = 4;
 		long time = Debugger.createTime();		
@@ -100,14 +99,17 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 			se.setTimeLimit(200);
 			se.setGraphPanel(gw.getGraphPanel());
 			se.layout();
-*/}
+*/
+		}
 		
 		System.out.println("stored subgraphs "+count);
 		ExactIsomorphism.reportFailRatios();
 		ExactIsomorphism.reportTimes();
-		
+	
 	}
 
+	
+	
 	/**
 	 * 
 	 * @param g the FastGraph to find motifs in

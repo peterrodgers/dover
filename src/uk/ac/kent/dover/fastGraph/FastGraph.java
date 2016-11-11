@@ -3296,6 +3296,7 @@ if(node%100000 == 0) {
 	}
 
 
+
 	
 	/**
 	 * This generates a new random graph based on the existing graph, but with rewired edges. The node degrees are maintained.
@@ -3307,26 +3308,33 @@ if(node%100000 == 0) {
 	 */
 	public FastGraph generateRandomRewiredGraph(int iterations, long seed) {
 		
+		String name = this.getName();
+		
 		long theSeed = seed;
 		FastGraph g = this;
 		for(int i = 0; i< iterations; i++) {
-			g = g.oneIterationGenerateRandomRewiredGraph(theSeed);
-			if(g == null) {
+			FastGraph h = g.oneIterationGenerateRandomRewiredGraph(theSeed);
+			if(h == null) {
 				return null;
+			} else {
+				h.setName(name+"-"+i);
 			}
+			g = h;
 			theSeed += g.getNumberOfEdges()*10;
-Debugger.log(theSeed);
+Debugger.outputTime("time for rewiring");
+h.saveBuffers(null, g.getName());
 		}
 		
 		return g;
 	}
-			
-
+	
+	
+	
+	
 	/**
 	 * This generates a new random graph based on the existing graph, but with rewired edges. The node degrees are maintained.
 	 * 
 	 * 
-
 	 * @param seed random number generator seed
 	 * @return a new graph, based on g, but rewired graph
 	 */
