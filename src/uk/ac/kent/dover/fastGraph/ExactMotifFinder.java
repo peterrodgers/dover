@@ -16,7 +16,7 @@ public class ExactMotifFinder {
 	private HashMap<String,LinkedList<LinkedList<FastGraph>>> hashBuckets;
 	
 	private FastGraph g;
-	private EnumerateSubgraphFanmod enumerator;
+	private EnumerateSubgraphNeighbourhood enumerator;
 	private EnumerateSubgraphRandom enumeratorRandom;
 	private HashSet<FastGraph> subgraphs; // subgraphs found by the enumerator
 	
@@ -27,11 +27,11 @@ public class ExactMotifFinder {
 		
 		FastGraph g = null;
 		try {
-			g = FastGraph.loadBuffersGraphFactory(null,"soc-pokec-relationships.txt-reduced");
+//			g = FastGraph.loadBuffersGraphFactory(null,"soc-pokec-relationships.txt-reduced");
 			
 //			g = FastGraph.randomGraphFactory(2,1,1000,true,false); // 1 hundred nodes, 1 thousand edges
 //			g = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
-//			g = FastGraph.randomGraphFactory(200,2000,1,true,false); // 3 hundred nodes, 3 thousand edges
+			g = FastGraph.randomGraphFactory(200,2000,1,true,false); // 3 hundred nodes, 3 thousand edges
 //			g = FastGraph.randomGraphFactory(300,3000,1,true,false); // 3 hundred nodes, 3 thousand edges
 //			g = FastGraph.randomGraphFactory(1000,10000,1,true,false); // 1 thousand nodes, 10 thousand edges
 //			g = FastGraph.randomGraphFactory(10000,100000,1,true,false); //10 thousand nodes 100 thousand edges
@@ -40,7 +40,9 @@ public class ExactMotifFinder {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+/*
 Debugger.resetTime();
+Debugger.log("Starting");
 		FastGraph h = g.generateRandomRewiredGraph(10,1);
 System.out.println("h consistent "+h.checkConsistency());
 System.out.println("g consistent "+g.checkConsistency());
@@ -49,7 +51,7 @@ System.out.println(Arrays.equals(h.inDegreeProfile(), g.inDegreeProfile())+" "+A
 System.out.println(Arrays.equals(h.outDegreeProfile(), g.outDegreeProfile())+" "+Arrays.toString(h.outDegreeProfile()));
 
 System.exit(0);
-
+*/
 		int numOfNodes = 4;
 		long time = Debugger.createTime();		
 		ExactMotifFinder emf = new ExactMotifFinder(g);
@@ -88,7 +90,8 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 			LinkedList<FastGraph> isoList = isoLists.get(key);
 			System.out.println(key+" "+isoList.size());
 			
-/*			uk.ac.kent.displayGraph.Graph dg = isoList.get(0).generateDisplayGraph();
+			
+			uk.ac.kent.displayGraph.Graph dg = isoList.get(0).generateDisplayGraph();
 			dg.randomizeNodePoints(new Point(20,20),300,300);
 			dg.setLabel(key);
 			uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg);
@@ -99,7 +102,7 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 			se.setTimeLimit(200);
 			se.setGraphPanel(gw.getGraphPanel());
 			se.layout();
-*/
+
 		}
 		
 		System.out.println("stored subgraphs "+count);
@@ -117,7 +120,8 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 	 */
 	public ExactMotifFinder(FastGraph g) {
 		this.g = g;
-		enumerator = new EnumerateSubgraphFanmod(g);
+		//enumerator = new EnumerateSubgraphFanmod(g);
+		enumerator = new EnumerateSubgraphNeighbourhood(g);
 		enumeratorRandom = new EnumerateSubgraphRandom(g);
 	}
 	
@@ -158,8 +162,8 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 
 		hashBuckets = new HashMap<String,LinkedList<LinkedList<FastGraph>>> (g.getNumberOfNodes());
 		
-//		subgraphs = enumerator.enumerateSubgraphs(k, q);
-		subgraphs = enumeratorRandom.randomSampleSubgraph(k,10000);		
+		subgraphs = enumerator.enumerateSubgraphs(k, 50 ,10);
+//		subgraphs = enumeratorRandom.randomSampleSubgraph(k,10000);		
 		for(FastGraph subgraph : subgraphs) {
 			ExactIsomorphism ei = new ExactIsomorphism(subgraph);
 			String hashString = ei.generateStringForHash();

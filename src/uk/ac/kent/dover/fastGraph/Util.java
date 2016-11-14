@@ -275,4 +275,22 @@ public class Util {
 	       clone.flip();
 	       return clone;
 	}
+	
+	/**
+	 * Gets a specific numbered item from the HashSet given
+	 * 
+	 * @param set The Set to look through
+	 * @param number The item nmber to return
+	 * @return The item
+	 */
+	public static <T> T getFromHashSet(HashSet<T> set, int number) {
+		int i = 0;
+		for (T item : set) {
+			if (i == number) {
+				return item;
+			}
+			i++;
+		}
+		return null;
+	}
 }

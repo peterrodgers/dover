@@ -154,7 +154,8 @@ String name = "soc-pokec-relationships.txt-reduced";
 		FastGraph g2;
 		try {
 			//time = Debugger.createTime();
-			g2 = loadBuffersGraphFactory(null,name);
+			//g2 = loadBuffersGraphFactory(null,name);
+			g2 = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
 			
 			Debugger.log("Connected: " + Connected.connected(g2));
 			
@@ -165,7 +166,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 			
 			//EnumerateSubgraphFanmod es = new EnumerateSubgraphFanmod(g2);
 			EnumerateSubgraphNeighbourhood es = new EnumerateSubgraphNeighbourhood(g2);
-			HashSet<FastGraph> gs = es.enumerateSubgraphs(8,20,5,10);
+			HashSet<FastGraph> gs = es.enumerateSubgraphs(4,1,10);
 		//	HashSet<Integer> startingNodes = new HashSet<Integer>();
 		//	HashSet<Integer> nodes = new HashSet<Integer>();
 		//	startingNodes.add(5490);
