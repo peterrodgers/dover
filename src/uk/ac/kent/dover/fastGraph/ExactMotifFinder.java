@@ -189,15 +189,19 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 
 		//export the motifs
 		String graphName = g.getName();
+		String nameString = "_comparison";
+		if (!comparisonSet) {
+			nameString = "_real";
+		}
 		/*
-		for(String key : isoLists.keySet()) {
-			LinkedList<FastGraph> isoList = isoLists.get(key);
-			FastGraph gOut = isoList.getFirst();
-			gOut.saveBuffers("motifs"+File.separatorChar+graphName+"_comparison"+File.separatorChar+key, key);
+		if(comparisonSet) {
+			for(String key : isoLists.keySet()) {
+				LinkedList<FastGraph> isoList = isoLists.get(key);
+				FastGraph gOut = isoList.getFirst();
+			}
 		}
 */
 		//save the motif info file
-		File output = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+"_comparison"+File.separatorChar+"motifs.txt");
 		try(PrintWriter out = new PrintWriter( output )){ //will close file after use
 		    out.println( sb );
 		}
