@@ -13,7 +13,7 @@ public class ExactMotifFinder {
 	 *  list of FastGraphs with the same hash value, second linked list is the list
 	 *  of FastGraphs that are isomorphic
 	 */
-	private HashMap<String,LinkedList<LinkedList<FastGraph>>> hashBuckets;
+	private static HashMap<String,LinkedList<LinkedList<FastGraph>>> hashBuckets;
 	
 	private FastGraph g;
 	private EnumerateSubgraphNeighbourhood enumerator;
@@ -55,7 +55,7 @@ System.exit(0);
 		int numOfNodes = 4;
 		long time = Debugger.createTime();		
 		ExactMotifFinder emf = new ExactMotifFinder(g);
-		emf.findMotifs(numOfNodes, 0);
+		emf.findMotifs(numOfNodes, 0, hashBuckets);
 		
 		System.out.println("number of subgraphs "+emf.subgraphs.size());
 		System.out.println("graph with "+g.getNumberOfNodes()+" nodes and "+g.getNumberOfEdges()+" edges");
@@ -85,7 +85,7 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 			}
 		}
 */		
-		HashMap<String,LinkedList<FastGraph>> isoLists = emf.extractGraphLists();
+		HashMap<String,LinkedList<FastGraph>> isoLists = emf.extractGraphLists(hashBuckets);
 		for(String key : isoLists.keySet()) {
 			LinkedList<FastGraph> isoList = isoLists.get(key);
 			System.out.println(key+" "+isoList.size());
@@ -111,7 +111,59 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 	
 	}
 
-	
+	/**
+	 * Generates a list mapping of keys to lists of motifs with that key
+	 * 
+	 * @param rewiresNeeded The number of times the graph needs to be rewired
+	 * @param sizeOfMotifs The size of motifs being investigated
+	 * @param motifSampling The number of motifs to sample?
+	 * @param hashBuckets The buckets to store the results in
+	 * @return The map of keys to buckets of motifs that match those keys
+	 */
+	public HashMap<String,LinkedList<FastGraph>> findAllMotifs(int rewiresNeeded, int sizeOfMotifs, int motifSampling, HashMap<String,LinkedList<LinkedList<FastGraph>>> hashBuckets) {
+		HashMap<String,LinkedList<FastGraph>> isoLists = new HashMap<>();
+		
+	//	isoLists.forEach((key, isoList) -> {
+	//		Debugger.log(key+" "+isoList.size());
+	//	});
+		
+		
+		FastGraph currentGraph = g;
+		
+		if(rewiresNeeded == 0) {
+			ExactMotifFinder emf = new ExactMotifFinder(g);
+			emf.findMotifs(sizeOfMotifs, 0, hashBuckets);
+			isoLists = emf.extractGraphLists(hashBuckets);
+		} else {
+			for (int i = 0; i < rewiresNeeded; i++) {
+				currentGraph = currentGraph.generateRandomRewiredGraph(10,1);
+				ExactMotifFinder emf = new ExactMotifFinder(currentGraph);
+				emf.findMotifs(sizeOfMotifs, 0, hashBuckets);
+				HashMap<String,LinkedList<FastGraph>> newIsoLists = emf.extractGraphLists(hashBuckets);
+				
+				//newIsoLists.forEach((key, isoList) -> {
+				//	Debugger.log(key+" "+isoList.size());
+				//});
+				
+				//store local list of motifs
+				for(String key : newIsoLists.keySet()) {
+					LinkedList<FastGraph> isoList = newIsoLists.get(key);
+					//add list to existing list for this key
+					//Debugger.log("key" + key);
+					if(isoLists.containsKey(key)) {
+						isoLists.get(key).addAll(isoList);
+					} else {
+						//create it if it doesn't exist
+						isoLists.put(key, new LinkedList<FastGraph>(isoList));
+					}
+					
+				}
+				
+			}			
+		}
+		return isoLists;
+		
+	}
 	
 	/**
 	 * 
@@ -130,9 +182,10 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 	 * This extracts the lists of isomorphic graphs. Each element in a list is isomorphic.
 	 * Call after running findMotifs.
 	 * 
+ 	 * @param hashBuckets The buckets to store the results in
 	 * @return collection of lists, all graphs in a single list are isomorphic
 	 */
-	public HashMap<String,LinkedList<FastGraph>> extractGraphLists() {
+	public HashMap<String,LinkedList<FastGraph>> extractGraphLists(HashMap<String,LinkedList<LinkedList<FastGraph>>> hashBuckets) {
 		
 		HashMap<String,LinkedList<FastGraph>> ret = new HashMap<String,LinkedList<FastGraph>>(hashBuckets.size()*2);
 		
@@ -157,10 +210,11 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 	 * 
 	 * @param k the size of motifs in terms of number of nodes.
 	 * @param q the fraction of nodes to sample.
+	 * @param hashBuckets The buckets to store the results in
 	 */
-	public void findMotifs(int k, double q) {
+	public void findMotifs(int k, double q, HashMap<String,LinkedList<LinkedList<FastGraph>>> hashBuckets) {
 
-		hashBuckets = new HashMap<String,LinkedList<LinkedList<FastGraph>>> (g.getNumberOfNodes());
+		//hashBuckets = new HashMap<String,LinkedList<LinkedList<FastGraph>>> (g.getNumberOfNodes());
 		
 		subgraphs = enumerator.enumerateSubgraphs(k, 50 ,10);
 //		subgraphs = enumeratorRandom.randomSampleSubgraph(k,10000);		

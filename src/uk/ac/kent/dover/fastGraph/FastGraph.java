@@ -119,7 +119,7 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(2,1,false);
 //		FastGraph g1 = randomGraphFactory(5,6,1,true);
 //		FastGraph g1 = randomGraphFactory(8,9,1,false);
-//		FastGraph g1 = randomGraphFactory(100,1000,1,false); // 1 hundred nodes, 1 thousand edges
+		FastGraph g1 = randomGraphFactory(100,1000,1,false); // 1 hundred nodes, 1 thousand edges
 //		FastGraph g1 = randomGraphFactory(10000,100000,1,false); // 10 thousand nodes, 100 thousand edges
 //		FastGraph g1 = randomGraphFactory(100000,1000000,1,false); // 100 thousand nodes, 1 million edges
 //		FastGraph g1 = randomGraphFactory(1000000,10000000,1,false); // 1 million nodes, 10 million edges
@@ -147,13 +147,13 @@ public class FastGraph {
 //String name = "random-n-100-e-1000";
 //String name = "random-n-2-e-1";
 //String name = "as-skitter.txt";
-String name = "soc-pokec-relationships.txt-reduced";
+//String name = "soc-pokec-relationships.txt-reduced";
 //String name = "soc-pokec-relationships.txt-veryshort-veryshort";
 //String name = "Wiki-Vote.txt";
 //		String name = g1.getName();
-		FastGraph g2;
+		FastGraph g2 = g1;
 		try {
-			//time = Debugger.createTime();
+			time = Debugger.createTime();
 			//g2 = loadBuffersGraphFactory(null,name);
 			g2 = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
 			
@@ -164,9 +164,20 @@ String name = "soc-pokec-relationships.txt-reduced";
 			
 			Debugger.resetTime();
 			
+			HashMap<String,LinkedList<LinkedList<FastGraph>>> hashBuckets = new HashMap<String,LinkedList<LinkedList<FastGraph>>>(g2.getNumberOfNodes());
+			ExactMotifFinder emf = new ExactMotifFinder(g2);
+			HashMap<String,LinkedList<FastGraph>> isoLists = emf.findAllMotifs(10, 4, 0, hashBuckets);
+			//HashMap<String,LinkedList<FastGraph>> isoLists = emf.extractGraphLists();
+			Debugger.log();
+			Debugger.log("OUTPUT:");
+			isoLists.forEach((key, isoList) -> {
+				Debugger.log(key+" "+isoList.size());
+			});
+			Debugger.outputTime("Time for rewiring");
+			
 			//EnumerateSubgraphFanmod es = new EnumerateSubgraphFanmod(g2);
-			EnumerateSubgraphNeighbourhood es = new EnumerateSubgraphNeighbourhood(g2);
-			HashSet<FastGraph> gs = es.enumerateSubgraphs(4,1,10);
+			//EnumerateSubgraphNeighbourhood es = new EnumerateSubgraphNeighbourhood(g2);
+			//HashSet<FastGraph> gs = es.enumerateSubgraphs(4,1,10);
 		//	HashSet<Integer> startingNodes = new HashSet<Integer>();
 		//	HashSet<Integer> nodes = new HashSet<Integer>();
 		//	startingNodes.add(5490);
@@ -175,8 +186,8 @@ String name = "soc-pokec-relationships.txt-reduced";
 		//	es.buildNeighbourhood(startingNodes, nodes, 20);
 		//	Debugger.log("neighbourhood size: " + nodes.size());
 			
-			Debugger.outputTime("Time for enumeration");			
-			Debugger.log("number of subgraphs " + gs.size());	
+		//	Debugger.outputTime("Time for enumeration");			
+		//	Debugger.log("number of subgraphs " + gs.size());	
 	/*		
 			time = Debugger.createTime();
 			LinkedList<Integer> nodes = new LinkedList<Integer>();
