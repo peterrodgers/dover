@@ -198,10 +198,12 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 			for(String key : isoLists.keySet()) {
 				LinkedList<FastGraph> isoList = isoLists.get(key);
 				FastGraph gOut = isoList.getFirst();
+				gOut.saveBuffers("motifs"+File.separatorChar+graphName+File.separatorChar+key, key);
 			}
 		}
 */
 		//save the motif info file
+		File output = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"motifs"+nameString+".txt");
 		try(PrintWriter out = new PrintWriter( output )){ //will close file after use
 		    out.println( sb );
 		}
