@@ -36,7 +36,7 @@ public class EnumerateSubgraphNeighbourhood {
 	 */
 	public HashSet<FastGraph> enumerateSubgraphs(int subgraphSize, int subgraphsPerNode, int attemptsToFindSubgraph) {
 		
-		Debugger.log("number of subgraphs per node " + subgraphsPerNode);
+	//	Debugger.log("number of subgraphs per node " + subgraphsPerNode);
 	/*	
 		int failuresNeighbourhoodTooSmall = 0;
 		int failuresAttemptsMaxedOut = 0;
@@ -112,7 +112,7 @@ public class EnumerateSubgraphNeighbourhood {
 			}
 			
 		}	
-		Debugger.log();
+		//Debugger.log();
 		return subgraphs;
 	}
 	

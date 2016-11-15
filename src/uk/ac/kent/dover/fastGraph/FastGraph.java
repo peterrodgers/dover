@@ -164,16 +164,9 @@ public class FastGraph {
 			
 			Debugger.resetTime();
 			
-			HashMap<String,LinkedList<LinkedList<FastGraph>>> hashBuckets = new HashMap<String,LinkedList<LinkedList<FastGraph>>>(g2.getNumberOfNodes());
 			ExactMotifFinder emf = new ExactMotifFinder(g2);
-			HashMap<String,LinkedList<FastGraph>> isoLists = emf.findAllMotifs(10, 4, 0, hashBuckets);
-			//HashMap<String,LinkedList<FastGraph>> isoLists = emf.extractGraphLists();
-			Debugger.log();
-			Debugger.log("OUTPUT:");
-			isoLists.forEach((key, isoList) -> {
-				Debugger.log(key+" "+isoList.size());
-			});
-			Debugger.outputTime("Time for rewiring");
+			emf.findAndExportAllMotifs(10, 4, 8, 0, true);
+			Debugger.outputTime("Time total motif detection");
 			
 			//EnumerateSubgraphFanmod es = new EnumerateSubgraphFanmod(g2);
 			//EnumerateSubgraphNeighbourhood es = new EnumerateSubgraphNeighbourhood(g2);
@@ -1590,6 +1583,7 @@ Debugger.log("h "+h.checkConsistency());
 			} else {
 				directoryAndBaseName = directory+File.separatorChar+fileBaseName;
 			}
+			new File(Launcher.startingWorkingDirectory+File.separatorChar+directory).mkdirs();
 		} else {
 			directoryAndBaseName = Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+fileBaseName+File.separatorChar+fileBaseName;
 			new File(Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+fileBaseName).mkdirs();
@@ -3333,7 +3327,7 @@ if(node%100000 == 0) {
 			}
 			g = h;
 			theSeed += g.getNumberOfEdges()*10;
-Debugger.outputTime("time for rewiring");
+//Debugger.outputTime("time for rewiring");
 h.saveBuffers(null, g.getName());
 		}
 		

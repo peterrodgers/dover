@@ -2,6 +2,9 @@ package uk.ac.kent.dover.fastGraph;
 
 import java.awt.Point;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.*;
 
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
@@ -55,6 +58,7 @@ System.exit(0);
 		int numOfNodes = 4;
 		long time = Debugger.createTime();		
 		ExactMotifFinder emf = new ExactMotifFinder(g);
+		HashMap<String,LinkedList<LinkedList<FastGraph>>> hashBuckets = new HashMap<String,LinkedList<LinkedList<FastGraph>>>(g.getNumberOfNodes());
 		emf.findMotifs(numOfNodes, 0, hashBuckets);
 		
 		System.out.println("number of subgraphs "+emf.subgraphs.size());
@@ -110,7 +114,103 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 		ExactIsomorphism.reportTimes();
 	
 	}
+	
+	/**
+	 * 
+	 * @param g the FastGraph to find motifs in
+	 * @param numOfNodes the number of nodes in each motif
+	 */
+	public ExactMotifFinder(FastGraph g) {
+		this.g = g;
+		//enumerator = new EnumerateSubgraphFanmod(g);
+		enumerator = new EnumerateSubgraphNeighbourhood(g);
+		enumeratorRandom = new EnumerateSubgraphRandom(g);
+	}
+	
+	/**
+	 * Merges two isoLists together, and returns the enlarged list
+	 * 
+	 * @param oldList The first list
+	 * @param newList The second list
+	 * @return The new list contains elements from both.
+	 */
+	public HashMap<String,LinkedList<FastGraph>> mergeIsoLists(HashMap<String,LinkedList<FastGraph>> oldList, HashMap<String,LinkedList<FastGraph>> newList) {
+		//store local list of motifs
+		for(String key : newList.keySet()) {
+			LinkedList<FastGraph> isoList = newList.get(key);
+			//add list to existing list for this key
+			//Debugger.log("key" + key);
+			if(oldList.containsKey(key)) {
+				oldList.get(key).addAll(isoList);
+			} else {
+				//create it if it doesn't exist
+				oldList.put(key, new LinkedList<FastGraph>(isoList));
+			}
+		}
+		return oldList;
+	}
 
+	/**
+	 * Finds and exports all motifs between the given sizes for this FastGraph
+	 * 
+	 * @param rewiresNeeded The number of times the graph needs to be rewired (0 if none required)
+	 * @param minSize The minimum size of motifs being investigated
+	 * @param maxSize The maximum size of motifs being investigated
+	 * @param motifSampling The number of motifs to sample?
+	 * @param comparisonSet Are these motifs the ones that will be compared against?
+	 * @throws FileNotFoundException If the output file cannot be written to
+	 */
+	public void findAndExportAllMotifs(int rewiresNeeded, int minSize, int maxSize, int motifSampling, boolean comparisonSet) throws FileNotFoundException {
+		long time = Debugger.createTime();
+		
+		HashMap<String,LinkedList<LinkedList<FastGraph>>> hashBuckets = new HashMap<String,LinkedList<LinkedList<FastGraph>>>(g.getNumberOfNodes());
+		HashMap<String,LinkedList<FastGraph>> isoLists = new HashMap<String,LinkedList<FastGraph>>();
+		for(int i = minSize; i <= maxSize; i++) {
+			isoLists = mergeIsoLists(isoLists, findAllMotifs(10, i, 0, hashBuckets));
+			Debugger.outputTime("Found motifs with size "+i, time);
+		}			
+		
+		//HashMap<String,LinkedList<FastGraph>> isoLists = emf.extractGraphLists();
+		
+		Debugger.outputTime("Time to find motifs", time);
+		Debugger.log();
+		time = Debugger.createTime();
+		
+		int totalSize = 0;
+		for(LinkedList<FastGraph> isoList : isoLists.values()) {
+			totalSize+= isoList.size();
+		}
+		StringBuilder sb = new StringBuilder();
+		for(String key : isoLists.keySet()) {
+			LinkedList<FastGraph> isoList = isoLists.get(key);
+			double percentage = ((double) isoList.size()/totalSize)*100;
+			sb.append(key+"\t"+isoList.size() + "\t" + String.format( "%.2f", percentage ) +"%\n");
+		}
+
+		//export the motifs
+		String graphName = g.getName();
+		for(String key : isoLists.keySet()) {
+			LinkedList<FastGraph> isoList = isoLists.get(key);
+			FastGraph gOut = isoList.getFirst();
+			gOut.saveBuffers("motifs"+File.separatorChar+graphName+"_comparison"+File.separatorChar+key, key);
+		}
+		//save the motif info file
+		File output = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+"_comparison"+File.separatorChar+"motifs.txt");
+		try(PrintWriter out = new PrintWriter( output )){ //will close file after use
+		    out.println( sb );
+		}
+		
+		Debugger.outputTime("Time to save: ", time);
+	}
+	
+	/**
+	 * Returns the hashbuckets from this instance
+	 * @return The hashbuckets
+	 */
+	public HashMap<String,LinkedList<LinkedList<FastGraph>>> getHashBuckets() {
+		return hashBuckets;
+	}
+	
 	/**
 	 * Generates a list mapping of keys to lists of motifs with that key
 	 * 
@@ -122,12 +222,7 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 	 */
 	public HashMap<String,LinkedList<FastGraph>> findAllMotifs(int rewiresNeeded, int sizeOfMotifs, int motifSampling, HashMap<String,LinkedList<LinkedList<FastGraph>>> hashBuckets) {
 		HashMap<String,LinkedList<FastGraph>> isoLists = new HashMap<>();
-		
-	//	isoLists.forEach((key, isoList) -> {
-	//		Debugger.log(key+" "+isoList.size());
-	//	});
-		
-		
+
 		FastGraph currentGraph = g;
 		
 		if(rewiresNeeded == 0) {
@@ -140,41 +235,10 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 				ExactMotifFinder emf = new ExactMotifFinder(currentGraph);
 				emf.findMotifs(sizeOfMotifs, 0, hashBuckets);
 				HashMap<String,LinkedList<FastGraph>> newIsoLists = emf.extractGraphLists(hashBuckets);
-				
-				//newIsoLists.forEach((key, isoList) -> {
-				//	Debugger.log(key+" "+isoList.size());
-				//});
-				
-				//store local list of motifs
-				for(String key : newIsoLists.keySet()) {
-					LinkedList<FastGraph> isoList = newIsoLists.get(key);
-					//add list to existing list for this key
-					//Debugger.log("key" + key);
-					if(isoLists.containsKey(key)) {
-						isoLists.get(key).addAll(isoList);
-					} else {
-						//create it if it doesn't exist
-						isoLists.put(key, new LinkedList<FastGraph>(isoList));
-					}
-					
-				}
-				
+				isoLists = mergeIsoLists(isoLists, newIsoLists);				
 			}			
 		}
-		return isoLists;
-		
-	}
-	
-	/**
-	 * 
-	 * @param g the FastGraph to find motifs in
-	 * @param numOfNodes the number of nodes in each motif
-	 */
-	public ExactMotifFinder(FastGraph g) {
-		this.g = g;
-		//enumerator = new EnumerateSubgraphFanmod(g);
-		enumerator = new EnumerateSubgraphNeighbourhood(g);
-		enumeratorRandom = new EnumerateSubgraphRandom(g);
+		return isoLists;		
 	}
 	
 
@@ -203,7 +267,6 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 		return ret;
 	}
 
-	
 	
 	/**
 	 * Run the motif finder.
