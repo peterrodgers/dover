@@ -16,7 +16,7 @@ public class ExactMotifFinder {
 	 *  list of FastGraphs with the same hash value, second linked list is the list
 	 *  of FastGraphs that are isomorphic
 	 */
-	private static HashMap<String,LinkedList<LinkedList<FastGraph>>> hashBuckets;
+	private static HashMap<String,LinkedList<IsoHolder>> hashBuckets;
 	
 	private FastGraph g;
 	private EnumerateSubgraphNeighbourhood enumerator;
@@ -33,8 +33,8 @@ public class ExactMotifFinder {
 //			g = FastGraph.loadBuffersGraphFactory(null,"soc-pokec-relationships.txt-reduced");
 			
 //			g = FastGraph.randomGraphFactory(2,1,1000,true,false); // 1 hundred nodes, 1 thousand edges
-//			g = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
-			g = FastGraph.randomGraphFactory(200,2000,1,true,false); // 3 hundred nodes, 3 thousand edges
+			g = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
+//			g = FastGraph.randomGraphFactory(200,2000,1,true,false); // 3 hundred nodes, 3 thousand edges
 //			g = FastGraph.randomGraphFactory(300,3000,1,true,false); // 3 hundred nodes, 3 thousand edges
 //			g = FastGraph.randomGraphFactory(1000,10000,1,true,false); // 1 thousand nodes, 10 thousand edges
 //			g = FastGraph.randomGraphFactory(10000,100000,1,true,false); //10 thousand nodes 100 thousand edges
@@ -47,54 +47,35 @@ public class ExactMotifFinder {
 Debugger.resetTime();
 Debugger.log("Starting");
 		FastGraph h = g.generateRandomRewiredGraph(10,1);
-System.out.println("h consistent "+h.checkConsistency());
-System.out.println("g consistent "+g.checkConsistency());
-System.out.println(Arrays.equals(h.degreeProfile(), g.degreeProfile())+" "+Arrays.toString(h.degreeProfile()));
-System.out.println(Arrays.equals(h.inDegreeProfile(), g.inDegreeProfile())+" "+Arrays.toString(h.inDegreeProfile()));
-System.out.println(Arrays.equals(h.outDegreeProfile(), g.outDegreeProfile())+" "+Arrays.toString(h.outDegreeProfile()));
+Debugger.log("h consistent "+h.checkConsistency());
+Debugger.log("g consistent "+g.checkConsistency());
+Debugger.log(Arrays.equals(h.degreeProfile(), g.degreeProfile())+" "+Arrays.toString(h.degreeProfile()));
+Debugger.log(Arrays.equals(h.inDegreeProfile(), g.inDegreeProfile())+" "+Arrays.toString(h.inDegreeProfile()));
+Debugger.log(Arrays.equals(h.outDegreeProfile(), g.outDegreeProfile())+" "+Arrays.toString(h.outDegreeProfile()));
 
 System.exit(0);
 */
-		int numOfNodes = 4;
+		int numOfNodes = 8;
 		long time = Debugger.createTime();		
 		ExactMotifFinder emf = new ExactMotifFinder(g);
 		HashMap<String,LinkedList<IsoHolder>> hashBuckets = new HashMap<String,LinkedList<IsoHolder>>(g.getNumberOfNodes());
 		emf.findMotifs(numOfNodes, 0, hashBuckets);
+		emf.outputHashBuckets(hashBuckets);
+		//emf.findMotifs(numOfNodes, 0, hashBuckets);
+		//emf.outputHashBuckets(hashBuckets);
 		
-		
-	//	System.out.println("number of subgraphs "+emf.subgraphs.size());
-		System.out.println("graph with "+g.getNumberOfNodes()+" nodes and "+g.getNumberOfEdges()+" edges");
+	//	Debugger.log("number of subgraphs "+emf.subgraphs.size());
+		Debugger.log("graph with "+g.getNumberOfNodes()+" nodes and "+g.getNumberOfEdges()+" edges");
 		Debugger.outputTime("time for motifs with "+numOfNodes+" nodes",time);
 
-		//System.out.println(hashBuckets);
+		//Debugger.log(hashBuckets);
 		
-		int count = 0;
-		for(String key : hashBuckets.keySet()) {
-			LinkedList<IsoHolder> sameHashList = hashBuckets.get(key);
-//			System.out.println("hash string \""+key+"\" number of different isomorphic groups "+sameHashList.size());
-			for(IsoHolder isoList: sameHashList) {
-System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups\t"+sameHashList.size()+"\tnumber of nodes in iso list\t"+isoList.getNumber());
-				count += isoList.getNumber();
-				
-				uk.ac.kent.displayGraph.Graph dg = isoList.getGraph().generateDisplayGraph();
-				dg.randomizeNodePoints(new Point(20,20),300,300);
-				dg.setLabel(key);
-//				uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg);
-//				uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
-//				GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
-//				se.setAnimateFlag(false);
-//				se.setIterations(1000);
-//				se.setTimeLimit(2000);
-//				se.setGraphPanel(gw.getGraphPanel());
-//				se.layout();
-				
-			}
-		}
+
 /*		
 		HashMap<String,IsoHolder> isoLists = emf.extractGraphLists(hashBuckets);
 		for(String key : isoLists.keySet()) {
 			IsoHolder isoList = isoLists.get(key);
-			System.out.println(key+" "+isoList.getNumber());
+			Debugger.log(key+" "+isoList.getNumber());
 			
 			
 			uk.ac.kent.displayGraph.Graph dg = isoList.getGraph().generateDisplayGraph();
@@ -111,10 +92,41 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 
 		}
 	*/	
-		System.out.println("stored subgraphs "+count);
+
+	
+	}
+	
+	/**
+	 * Outputs a given map hashBuckets to the screen. Note: Not to a file!
+	 * 
+	 * @param hashBuckets The hashbuckets to output
+	 */
+	public void outputHashBuckets(HashMap<String,LinkedList<IsoHolder>> hashBuckets) {
+		int count = 0;
+		for(String key : hashBuckets.keySet()) {
+			LinkedList<IsoHolder> sameHashList = hashBuckets.get(key);
+//			Debugger.log("hash string \""+key+"\" number of different isomorphic groups "+sameHashList.size());
+			for(IsoHolder isoList: sameHashList) {
+Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.size()+"\tnum of nodes in iso list\t"+isoList.getNumber());
+				count += isoList.getNumber();
+				
+//				uk.ac.kent.displayGraph.Graph dg = isoList.getGraph().generateDisplayGraph();
+//				dg.randomizeNodePoints(new Point(20,20),300,300);
+//				dg.setLabel(key);
+//				uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg);
+//				uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
+//				GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
+//				se.setAnimateFlag(false);
+//				se.setIterations(1000);
+//				se.setTimeLimit(2000);
+//				se.setGraphPanel(gw.getGraphPanel());
+//				se.layout();
+				
+			}
+		}
+		Debugger.log("stored subgraphs "+count);
 		ExactIsomorphism.reportFailRatios();
 		ExactIsomorphism.reportTimes();
-	
 	}
 	
 	/**
@@ -159,10 +171,10 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 	 * @param minSize The minimum size of motifs being investigated
 	 * @param maxSize The maximum size of motifs being investigated
 	 * @param motifSampling The number of motifs to sample?
-	 * @param comparisonSet Are these motifs the ones that will be compared against?
+	 * @param referenceSet Are these motifs the ones that will be referenced against? Will be saved to disk, if so
 	 * @throws FileNotFoundException If the output file cannot be written to
 	 */
-	public void findAndExportAllMotifs(int rewiresNeeded, int minSize, int maxSize, int motifSampling, boolean comparisonSet) throws FileNotFoundException {
+	public void findAndExportAllMotifs(int rewiresNeeded, int minSize, int maxSize, int motifSampling, boolean referenceSet) throws FileNotFoundException {
 		long time = Debugger.createTime();
 		
 		HashMap<String,LinkedList<IsoHolder>> hashBuckets = new HashMap<String,LinkedList<IsoHolder>>(g.getNumberOfNodes());
@@ -188,34 +200,38 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 		for(IsoHolder isoList : isoLists.values()) {
 			totalSize+= isoList.getNumber();
 		}
-		StringBuilder sb = new StringBuilder();
-		for(String key : isoLists.keySet()) {
-			IsoHolder isoList = isoLists.get(key);
-			double percentage = ((double) isoList.getNumber()/totalSize)*100;
-			sb.append(key+"\t"+isoList.getNumber() + "\t" + String.format( "%.2f", percentage ) +"\n");
-		}
 
 		//export the motifs
 		String graphName = g.getName();
 		String nameString = "_reference";
-		if (!comparisonSet) {
+		if (!referenceSet) {
 			nameString = "_real";
 		}
-		/*
-		if(comparisonSet) {
-			for(String key : isoLists.keySet()) {
-				LinkedList<FastGraph> isoList = isoLists.get(key);
-				FastGraph gOut = isoList.getFirst();
-				gOut.saveBuffers("motifs"+File.separatorChar+graphName+File.separatorChar+key, key);
+		
+		//build the output file, and if needed, save the motif buffers
+		StringBuilder sb = new StringBuilder();
+		for(String key : hashBuckets.keySet()) {
+			LinkedList<IsoHolder> holders = hashBuckets.get(key);
+			int count = 1;
+			for (IsoHolder holder : holders) {
+				double percentage = ((double) holder.getNumber()/totalSize)*100;
+				sb.append(key+"-"+count+"\t"+holder.getNumber() + "\t" + String.format( "%.2f", percentage ) +"\n");
+				
+				if(referenceSet) {
+					FastGraph gOut = holder.getGraph();
+					gOut.saveBuffers("motifs"+File.separatorChar+graphName+File.separatorChar+key+"-"+count, key+"-"+count);
+				}
+				
+				count++;
 			}
 		}
-*/
+
 		//save the motif info file
 		File output = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"motifs"+nameString+".txt");
 		try(PrintWriter out = new PrintWriter( output )){ //will close file after use
 		    out.println( sb );
 		}
-		
+		this.hashBuckets = hashBuckets;
 		Debugger.outputTime("Time to save: ", time);
 	}
 	
@@ -223,7 +239,7 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 	 * Returns the hashbuckets from this instance
 	 * @return The hashbuckets
 	 */
-	public HashMap<String,LinkedList<LinkedList<FastGraph>>> getHashBuckets() {
+	public HashMap<String,LinkedList<IsoHolder>> getHashBuckets() {
 		return hashBuckets;
 	}
 	
@@ -244,20 +260,7 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 		if(rewiresNeeded == 0) {
 			ExactMotifFinder emf = new ExactMotifFinder(g);
 			emf.findMotifs(sizeOfMotifs, 0, hashBuckets);
-			
-			System.out.println("### rewiring again");
-			for(String key : hashBuckets.keySet()) {
-				System.out.println(key + " size: " + hashBuckets.get(key).size());
-				for(IsoHolder list : hashBuckets.get(key)) {
-					System.out.println("    Bucket size: " + list.getNumber());
-					//System.out.println("    Bucket contents: " + list);
-				}
-				System.out.println();
-			}
-			
 			isoLists = emf.extractGraphLists(hashBuckets);
-			
-
 		} else {
 			for (int i = 0; i < rewiresNeeded; i++) {
 				currentGraph = currentGraph.generateRandomRewiredGraph(10,1);
@@ -265,8 +268,6 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 				emf.findMotifs(sizeOfMotifs, 0, hashBuckets);
 				HashMap<String,IsoHolder> newIsoLists = emf.extractGraphLists(hashBuckets);
 				isoLists = mergeIsoLists(isoLists, newIsoLists);
-				
-				
 			}			
 		}
 		return isoLists;		
@@ -312,6 +313,8 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 		
 		subgraphs = enumerator.enumerateSubgraphs(k, 50 ,10);
 //		subgraphs = enumeratorRandom.randomSampleSubgraph(k,10000);		
+		
+		
 		for(FastGraph subgraph : subgraphs) {
 			ExactIsomorphism ei = new ExactIsomorphism(subgraph);
 			String hashString = ei.generateStringForHash();
@@ -329,15 +332,16 @@ System.out.println("hash string \t"+key+"\tnumber of different isomorphic groups
 						break;
 					}
 				}
+				
 				if(!found) { // no isomorphic graphs found, so need to create a new list
-					IsoHolder newIsoList = new IsoHolder(hashString, 0, subgraph);
+					IsoHolder newIsoList = new IsoHolder(hashString, 1, subgraph);
 					//newIsoList.setGraph(subgraph);
 					sameHashList.add(newIsoList);
 				}
 			} else {
 				LinkedList<IsoHolder> newHashList = new LinkedList<IsoHolder>();
 				hashBuckets.put(hashString, newHashList);
-				IsoHolder newIsoList = new IsoHolder(hashString, 0, subgraph);
+				IsoHolder newIsoList = new IsoHolder(hashString, 1, subgraph);
 				//newIsoList.add(subgraph);
 				newHashList.add(newIsoList);
 			}

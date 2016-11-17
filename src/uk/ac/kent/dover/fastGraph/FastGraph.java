@@ -166,6 +166,7 @@ public class FastGraph {
 			
 			ExactMotifFinder emf = new ExactMotifFinder(g2);
 			emf.findAndExportAllMotifs(10, 4, 8, 0, true);
+			emf.outputHashBuckets(emf.getHashBuckets());
 			Debugger.outputTime("Time total motif detection");
 			
 			//EnumerateSubgraphFanmod es = new EnumerateSubgraphFanmod(g2);
