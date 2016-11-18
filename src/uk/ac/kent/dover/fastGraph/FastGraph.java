@@ -1406,7 +1406,7 @@ Debugger.log("h "+h.checkConsistency());
 	 * @See loadBuffers
 	 */
 	public static FastGraph loadBuffersGraphFactory(String directory, String fileBaseName) throws IOException {
-		FastGraph g = loadBuffers(null,fileBaseName);
+		FastGraph g = loadBuffers(directory,fileBaseName);
 		return g;
 	}
 

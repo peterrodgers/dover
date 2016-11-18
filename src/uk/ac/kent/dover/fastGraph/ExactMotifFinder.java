@@ -2,8 +2,11 @@ package uk.ac.kent.dover.fastGraph;
 
 import java.awt.Point;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 
@@ -165,16 +168,18 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	}
 
 	/**
-	 * Finds and exports all motifs between the given sizes for this FastGraph
-	 * 
+	 * Finds and exports all motifs between the given sizes for this FastGraph.<br>
+	 * Will only export if this is a reference set.<br>
+	 * Will load motifs from files if the output text file exists.<br>
+	 * <br>
 	 * @param rewiresNeeded The number of times the graph needs to be rewired (0 if none required)
 	 * @param minSize The minimum size of motifs being investigated
 	 * @param maxSize The maximum size of motifs being investigated
 	 * @param motifSampling The number of motifs to sample?
 	 * @param referenceSet Are these motifs the ones that will be referenced against? Will be saved to disk, if so
-	 * @throws FileNotFoundException If the output file cannot be written to
+	 * @throws IOException Files cannot be read
 	 */
-	public void findAndExportAllMotifs(int rewiresNeeded, int minSize, int maxSize, int motifSampling, boolean referenceSet) throws FileNotFoundException {
+	public void findAndExportAllMotifs(int rewiresNeeded, int minSize, int maxSize, int motifSampling, boolean referenceSet) throws IOException {
 		long time = Debugger.createTime();
 		
 		HashMap<String,LinkedList<IsoHolder>> hashBuckets = new HashMap<String,LinkedList<IsoHolder>>(g.getNumberOfNodes());
@@ -182,57 +187,82 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		
 		HashMap<String,IsoHolder> isoLists = new HashMap<String,IsoHolder>();
 		
-		for(int i = minSize; i <= maxSize; i++) {
-			HashMap<String,IsoHolder> newList = findAllMotifs(rewiresNeeded, i, motifSampling, hashBuckets);
-			isoLists = mergeIsoLists(isoLists, newList);
-			Debugger.outputTime("Found motifs with size "+i, time);
-		}			
-		
-
-		
-		//isoLists = extractGraphLists(hashBuckets);
-		
-		Debugger.outputTime("Time to find motifs", time);
-		Debugger.log();
-		time = Debugger.createTime();
-		
-		int totalSize = 0;
-		for(IsoHolder isoList : isoLists.values()) {
-			totalSize+= isoList.getNumber();
-		}
-
-		//export the motifs
 		String graphName = g.getName();
 		String nameString = "_reference";
-		if (!referenceSet) {
+		if(!referenceSet) {
+			rewiresNeeded = 0;
 			nameString = "_real";
 		}
 		
-		//build the output file, and if needed, save the motif buffers
-		StringBuilder sb = new StringBuilder();
-		for(String key : hashBuckets.keySet()) {
-			LinkedList<IsoHolder> holders = hashBuckets.get(key);
-			int count = 1;
-			for (IsoHolder holder : holders) {
-				double percentage = ((double) holder.getNumber()/totalSize)*100;
-				sb.append(key+"-"+count+"\t"+holder.getNumber() + "\t" + String.format( "%.2f", percentage ) +"\n");
-				
-				if(referenceSet) {
-					FastGraph gOut = holder.getGraph();
-					gOut.saveBuffers("motifs"+File.separatorChar+graphName+File.separatorChar+key+"-"+count, key+"-"+count);
-				}
-				
-				count++;
-			}
-		}
-
-		//save the motif info file
+		//finds all the motifs
 		File output = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"motifs"+nameString+".txt");
-		try(PrintWriter out = new PrintWriter( output )){ //will close file after use
-		    out.println( sb );
+		if(output.exists()) {
+			//then motifs already exist
+			
+			Debugger.log("loading from file");
+			loadMotifsFromFiles(output, new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName), isoLists, hashBuckets);
+			this.hashBuckets = hashBuckets;
+			
+		} else {
+			//otherwise, generate motifs
+			
+			for(int i = minSize; i <= maxSize; i++) {
+				Debugger.log("Finding motifs with size "+i);
+				HashMap<String,IsoHolder> newList = findAllMotifs(rewiresNeeded, i, motifSampling, hashBuckets);
+				Debugger.log("merging lists");
+				isoLists = mergeIsoLists(isoLists, newList);
+				Debugger.outputTime("Found motifs with size "+i, time);
+			}			
+
+			//isoLists = extractGraphLists(hashBuckets);
+			
+			Debugger.outputTime("Time to find motifs", time);
+			Debugger.log();
+			time = Debugger.createTime();
+			
+			int totalSize = 0;
+			for(IsoHolder isoList : isoLists.values()) {
+				totalSize+= isoList.getNumber();
+			}
+
+			//export the motifs
+
+			
+			//build the output file, and if needed, save the motif buffers
+			StringBuilder sb = new StringBuilder();
+			int outputCounter = 0;
+			long outputTime = Debugger.createTime();
+			for(String key : hashBuckets.keySet()) {
+				LinkedList<IsoHolder> holders = hashBuckets.get(key);
+				int count = 1;
+				for (IsoHolder holder : holders) {
+					double percentage = ((double) holder.getNumber()/totalSize)*100;
+					sb.append(key+"-"+count+"\t"+holder.getNumber() + "\t" + String.format( "%.2f", percentage ) +"\n");
+					
+					if(referenceSet) {
+						FastGraph gOut = holder.getGraph();
+						gOut.setName(key+"-"+count);
+						gOut.saveBuffers("motifs"+File.separatorChar+graphName+File.separatorChar+key+"-"+count, key+"-"+count);
+					}
+					
+					count++;
+				}
+				outputCounter++;
+				if(outputCounter % 1000 == 0) {
+					Debugger.outputTime("Saved "+outputCounter+" so far, out of " + hashBuckets.size() + " in ", outputTime);
+				}
+			}
+
+			//save the motif info file
+			//File output = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"motifs"+nameString+".txt");
+			try(PrintWriter out = new PrintWriter( output )){ //will close file after use
+			    out.println( sb );
+			}
+			this.hashBuckets = hashBuckets;
+			Debugger.outputTime("Time to save: ", time);
 		}
-		this.hashBuckets = hashBuckets;
-		Debugger.outputTime("Time to save: ", time);
+		
+		
 	}
 	
 	/**
@@ -263,10 +293,13 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 			isoLists = emf.extractGraphLists(hashBuckets);
 		} else {
 			for (int i = 0; i < rewiresNeeded; i++) {
+				Debugger.log("    rewiring for the "+i+" time");
 				currentGraph = currentGraph.generateRandomRewiredGraph(10,1);
 				ExactMotifFinder emf = new ExactMotifFinder(currentGraph);
+				Debugger.log("    finding motifs");
 				emf.findMotifs(sizeOfMotifs, 0, hashBuckets);
 				HashMap<String,IsoHolder> newIsoLists = emf.extractGraphLists(hashBuckets);
+				Debugger.log("    merging lists");
 				isoLists = mergeIsoLists(isoLists, newIsoLists);
 			}			
 		}
@@ -348,6 +381,58 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 
 		}
 		
+	}
+	
+	/**
+	 * Loads motifs from files.<br>
+	 * Uses the log file to find which motifs to load and their occurrences in the original reference set.<br>
+	 * Loads the motifs and rebuilds the isoLits and hashbuckets<br>
+	 * 
+	 * @param logFile The log file to load
+	 * @param directory The directory of the log file - used to load the motifs
+	 * @param isoLists The iosLists to populate
+	 * @param hashBuckets The hashbuckets to populate
+	 * @throws FileNotFoundException If any of the files cannot be found
+	 * @throws IOException If there is a problem loading any of the files
+	 */
+	public void loadMotifsFromFiles(File logFile, File directory, HashMap<String,IsoHolder> isoLists, HashMap<String,LinkedList<IsoHolder>> hashBuckets) throws FileNotFoundException, IOException {
+		long time = Debugger.createTime();
+		try (BufferedReader br = new BufferedReader(new FileReader(logFile))) {
+		    String line;
+		    while ((line = br.readLine()) != null) {
+		    	if(line.equals("\n") || line.equals("\r\n") || line.equals("")) {
+		    		continue;
+		    	}
+		    	String[] lineArr = line.split("\t");
+		    	Debugger.log(directory.toString());
+		    	FastGraph h = FastGraph.loadBuffersGraphFactory(directory.toString()+File.separatorChar+lineArr[0], lineArr[0]);
+		    	Debugger.log("num of nodes" + h.getNumberOfNodes());
+		    	
+		    	String isoKey = lineArr[0];
+		    	int lastIndex = isoKey.lastIndexOf("-");
+		    	String key = isoKey.substring(0, lastIndex);
+		    	int isoIndex = Integer.parseInt(isoKey.substring(lastIndex+1));
+		    	
+		    	Debugger.log("key: " + key);
+		    	Debugger.log("index: " + isoIndex);
+		    	
+		    	IsoHolder holder = new IsoHolder(key, Integer.parseInt(lineArr[1]), h);
+		    	
+		    	//store in isoholder
+		    	isoLists.put(key, holder);
+		    	
+		    	//store in hashbuckets
+		    	if(hashBuckets.containsKey(key)) {
+		    		LinkedList<IsoHolder> list = hashBuckets.get(key);
+		    		list.add(isoIndex-1, holder);
+		    	} else {
+		    		LinkedList<IsoHolder> list = new LinkedList<IsoHolder>();
+		    		hashBuckets.put(key, list);
+		    		list.add(isoIndex-1, holder);
+		    	}
+		    }
+		}
+		Debugger.outputTime("Loading complete in", time);
 	}
 	
 	/**
