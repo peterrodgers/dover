@@ -77,6 +77,11 @@ public class EnumerateSubgraphNeighbourhood {
 			}
 			*/
 			
+			//skip if the node has no connections
+			if(g.getNodeDegree(n) == 0) {
+				continue;
+			}
+			
 			//for each subgraph at this neighbourhood
 			int foundSubgraphs = 0;
 			while(foundSubgraphs < subgraphsPerNode) {
