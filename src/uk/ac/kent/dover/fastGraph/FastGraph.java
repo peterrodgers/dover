@@ -119,7 +119,7 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(2,1,false);
 //		FastGraph g1 = randomGraphFactory(5,6,1,true);
 //		FastGraph g1 = randomGraphFactory(8,9,1,false);
-		FastGraph g1 = randomGraphFactory(100,1000,1,false); // 1 hundred nodes, 1 thousand edges
+//		FastGraph g1 = randomGraphFactory(100,1000,1,false); // 1 hundred nodes, 1 thousand edges
 //		FastGraph g1 = randomGraphFactory(10000,100000,1,false); // 10 thousand nodes, 100 thousand edges
 //		FastGraph g1 = randomGraphFactory(100000,1000000,1,false); // 100 thousand nodes, 1 million edges
 //		FastGraph g1 = randomGraphFactory(1000000,10000000,1,false); // 1 million nodes, 10 million edges
@@ -147,15 +147,15 @@ public class FastGraph {
 //String name = "random-n-100-e-1000";
 //String name = "random-n-2-e-1";
 //String name = "as-skitter.txt";
-//String name = "soc-pokec-relationships.txt-reduced";
+String name = "soc-pokec-relationships.txt-reduced";
 //String name = "soc-pokec-relationships.txt-veryshort-veryshort";
 //String name = "Wiki-Vote.txt";
 //		String name = g1.getName();
-		FastGraph g2 = g1;
+		//FastGraph g2 = g1;
 		try {
 			time = Debugger.createTime();
-			//g2 = loadBuffersGraphFactory(null,name);
-			g2 = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
+			FastGraph g2 = loadBuffersGraphFactory(null,name);
+			//g2 = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
 			
 			Debugger.log("Connected: " + Connected.connected(g2));
 			
@@ -3316,10 +3316,11 @@ if(node%100000 == 0) {
 	public FastGraph generateRandomRewiredGraph(int iterations, long seed) {
 		
 		String name = this.getName();
-		
+		long time = Debugger.createTime();
 		long theSeed = seed;
 		FastGraph g = this;
 		for(int i = 0; i< iterations; i++) {
+			Debugger.log("        iteration number: " + i);
 			FastGraph h = g.oneIterationGenerateRandomRewiredGraph(theSeed);
 			if(h == null) {
 				return null;
@@ -3328,8 +3329,8 @@ if(node%100000 == 0) {
 			}
 			g = h;
 			theSeed += g.getNumberOfEdges()*10;
-//Debugger.outputTime("time for rewiring");
-h.saveBuffers(null, g.getName());
+Debugger.outputTime("time for rewiring");
+//h.saveBuffers(null, g.getName());
 		}
 		
 		return g;
