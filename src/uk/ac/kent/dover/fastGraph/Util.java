@@ -1,6 +1,7 @@
 package uk.ac.kent.dover.fastGraph;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -292,5 +293,21 @@ public class Util {
 			i++;
 		}
 		return null;
+	}
+	
+	/**
+	 * Returns a sublist.<br>
+	 * A copy of List.sublist() except the end is checked and shortend if too long
+	 * 
+	 * @param list The list to have a sublist of
+	 * @param start The start index
+	 * @param end The end index
+	 * @return The sublist
+	 */
+	public static <T> List<T> subList(ArrayList<T> list, int start, int end) {
+		if(end > list.size()) {
+			end = list.size();
+		}
+		return list.subList(start, end);
 	}
 }

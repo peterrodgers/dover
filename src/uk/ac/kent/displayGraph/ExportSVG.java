@@ -29,7 +29,7 @@ public class ExportSVG {
 		try {
 			BufferedWriter b = new BufferedWriter(new FileWriter(file));
 
-			System.out.println("Exporting SVG...");
+			//System.out.println("Exporting SVG...");
 			
 			int[] border = graph.findBorder();
 			int padding = 20;
@@ -43,7 +43,7 @@ public class ExportSVG {
 			//int widthAdjust = border[0];
 			//int heightAdjust = border[3];
 			
-			System.out.println(Arrays.toString(border));
+		//	System.out.println(Arrays.toString(border));
 			
 			b.write("<svg xmlns=\"http://www.w3.org/2000/svg\"");
 			b.newLine();
@@ -161,7 +161,7 @@ public class ExportSVG {
 			System.out.println("An IO exception occured when saving in SVG "+file.getName()+". Error: "+e+"\n");
 			return false;
 		}
-		System.out.println("Done");
+		//System.out.println("Done");
 		return true;
 
 	}

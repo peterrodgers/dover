@@ -10,6 +10,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 
+import javax.swing.text.html.parser.TagElement;
+
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
 
 public class ExactMotifFinder {
@@ -58,7 +63,7 @@ Debugger.log(Arrays.equals(h.outDegreeProfile(), g.outDegreeProfile())+" "+Array
 
 System.exit(0);
 */
-		int numOfNodes = 8;
+		int numOfNodes = 4;
 		long time = Debugger.createTime();		
 		ExactMotifFinder emf = new ExactMotifFinder(g);
 		HashMap<String,LinkedList<IsoHolder>> hashBuckets = new HashMap<String,LinkedList<IsoHolder>>(g.getNumberOfNodes());
@@ -74,8 +79,9 @@ System.exit(0);
 		//Debugger.log(hashBuckets);
 		
 
-/*		
+		
 		HashMap<String,IsoHolder> isoLists = emf.extractGraphLists(hashBuckets);
+		uk.ac.kent.displayGraph.display.GraphWindow gw = null;
 		for(String key : isoLists.keySet()) {
 			IsoHolder isoList = isoLists.get(key);
 			Debugger.log(key+" "+isoList.getNumber());
@@ -84,7 +90,7 @@ System.exit(0);
 			uk.ac.kent.displayGraph.Graph dg = isoList.getGraph().generateDisplayGraph();
 			dg.randomizeNodePoints(new Point(20,20),300,300);
 			dg.setLabel(key);
-			uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg);
+			gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg, true);
 			uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
 			GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
 			se.setAnimateFlag(false);
@@ -92,9 +98,15 @@ System.exit(0);
 			se.setTimeLimit(200);
 			se.setGraphPanel(gw.getGraphPanel());
 			se.layout();
-
+			File saveLocation = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+g.getName()+File.separatorChar+"motifs"+key+".svg");
+			uk.ac.kent.displayGraph.ExportSVG exSVG = new uk.ac.kent.displayGraph.ExportSVG(dg);
+			exSVG.saveGraph(saveLocation);
+			//gw.fileExit();
 		}
-	*/	
+		if(gw != null) {
+			gw.fileExit();
+		}
+		
 
 	
 	}
@@ -182,6 +194,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	public void findAndExportAllMotifs(int rewiresNeeded, int minSize, int maxSize, int motifSampling, boolean referenceSet) throws IOException {
 		long time = Debugger.createTime();
 		
+		
 		HashMap<String,LinkedList<IsoHolder>> hashBuckets = new HashMap<String,LinkedList<IsoHolder>>(g.getNumberOfNodes());
 		//HashMap<String,LinkedList<FastGraph>> isoLists = new HashMap<String,LinkedList<FastGraph>>();
 		
@@ -206,12 +219,11 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		} else {
 			//otherwise, generate motifs
 			
-
 			HashMap<String,IsoHolder> newList = findAllMotifs(rewiresNeeded, minSize, maxSize, motifSampling, hashBuckets);
 			Debugger.log("merging lists");
 			isoLists = mergeIsoLists(isoLists, newList);
 
-			//isoLists = extractGraphLists(hashBuckets);
+			isoLists = extractGraphLists(hashBuckets);
 			
 			Debugger.outputTime("Time to find motifs", time);
 			Debugger.log();
@@ -219,9 +231,10 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 			
 			int totalSize = 0;
 			for(IsoHolder isoList : isoLists.values()) {
+				Debugger.log("    "+isoList.getKey() + " " + isoList.getNumber());
 				totalSize+= isoList.getNumber();
 			}
-
+			Debugger.log("#TOTAL SIZE: "+totalSize);
 			//export the motifs
 
 			
@@ -233,15 +246,20 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 				LinkedList<IsoHolder> holders = hashBuckets.get(key);
 				int count = 1;
 				for (IsoHolder holder : holders) {
+					Debugger.log("    "+holder.getKey() + " num: " + holder.getNumber() + " total: " + totalSize);
 					double percentage = ((double) holder.getNumber()/totalSize)*100;
-					sb.append(key+"-"+count+"\t"+holder.getNumber() + "\t" + String.format( "%.2f", percentage ) +"\n");
+					sb.append(key+"-"+count+"\t"+holder.getNumber() + "\t" + String.format( "%.10f", percentage ) +"\n");
 					
+					//save buffer
 					if(referenceSet) {
 						FastGraph gOut = holder.getGraph();
 						gOut.setName(key+"-"+count);
 						gOut.saveBuffers("motifs"+File.separatorChar+graphName+File.separatorChar+key+"-"+count, key+"-"+count);
+						
+						//save SVG
+						exportSVG(holder,count);
 					}
-					
+
 					count++;
 				}
 				outputCounter++;
@@ -256,6 +274,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 			    out.println( sb );
 			}
 			this.hashBuckets = hashBuckets;
+			
 			Debugger.outputTime("Time to save: ", time);
 		}
 		
@@ -408,7 +427,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		    		continue;
 		    	}
 		    	String[] lineArr = line.split("\t");
-		    	Debugger.log(directory.toString());
+		    	//Debugger.log(directory.toString());
 		    	FastGraph h = FastGraph.loadBuffersGraphFactory(directory.toString()+File.separatorChar+lineArr[0], lineArr[0]);
 		    	//Debugger.log("num of nodes" + h.getNumberOfNodes());
 		    	
@@ -438,6 +457,200 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		}
 		Debugger.outputTime("Loading complete in", time);
 	}
+	
+	/**
+	 * Exports the given IsoHolder (and isomorphic count) to SVG.<br>
+	 * Saves as motifs/[graph name]/[iso key]-count/motif.svg
+	 * 
+	 * @param isoList The IsoHolder for this graph
+	 * @param count The isomorphic count
+	 */
+	private void exportSVG(IsoHolder isoList, int count) {
+		String key = isoList.getKey();
+		//int count = isoList.getNumber();
+		uk.ac.kent.displayGraph.Graph dg = isoList.getGraph().generateDisplayGraph();
+		dg.randomizeNodePoints(new Point(20,20),300,300);
+		dg.setLabel(key);
+		uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg, false);
+		uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
+		GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
+		se.setAnimateFlag(false);
+		se.setIterations(100);
+		se.setTimeLimit(200);
+		se.setGraphPanel(gw.getGraphPanel());
+		se.layout();
+		File saveLocation = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+g.getName()+File.separatorChar+key+"-"+count+File.separatorChar+"motif.svg");
+		uk.ac.kent.displayGraph.ExportSVG exSVG = new uk.ac.kent.displayGraph.ExportSVG(dg);
+		exSVG.saveGraph(saveLocation);
+		
+	}
+	
+	/**
+	 * Compares the results from the reference set to the real set.<br>
+	 * Exports these in a user friendly manner
+	 * 
+	 * @param referenceBuckets The hashbuckets of the reference set (may be loaded or calculated)
+	 * @param realBuckets The hashbuckets of the real set.
+	 * @throws IOException If the File cannot be read
+	 * @throws FileNotFoundException  If the file cannot be found
+	 */
+	public void compareAndExportResults(HashMap<String,LinkedList<IsoHolder>> referenceBuckets, HashMap<String,LinkedList<IsoHolder>> realBuckets) throws FileNotFoundException, IOException {
+		String graphName = g.getName();
+		File refOutput = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"motifs_reference"+".txt");
+		File realOutput = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"motifs_real"+".txt");
+		
+		HashMap<String,MotifResultHolder> results = new HashMap<String,MotifResultHolder>();
+		buildResults(results, refOutput, true);
+		buildResults(results, realOutput, false);
+		
+		ArrayList<MotifResultHolder> motifResults = new ArrayList<MotifResultHolder>(results.values());
+		motifResults.sort(Comparator.comparing(MotifResultHolder::generateSignificance));
+		
+		int numberOfPages = (int) Math.ceil(motifResults.size()/1000.0);
+		for(int i = 0; i < numberOfPages; i++) {
+			buildPage(i,numberOfPages,Util.subList(motifResults,i, i+1000));
+		}	
+		
+		Debugger.log("number of pages required: " + numberOfPages);
+		//Debugger.log(motifResults);
+		
+	}
+	
+	/**
+	 * Builds a list of results from the specified file
+	 * 
+	 * @param results The list of results to populate
+	 * @param logFile The log file to read
+	 * @param referenceSet If this is a reference set
+	 * @return The populated list of results
+	 * @throws IOException If the File cannot be read
+	 * @throws FileNotFoundException  If the file cannot be found
+	 */
+	private HashMap<String,MotifResultHolder> buildResults(HashMap<String,MotifResultHolder> results, File logFile, boolean referenceSet) throws FileNotFoundException, IOException {
+		long time = Debugger.createTime();
+		try (BufferedReader br = new BufferedReader(new FileReader(logFile))) {
+		    String line;
+		    while ((line = br.readLine()) != null) {
+		    	if(line.equals("\n") || line.equals("\r\n") || line.equals("")) {
+		    		continue;
+		    	}
+		    	String[] lineArr = line.split("\t");
+		    	String key = lineArr[0];
+		    	double percentage = Double.parseDouble(lineArr[2]);
+		    	
+		    	//store result
+		    	if(results.containsKey(key)) {
+		    		MotifResultHolder result = results.get(key);
+		    		result.setRealPercentage(percentage);
+		    	} else {
+		    		MotifResultHolder result = new MotifResultHolder();
+			    	result.setKey(key);
+			    	result.setReferencePercentage(percentage);
+			    	results.put(key,result);
+		    	}		    	
+		    }
+		}
+		Debugger.outputTime("Loading complete in", time);
+		return results;
+	}
+	
+	/**
+	 * Builds and exports a particular page for the HTML output.<br>
+	 * Note: expects the results list to only contain the required results to display
+	 * 
+	 * @param pageNumber This page number
+	 * @param totalPages The total number of pages
+	 * @param results The list of results to output
+	 * @throws FileNotFoundException If the output file cannot be written to
+	 */
+	private void buildPage(int pageNumber, int totalPages, List<MotifResultHolder> results) throws FileNotFoundException {
+
+		Document doc = Document.createShell("");
+
+		Element headline = doc.body().appendElement("h1").text(g.getName());
+		Element pTag = doc.body().appendElement("p").text("some text ...");
+		Element span = pTag.prependElement("span").text("That's");
+
+		String outputNum = pageNumber+"";
+		if(pageNumber == 0) {
+			outputNum = "";
+		}
+		File output = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+g.getName()+File.separatorChar+"index"+outputNum+".html");
+		//save the output html file
+		
+		try(PrintWriter out = new PrintWriter( output )){ //will close file after use
+		    out.println( doc.toString() );
+		}
+	}
+	
+	/**
+	 * Inner class to hold details of motifs ready for output
+	 * @author Rob Baker
+	 *
+	 */
+	private class MotifResultHolder {
+		private String key; //the key
+		private double referencePercentage, realPercentage; //the relevant percentages
+
+		/**
+		 * @return the key
+		 */
+		public String getKey() {
+			return key;
+		}
+
+		/**
+		 * @param key the key to set
+		 */
+		public void setKey(String key) {
+			this.key = key;
+		}
+
+		/**
+		 * @return the referencePercentage
+		 */
+		public double getReferencePercentage() {
+			return referencePercentage;
+		}
+
+		/**
+		 * @param referencePercentage the referencePercentage to set
+		 */
+		public void setReferencePercentage(double referencePercentage) {
+			this.referencePercentage = referencePercentage;
+		}
+
+		/**
+		 * @return the realPercentage
+		 */
+		public double getRealPercentage() {
+			return realPercentage;
+		}
+
+		/**
+		 * @param realPercentage the realPercentage to set
+		 */
+		public void setRealPercentage(double realPercentage) {
+			this.realPercentage = realPercentage;
+		}
+		
+		/**
+		 * Outputs a string representation of this object
+		 */
+		public String toString() {
+			return key+" "+referencePercentage+" "+getRealPercentage();
+		}
+		
+		/**
+		 * Generates the significance of this result. This will be used to compare them
+		 * @return The significance
+		 */
+		public double generateSignificance() {
+			return getRealPercentage() - getReferencePercentage();
+		}
+		
+	}
+	
 	
 	/**
 	 * Class to hold a FastGraph and the number of instances of that FastGraph for a particular key.
