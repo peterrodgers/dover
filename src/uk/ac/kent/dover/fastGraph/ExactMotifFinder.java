@@ -206,13 +206,10 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		} else {
 			//otherwise, generate motifs
 			
-			for(int i = minSize; i <= maxSize; i++) {
-				Debugger.log("Finding motifs with size "+i);
-				HashMap<String,IsoHolder> newList = findAllMotifs(rewiresNeeded, i, motifSampling, hashBuckets);
-				Debugger.log("merging lists");
-				isoLists = mergeIsoLists(isoLists, newList);
-				Debugger.outputTime("Found motifs with size "+i, time);
-			}			
+
+			HashMap<String,IsoHolder> newList = findAllMotifs(rewiresNeeded, minSize, maxSize, motifSampling, hashBuckets);
+			Debugger.log("merging lists");
+			isoLists = mergeIsoLists(isoLists, newList);
 
 			//isoLists = extractGraphLists(hashBuckets);
 			
@@ -277,30 +274,37 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * Generates a list mapping of keys to lists of motifs with that key
 	 * 
 	 * @param rewiresNeeded The number of times the graph needs to be rewired
-	 * @param sizeOfMotifs The size of motifs being investigated
+	 * @param minSizeOfMotifs The minimum size of motifs being investigated
+	 * @param maxSizeOfMotifs The maximum size of motifs being investigated
 	 * @param motifSampling The number of motifs to sample?
 	 * @param hashBuckets The buckets to store the results in
 	 * @return The map of keys to buckets of motifs that match those keys
 	 */
-	public HashMap<String,IsoHolder> findAllMotifs(int rewiresNeeded, int sizeOfMotifs, int motifSampling, HashMap<String,LinkedList<IsoHolder>> hashBuckets) {
+	public HashMap<String,IsoHolder> findAllMotifs(int rewiresNeeded, int minSizeOfMotifs, int maxSizeOfMotifs, int motifSampling, HashMap<String,LinkedList<IsoHolder>> hashBuckets) {
 		HashMap<String,IsoHolder> isoLists = new HashMap<>();
 
 		FastGraph currentGraph = g;
 		
 		if(rewiresNeeded == 0) {
 			ExactMotifFinder emf = new ExactMotifFinder(g);
-			emf.findMotifs(sizeOfMotifs, 0, hashBuckets);
-			isoLists = emf.extractGraphLists(hashBuckets);
+			for(int i = minSizeOfMotifs; i <= maxSizeOfMotifs; i++) {
+				emf.findMotifs(i, 0, hashBuckets);
+				HashMap<String,IsoHolder> newIsoLists = emf.extractGraphLists(hashBuckets);
+				Debugger.log("    merging lists");
+				isoLists = mergeIsoLists(isoLists, newIsoLists);
+			}
 		} else {
 			for (int i = 0; i < rewiresNeeded; i++) {
 				Debugger.log("    rewiring for the "+i+" time");
 				currentGraph = currentGraph.generateRandomRewiredGraph(10,1);
 				ExactMotifFinder emf = new ExactMotifFinder(currentGraph);
 				Debugger.log("    finding motifs");
-				emf.findMotifs(sizeOfMotifs, 0, hashBuckets);
-				HashMap<String,IsoHolder> newIsoLists = emf.extractGraphLists(hashBuckets);
-				Debugger.log("    merging lists");
-				isoLists = mergeIsoLists(isoLists, newIsoLists);
+				for(int j = minSizeOfMotifs; j <= maxSizeOfMotifs; j++) {
+					emf.findMotifs(j, 0, hashBuckets);
+					HashMap<String,IsoHolder> newIsoLists = emf.extractGraphLists(hashBuckets);
+					Debugger.log("    merging lists");
+					isoLists = mergeIsoLists(isoLists, newIsoLists);
+				}
 			}			
 		}
 		return isoLists;		
@@ -406,15 +410,15 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		    	String[] lineArr = line.split("\t");
 		    	Debugger.log(directory.toString());
 		    	FastGraph h = FastGraph.loadBuffersGraphFactory(directory.toString()+File.separatorChar+lineArr[0], lineArr[0]);
-		    	Debugger.log("num of nodes" + h.getNumberOfNodes());
+		    	//Debugger.log("num of nodes" + h.getNumberOfNodes());
 		    	
 		    	String isoKey = lineArr[0];
 		    	int lastIndex = isoKey.lastIndexOf("-");
 		    	String key = isoKey.substring(0, lastIndex);
 		    	int isoIndex = Integer.parseInt(isoKey.substring(lastIndex+1));
 		    	
-		    	Debugger.log("key: " + key);
-		    	Debugger.log("index: " + isoIndex);
+		    	//Debugger.log("key: " + key);
+		    	//Debugger.log("index: " + isoIndex);
 		    	
 		    	IsoHolder holder = new IsoHolder(key, Integer.parseInt(lineArr[1]), h);
 		    	
