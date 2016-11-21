@@ -26,7 +26,7 @@ public class GraphWindow extends JFrame implements ActionListener {
 	
 	private static final long serialVersionUID = 1L;
 
-	public GraphWindow(Graph g) {
+	public GraphWindow(Graph g, boolean visible) {
 		super("Graph Editor "+g.getLabel());
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
@@ -35,6 +35,7 @@ public class GraphWindow extends JFrame implements ActionListener {
 // this for convenience, as the program normally starts in graph/display
 //		startDirectory = startDirectory.getParentFile();
 
+		
 		gw = this;
 		
 		gp = new GraphPanel(g,this);
@@ -53,7 +54,7 @@ public class GraphWindow extends JFrame implements ActionListener {
 		int posY = (frameDim.height - getSize().height)/2;
 		setLocation(posX, posY);
 
-		setVisible(true);
+		setVisible(visible);
 
 		gp.requestFocus();
 	}

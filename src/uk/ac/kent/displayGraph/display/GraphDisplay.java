@@ -150,7 +150,7 @@ public class GraphDisplay {
 		}
 
 */
-		new GraphWindow(graph);
+		new GraphWindow(graph,true);
 	}
 
 }
