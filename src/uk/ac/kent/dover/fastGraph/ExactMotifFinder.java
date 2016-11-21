@@ -440,13 +440,13 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	}
 	
 	/**
-	 * Inner class to hold a FastGraph and the number of instances of that FastGraph for a particluar key.
+	 * Class to hold a FastGraph and the number of instances of that FastGraph for a particular key.
 	 * Saves keeping big lists and lists of lists.
 	 * 
 	 * @author Rob Baker
 	 *
 	 */
-	private class IsoHolder {
+	public class IsoHolder {
 		
 		private String key; //The key
 		private int number; //The number of graphs
@@ -518,6 +518,10 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		 */
 		public void setGraph(FastGraph graph) {
 			this.graph = graph;
+		}
+		
+		public String toString() {
+			return key+"|"+number;
 		}
 		
 	}
