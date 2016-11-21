@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * 
@@ -22,6 +23,7 @@ public class ExportSVG {
 		this.graph = graph;
 	}
 	
+	
 	public boolean saveGraph(File file) {
 
 		try {
@@ -31,16 +33,23 @@ public class ExportSVG {
 			
 			int[] border = graph.findBorder();
 			int padding = 20;
-			int width = border[1] + (padding *2);
-			int height = border[3] + (padding *2);
-			int widthAdjust = border[0];
-			int heightAdjust = border[3];
+			border[0] -= (padding);
+			border[1] += (padding)-border[0];
+			border[2] -= (padding);
+			border[3] += (padding)-border[2];
+			int left = border[0];
+			int top = border[2];
+			
+			//int widthAdjust = border[0];
+			//int heightAdjust = border[3];
+			
+			System.out.println(Arrays.toString(border));
 			
 			b.write("<svg xmlns=\"http://www.w3.org/2000/svg\"");
 			b.newLine();
-			b.write("width=\""+width+"\"");
+			b.write("width=\""+border[1]+"\"");
 			b.newLine();
-			b.write("height=\""+height+"\"");
+			b.write("height=\""+border[3]+"\"");
 			b.write(" >");
 			b.newLine();
 			
@@ -57,11 +66,11 @@ public class ExportSVG {
 				
 				b.write(getStartElementString("line"));
 				
-				b.write(" "+getAttributeString("x1",n1.getX()+""));
-				b.write(" "+getAttributeString("y1",n1.getY()+""));
+				b.write(" "+getAttributeString("x1",(n1.getX()-left)+""));
+				b.write(" "+getAttributeString("y1",(n1.getY()-top)+""));
 				
-				b.write(" "+getAttributeString("x2",n2.getX()+""));
-				b.write(" "+getAttributeString("y2",n2.getY()+""));
+				b.write(" "+getAttributeString("x2",(n2.getX()-left)+""));
+				b.write(" "+getAttributeString("y2",(n2.getY()-top)+""));
 				
 				//This is to improve the colours for paper output
 				Color stroke = e.getType().getLineColor();
@@ -79,6 +88,15 @@ public class ExportSVG {
 				//b.write(" "+getAttributeString("label",e.getLabel()));
 				b.write(getEndEmptyElementString());
 				b.newLine();
+				
+				b.write(getStartElementString("text"));
+				b.write(" "+getAttributeString("x",Integer.toString((n1.getX()-left+n2.getX()-left)/2)));
+				b.write(" "+getAttributeString("y",Integer.toString((n1.getY()-top+n2.getY()-top)/2)));
+				b.write(getEndAttributesString());
+				b.write(e.getLabel());
+				b.write(getEndElementString("text"));
+				b.newLine();
+				
 			}
 			
 			//write the nodes
@@ -90,8 +108,8 @@ public class ExportSVG {
 
 				b.write(" "+getAttributeString("id","n"+n.getMatch().toString()));
 				//b.write(" "+getAttributeString("text",n.getLabel()));
-				b.write(" "+getAttributeString("cx",Integer.toString(n.getX())));
-				b.write(" "+getAttributeString("cy",Integer.toString(n.getY())));
+				b.write(" "+getAttributeString("cx",Integer.toString(n.getX()-left)));
+				b.write(" "+getAttributeString("cy",Integer.toString(n.getY()-top)));
 				
 				//if (n.type.height)
 				int nodeHeight = n.type.height/2;
@@ -122,8 +140,8 @@ public class ExportSVG {
 				b.newLine();
 				
 				b.write(getStartElementString("text"));
-				b.write(" "+getAttributeString("x",Integer.toString(n.getX()-10)));
-				b.write(" "+getAttributeString("y",Integer.toString(n.getY()+5)));
+				b.write(" "+getAttributeString("x",Integer.toString(n.getX()-left-10)));
+				b.write(" "+getAttributeString("y",Integer.toString(n.getY()-top+5)));
 				b.write(getEndAttributesString());
 				b.write(n.getLabel());
 				b.write(getEndElementString("text"));
@@ -135,56 +153,7 @@ public class ExportSVG {
 			
 			
 			b.write("</svg>");
-			/*
-			 * 
-			 *     <circle
-       r="189"
-       cx="204"
-       cy="216"
-       class="euler"
-       style="fill: none; stroke:blue;"
-       id="circle6" />
-       xmlns="http://www.w3.org/2000/svg"
-			 * 
-			 * 
-			//write the graph info
-			b.write(getStartElementString("graph"));
-			b.write(getEndAttributesString());
-			b.newLine();
 
-			b.newLine();
-		  
-			//write the nodes
-			int index = 0;
-			for(Node n : graph.getNodes()) {
-				n.setMatch(new Integer(index));
-	
-				b.write(getStartElementString("node"));
-
-				b.write(" "+getAttributeString("id",n.getMatch().toString()));
-				b.write(" "+getAttributeString("label",n.getLabel()));
-				b.write(" "+getAttributeString("x",Integer.toString(n.getX())));
-				b.write(" "+getAttributeString("y",Integer.toString(n.getY())));
-
-				b.write(getEndEmptyElementString());
-				b.newLine();
-				index++;
-			}
-
-			//write the edges
-			for(Edge e : graph.getEdges()){
-				Node n1 = e.getFrom();
-				Node n2 = e.getTo();
-				b.write(getStartElementString("edge"));
-				b.write(" "+getAttributeString("from",n1.getMatch().toString()));
-				b.write(" "+getAttributeString("to",n2.getMatch().toString()));
-				b.write(" "+getAttributeString("label",e.getLabel()));
-				b.write(getEndEmptyElementString());
-				b.newLine();
-			}
-			b.write(getEndElementString("graph"));
-			
-			*/
 			b.newLine();
 			b.close();
 		}

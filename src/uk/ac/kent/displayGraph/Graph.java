@@ -3400,6 +3400,10 @@ private Node start = null;
 	 * If there are no nodes, null is returned.
 	 */
 	public int[] findBorder() {
+		for(Node n : getNodes()) {
+			System.out.println(n.getCentre());
+		}
+		
 		int[] ret = {Integer.MAX_VALUE,Integer.MIN_VALUE,Integer.MAX_VALUE,Integer.MIN_VALUE};
 		boolean foundANode = false;
 		

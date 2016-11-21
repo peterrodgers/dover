@@ -502,7 +502,7 @@ public class GraphWindow extends JFrame implements ActionListener {
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			currentFile = chooser.getSelectedFile();
 			//generalXML.saveGraph(currentFile);
-			ExportSVG export = new ExportSVG(graph);
+			ExportSVG export = new ExportSVG(getGraph());
 			export.saveGraph(currentFile);
 			
 		}
@@ -574,7 +574,7 @@ public class GraphWindow extends JFrame implements ActionListener {
 */	}
 
 
-	protected void fileExit() {
+	public void fileExit() {
 		System.exit(0);
 	}
 
