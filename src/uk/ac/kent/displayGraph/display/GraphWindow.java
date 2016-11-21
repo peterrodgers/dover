@@ -177,6 +177,8 @@ public class GraphWindow extends JFrame implements ActionListener {
 
 		JMenuItem filePNGItem = new JMenuItem("Export to png");
 		fileMenu.add(filePNGItem);
+		JMenuItem fileSVGItem = new JMenuItem("Export to SVG");
+		fileMenu.add(fileSVGItem);
 
 		JMenuItem fileExitItem = new JMenuItem("Exit",KeyEvent.VK_X);
 		fileExitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK));
@@ -233,6 +235,11 @@ public class GraphWindow extends JFrame implements ActionListener {
 		filePNGItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				filePNG();
+			}
+		});
+		fileSVGItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				fileSaveSVG();
 			}
 		});
 
@@ -481,6 +488,23 @@ public class GraphWindow extends JFrame implements ActionListener {
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			currentFile = chooser.getSelectedFile();
 			getGraph().saveSimple(currentFile);
+		}
+	}
+	
+	protected void fileSaveSVG(){
+		JFileChooser chooser = null;
+		if (currentFile == null) {
+			chooser = new JFileChooser(startDirectory);
+		} else {
+			chooser = new JFileChooser(currentFile);
+		}
+		int returnVal = chooser.showSaveDialog(gw);
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			currentFile = chooser.getSelectedFile();
+			//generalXML.saveGraph(currentFile);
+			ExportSVG export = new ExportSVG(graph);
+			export.saveGraph(currentFile);
+			
 		}
 	}
 

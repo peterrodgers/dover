@@ -3394,6 +3394,55 @@ private Node start = null;
 		return ret;
 	}
 	
+	
+	/**
+	 * Finds the borders of the graph, order of return is left, right, top, bottom.
+	 * If there are no nodes, null is returned.
+	 */
+	public int[] findBorder() {
+		int[] ret = {Integer.MAX_VALUE,Integer.MIN_VALUE,Integer.MAX_VALUE,Integer.MIN_VALUE};
+		boolean foundANode = false;
+		
+		for(Node node : getNodes()) {
+			foundANode = true;
+			
+			if(node.getX() < ret[0]) {
+				ret[0] = node.getX();
+			}
+			if(node.getX() > ret[1]) {
+				ret[1] = node.getX();
+			}
+			if(node.getY() < ret[2]) {
+				ret[2] = node.getY();
+			}
+			if(node.getY() > ret[3]) {
+				ret[3] = node.getY();
+			}
+		}
+			
+		for(Edge edge : getEdges()) {
+			for(Point point : edge.getBends()) {
+				if(point.x > ret[0]) {
+					ret[0] = point.x;
+				}
+				if(point.x < ret[1]) {
+					ret[1] = point.x;
+				}
+				if(point.y > ret[2]) {
+					ret[2] = point.y;
+				}
+				if(point.y < ret[3]) {
+					ret[3] = point.y;
+				}
+			}
+		}
+		
+		if(!foundANode) {
+			return null;
+		}
+		
+		return ret;
+	}
 
 
 }
