@@ -9,6 +9,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -239,15 +240,28 @@ public class LauncherGUI extends JFrame {
 	 * @return The Motif Tab
 	 */
 	private JPanel buildMotifTab() {
-		JPanel motifPanel = new JPanel(new BorderLayout());
+		JPanel motifPanel = new JPanel(new GridBagLayout());
 		
-		JTextField input = new JTextField(5);		
+		JLabel infoLabel = new JLabel("Find and export motifs", SwingConstants.CENTER);
+		JLabel minLabel = new JLabel("Min Size: ");
+		JLabel maxLabel = new JLabel("Max Size: ");
+		JTextField minInput = new JTextField(3);	
+		JTextField maxInput = new JTextField(3);	
 		JButton motifBtn = new JButton("Find Motifs");
+		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
+		JProgressBar bigProgress = new JProgressBar(0, 100);
+		bigProgress.setValue(0);
+		bigProgress.setStringPainted(true);
+		bigProgress.setString("");
+		JProgressBar smallProgress = new JProgressBar(0, 100);
+		smallProgress.setValue(0);
+		smallProgress.setStringPainted(true);
+		smallProgress.setString("");
 		
 		motifBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent evt) {
-				int number = checkForPositiveInteger(input.getText(),motifPanel);
+				int number = checkForPositiveInteger(minInput.getText(),motifPanel);
 				if (number != -1) {
 					
 					//replace with actual motif code
@@ -256,8 +270,66 @@ public class LauncherGUI extends JFrame {
 			}
 		});
 		
-		motifPanel.add(input, BorderLayout.WEST);	
-		motifPanel.add(motifBtn, BorderLayout.EAST);
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(2,2,2,2);;
+		c.fill = GridBagConstraints.HORIZONTAL;
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 3;
+		motifPanel.add(infoLabel, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 1;
+		c.gridwidth = 1;
+		motifPanel.add(minLabel, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 1;
+		c.gridx = 1;
+		c.gridy = 1;
+		motifPanel.add(minInput, c);		
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 2;
+		c.gridwidth = 1;
+		motifPanel.add(maxLabel, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 1;
+		c.gridx = 1;
+		c.gridy = 2;
+		motifPanel.add(maxInput, c);	
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridheight = 2;
+		c.gridx = 2;
+		c.gridy = 1;
+		motifPanel.add(motifBtn, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 3;
+		c.gridheight = 1;
+		c.gridx = 0;
+		c.gridy = 3;
+		motifPanel.add(sep, c);	
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 3;
+		c.gridheight = 1;
+		c.gridx = 0;
+		c.gridy = 4;
+		motifPanel.add(bigProgress, c);	
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 3;
+		c.gridheight = 1;
+		c.gridx = 0;
+		c.gridy = 5;
+		motifPanel.add(smallProgress, c);	
 		return motifPanel;
 	}
 	
@@ -381,6 +453,7 @@ public class LauncherGUI extends JFrame {
 		});
 		
 		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(2,2,2,2);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		
 		c.fill = GridBagConstraints.HORIZONTAL;
