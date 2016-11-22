@@ -3546,6 +3546,22 @@ Debugger.outputTime("time for rewiring");
 		return ret;
 		
 	}
+	
+	/**
+	 * Displays a FastGraph onscreen for the user
+	 */
+	public void displayFastGraph() {
+		uk.ac.kent.displayGraph.Graph dg = this.generateDisplayGraph();
+		dg.randomizeNodePoints(new Point(20,20),300,300);
+		uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg, true);
+		uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
+		GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
+		se.setAnimateFlag(false);
+		se.setIterations(100);
+		se.setTimeLimit(200);
+		se.setGraphPanel(gw.getGraphPanel());
+		se.layout();
+	}
 		
 	
 }
