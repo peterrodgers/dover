@@ -119,8 +119,9 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(1,0,false);
 //		FastGraph g1 = randomGraphFactory(2,1,false);
 //		FastGraph g1 = randomGraphFactory(5,6,1,true);
-		FastGraph g1 = randomGraphFactory(8,9,1,false);
-//		FastGraph g1 = randomGraphFactory(110,1000,1,false); // 1 hundred nodes, 1 thousand edges
+//		FastGraph g1 = randomGraphFactory(8,9,1,false);
+//		FastGraph g1 = randomGraphFactory(10,50,1,false);
+		FastGraph g1 = randomGraphFactory(100,1000,1,false); // 1 hundred nodes, 1 thousand edges
 //		FastGraph g1 = randomGraphFactory(10000,100000,1,false); // 10 thousand nodes, 100 thousand edges
 //		FastGraph g1 = randomGraphFactory(100000,1000000,1,false); // 100 thousand nodes, 1 million edges
 //		FastGraph g1 = randomGraphFactory(1000000,10000000,1,false); // 1 million nodes, 10 million edges
@@ -166,9 +167,9 @@ public class FastGraph {
 			Debugger.resetTime();
 			
 			ExactMotifFinder emf = new ExactMotifFinder(g2);
-			emf.findAndExportAllMotifs(10, 4, 4, 0, true);
+			emf.findAndExportAllMotifs(10, 4, 8, 0, true);
 			HashMap<String,LinkedList<IsoHolder>> referenceBuckets = emf.getHashBuckets();
-			emf.findAndExportAllMotifs(0, 4, 4, 0, false);
+			emf.findAndExportAllMotifs(0, 4, 8, 0, false);
 			HashMap<String,LinkedList<IsoHolder>> realBuckets = emf.getHashBuckets();
 			emf.compareAndExportResults(referenceBuckets, realBuckets);
 //			emf.outputHashBuckets(realBuckets);

@@ -14,6 +14,7 @@ import javax.swing.text.html.parser.TagElement;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Tag;
 
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
 
@@ -231,7 +232,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 			
 			int totalSize = 0;
 			for(IsoHolder isoList : isoLists.values()) {
-				Debugger.log("    "+isoList.getKey() + " " + isoList.getNumber());
+			//	Debugger.log("    "+isoList.getKey() + " " + isoList.getNumber());
 				totalSize+= isoList.getNumber();
 			}
 			Debugger.log("#TOTAL SIZE: "+totalSize);
@@ -246,7 +247,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 				LinkedList<IsoHolder> holders = hashBuckets.get(key);
 				int count = 1;
 				for (IsoHolder holder : holders) {
-					Debugger.log("    "+holder.getKey() + " num: " + holder.getNumber() + " total: " + totalSize);
+			//		Debugger.log("    "+holder.getKey() + " num: " + holder.getNumber() + " total: " + totalSize);
 					double percentage = ((double) holder.getNumber()/totalSize)*100;
 					sb.append(key+"-"+count+"\t"+holder.getNumber() + "\t" + String.format( "%.10f", percentage ) +"\n");
 					
@@ -506,19 +507,22 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		
 		ArrayList<MotifResultHolder> motifResults = new ArrayList<MotifResultHolder>(results.values());
 		
-		//sort by the significance method, then by the percentage of occurances in the real set
-		motifResults.sort(Comparator.comparing(MotifResultHolder::generateSignificance).thenComparing(MotifResultHolder::getRealPercentage));
+		//sort by the significance method, then by the percentage of occurrences in the real set
+		motifResults.sort(Comparator.comparing(MotifResultHolder::generateSignificance).thenComparing(MotifResultHolder::getRealPercentage).reversed());
 		
-		int numberOfPages = (int) Math.ceil(motifResults.size()/1000.0);
+		Debugger.log("length of motifResults" + motifResults.size());
+		
+		int sample = 1000;
+		int numberOfPages = (int) Math.ceil((double) motifResults.size()/sample);
 		for(int i = 0; i < numberOfPages; i++) {
-			buildPage(i,numberOfPages,Util.subList(motifResults,i, i+1000));
+			buildPage(i,numberOfPages,Util.subList(motifResults,i*sample, (i*sample)+sample));
 		}	
 		
 		Debugger.log("number of pages required: " + numberOfPages);
 		//Debugger.log(motifResults);
 		
 	}
-	
+
 	/**
 	 * Builds a list of results from the specified file
 	 * 
@@ -568,16 +572,44 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 */
 	private void buildPage(int pageNumber, int totalPages, List<MotifResultHolder> results) throws FileNotFoundException {
 
+		Debugger.log("length of output results" + results.size());
+		
 		Document doc = Document.createShell("");
 
 		Element headline = doc.body().appendElement("h1").text(g.getName());
+		Element pageNumberHeader = doc.body().appendElement("h2").text("Page "+(pageNumber+1));
+		Element linksDiv = doc.body().appendElement("div");
+		linksDiv.appendElement("a").text("1").attr("href", "index.html");
+		for(int i = 1; i < totalPages; i++) {
+			linksDiv.appendElement("a").text((i+1)+"").attr("href", "index"+(i+1)+".html");
+		}
+		doc.body().appendElement("br");
+		//build output table
+		Element table = doc.body().appendElement("table").attr("style", "border: 2px solid; border-collapse: collapse");
+		Element headerRow = table.appendElement("tr").attr("style", "border: 2px solid;");
+		headerRow.appendElement("th").text("Image").attr("style", "border: 1px solid;");
+		headerRow.appendElement("th").text("Key").attr("style", "border: 1px solid;");
+		headerRow.appendElement("th").text("Diff in %").attr("style", "border: 1px solid;");
+		headerRow.appendElement("th").text("% of motifs").attr("style", "border: 1px solid;");
+		headerRow.appendElement("th").text("% in reference set").attr("style", "border: 1px solid;");
+		for(MotifResultHolder result : results) {
+			Element row = table.appendElement("tr");
+			Element imageCell = row.appendElement("td").attr("style", "border: 1px solid;");
+			imageCell.appendElement("img").attr("src",result.getKey()+"/motif.svg");
+			row.appendElement("td").text(result.getKey()).attr("style", "border: 1px solid;");
+			row.appendElement("td").text(String.format( "%.4f", result.generateSignificance())).attr("style", "border: 1px solid;");
+			row.appendElement("td").text(String.format( "%.4f", result.getRealPercentage())).attr("style", "border: 1px solid;");
+			row.appendElement("td").text(String.format( "%.4f", result.getReferencePercentage())).attr("style", "border: 1px solid;");
+		}
+		doc.body().appendElement("br");
+		//output links again
+		linksDiv = doc.body().appendElement("div");
+		linksDiv.appendElement("a").text("1").attr("href", "index.html");
+		for(int i = 1; i < totalPages; i++) {
+			linksDiv.appendElement("a").text((i+1)+"").attr("href", "index"+(i+1)+".html");
+		}
 		
-		
-		
-		//Element pTag = doc.body().appendElement("p").text("some text ...");
-		//Element span = pTag.prependElement("span").text("That's");
-
-		String outputNum = pageNumber+"";
+		String outputNum = (pageNumber+1)+"";
 		if(pageNumber == 0) {
 			outputNum = "";
 		}
