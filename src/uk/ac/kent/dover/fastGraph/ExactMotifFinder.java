@@ -315,8 +315,8 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		} else {
 			for (int i = 0; i < rewiresNeeded; i++) {
 				Debugger.log("    rewiring for the "+i+" time");
-				currentGraph = currentGraph.generateRandomRewiredGraph(10,1);
-				ExactMotifFinder emf = new ExactMotifFinder(currentGraph);
+				FastGraph newGraph = currentGraph.generateRandomRewiredGraph(10,1);
+				ExactMotifFinder emf = new ExactMotifFinder(newGraph);
 				Debugger.log("    finding motifs");
 				for(int j = minSizeOfMotifs; j <= maxSizeOfMotifs; j++) {
 					emf.findMotifs(j, 0, hashBuckets);
@@ -324,6 +324,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 					Debugger.log("    merging lists");
 					isoLists = mergeIsoLists(isoLists, newIsoLists);
 				}
+				currentGraph = newGraph;
 			}			
 		}
 		return isoLists;		
@@ -504,7 +505,9 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		buildResults(results, realOutput, false);
 		
 		ArrayList<MotifResultHolder> motifResults = new ArrayList<MotifResultHolder>(results.values());
-		motifResults.sort(Comparator.comparing(MotifResultHolder::generateSignificance));
+		
+		//sort by the significance method, then by the percentage of occurances in the real set
+		motifResults.sort(Comparator.comparing(MotifResultHolder::generateSignificance).thenComparing(MotifResultHolder::getRealPercentage));
 		
 		int numberOfPages = (int) Math.ceil(motifResults.size()/1000.0);
 		for(int i = 0; i < numberOfPages; i++) {
@@ -568,8 +571,11 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		Document doc = Document.createShell("");
 
 		Element headline = doc.body().appendElement("h1").text(g.getName());
-		Element pTag = doc.body().appendElement("p").text("some text ...");
-		Element span = pTag.prependElement("span").text("That's");
+		
+		
+		
+		//Element pTag = doc.body().appendElement("p").text("some text ...");
+		//Element span = pTag.prependElement("span").text("That's");
 
 		String outputNum = pageNumber+"";
 		if(pageNumber == 0) {
