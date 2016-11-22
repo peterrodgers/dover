@@ -575,6 +575,8 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		Debugger.log("length of output results" + results.size());
 		
 		Document doc = Document.createShell("");
+		
+		doc.head().appendElement("title").text(g.getName());
 
 		Element headline = doc.body().appendElement("h1").text(g.getName());
 		Element pageNumberHeader = doc.body().appendElement("h2").text("Page "+(pageNumber+1));

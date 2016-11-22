@@ -1,6 +1,8 @@
 package uk.ac.kent.dover.fastGraph;
 
 
+import java.awt.Point;
+import java.awt.event.KeyEvent;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
@@ -9,6 +11,7 @@ import java.util.*;
 import org.json.*;
 
 import uk.ac.kent.displayGraph.*;
+import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
 import uk.ac.kent.dover.fastGraph.ExactMotifFinder.IsoHolder;
 
 
@@ -121,7 +124,7 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(5,6,1,true);
 //		FastGraph g1 = randomGraphFactory(8,9,1,false);
 //		FastGraph g1 = randomGraphFactory(10,50,1,false);
-		FastGraph g1 = randomGraphFactory(100,1000,1,false); // 1 hundred nodes, 1 thousand edges
+//		FastGraph g1 = randomGraphFactory(100,1000,1,false); // 1 hundred nodes, 1 thousand edges
 //		FastGraph g1 = randomGraphFactory(10000,100000,1,false); // 10 thousand nodes, 100 thousand edges
 //		FastGraph g1 = randomGraphFactory(100000,1000000,1,false); // 100 thousand nodes, 1 million edges
 //		FastGraph g1 = randomGraphFactory(1000000,10000000,1,false); // 1 million nodes, 10 million edges
@@ -151,12 +154,12 @@ public class FastGraph {
 //String name = "as-skitter.txt";
 //String name = "soc-pokec-relationships.txt-reduced";
 //String name = "soc-pokec-relationships.txt-veryshort-veryshort";
-//String name = "Wiki-Vote.txt";
+String name = "Wiki-Vote.txt";
 //		String name = g1.getName();
-		FastGraph g2 = g1;
+//		FastGraph g2 = g1;
 		try {
 			time = Debugger.createTime();
-			//FastGraph g2 = loadBuffersGraphFactory(null,name);
+			FastGraph g2 = loadBuffersGraphFactory(null,name);
 			//g2 = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
 			
 			Debugger.log("Connected: " + Connected.connected(g2));
@@ -167,14 +170,44 @@ public class FastGraph {
 			Debugger.resetTime();
 			
 			ExactMotifFinder emf = new ExactMotifFinder(g2);
-			emf.findAndExportAllMotifs(10, 4, 8, 0, true);
+			emf.findAndExportAllMotifs(10, 4, 4, 0, true);
 			HashMap<String,LinkedList<IsoHolder>> referenceBuckets = emf.getHashBuckets();
-			emf.findAndExportAllMotifs(0, 4, 8, 0, false);
+			emf.findAndExportAllMotifs(0, 4, 4, 0, false);
 			HashMap<String,LinkedList<IsoHolder>> realBuckets = emf.getHashBuckets();
 			emf.compareAndExportResults(referenceBuckets, realBuckets);
 //			emf.outputHashBuckets(realBuckets);
 			Debugger.outputTime("Time total motif detection");
 			
+/*
+			//ISO CHECK REWIRING
+			FastGraph g1 = FastGraph.randomGraphFactory(12,24,1,true,false);
+			FastGraph g2 = g1.generateRandomRewiredGraph(10, 1);
+			ExactIsomorphism em = new ExactIsomorphism(g1);
+			boolean iso = em.isomorphic(g2);
+			Debugger.log("g1 and g2 iso: " + iso);
+			
+			uk.ac.kent.displayGraph.Graph dg = g1.generateDisplayGraph();
+			dg.randomizeNodePoints(new Point(20,20),300,300);
+			uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg, true);
+			uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
+			GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
+			se.setAnimateFlag(false);
+			se.setIterations(100);
+			se.setTimeLimit(200);
+			se.setGraphPanel(gw.getGraphPanel());
+			se.layout();
+			
+			uk.ac.kent.displayGraph.Graph dg2 = g2.generateDisplayGraph();
+			dg2.randomizeNodePoints(new Point(20,20),300,300);
+			uk.ac.kent.displayGraph.display.GraphWindow gw2 = new uk.ac.kent.displayGraph.display.GraphWindow(dg2, true);
+			uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse2 = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
+			GraphDrawerSpringEmbedder se2 = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
+			se2.setAnimateFlag(false);
+			se2.setIterations(100);
+			se2.setTimeLimit(200);
+			se2.setGraphPanel(gw2.getGraphPanel());
+			se2.layout();
+	*/		
 			//EnumerateSubgraphFanmod es = new EnumerateSubgraphFanmod(g2);
 			//EnumerateSubgraphNeighbourhood es = new EnumerateSubgraphNeighbourhood(g2);
 			//HashSet<FastGraph> gs = es.enumerateSubgraphs(4,1,10);
