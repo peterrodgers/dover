@@ -1,5 +1,7 @@
 package uk.ac.kent.dover.fastGraph;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.*;
 
 import uk.ac.kent.displayGraph.*;
@@ -61,9 +63,29 @@ public class ExactIsomorphism {
 	 */
 	public static void main(String[] args) {
 		
-		int comparisons = 100000;
+		int comparisons = 1000;
 		int numNodes = 8;
-		int numEdges = 15;
+		int numEdges = 24;
+
+		FastGraph g = null;
+		try {
+			g = FastGraph.randomGraphFactory(10000, 100000, 44, true);
+		} catch(Exception e) {}
+	
+		FastGraph ga = g.generateRandomRewiredGraph(10,1);
+		int outdiff = 0;
+		int indiff = 0;
+		for(int i = 0; i < g.getNumberOfEdges(); i++) {
+//			System.out.println(i+" | "+g.getEdgeNode1(i)+" "+ga.getEdgeNode1(i)+" | "+g.getEdgeNode2(i)+" "+ga.getEdgeNode2(i));
+			if(g.getEdgeNode1(i) != ga.getEdgeNode1(i)) {
+				outdiff++;
+			}
+			if(g.getEdgeNode2(i) != ga.getEdgeNode2(i)) {
+				indiff++;
+			}
+		}
+		System.out.println("outdiff "+(outdiff/(1.0*g.getNumberOfEdges()))+" indiff "+(indiff/(1.0*g.getNumberOfEdges())));
+
 		
 		try {
 			long isoTime = 0;
@@ -71,6 +93,7 @@ public class ExactIsomorphism {
 				FastGraph g1;
 				g1 = FastGraph.randomGraphFactory(numNodes,numEdges,i,true,false);
 				FastGraph g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i+comparisons*2,true,false);
+g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i,true,false);
 				long time = System.currentTimeMillis();
 				ExactIsomorphism ei = new ExactIsomorphism(g1);
 //System.out.println(ei.generateStringForHash().hashCode()+" "+ei.generateStringForHash());
@@ -91,14 +114,17 @@ public class ExactIsomorphism {
 //				}
 	
 			}
-			FastGraph g1 = FastGraph.randomGraphFactory(numNodes,numEdges,0,true,false);
 			ExactIsomorphism.reportTimes();
 			ExactIsomorphism.reportFailRatios();
 			System.out.println("Full isomorphism time "+isoTime/1000.0+" seconds, "+isoTime/(comparisons*1000.0)+" seconds per test");
+					
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
+		
+		
 	}
 
 	

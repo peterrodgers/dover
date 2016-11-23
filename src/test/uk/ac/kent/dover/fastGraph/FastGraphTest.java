@@ -1578,6 +1578,22 @@ public class FastGraphTest {
 	}
 
 	
+	@Test
+	public void test133() {
+		FastGraph g,g1;
+		g = FastGraph.jsonStringGraphFactory(get4Node5Edge(),false);
+		g1 = g.generateRandomRewiredGraph(5,1);
+		assertTrue(g1.checkConsistency());
+		assertTrue((g.getEdgeNode1(0) != g1.getEdgeNode1(0)) || (g.getEdgeNode2(0) != g1.getEdgeNode2(0)));
+		assertTrue((g.getEdgeNode1(0) != g1.getEdgeNode1(0)) || (g.getEdgeNode1(1) != g1.getEdgeNode1(1)) || (g.getEdgeNode1(2) != g1.getEdgeNode1(2)) || (g.getEdgeNode1(3) != g1.getEdgeNode1(3)) || (g.getEdgeNode1(4) != g1.getEdgeNode1(4)));
+		assertTrue((g.getEdgeNode2(0) != g1.getEdgeNode2(0)) || (g.getEdgeNode2(1) != g1.getEdgeNode2(1)) || (g.getEdgeNode2(2) != g1.getEdgeNode2(2)) || (g.getEdgeNode2(3) != g1.getEdgeNode2(3)) || (g.getEdgeNode2(4) != g1.getEdgeNode2(4)));
+		
+		g = FastGraph.jsonStringGraphFactory(get4Node5Edge(),false);
+		g1 = g.generateRandomRewiredGraph(10,1);
+		assertTrue(g1.checkConsistency());
+		assertTrue((g.getEdgeNode1(0) != g1.getEdgeNode1(0)) || (g.getEdgeNode2(0) != g1.getEdgeNode2(0)));
+		
+	}
 	
 	
 	

@@ -3420,20 +3420,19 @@ Debugger.outputTime("time for rewiring");
 		remainingNodes.remove(startNode);
 		
 		LinkedList<int[]> rewireEdges = new LinkedList<int[]>();
-		int[] rewire = new int[3];
+		int[] rewiring = new int[3];
 		int nextNode = oppositeEnd(startEdge, startNode);
-		rewire[0] = startEdge;
-		rewire[1] = nextNode;
-		rewire[2] = startNode;
-		rewireEdges.add(rewire);
-//Debugger.log("first rewire "+rewire[0]+" "+rewire[1]+" "+rewire[2]);
+		rewiring[0] = startEdge;
+		rewiring[1] = nextNode;
+		rewiring[2] = startNode;
+		rewireEdges.add(rewiring);
+Debugger.log("first rewire "+rewiring[0]+" "+rewiring[1]+" "+rewiring[2]);
 		
 		boolean in = false;
 
 		boolean loop = true;
 		while(loop) {
-			rewire = new int[3];
-			
+			rewiring = new int[3];
 			if(in) {
 				// next is an in edge
 				count = 0;
@@ -3441,36 +3440,42 @@ Debugger.outputTime("time for rewiring");
 				while(!foundEdge) {
 					count++;
 					if(count > ITERATIONS_TIME_OUT) { // end here and attach to start node
-						rewire[1] = nextNode;
-						rewire[2] = startNode;
+						rewiring[1] = nextNode;
+						rewiring[2] = startNode;
 						int[] connectingEdges = getNodeConnectingInEdges(startNode);
 					
 						int pos = r.nextInt(connectingEdges.length);
 						int edge = connectingEdges[pos];
+						int edgeCount = 0;
 						while(edge == startEdge) {
+							if(edgeCount > ITERATIONS_TIME_OUT) {
+								break;
+							}
+							edgeCount++;
+
 							pos = r.nextInt(connectingEdges.length);
 							edge = connectingEdges[pos];
 						}
-						rewire[0] = edge;
+						rewiring[0] = edge;
 						foundEdge = true;
 						loop = false;
-//Debugger.log("in finish on no more nodes "+rewire[0]+" "+rewire[1]+" "+rewire[2]);
+Debugger.log("in finish on no more nodes "+rewiring[0]+" "+rewiring[1]+" "+rewiring[2]);
 					}
 					
 					int testInd = r.nextInt(remainingNodes.size());
 					int testNode = remainingNodes.get(testInd);
 					if(getNodeInDegree(testNode) > 0) { // found a suitable node
-						rewire[1] = nextNode;
-						rewire[2] = testNode;
+						rewiring[1] = nextNode;
+						rewiring[2] = testNode;
 						int[] connectingEdges = getNodeConnectingInEdges(testNode);
 						int pos = r.nextInt(connectingEdges.length);
 						int edge = connectingEdges[pos];
-						rewire[0] = edge;
+						rewiring[0] = edge;
 						nextNode = testNode;
 						remainingNodes.remove(testInd);
 						in = false;
 						foundEdge = true;
-//Debugger.log("in rewire "+rewire[0]+" "+rewire[1]+" "+rewire[2]+" remaining "+remainingNodes.size());
+Debugger.log("in rewire "+rewiring[0]+" "+rewiring[1]+" "+rewiring[2]+" remaining "+remainingNodes.size());
 					}
 				}
 			} else {
@@ -3480,66 +3485,85 @@ Debugger.outputTime("time for rewiring");
 				while(!foundEdge) {
 					count++;
 					if(count > ITERATIONS_TIME_OUT) { // end here and attach to start node
-						rewire[1] = startNode;
-						rewire[2] = nextNode;
+						rewiring[1] = startNode;
+						rewiring[2] = nextNode;
 						int[] connectingEdges = getNodeConnectingOutEdges(startNode);
 						int pos = r.nextInt(connectingEdges.length);
 						int edge = connectingEdges[pos];
+						int edgeCount = 0;
 						while(edge == startEdge) {
+							if(edgeCount > ITERATIONS_TIME_OUT) {
+								break;
+							}
+							edgeCount++;
+
 							pos = r.nextInt(connectingEdges.length);
 							edge = connectingEdges[pos];
 						}
-						rewire[0] = edge;
+						rewiring[0] = edge;
 						foundEdge = true;
 						loop = false;
-//Debugger.log("out finish on no more nodes "+rewire[0]+" "+rewire[1]+" "+rewire[2]);
+Debugger.log("out finish on no more nodes "+rewiring[0]+" "+rewiring[1]+" "+rewiring[2]);
 					}
 					int testInd = r.nextInt(remainingNodes.size());
 					int testNode = remainingNodes.get(testInd);
 					if(getNodeOutDegree(testNode) > 0) { // found a suitable node
-						rewire[1] = testNode;
-						rewire[2] = nextNode;
+						rewiring[1] = testNode;
+						rewiring[2] = nextNode;
 						int[] connectingEdges = getNodeConnectingOutEdges(testNode);
 						int pos = r.nextInt(connectingEdges.length);
 						int edge = connectingEdges[pos];
-						rewire[0] = edge;
+						rewiring[0] = edge;
 						nextNode = testNode;
 						remainingNodes.remove(testInd);
 						in = true;
 						foundEdge = true;
-//Debugger.log("out rewire "+rewire[0]+" "+rewire[1]+" "+rewire[2]+" remaining "+remainingNodes.size());
+Debugger.log("out rewire "+rewiring[0]+" "+rewiring[1]+" "+rewiring[2]+" remaining "+remainingNodes.size());
 					}
 				}
 			}
 			if(remainingNodes.size() == 0) { // connect back to the start node and finish
 				if(in) {
-					rewire[1] = nextNode;
-					rewire[2] = startNode;
+					rewiring[1] = nextNode;
+					rewiring[2] = startNode;
 					int[] connectingEdges = getNodeConnectingInEdges(startNode);
 					int pos = r.nextInt(connectingEdges.length);
 					int edge = connectingEdges[pos];
+					int edgeCount = 0;
 					while(edge == startEdge) {
+						if(edgeCount > ITERATIONS_TIME_OUT) {
+							break;
+						}
+						edgeCount++;
+
 						pos = r.nextInt(connectingEdges.length);
 						edge = connectingEdges[pos];
 					}
-//Debugger.log("in finish on empty "+rewire[0]+" "+rewire[1]+" "+rewire[2]);
+					rewiring[0] = edge;
+Debugger.log("in finish on empty "+rewiring[0]+" "+rewiring[1]+" "+rewiring[2]);
 				} else {
-					rewire[1] = startNode;
-					rewire[2] = nextNode;
+					rewiring[1] = startNode;
+					rewiring[2] = nextNode;
 					int[] connectingEdges = getNodeConnectingOutEdges(startNode);
 					int pos = r.nextInt(connectingEdges.length);
 					int edge = connectingEdges[pos];
+					int edgeCount = 0;
 					while(edge == startEdge) {
+						if(edgeCount > ITERATIONS_TIME_OUT) {
+							break;
+						}
+						edgeCount++;
 						pos = r.nextInt(connectingEdges.length);
 						edge = connectingEdges[pos];
 					}
-//Debugger.log("out finish on empty "+rewire[0]+" "+rewire[1]+" "+rewire[2]);
+					rewiring[0] = edge;
+Debugger.log("out finish on empty "+rewiring[0]+" "+rewiring[1]+" "+rewiring[2]);
 				}
 
 				loop = false;
 			}
+			rewireEdges.add(rewiring);
 		}
-		
 		
 		FastGraph ret = generateRewiredGraph(rewireEdges);
 		
