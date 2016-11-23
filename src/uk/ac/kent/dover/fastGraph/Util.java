@@ -1,16 +1,11 @@
 package uk.ac.kent.dover.fastGraph;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import javax.swing.JOptionPane;
+import static org.cytoscape.gedevo.GedevoNative.Network;
 
 /**
  * A class to hold a number of useful methods
@@ -256,7 +251,6 @@ public class Util {
 	 * Converts an int[] to a HashSet of Integer using streams
 	 * 
 	 * @param array The array to convert
-	 * @param list The newly populated HashSet
 	 */
 	public static void convertArray(int[] array, HashSet<Integer> set) {
 		set.addAll(IntStream.of(array).boxed().collect(Collectors.toList()));
@@ -309,5 +303,20 @@ public class Util {
 			end = list.size();
 		}
 		return list.subList(start, end);
+	}
+
+	public static Network fastGraphToNetwork(FastGraph fastgraph) {
+		int numEdges = fastgraph.getNumberOfEdges();
+		int[] src = new int[numEdges];
+		int[] dst = new int[numEdges];
+		String[] names = new String[numEdges];
+
+		for (int i=0; i < numEdges; i++) {
+			src[i] = fastgraph.getEdgeNode1(i);
+			dst[i] = fastgraph.getEdgeNode2(i);
+			names[i] = "PLACEHOLDER";
+		}
+
+		return Network.createFromArrays(names, src, dst);
 	}
 }
