@@ -1,59 +1,19 @@
 package uk.ac.kent.dover.fastGraph;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Toolkit;
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultListModel;
-import javax.swing.BorderFactory;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
-import javax.swing.border.EtchedBorder;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JRadioButton;
-import javax.swing.JSeparator;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 
 /**
  * This class handles all the GUI for the main Launcher.
@@ -141,7 +101,11 @@ public class LauncherGUI extends JFrame {
 		JPanel otherPanel = buildOtherTab(graphList, progressBar, statusBar);
 		tabbedPane.addTab("Others", otherPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_4);
-		
+
+		JPanel gedPanel = buildGedTab(graphList, progressBar, statusBar);
+		tabbedPane.addTab("GED", gedPanel);
+		tabbedPane.setMnemonicAt(0, KeyEvent.VK_5);
+
 		blackline = BorderFactory.createLineBorder(Color.black);
 		titled = BorderFactory.createTitledBorder(blackline, "Task");
 		titled.setTitleJustification(TitledBorder.LEFT);
@@ -163,7 +127,8 @@ public class LauncherGUI extends JFrame {
 		pack();
 		setVisible(true);
 	}
-	
+
+
 	/**
 	 * Builds the menu bar
 	 * 
@@ -578,7 +543,97 @@ public class LauncherGUI extends JFrame {
 		otherPanel.add(new JLabel("more text"), BorderLayout.EAST);
 		return otherPanel;
 	}
-	
+
+	/**
+	 * Builds the Panel used to house the GUI elements for the Graph Edit Distance Tab
+	 *
+	 * @param graphList The JList element used to select which is the target graph
+	 * @param progressBar The JProgressBar to update when loading a graph
+	 * @return the GED tab
+	 */
+	private JPanel buildGedTab(JList graphList, JProgressBar progressBar, JPanel statusBar) {
+
+		JPanel gedPanel = new JPanel(new GridBagLayout());
+
+		// Set the layout
+		GridBagConstraints c = new GridBagConstraints();
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.insets = new Insets(2,2,2,2);
+
+		JLabel graphOneLabel = new JLabel("Graph one:");
+
+		c.gridx = 0;
+		c.gridy = 0;
+		gedPanel.add(graphOneLabel, c);
+
+		JLabel graphTwoLabel = new JLabel("Graph two:");
+
+		c.gridx = 1;
+		c.gridy = 0;
+		gedPanel.add(graphTwoLabel, c);
+
+		JTextField graphOneTextField = new JTextField();
+		graphOneTextField.setEditable(false);
+
+		c.gridx = 0;
+		c.gridy = 1;
+		gedPanel.add(graphOneTextField, c);
+
+		JTextField graphTwoTextField = new JTextField();
+		graphTwoTextField.setEditable(false);
+
+		c.gridx = 1;
+		c.gridy = 1;
+		gedPanel.add(graphTwoTextField, c);
+
+		JButton selectGraphOne = new JButton("Set selected graph as graph one");
+
+		c.gridx = 0;
+		c.gridy = 2;
+		gedPanel.add(selectGraphOne, c);
+
+		JButton selectGraphTwo = new JButton("Set selected graph as graph two");
+
+		c.gridx = 1;
+		c.gridy = 2;
+		gedPanel.add(selectGraphTwo, c);
+
+		JButton getGedBtn = new JButton("Get GED of selected graphs");
+
+		c.gridx = 0;
+		c.gridy = 3;
+		c.gridwidth = 2;
+		gedPanel.add(getGedBtn, c);
+		// Layout finished
+
+		// Set behaivour
+		selectGraphOne.addActionListener(new ActionListener() {
+			 @Override
+			 public void actionPerformed(ActionEvent actionEvent) {
+				String selectedGraph = (String) graphList.getSelectedValue();
+				 graphOneTextField.setText(selectedGraph);
+			 }
+		 });
+		selectGraphTwo.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				String selectedGraph = (String) graphList.getSelectedValue();
+				graphTwoTextField.setText(selectedGraph);
+			}
+		});
+
+		getGedBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				// this is the hard bit
+			}
+		});
+		// Behaivour finished
+
+		return gedPanel;
+	}
+
 	/**
 	 * Builds the status bar - used for updating the user on small piece of information
 	 * @return The fully built Status Bar
