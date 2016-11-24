@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 
+import uk.ac.kent.dover.fastGraph.Gui.LauncherGUI;
+
 /**
  * Main class from which all the other functionality is called.
  * 

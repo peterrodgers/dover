@@ -1,7 +1,8 @@
-package uk.ac.kent.dover.fastGraph;
+package uk.ac.kent.dover.fastGraph.Gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -18,6 +19,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -35,6 +38,11 @@ import javax.swing.BorderFactory;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+
+import uk.ac.kent.dover.fastGraph.FastGraph;
+import uk.ac.kent.dover.fastGraph.Launcher;
+import uk.ac.kent.dover.fastGraph.Util;
+
 import javax.swing.border.EtchedBorder;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -53,6 +61,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
 /**
@@ -126,7 +135,7 @@ public class LauncherGUI extends JFrame {
 		// Builds the Tabbed area
 		JTabbedPane tabbedPane = new JTabbedPane();
 		
-		JPanel motifPanel = buildMotifTab();
+		JPanel motifPanel = buildMotifTab(progressBar);
 		tabbedPane.addTab("Motif", motifPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
@@ -237,9 +246,10 @@ public class LauncherGUI extends JFrame {
 	
 	/**
 	 * Builds the Panel used to house the GUI elements for the Motif Tab
+	 * @param progressBar The main progress bar
 	 * @return The Motif Tab
 	 */
-	private JPanel buildMotifTab() {
+	private JPanel buildMotifTab(JProgressBar progressBar) {
 		JPanel motifPanel = new JPanel(new GridBagLayout());
 		
 		JLabel infoLabel = new JLabel("Find and export motifs", SwingConstants.CENTER);
@@ -258,17 +268,7 @@ public class LauncherGUI extends JFrame {
 		smallProgress.setStringPainted(true);
 		smallProgress.setString("");
 		
-		motifBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent evt) {
-				int number = checkForPositiveInteger(minInput.getText(),motifPanel);
-				if (number != -1) {
-					
-					//replace with actual motif code
-					System.out.println("Motif search, with number: " + number);
-				}		
-			}
-		});
+		motifBtn.addActionListener(new MotifActionListener(launcher, this, minInput, maxInput, motifPanel, bigProgress));
 		
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(2,2,2,2);;
@@ -333,6 +333,8 @@ public class LauncherGUI extends JFrame {
 		return motifPanel;
 	}
 	
+	
+	
 	/**
 	 * Builds the Panel used to house the GUI elements for the Pattern Tab
 	 * @return The Pattern Tab
@@ -394,63 +396,8 @@ public class LauncherGUI extends JFrame {
 		JButton convertBtn = new JButton("Convert");
 		
 		//The action for when the user converts a file
-		convertBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent evt) {
-				//check that the numbers of nodes are valid
-				
-				int nodeNumber = checkForPositiveInteger(nodeField.getText(),convertPanel);
-				int edgeNumber = checkForPositiveInteger(edgeField.getText(),convertPanel);
-				if (nodeNumber != -1 && edgeNumber != -1) {
-					//input numbers are valid
-					
-					//if the undirected button is selected, then the graph is undirected
-					boolean directedGraph = directed.isSelected();
-					File graphFile = fileChooser.getSelectedFile();
-					String name = graphFile.getName();
-					String path = fileChooser.getCurrentDirectory().toString();
-					
-					System.out.println(fileChooser.getSelectedFile());
-					System.out.println("path: " + fileChooser.getCurrentDirectory());
-					System.out.println("node: " + nodeNumber);
-					System.out.println("edge: " + edgeNumber);
-					System.out.println("directed: " + directedGraph);
-					
-					//set the Progress Bar to move
-					progressBar.setIndeterminate(true);
-					status.setText("Converting...");
-
-					// Start converting the Graph, but in a separate thread, to avoid locking up the GUI
-					Thread thread = new Thread(new Runnable() {
-
-					    @Override
-					    public void run() {
-					    	
-					    	//Display error message to the user if this is unavailable
-							try {
-								
-								launcher.convertGraphToBuffers(nodeNumber, edgeNumber, path, name, directedGraph);
-								
-								status.setText("Conversion Complete");
-								model.addElement(name);
-						    	//stop the Progress Bar
-						    	progressBar.setIndeterminate(false);
-							} catch (Exception e) {
-								//stop the Progress Bar
-								progressBar.setIndeterminate(false);
-								JOptionPane.showMessageDialog(convertPanel, "This buffer could not be built. \n" + e.getMessage(), "Error: Exception", JOptionPane.ERROR_MESSAGE);
-								
-								e.printStackTrace();
-							}
-
-					    }
-					            
-					});					        
-					thread.start();
-					
-				}
-			}
-		});
+		convertBtn.addActionListener(new ConvertGraphActionListener(launcher, this, nodeField, edgeField, 
+				fileChooser, directed, model, convertPanel, progressBar, status));
 		
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(2,2,2,2);
@@ -598,7 +545,7 @@ public class LauncherGUI extends JFrame {
 	 * @param panel The JPanel to attach the error Popup
 	 * @return The converted integer, or -1 if failed.
 	 */
-	private int checkForPositiveInteger(String input, JPanel panel) {
+	public int checkForPositiveInteger(String input, JPanel panel) {
 		try {
 			int number = Util.checkForPositiveInteger(input);
 			return number;
