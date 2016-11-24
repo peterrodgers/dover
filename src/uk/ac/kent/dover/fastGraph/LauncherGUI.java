@@ -1,8 +1,5 @@
 package uk.ac.kent.dover.fastGraph;
 
-import org.cytoscape.gedevo.GedevoNative;
-import org.cytoscape.gedevo.UserSettings;
-
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
@@ -17,8 +14,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-
-import static org.cytoscape.gedevo.GedevoNative.Network;
 
 /**
  * This class handles all the GUI for the main Launcher.
@@ -643,31 +638,19 @@ public class LauncherGUI extends JFrame {
                         String g1String = graphOneTextField.getText();
                         String g2String = graphTwoTextField.getText();
 
-                        if (g1String != null && g2String != null) {
-                            try {
-                                FastGraph g1 = launcher.loadFromBuffers(null, g1String);
-                                FastGraph g2 = launcher.loadFromBuffers(null, g2String);
-                                System.out.println("Loaded graphs as dover.FastGraph");
+                        FastGraph g1 = null;
+                        FastGraph g2 = null;
+                        try {
+                            g1 = launcher.loadFromBuffers(null, g1String);
+                            g2 = launcher.loadFromBuffers(null, g2String);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
 
-                                Network g1Network = Util.fastGraphToNetwork(g1, "Graph One");
-                                Network g2Network = Util.fastGraphToNetwork(g2, "Graph Two");
-                                System.out.println("Created gedevo Network objects from graphs");
+                        System.out.println("Loaded graphs as dover.FastGraph");
 
-                                UserSettings userSettings = new UserSettings();
-                                GedevoNative.Instance instance = GedevoNative.Instance.create(userSettings);
-                                System.out.println("Instance created");
-
-                                if (instance.importNetwork(g1Network, 0) && instance.importNetwork(g2Network, 1)) {
-                                    System.out.println("Networks imported into instance");
-                                }
-                                else {
-                                    System.out.println("ERROR. Networks not imported into instance");
-                                }
-
-                            }
-                            catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                        if (g1 != null && g2 != null) {
+                            GedUtil.getGedScore(g1, g2);
                         }
                     }
                 });
