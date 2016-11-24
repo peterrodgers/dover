@@ -647,10 +647,8 @@ public class LauncherGUI extends JFrame {
                             e.printStackTrace();
                         }
 
-                        System.out.println("Loaded graphs as dover.FastGraph");
-
                         if (g1 != null && g2 != null) {
-                            GedUtil.getGedScore(g1, g2);
+                            System.out.println(GedUtil.getGedScore(g1, g2));
                         }
                     }
                 });

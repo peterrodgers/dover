@@ -5,6 +5,7 @@ import org.cytoscape.gedevo.UserSettings;
 import org.cytoscape.gedevo.simplenet.Edge;
 import org.cytoscape.gedevo.simplenet.Graph;
 import org.cytoscape.gedevo.simplenet.Node;
+import org.cytoscape.gedevo.task.AlignmentTaskData;
 
 /**
  * Created by dw3 on 24/11/2016.
@@ -20,7 +21,7 @@ public class GedUtil {
 	 * @param name
      * @return A Network object
      */
-	private static GedevoNative.Network fastGraphToNetwork(FastGraph fastgraph, String name) {
+	private static Graph fastGraphToCytoGraph(FastGraph fastgraph, String name) {
 		int numEdges = fastgraph.getNumberOfEdges();
 		int[] src = new int[numEdges];
 		int[] dst = new int[numEdges];
@@ -46,7 +47,7 @@ public class GedUtil {
 		cytograph.nodes = cytonodes;
 		cytograph.edges = cytoedges;
 
-		return GedevoNative.Network.convertToNative(cytograph);
+		return cytograph;
 	}
 
 
@@ -61,21 +62,27 @@ public class GedUtil {
      */
 	public static String getGedScore(FastGraph g1, FastGraph g2) {
 
-		GedevoNative.Network g1Network = GedUtil.fastGraphToNetwork(g1, "Graph One");
-		GedevoNative.Network g2Network = GedUtil.fastGraphToNetwork(g2, "Graph Two");
-		System.out.println("Created gedevo Network objects from graphs");
+		Graph cytog1 = GedUtil.fastGraphToCytoGraph(g1, "Graph One");
+		Graph cytog2 = GedUtil.fastGraphToCytoGraph(g2, "Graph Two");
+
+		GedevoNative.Network g1Network = GedevoNative.Network.convertToNative(cytog1);
+		GedevoNative.Network g2Network = GedevoNative.Network.convertToNative(cytog2);
 
 		UserSettings userSettings = new UserSettings();
-		GedevoNative.Instance instance = GedevoNative.Instance.create(userSettings);
-		System.out.println("Instance created");
+		final AlignmentTaskData alignmentTaskData = new AlignmentTaskData(userSettings);
 
-		if (instance.importNetwork(g1Network, 0) && instance.importNetwork(g2Network, 1)) {
-			System.out.println("Networks imported into instance");
-		}
-		else {
-			System.out.println("ERROR. Networks not imported into instance");
-		}
+		alignmentTaskData.instance = GedevoNative.Instance.create(alignmentTaskData.settings);
+		alignmentTaskData.instance.init1();
+		alignmentTaskData.instance.init2();
+//		alignmentTaskData.instance.importNetwork(g1Network, 0);
+//		alignmentTaskData.instance.importNetwork(g2Network, 1);
+//		alignmentTaskData.graphs = new Graph[]{cytog1, cytog2};
+//		alignmentTaskData.cynet = null;
+		alignmentTaskData.instance.fillAlignmentInfo(0, alignmentTaskData.info);
+		alignmentTaskData.instance.update(1);
 
 		return "GED score goes here";
 	}
+
+
 }
