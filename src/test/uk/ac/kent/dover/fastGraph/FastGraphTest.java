@@ -1582,16 +1582,20 @@ public class FastGraphTest {
 	public void test133() {
 		FastGraph g,g1;
 		g = FastGraph.jsonStringGraphFactory(get4Node5Edge(),false);
-		g1 = g.generateRandomRewiredGraph(5,1);
+		g1 = g.generateRandomRewiredGraph(5,888);
 		assertTrue(g1.checkConsistency());
-		assertTrue((g.getEdgeNode1(0) != g1.getEdgeNode1(0)) || (g.getEdgeNode2(0) != g1.getEdgeNode2(0)));
+		assertTrue((g.getEdgeNode1(1) != g1.getEdgeNode1(1)) || (g.getEdgeNode2(1) != g1.getEdgeNode2(1)));
 		assertTrue((g.getEdgeNode1(0) != g1.getEdgeNode1(0)) || (g.getEdgeNode1(1) != g1.getEdgeNode1(1)) || (g.getEdgeNode1(2) != g1.getEdgeNode1(2)) || (g.getEdgeNode1(3) != g1.getEdgeNode1(3)) || (g.getEdgeNode1(4) != g1.getEdgeNode1(4)));
 		assertTrue((g.getEdgeNode2(0) != g1.getEdgeNode2(0)) || (g.getEdgeNode2(1) != g1.getEdgeNode2(1)) || (g.getEdgeNode2(2) != g1.getEdgeNode2(2)) || (g.getEdgeNode2(3) != g1.getEdgeNode2(3)) || (g.getEdgeNode2(4) != g1.getEdgeNode2(4)));
+		Assert.assertArrayEquals(g.inDegreeProfile(),g1.inDegreeProfile());
+		Assert.assertArrayEquals(g.outDegreeProfile(),g1.outDegreeProfile());
 		
 		g = FastGraph.jsonStringGraphFactory(get4Node5Edge(),false);
-		g1 = g.generateRandomRewiredGraph(10,1);
+		g1 = g.generateRandomRewiredGraph(10,111);
 		assertTrue(g1.checkConsistency());
-		assertTrue((g.getEdgeNode1(0) != g1.getEdgeNode1(0)) || (g.getEdgeNode2(0) != g1.getEdgeNode2(0)));
+		assertTrue((g.getEdgeNode1(1) != g1.getEdgeNode1(1)) || (g.getEdgeNode2(1) != g1.getEdgeNode2(1)));
+		Assert.assertArrayEquals(g.inDegreeProfile(),g1.inDegreeProfile());
+		Assert.assertArrayEquals(g.outDegreeProfile(),g1.outDegreeProfile());
 		
 	}
 	

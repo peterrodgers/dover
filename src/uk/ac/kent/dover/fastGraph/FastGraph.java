@@ -3385,191 +3385,186 @@ Debugger.outputTime("time for rewiring");
 	 * @param seed random number generator seed
 	 * @return a new graph, based on g, but rewired graph
 	 */
+	
+	
 	private FastGraph oneIterationGenerateRandomRewiredGraph(long seed) {
-			
+		
 		final int ITERATIONS_TIME_OUT = 10000;
 
 		Random r = new Random(seed);
-		
-		ArrayList<Integer> remainingNodes = new ArrayList<Integer>(getNumberOfNodes()*3);
-		for(Integer i = 0; i < getNumberOfNodes(); i++) {
-			remainingNodes.add(i);
-		}
-		
-		int startNode = -1;
-		int startEdge = -1;
-		
-		boolean foundStart = false;
-		int count = 0;
-		while(!foundStart) {
-			count++;
-			if(count > ITERATIONS_TIME_OUT) {
-				// graph is too sparse for rewiring
-				return null;
-			}
-			// need at least 2 in edges, 1 out edge
-			// leaving 1 out edge and 1 in edge to finish the rewiring with
-			int testNode = r.nextInt(getNumberOfNodes());
-			if(getNodeInDegree(testNode) > 1 && getNodeOutDegree(testNode) > 0) {
-				startNode = testNode;
-				startEdge = getNodeConnectingInEdges(startNode)[0];
-				foundStart = true;
-			}
-		}
 
-		remainingNodes.remove(startNode);
+		// rewiring the node1 of edges
+
+		// don't rewire node1 of edges more than once
+		HashSet<Integer> remainingEdges = new HashSet<Integer>(getNumberOfEdges()*2);
+		for(int i = 0; i < getNumberOfEdges(); i++) {
+			remainingEdges.add(i);
+		}
+		// keep track of nodes that have unvisited out edges
+		ArrayList<Integer> candidateNodes = new ArrayList<Integer>(getNumberOfNodes()*2);
+		for(int i = 0; i < getNumberOfNodes(); i++) {
+			if(getNodeOutDegree(i) > 0) {
+				candidateNodes.add(i);
+			}
+		}
 		
+		int startEdge = r.nextInt(getNumberOfEdges());
+		int startNode = getEdgeNode1(startEdge);
+		remainingEdges.remove(startEdge);
+		int nextEdge = startEdge;
+		HashMap<Integer,Integer> rewireNode1 = new HashMap<Integer,Integer>(getNumberOfEdges()*2); // edge then new node1 for the edge
+		int nextNode = -1;
+		while(remainingEdges.size() > 0) {
+			// find another node and an in edge to swap
+			nextNode = -1;
+			int foundEdge = -1;
+			int nodeIterations = 0;
+			while(nextNode == -1) {
+				nodeIterations++;
+				if(nodeIterations > ITERATIONS_TIME_OUT) { // end here-  no candidate nodes
+					break;
+				}
+
+				int nodeIndex = r.nextInt(candidateNodes.size());
+				int tryNode = candidateNodes.get(nodeIndex);
+				
+				// need to find an unused edge, connecting to tryNode, randomly
+				ArrayList<Integer> candidateEdges = new ArrayList<Integer>(Util.convertArray(getNodeConnectingOutEdges(tryNode)));
+				while(candidateEdges.size() > 0 && foundEdge == -1) {
+					int edgeIndex = r.nextInt(candidateEdges.size());
+					int tryEdge = candidateEdges.get(edgeIndex);
+					if(remainingEdges.contains(tryEdge)) {
+						foundEdge = tryEdge;
+						remainingEdges.remove(tryEdge);
+						nextNode = tryNode;
+					}
+					candidateEdges.remove(edgeIndex);
+				}
+				
+				if(foundEdge == -1) { // if there is no suitable edge, node is no longer a candidate as all its out edges have been used up
+					candidateNodes.remove(nodeIndex);
+				}
+			}
+			
+			if(nextNode == -1) { // cant find a suitable node so exit
+				break;
+			}
+			
+			rewireNode1.put(nextEdge, nextNode);
+			nextEdge = foundEdge; // the next edge to be rewired attaches to nextNode
+			
+		}
+		// rewire the current edge to the start node, making the start node degree correct
+		if(nextNode != -1) {
+			rewireNode1.put(nextEdge, startNode);
+		}
+		
+		
+		
+		// rewiring the node2 of edges
+
+		// don't rewire node2 of edges more than once
+		remainingEdges = new HashSet<Integer>(getNumberOfEdges()*2);
+		for(int i = 0; i < getNumberOfEdges(); i++) {
+			remainingEdges.add(i);
+		}
+		// keep track of nodes that have unvisited in edges
+		candidateNodes = new ArrayList<Integer>(getNumberOfNodes()*2);
+		for(int i = 0; i < getNumberOfNodes(); i++) {
+			if(getNodeInDegree(i) > 0) {
+				candidateNodes.add(i);
+			}
+		}
+		
+		startEdge = r.nextInt(getNumberOfEdges());
+		startNode = getEdgeNode2(startEdge);
+		remainingEdges.remove(startEdge);
+		nextEdge = startEdge;
+		
+		HashMap<Integer,Integer> rewireNode2 = new HashMap<Integer,Integer>(getNumberOfEdges()*2); // edge then new node1 for the edge
+		nextNode = -1;
+		while(remainingEdges.size() > 0) {
+			
+			// find another node and an in edge to swap
+			nextNode = -1;
+			int foundEdge = -1;
+			int nodeIterations = 0;
+			while(nextNode == -1) {
+				nodeIterations++;
+				if(nodeIterations > ITERATIONS_TIME_OUT) { // end here, no candidate nodes
+					break;
+				}
+				
+				int nodeIndex = r.nextInt(candidateNodes.size());
+				int tryNode = candidateNodes.get(nodeIndex);
+				
+				// need to find an unused edge, connecting to tryNode, randomly
+				ArrayList<Integer> candidateEdges = new ArrayList<Integer>(Util.convertArray(getNodeConnectingInEdges(tryNode)));
+				while(candidateEdges.size() > 0 && foundEdge == -1) {
+					int edgeIndex = r.nextInt(candidateEdges.size());
+					int tryEdge = candidateEdges.get(edgeIndex);
+					if(remainingEdges.contains(tryEdge)) {
+						foundEdge = tryEdge;
+						remainingEdges.remove(tryEdge);
+						nextNode = tryNode;
+					}
+					candidateEdges.remove(edgeIndex);
+				}
+
+				if(foundEdge == -1) { // if there is no suitable edge, node is no longer a candidate as all its in edges have been used up
+					candidateNodes.remove(nodeIndex);
+				}
+			}
+			
+			if(nextNode == -1) { // cant find a suitable node so exit
+				break;
+			}
+			
+			rewireNode2.put(nextEdge, nextNode);
+			nextEdge = foundEdge; // the next edge to be rewired attaches to nextNode
+			
+		}
+		// rewire the current edge to the end node, making the start node degree correct
+		if(nextNode != -1) {
+			rewireNode2.put(nextEdge, startNode);
+		}
+		
+		// populate the rewiring
 		LinkedList<int[]> rewireEdges = new LinkedList<int[]>();
-		int[] rewiring = new int[3];
-		int nextNode = oppositeEnd(startEdge, startNode);
-		rewiring[0] = startEdge;
-		rewiring[1] = nextNode;
-		rewiring[2] = startNode;
-		rewireEdges.add(rewiring);
-Debugger.log("first rewire "+rewiring[0]+" "+rewiring[1]+" "+rewiring[2]);
-		
-		boolean in = false;
-
-		boolean loop = true;
-		while(loop) {
-			rewiring = new int[3];
-			if(in) {
-				// next is an in edge
-				count = 0;
-				boolean foundEdge = false;
-				while(!foundEdge) {
-					count++;
-					if(count > ITERATIONS_TIME_OUT) { // end here and attach to start node
-						rewiring[1] = nextNode;
-						rewiring[2] = startNode;
-						int[] connectingEdges = getNodeConnectingInEdges(startNode);
-					
-						int pos = r.nextInt(connectingEdges.length);
-						int edge = connectingEdges[pos];
-						int edgeCount = 0;
-						while(edge == startEdge) {
-							if(edgeCount > ITERATIONS_TIME_OUT) {
-								break;
-							}
-							edgeCount++;
-
-							pos = r.nextInt(connectingEdges.length);
-							edge = connectingEdges[pos];
-						}
-						rewiring[0] = edge;
-						foundEdge = true;
-						loop = false;
-Debugger.log("in finish on no more nodes "+rewiring[0]+" "+rewiring[1]+" "+rewiring[2]);
-					}
-					
-					int testInd = r.nextInt(remainingNodes.size());
-					int testNode = remainingNodes.get(testInd);
-					if(getNodeInDegree(testNode) > 0) { // found a suitable node
-						rewiring[1] = nextNode;
-						rewiring[2] = testNode;
-						int[] connectingEdges = getNodeConnectingInEdges(testNode);
-						int pos = r.nextInt(connectingEdges.length);
-						int edge = connectingEdges[pos];
-						rewiring[0] = edge;
-						nextNode = testNode;
-						remainingNodes.remove(testInd);
-						in = false;
-						foundEdge = true;
-Debugger.log("in rewire "+rewiring[0]+" "+rewiring[1]+" "+rewiring[2]+" remaining "+remainingNodes.size());
-					}
-				}
-			} else {
-				// next is an out edge
-				count = 0;
-				boolean foundEdge = false;
-				while(!foundEdge) {
-					count++;
-					if(count > ITERATIONS_TIME_OUT) { // end here and attach to start node
-						rewiring[1] = startNode;
-						rewiring[2] = nextNode;
-						int[] connectingEdges = getNodeConnectingOutEdges(startNode);
-						int pos = r.nextInt(connectingEdges.length);
-						int edge = connectingEdges[pos];
-						int edgeCount = 0;
-						while(edge == startEdge) {
-							if(edgeCount > ITERATIONS_TIME_OUT) {
-								break;
-							}
-							edgeCount++;
-
-							pos = r.nextInt(connectingEdges.length);
-							edge = connectingEdges[pos];
-						}
-						rewiring[0] = edge;
-						foundEdge = true;
-						loop = false;
-Debugger.log("out finish on no more nodes "+rewiring[0]+" "+rewiring[1]+" "+rewiring[2]);
-					}
-					int testInd = r.nextInt(remainingNodes.size());
-					int testNode = remainingNodes.get(testInd);
-					if(getNodeOutDegree(testNode) > 0) { // found a suitable node
-						rewiring[1] = testNode;
-						rewiring[2] = nextNode;
-						int[] connectingEdges = getNodeConnectingOutEdges(testNode);
-						int pos = r.nextInt(connectingEdges.length);
-						int edge = connectingEdges[pos];
-						rewiring[0] = edge;
-						nextNode = testNode;
-						remainingNodes.remove(testInd);
-						in = true;
-						foundEdge = true;
-Debugger.log("out rewire "+rewiring[0]+" "+rewiring[1]+" "+rewiring[2]+" remaining "+remainingNodes.size());
-					}
-				}
+		for(int i = 0; i < getNumberOfEdges(); i++) {
+			Integer node1 = rewireNode1.get(i);
+			Integer node2 = rewireNode2.get(i);
+			int[] rewiring = new int[3];
+			if(node1 != null && node2 != null) { // both ends are rewired
+				rewiring[0] = i;
+				rewiring[1] = node1;
+				rewiring[2] = node2;
+				rewireEdges.add(rewiring);
 			}
-			if(remainingNodes.size() == 0) { // connect back to the start node and finish
-				if(in) {
-					rewiring[1] = nextNode;
-					rewiring[2] = startNode;
-					int[] connectingEdges = getNodeConnectingInEdges(startNode);
-					int pos = r.nextInt(connectingEdges.length);
-					int edge = connectingEdges[pos];
-					int edgeCount = 0;
-					while(edge == startEdge) {
-						if(edgeCount > ITERATIONS_TIME_OUT) {
-							break;
-						}
-						edgeCount++;
-
-						pos = r.nextInt(connectingEdges.length);
-						edge = connectingEdges[pos];
-					}
-					rewiring[0] = edge;
-Debugger.log("in finish on empty "+rewiring[0]+" "+rewiring[1]+" "+rewiring[2]);
-				} else {
-					rewiring[1] = startNode;
-					rewiring[2] = nextNode;
-					int[] connectingEdges = getNodeConnectingOutEdges(startNode);
-					int pos = r.nextInt(connectingEdges.length);
-					int edge = connectingEdges[pos];
-					int edgeCount = 0;
-					while(edge == startEdge) {
-						if(edgeCount > ITERATIONS_TIME_OUT) {
-							break;
-						}
-						edgeCount++;
-						pos = r.nextInt(connectingEdges.length);
-						edge = connectingEdges[pos];
-					}
-					rewiring[0] = edge;
-Debugger.log("out finish on empty "+rewiring[0]+" "+rewiring[1]+" "+rewiring[2]);
-				}
-
-				loop = false;
+			if(node1 != null && node2 == null) { // only node1 is rewired
+				rewiring[0] = i;
+				rewiring[1] = node1;
+				rewiring[2] = getEdgeNode2(i);
+				rewireEdges.add(rewiring);
 			}
-			rewireEdges.add(rewiring);
+			if(node1 == null && node2 != null) { // only node2 is rewired
+				rewiring[0] = i;
+				rewiring[1] = getEdgeNode1(i);
+				rewiring[2] = node2;
+				rewireEdges.add(rewiring);
+			}
 		}
+		
+
 		
 		FastGraph ret = generateRewiredGraph(rewireEdges);
+
 		
 		return ret;
 		
+		
 	}
+
 	
 	/**
 	 * Displays a FastGraph onscreen for the user
