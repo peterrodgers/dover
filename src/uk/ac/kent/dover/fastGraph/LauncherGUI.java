@@ -1,5 +1,8 @@
 package uk.ac.kent.dover.fastGraph;
 
+import org.cytoscape.gedevo.GedevoNative;
+import org.cytoscape.gedevo.UserSettings;
+
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
@@ -646,11 +649,23 @@ public class LauncherGUI extends JFrame {
                                 FastGraph g2 = launcher.loadFromBuffers(null, g2String);
                                 System.out.println("Loaded graphs as dover.FastGraph");
 
-                                Network g1Network = Util.fastGraphToNetwork(g1);
-                                Network g2Network = Util.fastGraphToNetwork(g2);
-                                System.out.println("Created gedevo Network objects of graphs");
+                                Network g1Network = Util.fastGraphToNetwork(g1, "Graph One");
+                                Network g2Network = Util.fastGraphToNetwork(g2, "Graph Two");
+                                System.out.println("Created gedevo Network objects from graphs");
 
-                            } catch (IOException e) {
+                                UserSettings userSettings = new UserSettings();
+                                GedevoNative.Instance instance = GedevoNative.Instance.create(userSettings);
+                                System.out.println("Instance created");
+
+                                if (instance.importNetwork(g1Network, 0) && instance.importNetwork(g2Network, 1)) {
+                                    System.out.println("Networks imported into instance");
+                                }
+                                else {
+                                    System.out.println("ERROR. Networks not imported into instance");
+                                }
+
+                            }
+                            catch (IOException e) {
                                 e.printStackTrace();
                             }
                         }

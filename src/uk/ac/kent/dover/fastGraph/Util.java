@@ -1,5 +1,9 @@
 package uk.ac.kent.dover.fastGraph;
 
+import org.cytoscape.gedevo.simplenet.Edge;
+import org.cytoscape.gedevo.simplenet.Graph;
+import org.cytoscape.gedevo.simplenet.Node;
+
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -305,18 +309,32 @@ public class Util {
 		return list.subList(start, end);
 	}
 
-	public static Network fastGraphToNetwork(FastGraph fastgraph) {
+	public static Network fastGraphToNetwork(FastGraph fastgraph, String name) {
 		int numEdges = fastgraph.getNumberOfEdges();
 		int[] src = new int[numEdges];
 		int[] dst = new int[numEdges];
-		String[] names = new String[numEdges];
+		Edge[] cytoedges = new Edge[numEdges];
+		Node[] cytonodes = new Node[fastgraph.getNumberOfNodes()];
 
 		for (int i=0; i < numEdges; i++) {
-			src[i] = fastgraph.getEdgeNode1(i);
-			dst[i] = fastgraph.getEdgeNode2(i);
-			names[i] = "PLACEHOLDER";
+			int srcInt = fastgraph.getEdgeNode1(i);
+			int dstInt = fastgraph.getEdgeNode2(i);
+			src[i] = srcInt;
+			dst[i] = dstInt;
+			cytoedges[i] = new Edge(srcInt, dstInt, false);
 		}
 
-		return Network.createFromArrays(names, src, dst);
+		for(int i=0; i < fastgraph.getNumberOfNodes(); i++) {
+			cytonodes[i] = new Node(i, fastgraph.getNodeLabel(i));
+		}
+
+		// This is a graph from the cytogedevo library, not this one
+		Graph cytograph = new Graph(name);
+		cytograph.eSrc = src;
+		cytograph.eDst = dst;
+		cytograph.nodes = cytonodes;
+		cytograph.edges = cytoedges;
+
+		return Network.convertToNative(cytograph);
 	}
 }
