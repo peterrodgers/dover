@@ -195,7 +195,7 @@ public class LauncherGUI extends JFrame {
 		
 		JMenuItem data = new JMenuItem("Get More Data");
 		data.getAccessibleContext().setAccessibleDescription("Allows the user to get more data");
-		data.addActionListener(new GetDataActionListener());
+		data.addActionListener(new GetDataActionListener(launcher,panel));
 		dataMenu.add(data);
 		
 		menuBar.add(dataMenu);
