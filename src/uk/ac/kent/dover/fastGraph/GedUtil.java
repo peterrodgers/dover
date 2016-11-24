@@ -72,17 +72,19 @@ public class GedUtil {
 		final AlignmentTaskData alignmentTaskData = new AlignmentTaskData(userSettings);
 
 		alignmentTaskData.instance = GedevoNative.Instance.create(alignmentTaskData.settings);
+		alignmentTaskData.instance.importNetwork(g1Network, 0);
+		alignmentTaskData.instance.importNetwork(g2Network, 1);
+		alignmentTaskData.graphs = new Graph[]{cytog1, cytog2};
+		alignmentTaskData.cynet = null;
+
 		alignmentTaskData.instance.init1();
 		alignmentTaskData.instance.init2();
-//		alignmentTaskData.instance.importNetwork(g1Network, 0);
-//		alignmentTaskData.instance.importNetwork(g2Network, 1);
-//		alignmentTaskData.graphs = new Graph[]{cytog1, cytog2};
-//		alignmentTaskData.cynet = null;
+
 		alignmentTaskData.instance.fillAlignmentInfo(0, alignmentTaskData.info);
-		alignmentTaskData.instance.update(1);
+		alignmentTaskData.instance.update(100);
 
-		return "GED score goes here";
+		alignmentTaskData.instance.shutdown();
+
+		return alignmentTaskData.info.toString();
 	}
-
-
 }
