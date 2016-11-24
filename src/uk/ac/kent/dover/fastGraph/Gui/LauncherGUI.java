@@ -74,7 +74,7 @@ import javax.swing.UIManager;
 @SuppressWarnings("serial")
 public class LauncherGUI extends JFrame {
 	
-	private final String DEFAULT_STATUS_MESSAGE = "Ready"; //The default message displayed to a user
+	public static final String DEFAULT_STATUS_MESSAGE = "Ready"; //The default message displayed to a user
 	
 	private Launcher launcher;
 	private DefaultListModel model = new DefaultListModel();
@@ -135,7 +135,7 @@ public class LauncherGUI extends JFrame {
 		// Builds the Tabbed area
 		JTabbedPane tabbedPane = new JTabbedPane();
 		
-		JPanel motifPanel = buildMotifTab(progressBar);
+		JPanel motifPanel = buildMotifTab(graphList, progressBar, statusBar);
 		tabbedPane.addTab("Motif", motifPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
@@ -186,12 +186,7 @@ public class LauncherGUI extends JFrame {
 		
 		JMenuItem exit = new JMenuItem("Exit");
 		exit.getAccessibleContext().setAccessibleDescription("Exit the program");
-		exit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent evt) {
-				System.exit(0);	
-			}
-		});
+		exit.addActionListener(new ExitActionListener());
 		fileMenu.add(exit);
 		
 		menuBar.add(fileMenu);
@@ -200,17 +195,7 @@ public class LauncherGUI extends JFrame {
 		
 		JMenuItem data = new JMenuItem("Get More Data");
 		data.getAccessibleContext().setAccessibleDescription("Allows the user to get more data");
-		data.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent evt) {
-		        try {
-		            Desktop.getDesktop().browse(new URI(launcher.DATA_URL));
-		        } catch(Exception e) {
-		        	JOptionPane.showMessageDialog(panel, "Browser loading is not supported. \nInstead, please visit:\n" + launcher.DATA_URL, "Browser Loading not supported", JOptionPane.WARNING_MESSAGE);
-		            e.printStackTrace();
-		        }
-			}
-		});
+		data.addActionListener(new GetDataActionListener());
 		dataMenu.add(data);
 		
 		menuBar.add(dataMenu);
@@ -249,8 +234,9 @@ public class LauncherGUI extends JFrame {
 	 * @param progressBar The main progress bar
 	 * @return The Motif Tab
 	 */
-	private JPanel buildMotifTab(JProgressBar progressBar) {
+	private JPanel buildMotifTab(JList graphList, JProgressBar progressBar, JPanel statusBar) {
 		JPanel motifPanel = new JPanel(new GridBagLayout());
+		JLabel status = (JLabel) statusBar.getComponent(0);
 		
 		JLabel infoLabel = new JLabel("Find and export motifs", SwingConstants.CENTER);
 		JLabel minLabel = new JLabel("Min Size: ");
@@ -268,10 +254,13 @@ public class LauncherGUI extends JFrame {
 		smallProgress.setStringPainted(true);
 		smallProgress.setString("");
 		
-		motifBtn.addActionListener(new MotifActionListener(launcher, this, minInput, maxInput, motifPanel, bigProgress));
+		//add an action when the user clickes this button
+		//in an external class, so needs lots(!) of parameters
+		motifBtn.addActionListener(new MotifActionListener(launcher, this, minInput, maxInput, motifPanel, 
+				bigProgress, smallProgress, progressBar, status, graphList));
 		
 		GridBagConstraints c = new GridBagConstraints();
-		c.insets = new Insets(2,2,2,2);;
+		c.insets = new Insets(2,2,2,2);
 		c.fill = GridBagConstraints.HORIZONTAL;
 
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -362,23 +351,7 @@ public class LauncherGUI extends JFrame {
 		JButton openBtn = new JButton("Open File...");
 		
 		//The action for when the user chooses a file
-		openBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent evt) {
-				status.setText("Waiting for user response");
-			    //Handle open button action.
-			    if (evt.getSource() == openBtn) {
-			        int returnVal = fileChooser.showOpenDialog(convertPanel);
-	
-			        if (returnVal == JFileChooser.APPROVE_OPTION) {
-			            File file = fileChooser.getSelectedFile();
-			            fileLabel.setText(file.getName());
-			            fileLabel.setFont(new Font(fileLabel.getFont().getFontName(), Font.PLAIN, fileLabel.getFont().getSize()));
-			        }
-			   }
-			   status.setText(DEFAULT_STATUS_MESSAGE);
-			}
-		});
+		openBtn.addActionListener(new LoadFileActionListener(status, fileLabel, fileChooser, convertPanel, openBtn));
 		
 		JLabel nodeLabel = new JLabel("Number of Nodes:");
 		JTextField nodeField = new JTextField(12);
@@ -474,54 +447,8 @@ public class LauncherGUI extends JFrame {
 		otherPanel.add(selectedBtn, BorderLayout.WEST);
 		
 		//The action for when the use selected the 
-		selectedBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent evt) {
-				String graph = (String) graphList.getSelectedValue();
-				if (graph != null) {
-					System.out.println(graph);
-					
-					//set the Progress Bar to move
-					progressBar.setIndeterminate(true);
-					status.setText("Loading...");
-
-					// Start loading the Graph, but in a separate thread, to avoid locking up the GUI
-					Thread thread = new Thread(new Runnable() {
-
-					    @Override
-					    public void run() {
-					    	
-					    	//Display error message to the user if this is unavailable
-							try {
-								FastGraph g = launcher.loadFromBuffers(null,graph);
-								status.setText("Loading Complete");
-						    	System.out.println("Maximum Degree: " + g.maximumDegree());
-						    	System.out.println("Degree Counts: " + Arrays.toString(g.countInstancesOfNodeDegrees(5)));
-						    	
-						    	//stop the Progress Bar
-						    	progressBar.setIndeterminate(false);
-							} catch (IOException e) {
-								//stop the Progress Bar
-								progressBar.setIndeterminate(false);
-								JOptionPane.showMessageDialog(otherPanel, "This buffer could not be found. \n" + e.getMessage(), "Error: IOException", JOptionPane.ERROR_MESSAGE);
-								
-								e.printStackTrace();
-							}
-
-					    }
-					            
-					});					        
-					thread.start();
-					
-				} else {
-					JOptionPane.showMessageDialog(otherPanel, "Please select a target graph", "No target graph selected", JOptionPane.ERROR_MESSAGE);
-				}
+		selectedBtn.addActionListener(new OtherActionListener(graphList, progressBar, status, launcher, otherPanel));
 				
-				
-			}
-		});
-		
-		
 		otherPanel.add(new JLabel("more text"), BorderLayout.EAST);
 		return otherPanel;
 	}

@@ -8,6 +8,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 import javax.swing.text.html.parser.TagElement;
@@ -17,6 +19,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.parser.Tag;
 
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
+import uk.ac.kent.dover.fastGraph.Gui.MotifTask;
 
 public class ExactMotifFinder {
 	
@@ -28,6 +31,7 @@ public class ExactMotifFinder {
 	private static HashMap<String,LinkedList<IsoHolder>> hashBuckets;
 	
 	private FastGraph g;
+	private MotifTask mt = null;
 	private EnumerateSubgraphNeighbourhood enumerator;
 	private EnumerateSubgraphRandom enumeratorRandom;
 	private HashSet<FastGraph> subgraphs; // subgraphs found by the enumerator
@@ -144,14 +148,24 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		ExactIsomorphism.reportFailRatios();
 		ExactIsomorphism.reportTimes();
 	}
-	
+
 	/**
 	 * 
 	 * @param g the FastGraph to find motifs in
 	 * @param numOfNodes the number of nodes in each motif
 	 */
 	public ExactMotifFinder(FastGraph g) {
+		this(g,null);
+	}
+	
+	/**
+	 * 
+	 * @param g the FastGraph to find motifs in
+	 * @param mf The MotifTask to report progress to
+	 */
+	public ExactMotifFinder(FastGraph g, MotifTask mt) {
 		this.g = g;
+		this.mt = mt;
 		//enumerator = new EnumerateSubgraphFanmod(g);
 		enumerator = new EnumerateSubgraphNeighbourhood(g);
 		enumeratorRandom = new EnumerateSubgraphRandom(g);
@@ -195,6 +209,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	public void findAndExportAllMotifs(int rewiresNeeded, int minSize, int maxSize, int motifSampling, boolean referenceSet) throws IOException {
 		long time = Debugger.createTime();
 		
+		mt.publish(0,"Finding Motifs", false);
 		
 		HashMap<String,LinkedList<IsoHolder>> hashBuckets = new HashMap<String,LinkedList<IsoHolder>>(g.getNumberOfNodes());
 		//HashMap<String,LinkedList<FastGraph>> isoLists = new HashMap<String,LinkedList<FastGraph>>();
@@ -238,6 +253,11 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 			Debugger.log("#TOTAL SIZE: "+totalSize);
 			//export the motifs
 
+			if(referenceSet) {
+				mt.publish(33, "Saving Reference Set", 0, "");	
+			} else {
+				mt.publish(66, "Saving Main Set", 0, "");	
+			}
 			
 			//build the output file, and if needed, save the motif buffers
 			StringBuilder sb = new StringBuilder();
@@ -246,24 +266,29 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 			for(String key : hashBuckets.keySet()) {
 				LinkedList<IsoHolder> holders = hashBuckets.get(key);
 				int count = 1;
+				outputCounter++;
+				
+				int outputPercentage = (int) ( ((double) outputCounter/hashBuckets.size())*100);
+				mt.publish(outputPercentage, "Saving motif " + outputCounter + " of " + hashBuckets.size(),false);
+				
 				for (IsoHolder holder : holders) {
 			//		Debugger.log("    "+holder.getKey() + " num: " + holder.getNumber() + " total: " + totalSize);
 					double percentage = ((double) holder.getNumber()/totalSize)*100;
 					sb.append(key+"-"+count+"\t"+holder.getNumber() + "\t" + String.format( "%.10f", percentage ) +"\n");
 					
 					//save buffer
-					if(referenceSet) {
+					//if(referenceSet) {
 						FastGraph gOut = holder.getGraph();
 						gOut.setName(key+"-"+count);
 						gOut.saveBuffers("motifs"+File.separatorChar+graphName+File.separatorChar+key+"-"+count, key+"-"+count);
 						
 						//save SVG
 						exportSVG(holder,count);
-					}
+					//}
 
 					count++;
 				}
-				outputCounter++;
+				
 				if(outputCounter % 1000 == 0) {
 					Debugger.outputTime("Saved "+outputCounter+" so far, out of " + hashBuckets.size() + " in ", outputTime);
 				}
@@ -315,11 +340,16 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 			}
 		} else {
 			for (int i = 0; i < rewiresNeeded; i++) {
+				int rewirePercentage = (int) ((double) i / rewiresNeeded)*100;
+				mt.publish(rewirePercentage, "Rewiring "+i+" out of "+rewiresNeeded+" times",false);	
 				Debugger.log("    rewiring for the "+i+" time");
-				FastGraph newGraph = currentGraph.generateRandomRewiredGraph(10,1);
+				FastGraph newGraph = currentGraph.generateRandomRewiredGraph(10,1); //TODO change this?
 				ExactMotifFinder emf = new ExactMotifFinder(newGraph);
 				Debugger.log("    finding motifs");
 				for(int j = minSizeOfMotifs; j <= maxSizeOfMotifs; j++) {
+					
+					mt.publish(rewirePercentage, "Finding motifs sized "+j+" ("+i+"/"+rewiresNeeded+")",false);	
+					
 					emf.findMotifs(j, 0, hashBuckets);
 					HashMap<String,IsoHolder> newIsoLists = emf.extractGraphLists(hashBuckets);
 					Debugger.log("    merging lists");
@@ -421,17 +451,28 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * @throws IOException If there is a problem loading any of the files
 	 */
 	public void loadMotifsFromFiles(File logFile, File directory, HashMap<String,IsoHolder> isoLists, HashMap<String,LinkedList<IsoHolder>> hashBuckets) throws FileNotFoundException, IOException {
+		
+		int directories = (int) (Files.find(Paths.get(directory.toString()),1,(path, attributes) -> attributes.isDirectory()).count() - 1);
+		int i = 0;
+		
 		long time = Debugger.createTime();
 		try (BufferedReader br = new BufferedReader(new FileReader(logFile))) {
 		    String line;
 		    while ((line = br.readLine()) != null) {
+		    	i++;
+	    	
 		    	if(line.equals("\n") || line.equals("\r\n") || line.equals("")) {
 		    		continue;
 		    	}
+		    	
+		    	//update the GUI
+	    		int percent = (int) (((double) i / directories)*100);
+		    	mt.publish(percent, "Loading motif "+i+" of "+directories, false);
+		    	
 		    	String[] lineArr = line.split("\t");
-		    	//Debugger.log(directory.toString());
+		    	Debugger.log(directory.toString() + " file: " + lineArr[0]);
 		    	FastGraph h = FastGraph.loadBuffersGraphFactory(directory.toString()+File.separatorChar+lineArr[0], lineArr[0]);
-		    	//Debugger.log("num of nodes" + h.getNumberOfNodes());
+		    	Debugger.log("num of nodes" + h.getNumberOfNodes());
 		    	
 		    	String isoKey = lineArr[0];
 		    	int lastIndex = isoKey.lastIndexOf("-");
@@ -512,9 +553,14 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		
 		Debugger.log("length of motifResults" + motifResults.size());
 		
+		mt.publish(83, "Exporting Results", 0, "");
+		
 		int sample = 1000;
 		int numberOfPages = (int) Math.ceil((double) motifResults.size()/sample);
 		for(int i = 0; i < numberOfPages; i++) {
+			int pagePercentage = (int) (((double) i/numberOfPages)*100);
+			mt.publish(pagePercentage, "Exporting page "+i+" of "+numberOfPages, false);
+			
 			buildPage(i,numberOfPages,Util.subList(motifResults,i*sample, (i*sample)+sample));
 		}	
 		

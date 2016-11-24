@@ -23,16 +23,16 @@ import uk.ac.kent.dover.fastGraph.Launcher;
  */
 public class ConvertGraphActionListener implements ActionListener{
 
-	Launcher launcher;
-	LauncherGUI launcherGUI;
-	JTextField nodeField;
-	JTextField edgeField;
-	JFileChooser fileChooser;
-	JRadioButton directed;
-	DefaultListModel model;
-	JPanel convertPanel;
-	JProgressBar progressBar;
-	JLabel status;
+	private Launcher launcher;
+	private LauncherGUI launcherGUI;
+	private JTextField nodeField;
+	private JTextField edgeField;
+	private JFileChooser fileChooser;
+	private JRadioButton directed;
+	private DefaultListModel model;
+	private JPanel convertPanel;
+	private JProgressBar progressBar;
+	private JLabel status;
 	
 	/**
 	 * Trivial constructor

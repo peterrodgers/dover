@@ -3,8 +3,12 @@ package uk.ac.kent.dover.fastGraph;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 
+import uk.ac.kent.dover.fastGraph.ExactMotifFinder.IsoHolder;
 import uk.ac.kent.dover.fastGraph.Gui.LauncherGUI;
+import uk.ac.kent.dover.fastGraph.Gui.MotifTask;
 
 /**
  * Main class from which all the other functionality is called.
@@ -79,4 +83,41 @@ public class Launcher {
 		g1.saveBuffers(null,fileName);
 	}
 
+	
+	/**
+	 * Calls the method to find all motifs with the parameters given
+	 * 
+	 * @param mt The MotifTask to handle GUI updates
+	 * @param directory The directory of the graph to be loaded
+	 * @param fileBaseName The name of the graph to be loaded
+	 * @param minNum The minimum size of motifs
+	 * @param maxNum The maximum size of motifs
+	 * @throws IOException If the files cannot be loaded
+	 */
+	public void findMotifs(MotifTask mt, String directory, String fileBaseName, int minNum, int maxNum) throws IOException {
+		Debugger.enabled = true;
+		mt.publish(0, "Loading Buffers", 0, "");
+		mt.setSmallIndeterminate(true);
+		
+		FastGraph g2 = FastGraph.loadBuffersGraphFactory(directory, fileBaseName);
+		
+		mt.setSmallIndeterminate(false);	
+
+		
+		ExactMotifFinder emf = new ExactMotifFinder(g2,mt);
+		mt.publish(16, "Building Reference Set", 0, "");		
+		emf.findAndExportAllMotifs(10, minNum, maxNum, 0, true);
+		HashMap<String,LinkedList<IsoHolder>> referenceBuckets = emf.getHashBuckets();	
+		
+		mt.publish(50, "Building Main Set", 0, "");	
+		emf.findAndExportAllMotifs(0, minNum, maxNum, 0, false);
+		HashMap<String,LinkedList<IsoHolder>> realBuckets = emf.getHashBuckets();
+		
+		mt.publish(83, "Comparing Motif Sets", 0, "");
+		
+		emf.compareAndExportResults(referenceBuckets, realBuckets);
+		//emf.outputHashBuckets(referenceBuckets);
+		//Debugger.outputTime("Time total motif detection");
+		mt.publish(100, "Complete", 0, "");
+	}
 }
