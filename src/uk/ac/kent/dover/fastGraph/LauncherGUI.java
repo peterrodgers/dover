@@ -643,6 +643,8 @@ public class LauncherGUI extends JFrame {
                         try {
                             g1 = launcher.loadFromBuffers(null, g1String);
                             g2 = launcher.loadFromBuffers(null, g2String);
+                            System.out.println("Created dover graphs");
+
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
