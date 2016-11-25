@@ -95,12 +95,10 @@ public class Launcher {
 	 * @throws IOException If the files cannot be loaded
 	 */
 	public void findMotifs(MotifTask mt, String directory, String fileBaseName, int minNum, int maxNum) throws IOException {
-		Debugger.enabled = true;
 		mt.publish(0, "Loading Buffers", 0, "");
 		mt.setSmallIndeterminate(true);
-		
 		FastGraph g2 = FastGraph.loadBuffersGraphFactory(directory, fileBaseName);
-		
+			
 		mt.setSmallIndeterminate(false);	
 
 		
@@ -117,7 +115,7 @@ public class Launcher {
 		
 		emf.compareAndExportResults(referenceBuckets, realBuckets);
 		//emf.outputHashBuckets(referenceBuckets);
-		//Debugger.outputTime("Time total motif detection");
+		Debugger.outputTime("Time total motif detection");
 		mt.publish(100, "Complete", 0, "");
 	}
 }

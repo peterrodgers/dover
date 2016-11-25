@@ -67,7 +67,7 @@ public class MotifActionListener implements ActionListener {
 			String graph = (String) graphList.getSelectedValue();
 			if(graph != null) {
 				//create a Task that will run the motif code and provide updates
-				MotifTask task = new MotifTask(launcher, bigProgress, smallProgress, graph, minNumber, maxNumber, progressBar, statusBar);
+				MotifTask task = new MotifTask(launcher, bigProgress, smallProgress, graph, minNumber, maxNumber, progressBar, statusBar, motifPanel);
 				task.execute();
 			} else {
 				JOptionPane.showMessageDialog(motifPanel, "Please select a target graph", "No target graph selected", JOptionPane.ERROR_MESSAGE);

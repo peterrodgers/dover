@@ -1,10 +1,14 @@
 package uk.ac.kent.dover.fastGraph.Gui;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
@@ -30,6 +34,7 @@ public class MotifTask extends SwingWorker<Void, Progress> {
 	private int minSize, maxSize;
 	private JLabel status;
 	private Progress lastProgress;
+	private JPanel motifPanel;
 	
 	/**
 	 * Trivial constructor
@@ -42,9 +47,10 @@ public class MotifTask extends SwingWorker<Void, Progress> {
 	 * @param maxSize The maximum number of nodes in a motif
 	 * @param progressBar The main window's progress bar
 	 * @param status The main window's status bar
+	 * @param motifPanel The panel to attach errors to
 	 */
 	public MotifTask(Launcher launcher, JProgressBar bigProgress, JProgressBar smallProgress, String graph, int minSize, int maxSize,
-			JProgressBar progressBar, JLabel status) {
+			JProgressBar progressBar, JLabel status, JPanel motifPanel) {
 		this.launcher = launcher;
 		this.bigProgress = bigProgress;
 		this.smallProgress = smallProgress;
@@ -52,7 +58,8 @@ public class MotifTask extends SwingWorker<Void, Progress> {
 		this.minSize = minSize;
 		this.maxSize = maxSize;
 		this.progressBar = progressBar;
-		this.status = status;		
+		this.status = status;
+		this.motifPanel = motifPanel;
 	}
 	
 
@@ -130,6 +137,15 @@ public class MotifTask extends SwingWorker<Void, Progress> {
 	protected void done() {
 		progressBar.setIndeterminate(false);
 		status.setText(LauncherGUI.DEFAULT_STATUS_MESSAGE);
+		String url = "file:///"+launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graph+File.separatorChar+"index.html";
+		url = url.replace("\\", "/");
+		try {
+            Desktop.getDesktop().browse(new URI(url));
+        } catch(Exception e) {
+        	JOptionPane.showMessageDialog(motifPanel, "Exporting complete. \nOutput file is sotred in motif/graphName/index.html \n", "Motif finding complete", JOptionPane.INFORMATION_MESSAGE);
+            e.printStackTrace();
+        }
+		
 	}
 
 	/**
