@@ -101,6 +101,7 @@ public class GedUtil {
 
 		alignmentTaskData.instance.shutdown();
 
+
 		System.out.println("Alignment finished");
 
 		return alignmentTaskData.info.toString();
