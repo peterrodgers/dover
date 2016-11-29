@@ -1,0 +1,5 @@
+.idea/
+*.jar
+data/test/
+motifs/
+bin/
