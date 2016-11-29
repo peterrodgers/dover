@@ -1,17 +1,10 @@
 package uk.ac.kent.dover.fastGraph.Gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Toolkit;
+import uk.ac.kent.dover.fastGraph.FastGraph;
+import uk.ac.kent.dover.fastGraph.GedUtil;
+import uk.ac.kent.dover.fastGraph.Launcher;
+import uk.ac.kent.dover.fastGraph.Util;
+
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
@@ -19,55 +12,11 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultListModel;
-import javax.swing.BorderFactory;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
-
-import uk.ac.kent.dover.fastGraph.FastGraph;
-import uk.ac.kent.dover.fastGraph.Launcher;
-import uk.ac.kent.dover.fastGraph.Util;
-
-import javax.swing.border.EtchedBorder;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JRadioButton;
-import javax.swing.JSeparator;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingWorker;
-import javax.swing.UIManager;
 
 /**
  * This class handles all the GUI for the main Launcher.
@@ -144,18 +93,22 @@ public class LauncherGUI extends JFrame {
 		tabbedPane.addTab("Motif", motifPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
-        JPanel patternPanel = buildPatternTab();
-        tabbedPane.addTab("Pattern", patternPanel);
-        tabbedPane.setMnemonicAt(0, KeyEvent.VK_2);
+		JPanel patternPanel = buildPatternTab();
+		tabbedPane.addTab("Pattern", patternPanel);
+		tabbedPane.setMnemonicAt(0, KeyEvent.VK_2);
 
-        JPanel convertPanel = buildConvertTab(graphList, progressBar, statusBar);
-        tabbedPane.addTab("Convert Graph", convertPanel);
-        tabbedPane.setMnemonicAt(0, KeyEvent.VK_3);
+		JPanel convertPanel = buildConvertTab(graphList, progressBar, statusBar);
+		tabbedPane.addTab("Convert Graph", convertPanel);
+		tabbedPane.setMnemonicAt(0, KeyEvent.VK_3);
 
 		JPanel otherPanel = buildOtherTab(graphList, progressBar, statusBar);
 		tabbedPane.addTab("Others", otherPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_4);
-		
+
+		JPanel gedPanel = buildGedTab(graphList, progressBar, statusBar);
+		tabbedPane.addTab("GED", gedPanel);
+		tabbedPane.setMnemonicAt(0, KeyEvent.VK_5);
+
 		blackline = BorderFactory.createLineBorder(Color.black);
 		titled = BorderFactory.createTitledBorder(blackline, "Task");
 		titled.setTitleJustification(TitledBorder.LEFT);
@@ -486,415 +439,117 @@ public class LauncherGUI extends JFrame {
 			return -1;
 		} 
 	}
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridwidth = 3;
-        c.gridheight = 1;
-        c.gridx = 0;
-        c.gridy = 4;
-        motifPanel.add(bigProgress, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridwidth = 3;
-        c.gridheight = 1;
-        c.gridx = 0;
-        c.gridy = 5;
-        motifPanel.add(smallProgress, c);
-        return motifPanel;
-    }
-
-    /**
-     * Builds the Panel used to house the GUI elements for the Pattern Tab
-     *
-     * @return The Pattern Tab
-     */
-    private JPanel buildPatternTab() {
-        JPanel patternPanel = new JPanel(new BorderLayout());
-        patternPanel.add(new JButton("Button"), BorderLayout.WEST);
-        return patternPanel;
-    }
-
-    /**
-     * Builds the Panel used to house the GUI elements for the Pattern Tab
-     *
-     * @return The Pattern Tab
-     */
-    private JPanel buildConvertTab(JList graphList, JProgressBar progressBar, JPanel statusBar) {
-        JLabel status = (JLabel) statusBar.getComponent(0);
-        JLabel label = new JLabel("Convert from adjacency list to buffers");
-        JLabel fileLabel = new JLabel("No file selected");
-        fileLabel.setFont(new Font(fileLabel.getFont().getFontName(), Font.ITALIC, fileLabel.getFont().getSize()));
-
-        //Panel used to house the two buttons
-        JPanel convertPanel = new JPanel(new GridBagLayout());
-
-        JFileChooser fileChooser = new JFileChooser();
-        JButton openBtn = new JButton("Open File...");
-
-        //The action for when the user chooses a file
-        openBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                status.setText("Waiting for user response");
-                //Handle open button action.
-                if (evt.getSource() == openBtn) {
-                    int returnVal = fileChooser.showOpenDialog(convertPanel);
-
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        File file = fileChooser.getSelectedFile();
-                        fileLabel.setText(file.getName());
-                        fileLabel.setFont(new Font(fileLabel.getFont().getFontName(), Font.PLAIN, fileLabel.getFont().getSize()));
-                    }
-                }
-                status.setText(DEFAULT_STATUS_MESSAGE);
-            }
-        });
-
-        JLabel nodeLabel = new JLabel("Number of Nodes:");
-        JTextField nodeField = new JTextField(12);
-
-        JLabel edgeLabel = new JLabel("Number of Edges:");
-        JTextField edgeField = new JTextField(12);
-
-        JRadioButton undirected = new JRadioButton("Undirected");
-        undirected.setSelected(true);
-        JRadioButton directed = new JRadioButton("Directed");
-        ButtonGroup group = new ButtonGroup();
-        group.add(undirected);
-        group.add(directed);
-
-        JButton convertBtn = new JButton("Convert");
-
-        //The action for when the user converts a file
-        convertBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                //check that the numbers of nodes are valid
-
-                int nodeNumber = checkForPositiveInteger(nodeField.getText(), convertPanel);
-                int edgeNumber = checkForPositiveInteger(edgeField.getText(), convertPanel);
-                if (nodeNumber != -1 && edgeNumber != -1) {
-                    //input numbers are valid
-
-                    //if the undirected button is selected, then the graph is undirected
-                    boolean directedGraph = directed.isSelected();
-                    File graphFile = fileChooser.getSelectedFile();
-                    String name = graphFile.getName();
-                    String path = fileChooser.getCurrentDirectory().toString();
-
-                    System.out.println(fileChooser.getSelectedFile());
-                    System.out.println("path: " + fileChooser.getCurrentDirectory());
-                    System.out.println("node: " + nodeNumber);
-                    System.out.println("edge: " + edgeNumber);
-                    System.out.println("directed: " + directedGraph);
-
-                    //set the Progress Bar to move
-                    progressBar.setIndeterminate(true);
-                    status.setText("Converting...");
-
-                    // Start converting the Graph, but in a separate thread, to avoid locking up the GUI
-                    Thread thread = new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-
-                            //Display error message to the user if this is unavailable
-                            try {
-
-                                launcher.convertGraphToBuffers(nodeNumber, edgeNumber, path, name, directedGraph);
-
-                                status.setText("Conversion Complete");
-                                model.addElement(name);
-                                //stop the Progress Bar
-                                progressBar.setIndeterminate(false);
-                            } catch (Exception e) {
-                                //stop the Progress Bar
-                                progressBar.setIndeterminate(false);
-                                JOptionPane.showMessageDialog(convertPanel, "This buffer could not be built. \n" + e.getMessage(), "Error: Exception", JOptionPane.ERROR_MESSAGE);
-
-                                e.printStackTrace();
-                            }
-
-                        }
-
-                    });
-                    thread.start();
-
-                }
-            }
-        });
-
-        GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(2, 2, 2, 2);
-        c.fill = GridBagConstraints.HORIZONTAL;
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 0;
-        c.gridy = 0;
-        c.gridwidth = 3;
-        convertPanel.add(label, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridwidth = 1;
-        c.gridx = 0;
-        c.gridy = 1;
-        convertPanel.add(openBtn, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 1;
-        c.gridy = 1;
-        convertPanel.add(fileLabel, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 0;
-        c.gridy = 2;
-        convertPanel.add(nodeLabel, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 1;
-        c.gridy = 2;
-        convertPanel.add(nodeField, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 0;
-        c.gridy = 3;
-        convertPanel.add(edgeLabel, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 1;
-        c.gridy = 3;
-        convertPanel.add(edgeField, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 0;
-        c.gridy = 4;
-        convertPanel.add(undirected, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 1;
-        c.gridy = 4;
-        convertPanel.add(directed, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 0;
-        c.gridy = 5;
-        c.gridwidth = 2;
-        convertPanel.add(convertBtn, c);
-
-        return convertPanel;
-    }
-
-    /**
-     * Builds the Panel used to house the GUI elements for the Pattern Tab
-     *
-     * @param graphList   The JList element used to select which is the target graph
-     * @param progressBar The JProgressBar to update when loading a graph
-     * @return the Other tab
-     */
-    private JPanel buildOtherTab(JList graphList, JProgressBar progressBar, JPanel statusBar) {
-        JPanel otherPanel = new JPanel(new BorderLayout());
-        JLabel status = (JLabel) statusBar.getComponent(0);
-
-        JButton selectedBtn = new JButton("Node Count");
-        otherPanel.add(selectedBtn, BorderLayout.WEST);
-
-        //The action for when the use selected the
-        selectedBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                String graph = (String) graphList.getSelectedValue();
-                if (graph != null) {
-                    System.out.println(graph);
-
-                    //set the Progress Bar to move
-                    progressBar.setIndeterminate(true);
-                    status.setText("Loading...");
 
-                    // Start loading the Graph, but in a separate thread, to avoid locking up the GUI
-                    Thread thread = new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-
-                            //Display error message to the user if this is unavailable
-                            try {
-                                FastGraph g = launcher.loadFromBuffers(null, graph);
-                                status.setText("Loading Complete");
-                                System.out.println("Maximum Degree: " + g.maximumDegree());
-                                System.out.println("Degree Counts: " + Arrays.toString(g.countInstancesOfNodeDegrees(5)));
-
-                                //stop the Progress Bar
-                                progressBar.setIndeterminate(false);
-                            } catch (IOException e) {
-                                //stop the Progress Bar
-                                progressBar.setIndeterminate(false);
-                                JOptionPane.showMessageDialog(otherPanel, "This buffer could not be found. \n" + e.getMessage(), "Error: IOException", JOptionPane.ERROR_MESSAGE);
-
-                                e.printStackTrace();
-                            }
-
-                        }
-
-                    });
-                    thread.start();
-
-                } else {
-                    JOptionPane.showMessageDialog(otherPanel, "Please select a target graph", "No target graph selected", JOptionPane.ERROR_MESSAGE);
-                }
-
-
-            }
-        });
-
-
-        otherPanel.add(new JLabel("more text"), BorderLayout.EAST);
-        return otherPanel;
-    }
-
-    /**
-     * Builds the Panel used to house the GUI elements for the Graph Edit Distance Tab
-     *
-     * @param graphList   The JList element used to select which is the target graph
-     * @param progressBar The JProgressBar to update when loading a graph
-     * @return the GED tab
-     */
-    private JPanel buildGedTab(JList graphList, JProgressBar progressBar, JPanel statusBar) {
-
-        JPanel gedPanel = new JPanel(new GridBagLayout());
-
-        // Set the layout
-        GridBagConstraints c = new GridBagConstraints();
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(2, 2, 2, 2);
-
-        JLabel graphOneLabel = new JLabel("Graph one:");
-
-        c.gridx = 0;
-        c.gridy = 0;
-        gedPanel.add(graphOneLabel, c);
-
-        JLabel graphTwoLabel = new JLabel("Graph two:");
-
-        c.gridx = 1;
-        c.gridy = 0;
-        gedPanel.add(graphTwoLabel, c);
-
-        JTextField graphOneTextField = new JTextField();
-        graphOneTextField.setEditable(false);
-
-        c.gridx = 0;
-        c.gridy = 1;
-        gedPanel.add(graphOneTextField, c);
-
-        JTextField graphTwoTextField = new JTextField();
-        graphTwoTextField.setEditable(false);
-
-        c.gridx = 1;
-        c.gridy = 1;
-        gedPanel.add(graphTwoTextField, c);
-
-        JButton selectGraphOne = new JButton("Set selected graph as graph one");
-
-        c.gridx = 0;
-        c.gridy = 2;
-        gedPanel.add(selectGraphOne, c);
-
-        JButton selectGraphTwo = new JButton("Set selected graph as graph two");
-
-        c.gridx = 1;
-        c.gridy = 2;
-        gedPanel.add(selectGraphTwo, c);
-
-        JButton getGedBtn = new JButton("Get GED of selected graphs");
-
-        c.gridx = 0;
-        c.gridy = 3;
-        c.gridwidth = 2;
-        gedPanel.add(getGedBtn, c);
-        // Layout finished
-
-        // Set behaviour
-        selectGraphOne.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                String selectedGraph = (String) graphList.getSelectedValue();
-                graphOneTextField.setText(selectedGraph);
-            }
-        });
-        selectGraphTwo.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                String selectedGraph = (String) graphList.getSelectedValue();
-                graphTwoTextField.setText(selectedGraph);
-            }
-        });
-
-        getGedBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                Thread thread = new Thread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        System.out.println("Click");
-                        String g1String = graphOneTextField.getText();
-                        String g2String = graphTwoTextField.getText();
-
-                        FastGraph g1 = null;
-                        FastGraph g2 = null;
-                        try {
-                            g1 = launcher.loadFromBuffers(null, g1String);
-                            g2 = launcher.loadFromBuffers(null, g2String);
-                            System.out.println("Created dover graphs");
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                        if (g1 != null && g2 != null) {
-                            System.out.println(GedUtil.getGedScore(g1, g2));
-                        }
-                    }
-                });
-                thread.start();
-            }
-        });
-
-        return gedPanel;
-    }
-
-
-    /**
-     * Builds the status bar - used for updating the user on small piece of information
-     *
-     * @return The fully built Status Bar
-     */
-
-    private JPanel buildStatusBar() {
-        JPanel statusPanel = new JPanel();
-        statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
-        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
-        JLabel statusLabel = new JLabel(DEFAULT_STATUS_MESSAGE);
-        statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
-        statusPanel.add(statusLabel);
-        return statusPanel;
-    }
-
-    /**
-     * Checks that a String is a positive integer
-     *
-     * @param input The input String to be tested
-     * @param panel The JPanel to attach the error Popup
-     * @return The converted integer, or -1 if failed.
-     */
-    private int checkForPositiveInteger(String input, JPanel panel) {
-        try {
-            int number = Util.checkForPositiveInteger(input);
-            return number;
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(panel, "Please enter a positive integer", "Invalid Input", JOptionPane.ERROR_MESSAGE);
-            return -1;
-        }
-    }
-
+	/**
+	 * Builds the Panel used to house the GUI elements for the Graph Edit Distance Tab
+	 *
+	 * @param graphList   The JList element used to select which is the target graph
+	 * @param progressBar The JProgressBar to update when loading a graph
+	 * @return the GED tab
+	 */
+	private JPanel buildGedTab(JList graphList, JProgressBar progressBar, JPanel statusBar) {
+
+		JPanel gedPanel = new JPanel(new GridBagLayout());
+
+		// Set the layout
+		GridBagConstraints c = new GridBagConstraints();
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.insets = new Insets(2, 2, 2, 2);
+
+		JLabel graphOneLabel = new JLabel("Graph one:");
+
+		c.gridx = 0;
+		c.gridy = 0;
+		gedPanel.add(graphOneLabel, c);
+
+		JLabel graphTwoLabel = new JLabel("Graph two:");
+
+		c.gridx = 1;
+		c.gridy = 0;
+		gedPanel.add(graphTwoLabel, c);
+
+		JTextField graphOneTextField = new JTextField();
+		graphOneTextField.setEditable(false);
+
+		c.gridx = 0;
+		c.gridy = 1;
+		gedPanel.add(graphOneTextField, c);
+
+		JTextField graphTwoTextField = new JTextField();
+		graphTwoTextField.setEditable(false);
+
+		c.gridx = 1;
+		c.gridy = 1;
+		gedPanel.add(graphTwoTextField, c);
+
+		JButton selectGraphOne = new JButton("Set selected graph as graph one");
+
+		c.gridx = 0;
+		c.gridy = 2;
+		gedPanel.add(selectGraphOne, c);
+
+		JButton selectGraphTwo = new JButton("Set selected graph as graph two");
+
+		c.gridx = 1;
+		c.gridy = 2;
+		gedPanel.add(selectGraphTwo, c);
+
+		JButton getGedBtn = new JButton("Get GED of selected graphs");
+
+		c.gridx = 0;
+		c.gridy = 3;
+		c.gridwidth = 2;
+		gedPanel.add(getGedBtn, c);
+		// Layout finished
+
+		// Set behaviour
+		selectGraphOne.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				String selectedGraph = (String) graphList.getSelectedValue();
+				graphOneTextField.setText(selectedGraph);
+			}
+		});
+		selectGraphTwo.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				String selectedGraph = (String) graphList.getSelectedValue();
+				graphTwoTextField.setText(selectedGraph);
+			}
+		});
+
+		getGedBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				Thread thread = new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						System.out.println("Click");
+						String g1String = graphOneTextField.getText();
+						String g2String = graphTwoTextField.getText();
+
+						FastGraph g1 = null;
+						FastGraph g2 = null;
+						try {
+							g1 = launcher.loadFromBuffers(null, g1String);
+							g2 = launcher.loadFromBuffers(null, g2String);
+							System.out.println("Created dover graphs");
+
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+
+						if (g1 != null && g2 != null) {
+							System.out.println(GedUtil.getGedScore(g1, g2));
+						}
+					}
+				});
+				thread.start();
+			}
+		});
+
+		return gedPanel;
+	}
 }
