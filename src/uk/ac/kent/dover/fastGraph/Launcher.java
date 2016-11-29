@@ -1,14 +1,13 @@
 package uk.ac.kent.dover.fastGraph;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-
+import org.cytoscape.gedevo.GedevoNativeUtil;
 import uk.ac.kent.dover.fastGraph.ExactMotifFinder.IsoHolder;
 import uk.ac.kent.dover.fastGraph.Gui.LauncherGUI;
 import uk.ac.kent.dover.fastGraph.Gui.MotifTask;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * Main class from which all the other functionality is called.
@@ -45,7 +44,8 @@ public class Launcher {
 		//System.out.println("Launched!");
 		//System.out.println(Arrays.toString(args));
 		//System.out.println(args.length);
-		
+
+		GedevoNativeUtil.initNativeLibs();
 		//if there are no arguments given, then load the GUI. Otherwise, load the command line interface
 		if (args.length == 0) {
 			new LauncherGUI(this);

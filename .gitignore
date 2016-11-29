@@ -1,5 +1,5 @@
 .idea/
-data/test/
+data/test*/
 motifs/
 bin/
 dover.jar
