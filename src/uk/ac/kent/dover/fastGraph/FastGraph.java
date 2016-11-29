@@ -124,7 +124,10 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(5,6,1,true);
 //		FastGraph g1 = randomGraphFactory(8,9,1,false);
 //		FastGraph g1 = randomGraphFactory(10,50,1,false);
-//		FastGraph g1 = randomGraphFactory(100,1000,1,false); // 1 hundred nodes, 1 thousand edges
+		for (int i = 0 ; i<10; i++) {
+			FastGraph g = randomGraphFactory(100, 1000, 1, false); // 1 hundred nodes, 1 thousand edges
+			g.saveBuffers("test" + i, g.getName());
+		}
 //		FastGraph g1 = randomGraphFactory(10000,100000,1,false); // 10 thousand nodes, 100 thousand edges
 //		FastGraph g1 = randomGraphFactory(100000,1000000,1,false); // 100 thousand nodes, 1 million edges
 //		FastGraph g1 = randomGraphFactory(1000000,10000000,1,false); // 1 million nodes, 10 million edges
@@ -157,133 +160,133 @@ public class FastGraph {
 String name = "Wiki-Vote.txt";
 //		String name = g1.getName();
 //		FastGraph g2 = g1;
-		try {
-			time = Debugger.createTime();
-			FastGraph g2 = loadBuffersGraphFactory(null,name);
-			//g2 = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
-			
-			Debugger.log("Connected: " + Connected.connected(g2));
-			
-			Debugger.log("Number of nodes: " + g2.getNumberOfNodes());
-			Debugger.log("Number of edges: " + g2.getNumberOfEdges());
-			
-			Debugger.resetTime();
-			
-			ExactMotifFinder emf = new ExactMotifFinder(g2);
-			emf.findAndExportAllMotifs(10, 4, 4, 0, true);
-			HashMap<String,LinkedList<IsoHolder>> referenceBuckets = emf.getHashBuckets();
-			emf.findAndExportAllMotifs(0, 4, 4, 0, false);
-			HashMap<String,LinkedList<IsoHolder>> realBuckets = emf.getHashBuckets();
-			emf.compareAndExportResults(referenceBuckets, realBuckets);
-//			emf.outputHashBuckets(realBuckets);
-			Debugger.outputTime("Time total motif detection");
-			
-/*
-			//ISO CHECK REWIRING
-			FastGraph g1 = FastGraph.randomGraphFactory(12,24,1,true,false);
-			FastGraph g2 = g1.generateRandomRewiredGraph(10, 1);
-			ExactIsomorphism em = new ExactIsomorphism(g1);
-			boolean iso = em.isomorphic(g2);
-			Debugger.log("g1 and g2 iso: " + iso);
-			
-			uk.ac.kent.displayGraph.Graph dg = g1.generateDisplayGraph();
-			dg.randomizeNodePoints(new Point(20,20),300,300);
-			uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg, true);
-			uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
-			GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
-			se.setAnimateFlag(false);
-			se.setIterations(100);
-			se.setTimeLimit(200);
-			se.setGraphPanel(gw.getGraphPanel());
-			se.layout();
-			
-			uk.ac.kent.displayGraph.Graph dg2 = g2.generateDisplayGraph();
-			dg2.randomizeNodePoints(new Point(20,20),300,300);
-			uk.ac.kent.displayGraph.display.GraphWindow gw2 = new uk.ac.kent.displayGraph.display.GraphWindow(dg2, true);
-			uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse2 = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
-			GraphDrawerSpringEmbedder se2 = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
-			se2.setAnimateFlag(false);
-			se2.setIterations(100);
-			se2.setTimeLimit(200);
-			se2.setGraphPanel(gw2.getGraphPanel());
-			se2.layout();
-	*/		
-			//EnumerateSubgraphFanmod es = new EnumerateSubgraphFanmod(g2);
-			//EnumerateSubgraphNeighbourhood es = new EnumerateSubgraphNeighbourhood(g2);
-			//HashSet<FastGraph> gs = es.enumerateSubgraphs(4,1,10);
-		//	HashSet<Integer> startingNodes = new HashSet<Integer>();
-		//	HashSet<Integer> nodes = new HashSet<Integer>();
-		//	startingNodes.add(5490);
-		//	Debugger.log("startingNodes: " + startingNodes);
-		//	Debugger.log("nodes: " + nodes);
-		//	es.buildNeighbourhood(startingNodes, nodes, 20);
-		//	Debugger.log("neighbourhood size: " + nodes.size());
-			
-		//	Debugger.outputTime("Time for enumeration");			
-		//	Debugger.log("number of subgraphs " + gs.size());	
-	/*		
-			time = Debugger.createTime();
-			LinkedList<Integer> nodes = new LinkedList<Integer>();
-			LinkedList<Integer> edges = new LinkedList<Integer>();
-			
-			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1500,100);
-			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1500000,10000000);
-			FastGraph g3 = g2;
-			
-			//Debugger.outputTime("deletion test time ");
-			
-			time = Debugger.createTime();
-			g3.relabelFastGraph(g3.getNumberOfNodes()/10);
-			Debugger.log("relabelling test time ");
-			//Debugger.log("deletion test time (from before) " + deletionTime+" seconds");
-			Debugger.outputTime("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
-	
-			time = Debugger.createTime();
-			g3.setName(g2.getName()+"-relabelled");
-			g3.saveBuffers(null,g3.getName());
-			Debugger.outputTime("saveBuffers test time ");
-				
-			FastGraph g4 = loadBuffersGraphFactory(null,g3.getName());
-			
-		//	Graph dg = g2.generateDisplayGraph();
-		//	boolean consistent = dg.consistent();
-		//	Debugger.log("consistent: " + consistent);
-			
-	*/		
-			//just for testing
-		//	Debugger.log();
-	/*		
-			Debugger.log("graph now has the labels (taken from the buffer):");
-			FastGraphNodeType[] ntypes = FastGraphNodeType.values();
-			for(int j = 0; j < g4.getNumberOfNodes(); j++) {
-				byte type = g4.getNodeType(j);
-				Debugger.log(g4.getNodeLabel(j) + " " + type + " (" + ntypes[type] + ")");
-			}
-			Debugger.log();
-			Debugger.log("edges now have the types (taken from the buffer):");
-			for(int j = 0; j < g4.getNumberOfEdges(); j++) {
-				byte type = g4.getEdgeType(j);
-				Debugger.log("n1" + g4.getEdgeNode1(j) + " n2" + g4.getEdgeNode2(j) + " type " + type + " (" + g4.getEdgeLabel(j) + ")");
-			}
-		*/	
-//			int[] degrees = g2.countInstancesOfNodeDegrees(4);
-//			Debugger.log(Arrays.toString(degrees));
-			
-	/*		
-			LinkedList<int[]> rewiring = new LinkedList<int[]>();
-			Random rand = new Random(78);
-			for(int i = 0; i < g2.numberOfEdges; i++) {
-				int[] r = {i,rand.nextInt(g2.getNumberOfNodes()),rand.nextInt(g2.getNumberOfNodes())};
-				rewiring.add(r);
-			}
-			FastGraph h = g2.generateRewiredGraph(rewiring);
-Debugger.log("g2 "+g2.checkConsistency());
-Debugger.log("h "+h.checkConsistency());
-*/
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			time = Debugger.createTime();
+//			FastGraph g2 = loadBuffersGraphFactory(null,name);
+//			//g2 = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
+//
+//			Debugger.log("Connected: " + Connected.connected(g2));
+//
+//			Debugger.log("Number of nodes: " + g2.getNumberOfNodes());
+//			Debugger.log("Number of edges: " + g2.getNumberOfEdges());
+//
+//			Debugger.resetTime();
+//
+//			ExactMotifFinder emf = new ExactMotifFinder(g2);
+//			emf.findAndExportAllMotifs(10, 4, 4, 0, true);
+//			HashMap<String,LinkedList<IsoHolder>> referenceBuckets = emf.getHashBuckets();
+//			emf.findAndExportAllMotifs(0, 4, 4, 0, false);
+//			HashMap<String,LinkedList<IsoHolder>> realBuckets = emf.getHashBuckets();
+//			emf.compareAndExportResults(referenceBuckets, realBuckets);
+////			emf.outputHashBuckets(realBuckets);
+//			Debugger.outputTime("Time total motif detection");
+//
+///*
+//			//ISO CHECK REWIRING
+//			FastGraph g1 = FastGraph.randomGraphFactory(12,24,1,true,false);
+//			FastGraph g2 = g1.generateRandomRewiredGraph(10, 1);
+//			ExactIsomorphism em = new ExactIsomorphism(g1);
+//			boolean iso = em.isomorphic(g2);
+//			Debugger.log("g1 and g2 iso: " + iso);
+//
+//			uk.ac.kent.displayGraph.Graph dg = g1.generateDisplayGraph();
+//			dg.randomizeNodePoints(new Point(20,20),300,300);
+//			uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg, true);
+//			uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
+//			GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
+//			se.setAnimateFlag(false);
+//			se.setIterations(100);
+//			se.setTimeLimit(200);
+//			se.setGraphPanel(gw.getGraphPanel());
+//			se.layout();
+//
+//			uk.ac.kent.displayGraph.Graph dg2 = g2.generateDisplayGraph();
+//			dg2.randomizeNodePoints(new Point(20,20),300,300);
+//			uk.ac.kent.displayGraph.display.GraphWindow gw2 = new uk.ac.kent.displayGraph.display.GraphWindow(dg2, true);
+//			uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse2 = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
+//			GraphDrawerSpringEmbedder se2 = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
+//			se2.setAnimateFlag(false);
+//			se2.setIterations(100);
+//			se2.setTimeLimit(200);
+//			se2.setGraphPanel(gw2.getGraphPanel());
+//			se2.layout();
+//	*/
+//			//EnumerateSubgraphFanmod es = new EnumerateSubgraphFanmod(g2);
+//			//EnumerateSubgraphNeighbourhood es = new EnumerateSubgraphNeighbourhood(g2);
+//			//HashSet<FastGraph> gs = es.enumerateSubgraphs(4,1,10);
+//		//	HashSet<Integer> startingNodes = new HashSet<Integer>();
+//		//	HashSet<Integer> nodes = new HashSet<Integer>();
+//		//	startingNodes.add(5490);
+//		//	Debugger.log("startingNodes: " + startingNodes);
+//		//	Debugger.log("nodes: " + nodes);
+//		//	es.buildNeighbourhood(startingNodes, nodes, 20);
+//		//	Debugger.log("neighbourhood size: " + nodes.size());
+//
+//		//	Debugger.outputTime("Time for enumeration");
+//		//	Debugger.log("number of subgraphs " + gs.size());
+//	/*
+//			time = Debugger.createTime();
+//			LinkedList<Integer> nodes = new LinkedList<Integer>();
+//			LinkedList<Integer> edges = new LinkedList<Integer>();
+//
+//			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1500,100);
+//			//FastGraph g3 = g2.removeNodesAndEdgesFromGraph(nodes,edges,1500000,10000000);
+//			FastGraph g3 = g2;
+//
+//			//Debugger.outputTime("deletion test time ");
+//
+//			time = Debugger.createTime();
+//			g3.relabelFastGraph(g3.getNumberOfNodes()/10);
+//			Debugger.log("relabelling test time ");
+//			//Debugger.log("deletion test time (from before) " + deletionTime+" seconds");
+//			Debugger.outputTime("New graph has: nodes: " + g3.getNumberOfNodes() + " and edges: " + g3.getNumberOfEdges());
+//
+//			time = Debugger.createTime();
+//			g3.setName(g2.getName()+"-relabelled");
+//			g3.saveBuffers(null,g3.getName());
+//			Debugger.outputTime("saveBuffers test time ");
+//
+//			FastGraph g4 = loadBuffersGraphFactory(null,g3.getName());
+//
+//		//	Graph dg = g2.generateDisplayGraph();
+//		//	boolean consistent = dg.consistent();
+//		//	Debugger.log("consistent: " + consistent);
+//
+//	*/
+//			//just for testing
+//		//	Debugger.log();
+//	/*
+//			Debugger.log("graph now has the labels (taken from the buffer):");
+//			FastGraphNodeType[] ntypes = FastGraphNodeType.values();
+//			for(int j = 0; j < g4.getNumberOfNodes(); j++) {
+//				byte type = g4.getNodeType(j);
+//				Debugger.log(g4.getNodeLabel(j) + " " + type + " (" + ntypes[type] + ")");
+//			}
+//			Debugger.log();
+//			Debugger.log("edges now have the types (taken from the buffer):");
+//			for(int j = 0; j < g4.getNumberOfEdges(); j++) {
+//				byte type = g4.getEdgeType(j);
+//				Debugger.log("n1" + g4.getEdgeNode1(j) + " n2" + g4.getEdgeNode2(j) + " type " + type + " (" + g4.getEdgeLabel(j) + ")");
+//			}
+//		*/
+////			int[] degrees = g2.countInstancesOfNodeDegrees(4);
+////			Debugger.log(Arrays.toString(degrees));
+//
+//	/*
+//			LinkedList<int[]> rewiring = new LinkedList<int[]>();
+//			Random rand = new Random(78);
+//			for(int i = 0; i < g2.numberOfEdges; i++) {
+//				int[] r = {i,rand.nextInt(g2.getNumberOfNodes()),rand.nextInt(g2.getNumberOfNodes())};
+//				rewiring.add(r);
+//			}
+//			FastGraph h = g2.generateRewiredGraph(rewiring);
+//Debugger.log("g2 "+g2.checkConsistency());
+//Debugger.log("h "+h.checkConsistency());
+//*/
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 
  		
 	}
