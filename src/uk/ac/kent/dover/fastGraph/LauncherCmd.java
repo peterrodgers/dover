@@ -1,14 +1,19 @@
 package uk.ac.kent.dover.fastGraph;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import uk.ac.kent.dover.fastGraph.Gui.MotifTaskDummy;
 
 /**
  * 
@@ -55,6 +60,11 @@ public class LauncherCmd {
 		options.addOption("e", "edges", true, "Number of edges in Adjacency Matrix to convert");
 		options.addOption("d", "directed", true, "Adjacency Matrix to convert is a directed graph");
 		
+		//add motif options
+		options.addOption("m","motif", true, "Find motifs in this graph. Requires minSize and maxSize.");
+		options.addOption(Option.builder().longOpt("minsize").desc("The minimum size of motif to find").hasArg().build());
+		options.addOption(Option.builder().longOpt("maxsize").desc("The maximum size of motif to find").hasArg().build());
+		
 		// add help option
 		options.addOption("h", "help", false, "Prints this message");
 		
@@ -79,53 +89,11 @@ public class LauncherCmd {
 			
 			//if the user wishes to convert an adjacency List
 			if(cmd.hasOption("c")) { 
-				if(cmd.hasOption("n") && cmd.hasOption("e") && cmd.hasOption("d")) {
-					String cVal = cmd.getOptionValue("c");
-					String eVal = cmd.getOptionValue("e");
-					String dVal = cmd.getOptionValue("d");
-					String nVal = cmd.getOptionValue("n");
-					
-					//ensure that the user has specified the arguments for these
-					if (cVal != null && eVal != null && dVal != null && nVal != null) {
-						
-						//ensure the node and egde inputs are valid
-						int nodes, edges;
-						try {
-							nodes = Util.checkForPositiveInteger(nVal);
-							edges = Util.checkForPositiveInteger(eVal);
-						} catch (NumberFormatException e) {
-							throw new ParseException("The values for n & e must be positive (or 0) integers");
-						}						
-						
-						//ensure the directed input is valid
-						boolean directed;
-						if(dVal.equals("true") || dVal.equals("True")) {
-							directed = true;
-						} else if(dVal.equals("false") || dVal.equals("False")) {
-							directed = false;
-						} else {
-							throw new ParseException("Directed input (d) must be true, True, false, False");
-						}
-						
-						//ensure the file is valid and readable
-						File f = new File(cVal);
-						if(f.isFile() && f.canRead()) {
-							String name = f.getName();
-							String path = f.getParent();							
-							
-							System.out.println("Converting graph. This may take some time....");
-							launcher.convertGraphToBuffers(nodes, edges, path, name, directed);
-							System.out.println("Conversion Complete");
-							
-						} else {
-							throw new ParseException("File does not exist, or is not readable");
-						}						
-					} else {
-						throw new ParseException("Converting requires the c, e, d, n all have arguments. See --help for details.");
-					}					
-				} else {
-					throw new ParseException("Converting requires e, d, n. See --help for details.");
-				}		
+				convert(cmd);
+				
+				//if the user is finding motifs
+			} else if(cmd.hasOption("m")){
+				motif(cmd);	
 				
 				//if the user is testing the command line
 			} else if(cmd.hasOption("t")) {
@@ -150,6 +118,122 @@ public class LauncherCmd {
 			System.err.println(e.getMessage());
 			System.exit(1);
 		}
+	}
+	
+	/**
+	 * Runs the motif finding code and checks that parameters are valid
+	 * @param cmd The CommandLine object that holds the user's input
+	 * @throws ParseException If there is an error with the user's input
+	 */
+	private void motif(CommandLine cmd) throws ParseException {
+		Option minFound = null;
+		Option maxFound = null;
+		for(Option o : cmd.getOptions()) {
+			if (o.getLongOpt().toLowerCase().equals("minsize")) {
+				minFound = o;
+			}
+			if (o.getLongOpt().toLowerCase().equals("maxsize")) {
+				maxFound = o;
+			}
+			if (minFound!=null && maxFound!=null) {
+				break;
+			}
+		}
+		
+		if(minFound!=null && maxFound!=null) {
+			String mVal = cmd.getOptionValue("m");
+			String minSizeVal = minFound.getValues()[0];
+			String maxSizeVal = maxFound.getValues()[0];
+			
+			//ensure that the user has specified the arguments for these
+			if (mVal != null && minSizeVal != null && maxSizeVal != null) {
+				//ensure the node and egde inputs are valid
+				int minSize, maxSize;
+				try {
+					minSize = Util.checkForPositiveInteger(minSizeVal);
+					maxSize = Util.checkForPositiveInteger(maxSizeVal);
+				} catch (NumberFormatException e) {
+					throw new ParseException("The values for minSize & maxSize must be positive (or 0) integers");
+				}
+				//ensure the file is valid and readable
+				File f = new File(mVal);
+				if(f.canRead()) {
+					String name = f.getName();
+					String path = f.getParent();							
+					System.out.println("Finding motifs. This may take some time....");
+					try {
+						launcher.findMotifs(new MotifTaskDummy(), path+File.separatorChar+name, name, minSize, maxSize);
+					} catch (IOException e) {
+						throw new ParseException("Error occurred: "+e.getMessage());
+					}
+					System.out.println("Motif finding Complete. Output has been exported");
+					
+				} else {
+					throw new ParseException("File does not exist, or is not readable");
+				}
+				
+			} else {
+				throw new ParseException("Motif finding requires the minSize, maxSize all have arguments. See --help for details.");
+			}
+			
+		} else {
+			throw new ParseException("Motif finding requires minSize, maxSize. See --help for details.");
+		}
+	}
+	
+	/**
+	 * Converts a graph
+	 * @param cmd The CommandLine function
+	 * @throws Exception If the graph cannot be loaded, or incorrect parameters
+	 */
+	private void convert(CommandLine cmd) throws Exception {
+		if(cmd.hasOption("n") && cmd.hasOption("e") && cmd.hasOption("d")) {
+			String cVal = cmd.getOptionValue("c");
+			String eVal = cmd.getOptionValue("e");
+			String dVal = cmd.getOptionValue("d");
+			String nVal = cmd.getOptionValue("n");
+			
+			//ensure that the user has specified the arguments for these
+			if (cVal != null && eVal != null && dVal != null && nVal != null) {
+				
+				//ensure the node and egde inputs are valid
+				int nodes, edges;
+				try {
+					nodes = Util.checkForPositiveInteger(nVal);
+					edges = Util.checkForPositiveInteger(eVal);
+				} catch (NumberFormatException e) {
+					throw new ParseException("The values for n & e must be positive (or 0) integers");
+				}						
+				
+				//ensure the directed input is valid
+				boolean directed;
+				if(dVal.equals("true") || dVal.equals("True")) {
+					directed = true;
+				} else if(dVal.equals("false") || dVal.equals("False")) {
+					directed = false;
+				} else {
+					throw new ParseException("Directed input (d) must be true, True, false, False");
+				}
+				
+				//ensure the file is valid and readable
+				File f = new File(cVal);
+				if(f.isFile() && f.canRead()) {
+					String name = f.getName();
+					String path = f.getParent();							
+					
+					System.out.println("Converting graph. This may take some time....");
+					launcher.convertGraphToBuffers(nodes, edges, path, name, directed);
+					System.out.println("Conversion Complete");
+					
+				} else {
+					throw new ParseException("File does not exist, or is not readable");
+				}						
+			} else {
+				throw new ParseException("Converting requires the c, e, d, n all have arguments. See --help for details.");
+			}					
+		} else {
+			throw new ParseException("Converting requires e, d, n. See --help for details.");
+		}	
 	}
 	
 }

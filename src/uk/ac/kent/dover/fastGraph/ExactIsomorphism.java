@@ -2,6 +2,7 @@ package uk.ac.kent.dover.fastGraph;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.*;
 
 import uk.ac.kent.displayGraph.*;
@@ -60,19 +61,29 @@ public class ExactIsomorphism {
 	
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		
-		int comparisons = 1000;
-		int numNodes = 8;
-		int numEdges = 24;
-
-		FastGraph g = null;
+		// Profiling code for number of required rewirings
+		int nodes = 100000;
+		int edges = 1000000;
+		int iterations = 1;
+			
+		FastGraph g = FastGraph.loadBuffersGraphFactory(null, "soc-pokec-relationships-reduced");
+		System.out.println("number of nodes:" + g.getNumberOfNodes());
 		try {
-			g = FastGraph.randomGraphFactory(10000, 100000, 44, true);
+//			g = FastGraph.adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
+//			g = FastGraph.adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
+//			g = FastGraph.adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false);
+//			g = FastGraph.adjacencyListGraphFactory(1696415,11095298,null,"as-skitter.txt",false);
+//			g = FastGraph.adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
+//			g = FastGraph.randomGraphFactory(nodes, edges, 1142454, true);
 		} catch(Exception e) {}
-	
-		FastGraph ga = g.generateRandomRewiredGraph(10,1);
+long t1 = System.currentTimeMillis();	
+		FastGraph ga = g.generateRandomRewiredGraph(iterations,1);
+System.out.println("rewire time "+(System.currentTimeMillis()-t1)/1000.0);
+		
 		int outdiff = 0;
 		int indiff = 0;
 		for(int i = 0; i < g.getNumberOfEdges(); i++) {
@@ -84,9 +95,49 @@ public class ExactIsomorphism {
 				indiff++;
 			}
 		}
+/*		
+for(int i = 0; i< g.getNumberOfEdges();i++) {
+	System.out.println("g  "+i+" "+g.getEdgeNode1(i)+" "+g.getEdgeNode2(i));
+}
+for(int i = 0; i< ga.getNumberOfEdges();i++) {
+	System.out.println("ga "+i+" "+ga.getEdgeNode1(i)+" "+ga.getEdgeNode2(i));
+}
+*/	
 		System.out.println("outdiff "+(outdiff/(1.0*g.getNumberOfEdges()))+" indiff "+(indiff/(1.0*g.getNumberOfEdges())));
-
+		System.out.println("nodes\t"+nodes+"\tedges\t"+edges+"\titerations\t"+iterations+"\tdifferent edge ends\t"+100*((outdiff+indiff)/(2.0*g.getNumberOfEdges()))+"%");
+		System.out.println("consistent "+ga.checkConsistency());
+//		long t = System.currentTimeMillis();
+//		boolean isomorphic = ExactIsomorphism.isomorphic(g,ga);
+//		System.out.println("isomorphic "+isomorphic+" time "+(System.currentTimeMillis()-t)/1000.0);
+//		ExactIsomorphism.reportFailRatios();
 		
+		String s1 = Arrays.toString(g.inDegreeProfile());
+		String s2 = Arrays.toString(ga.inDegreeProfile());
+		System.out.println(s1);
+		System.out.println(s2);
+		
+		s1 = Arrays.toString(g.outDegreeProfile());
+		s2 = Arrays.toString(ga.outDegreeProfile());
+		System.out.println(s1);
+		System.out.println(s2);
+		
+		s1 = Arrays.toString(g.degreeProfile());
+		s2 = Arrays.toString(ga.degreeProfile());
+		System.out.println(s1);
+		System.out.println(s2);
+		
+		
+		
+System.exit(0);
+		// end of profiling code
+		
+		// TODO test in degrees and out degrees in JUNIT
+		
+		
+		int comparisons = 1000;
+		int numNodes = 2;
+		int numEdges = 24;
+
 		try {
 			long isoTime = 0;
 			for(int i = 1; i <= comparisons; i++) {
