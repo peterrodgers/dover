@@ -16,6 +16,9 @@ import uk.ac.kent.dover.fastGraph.Launcher;
  */
 public class MotifTaskDummy extends MotifTask {
 
+	int bigP, smallP;
+	String bigT, smallT;
+	
 	/**
 	 * Trivial constructor
 	 */
@@ -49,6 +52,10 @@ public class MotifTaskDummy extends MotifTask {
 	 * @param childTaskText Not Used.
 	 */
 	public void publish(int mainTaskNum, String mainTaskText, int childTaskNum, String childTaskText){
+		bigP = mainTaskNum;
+		bigT = mainTaskText;
+		smallP = childTaskNum;
+		smallT = childTaskText;		
 	}
 	
 	/**
@@ -59,6 +66,13 @@ public class MotifTaskDummy extends MotifTask {
 	 * @param main Not Used.
 	 */
 	public void publish(int taskNum, String taskText, boolean main){
+		if(main) {
+			bigP = taskNum;
+			bigT = taskText;
+		} else {
+			smallP = taskNum;
+			smallT = taskText;			
+		}
 	}
 	
 	/**

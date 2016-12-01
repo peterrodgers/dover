@@ -341,21 +341,21 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		} else {
 			for (int i = 0; i < rewiresNeeded; i++) {
 				int rewirePercentage = (int) ((double) i / rewiresNeeded)*100;
-				mt.publish(rewirePercentage, "Rewiring "+i+" out of "+rewiresNeeded+" times",false);	
+				mt.publish(rewirePercentage, "Rewiring "+(i+1)+" out of "+rewiresNeeded+" times",false);	
 				Debugger.log("    rewiring for the "+i+" time");
-				FastGraph newGraph = currentGraph.generateRandomRewiredGraph(10,1); //TODO change this?
-				ExactMotifFinder emf = new ExactMotifFinder(newGraph);
+				currentGraph = currentGraph.generateRandomRewiredGraph(1,1); 
+				ExactMotifFinder emf = new ExactMotifFinder(currentGraph);
 				Debugger.log("    finding motifs");
 				for(int j = minSizeOfMotifs; j <= maxSizeOfMotifs; j++) {
 					
-					mt.publish(rewirePercentage, "Finding motifs sized "+j+" ("+i+"/"+rewiresNeeded+")",false);	
+					mt.publish(rewirePercentage, "Finding motifs sized "+j+" ("+(i+1)+"/"+rewiresNeeded+")",false);	
 					
 					emf.findMotifs(j, 0, hashBuckets);
 					HashMap<String,IsoHolder> newIsoLists = emf.extractGraphLists(hashBuckets);
 					Debugger.log("    merging lists");
 					isoLists = mergeIsoLists(isoLists, newIsoLists);
 				}
-				currentGraph = newGraph;
+				//currentGraph = newGraph;
 			}			
 		}
 		return isoLists;		
@@ -399,7 +399,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		
 		//hashBuckets = new HashMap<String,LinkedList<LinkedList<FastGraph>>> (g.getNumberOfNodes());
 		
-		subgraphs = enumerator.enumerateSubgraphs(k, 50 ,10);
+		subgraphs = enumerator.enumerateSubgraphs(k, 5 ,10);
 //		subgraphs = enumeratorRandom.randomSampleSubgraph(k,10000);		
 		
 		
