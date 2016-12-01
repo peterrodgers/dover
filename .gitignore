@@ -1,6 +1,10 @@
 .idea/
-data/test*/
+data/
 motifs/
 bin/
+doc/
+subgraphs/
 dover.jar
-
+.*
+desktop.ini
+*.svg

@@ -93,8 +93,8 @@ public class LauncherGUI extends JFrame {
 		tabbedPane.addTab("Motif", motifPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
-		JPanel patternPanel = buildPatternTab();
-		tabbedPane.addTab("Pattern", patternPanel);
+		JPanel subgraphPanel = buildSubgraphTab();
+		tabbedPane.addTab("Subgraph", subgraphPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_2);
 
 		JPanel convertPanel = buildConvertTab(graphList, progressBar, statusBar);
@@ -286,10 +286,63 @@ public class LauncherGUI extends JFrame {
 	 * Builds the Panel used to house the GUI elements for the Pattern Tab
 	 * @return The Pattern Tab
 	 */
-	private JPanel buildPatternTab() {
-		JPanel patternPanel = new JPanel(new BorderLayout());
-		patternPanel.add(new JButton("Button"), BorderLayout.WEST);
-		return patternPanel;
+	private JPanel buildSubgraphTab() {
+		JPanel subgraphPanel = new JPanel(new GridBagLayout());
+		
+		JLabel subgraphLabel = new JLabel("Find subgraphs in main graph");
+		
+		JPanel addPanel = new JPanel(new FlowLayout());
+		Border blackline = BorderFactory.createLineBorder(Color.black);
+		TitledBorder titled = BorderFactory.createTitledBorder(blackline, "Add New Subgraph");
+		titled.setTitleJustification(TitledBorder.LEFT);
+		addPanel.setBorder(titled);
+		
+		JButton addBtn = new JButton("Create");
+		JButton importBtn = new JButton("Import");
+		
+		addPanel.add(addBtn);
+		addPanel.add(importBtn);
+		
+		JLabel subgraphList = new JLabel("list will go here");
+		JButton editBtn = new JButton("Edit");
+		
+		JButton findBtn = new JButton("Find subgraphs");
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(2,2,2,2);
+		c.fill = GridBagConstraints.HORIZONTAL;
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 3;
+		subgraphPanel.add(subgraphLabel, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 3;
+		c.gridx = 0;
+		c.gridy = 1;
+		subgraphPanel.add(addPanel, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 2;
+		c.gridwidth = 2;
+		subgraphPanel.add(subgraphList, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 1;
+		c.gridx = 2;
+		c.gridy = 2;
+		subgraphPanel.add(editBtn, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 3;
+		c.gridwidth = 3;
+		subgraphPanel.add(findBtn, c);
+		
+		return subgraphPanel;
 	}
 
 	/**
@@ -504,51 +557,10 @@ public class LauncherGUI extends JFrame {
 		// Layout finished
 
 		// Set behaviour
-		selectGraphOne.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent actionEvent) {
-				String selectedGraph = (String) graphList.getSelectedValue();
-				graphOneTextField.setText(selectedGraph);
-			}
-		});
-		selectGraphTwo.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent actionEvent) {
-				String selectedGraph = (String) graphList.getSelectedValue();
-				graphTwoTextField.setText(selectedGraph);
-			}
-		});
+		selectGraphOne.addActionListener(new GraphSelectedActionListener(graphList,graphOneTextField));
+		selectGraphTwo.addActionListener(new GraphSelectedActionListener(graphList,graphTwoTextField));
 
-		getGedBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent actionEvent) {
-				Thread thread = new Thread(new Runnable() {
-
-					@Override
-					public void run() {
-						System.out.println("Click");
-						String g1String = graphOneTextField.getText();
-						String g2String = graphTwoTextField.getText();
-
-						FastGraph g1 = null;
-						FastGraph g2 = null;
-						try {
-							g1 = launcher.loadFromBuffers(null, g1String);
-							g2 = launcher.loadFromBuffers(null, g2String);
-							System.out.println("Created dover graphs");
-
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-
-						if (g1 != null && g2 != null) {
-							System.out.println(GedUtil.getGedScore(g1, g2));
-						}
-					}
-				});
-				thread.start();
-			}
-		});
+		getGedBtn.addActionListener(new GedActionListener(graphOneTextField,graphTwoTextField,launcher));
 
 		return gedPanel;
 	}
