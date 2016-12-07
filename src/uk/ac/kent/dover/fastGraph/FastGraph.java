@@ -3358,11 +3358,11 @@ if(node%100000 == 0) {
 	public FastGraph generateRandomRewiredGraph(int iterations, long seed) {
 		
 		String name = this.getName();
-		long time = Debugger.createTime();
+Debugger.resetTime();
 		long theSeed = seed;
 		FastGraph g = this;
 		for(int i = 0; i< iterations; i++) {
-			Debugger.log("        iteration number: " + i);
+Debugger.log("        iteration number: " + i);
 			FastGraph h = g.oneIterationGenerateRandomRewiredGraph(theSeed);
 			if(h == null) {
 				return null;
@@ -3388,8 +3388,6 @@ Debugger.outputTime("time for rewiring");
 	 * @param seed random number generator seed
 	 * @return a new graph, based on g, but rewired graph
 	 */
-	
-	
 	private FastGraph oneIterationGenerateRandomRewiredGraph(long seed) {
 		
 		final int ITERATIONS_TIME_OUT = 10000;
@@ -3398,10 +3396,12 @@ Debugger.outputTime("time for rewiring");
 
 		// rewiring the node1 of edges
 
+		HashSet<Integer> removedEdges = new HashSet<Integer>(getNumberOfEdges()*2);
 		// don't rewire node1 of edges more than once
-		HashSet<Integer> remainingEdges = new HashSet<Integer>(getNumberOfEdges()*2);
+		int[] remainingEdgeArray = new int[getNumberOfEdges()];
+		int remainingEdgeCount = getNumberOfEdges();
 		for(int i = 0; i < getNumberOfEdges(); i++) {
-			remainingEdges.add(i);
+			remainingEdgeArray[i] = i;
 		}
 		// keep track of nodes that have unvisited out edges
 		ArrayList<Integer> candidateNodes = new ArrayList<Integer>(getNumberOfNodes()*2);
@@ -3410,14 +3410,19 @@ Debugger.outputTime("time for rewiring");
 				candidateNodes.add(i);
 			}
 		}
-		
-		int startEdge = r.nextInt(getNumberOfEdges());
+
+		// this removes an edge from remainingEdgeArray
+		// by replacing the edge with the last edge in the array, and reducing the elements in the array that will be searched next time by one
+		int startEdge = r.nextInt(remainingEdgeCount);
 		int startNode = getEdgeNode1(startEdge);
-		remainingEdges.remove(startEdge);
+		remainingEdgeArray[startEdge] = remainingEdgeArray[remainingEdgeCount-1];
+		remainingEdgeCount--;
+		removedEdges.add(startEdge);
+
 		int nextEdge = startEdge;
 		HashMap<Integer,Integer> rewireNode1 = new HashMap<Integer,Integer>(getNumberOfEdges()*2); // edge then new node1 for the edge
 		int nextNode = -1;
-		while(remainingEdges.size() > 0) {
+		while(remainingEdgeCount > 0) {
 			// find another node and an in edge to swap
 			nextNode = -1;
 			int foundEdge = -1;
@@ -3436,9 +3441,13 @@ Debugger.outputTime("time for rewiring");
 				while(candidateEdges.size() > 0 && foundEdge == -1) {
 					int edgeIndex = r.nextInt(candidateEdges.size());
 					int tryEdge = candidateEdges.get(edgeIndex);
-					if(remainingEdges.contains(tryEdge)) {
+					if(!removedEdges.contains(tryEdge)) {
 						foundEdge = tryEdge;
-						remainingEdges.remove(tryEdge);
+						// these commands remove tryEdge
+						remainingEdgeArray[tryEdge] = remainingEdgeArray[remainingEdgeCount-1];
+						remainingEdgeCount--;
+						removedEdges.add(tryEdge);
+
 						nextNode = tryNode;
 					}
 					candidateEdges.remove(edgeIndex);
@@ -3463,14 +3472,15 @@ Debugger.outputTime("time for rewiring");
 		}
 		
 		
-		
 		// rewiring the node2 of edges
 
 		// don't rewire node2 of edges more than once
-		remainingEdges = new HashSet<Integer>(getNumberOfEdges()*2);
+		removedEdges.clear();
+		remainingEdgeCount = getNumberOfEdges();
 		for(int i = 0; i < getNumberOfEdges(); i++) {
-			remainingEdges.add(i);
+			remainingEdgeArray[i] = i;
 		}
+		
 		// keep track of nodes that have unvisited in edges
 		candidateNodes = new ArrayList<Integer>(getNumberOfNodes()*2);
 		for(int i = 0; i < getNumberOfNodes(); i++) {
@@ -3481,12 +3491,16 @@ Debugger.outputTime("time for rewiring");
 		
 		startEdge = r.nextInt(getNumberOfEdges());
 		startNode = getEdgeNode2(startEdge);
-		remainingEdges.remove(startEdge);
+		// this code removes startEdge
+		remainingEdgeArray[startEdge] = remainingEdgeArray[remainingEdgeCount-1];
+		remainingEdgeCount--;
+		removedEdges.add(startEdge);
+
 		nextEdge = startEdge;
 		
 		HashMap<Integer,Integer> rewireNode2 = new HashMap<Integer,Integer>(getNumberOfEdges()*2); // edge then new node1 for the edge
 		nextNode = -1;
-		while(remainingEdges.size() > 0) {
+		while(remainingEdgeCount > 0) {
 			
 			// find another node and an in edge to swap
 			nextNode = -1;
@@ -3506,9 +3520,13 @@ Debugger.outputTime("time for rewiring");
 				while(candidateEdges.size() > 0 && foundEdge == -1) {
 					int edgeIndex = r.nextInt(candidateEdges.size());
 					int tryEdge = candidateEdges.get(edgeIndex);
-					if(remainingEdges.contains(tryEdge)) {
+					if(!removedEdges.contains(tryEdge)) {
 						foundEdge = tryEdge;
-						remainingEdges.remove(tryEdge);
+						// these commands remove tryEdge
+						remainingEdgeArray[tryEdge] = remainingEdgeArray[remainingEdgeCount-1];
+						remainingEdgeCount--;
+						removedEdges.add(tryEdge);
+						
 						nextNode = tryNode;
 					}
 					candidateEdges.remove(edgeIndex);

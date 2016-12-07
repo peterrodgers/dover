@@ -64,22 +64,24 @@ public class ExactIsomorphism {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		
+
+		Debugger.enabled = true;
 		// Profiling code for number of required rewirings
 		int nodes = 100000;
 		int edges = 1000000;
 		int iterations = 1;
 			
-		FastGraph g = FastGraph.loadBuffersGraphFactory(null, "soc-pokec-relationships-reduced");
-		System.out.println("number of nodes:" + g.getNumberOfNodes());
+		FastGraph g = null;
 		try {
+//			g = FastGraph.loadBuffersGraphFactory(null, "soc-pokec-relationships-reduced");
 //			g = FastGraph.adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
 //			g = FastGraph.adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
 //			g = FastGraph.adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false);
 //			g = FastGraph.adjacencyListGraphFactory(1696415,11095298,null,"as-skitter.txt",false);
 //			g = FastGraph.adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
-//			g = FastGraph.randomGraphFactory(nodes, edges, 1142454, true);
+			g = FastGraph.randomGraphFactory(nodes, edges, 1142454, true);
 		} catch(Exception e) {}
+System.out.println("number of nodes:" + g.getNumberOfNodes());
 long t1 = System.currentTimeMillis();	
 		FastGraph ga = g.generateRandomRewiredGraph(iterations,1);
 System.out.println("rewire time "+(System.currentTimeMillis()-t1)/1000.0);
