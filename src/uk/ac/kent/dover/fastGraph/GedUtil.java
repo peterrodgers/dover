@@ -1,12 +1,12 @@
 package uk.ac.kent.dover.fastGraph;
 
 import org.cytoscape.gedevo.AlignmentInfo;
+import org.cytoscape.gedevo.AlignmentResult;
 import org.cytoscape.gedevo.GedevoNative;
 import org.cytoscape.gedevo.UserSettings;
 import org.cytoscape.gedevo.simplenet.Edge;
 import org.cytoscape.gedevo.simplenet.Graph;
 import org.cytoscape.gedevo.simplenet.Node;
-import org.cytoscape.gedevo.task.AlignmentTaskData;
 
 /**
  * Created by dw3 on 24/11/2016.
@@ -15,7 +15,7 @@ import org.cytoscape.gedevo.task.AlignmentTaskData;
  */
 public class GedUtil {
 
-	private static Graph fastGraphToCytoGraph(FastGraph fastgraph, String name) {
+	private static GedevoNative.Network fastGraphToNetwork(FastGraph fastgraph, String name) {
 		Graph cytograph = new Graph(name);
 
 		int numEdges = fastgraph.getNumberOfEdges();
@@ -42,7 +42,9 @@ public class GedUtil {
 
 		// This is a graph from the cytogedevo library, not this one
 
-		return cytograph;
+		GedevoNative.Network n = GedevoNative.Network.convertToNative(cytograph);
+
+		return n;
 	}
 
 
@@ -50,8 +52,9 @@ public class GedUtil {
 	private static void printInfo(AlignmentInfo info) {
 		System.out.println("Iterations: " + info.iterations);
 		System.out.println("Without change: " + info.iterationsWithoutScoreChange);
-		System.out.println("Unaligned edges: " + info.unalignedEdges);
-		System.out.println("Aligned edges: " + info.alignedEdges);
+		System.out.println("Population: " + info.numAgents);
+		System.out.println("EC: " + info.edgeCorrectness);
+		System.out.println("Life: " + info.lifeTime);
 		System.out.println("");
 	}
 
@@ -65,46 +68,39 @@ public class GedUtil {
      */
 	public static String getGedScore(FastGraph g1, FastGraph g2) {
 
-		Graph cytog1 = GedUtil.fastGraphToCytoGraph(g1, "Graph One");
-		Graph cytog2 = GedUtil.fastGraphToCytoGraph(g2, "Graph Two");
-
-		System.out.println("Converted to cytograph");
-
-		GedevoNative.Network g1Network = GedevoNative.Network.convertToNative(cytog1);
-		GedevoNative.Network g2Network = GedevoNative.Network.convertToNative(cytog2);
+		GedevoNative.Network g1Network = GedUtil.fastGraphToNetwork(g1, "Graph One");
+		GedevoNative.Network g2Network = GedUtil.fastGraphToNetwork(g2, "Graph Two");
 
 		System.out.println("Converted to native");
 
-		UserSettings userSettings = new UserSettings();
-		final AlignmentTaskData alignmentTaskData = new AlignmentTaskData(userSettings);
+		UserSettings userSettings = new NewUserSettings();
 
-		alignmentTaskData.instance = GedevoNative.Instance.create(alignmentTaskData.settings);
-		alignmentTaskData.instance.importNetwork(g1Network, 0);
-		alignmentTaskData.instance.importNetwork(g2Network, 1);
-		alignmentTaskData.graphs = new Graph[]{cytog1, cytog2};
-		alignmentTaskData.cynet = null;
+		GedevoNative.Instance instance = GedevoNative.Instance.create(userSettings);
+		instance.importNetwork(g1Network, 0);
+		instance.importNetwork(g2Network, 1);
 
-		alignmentTaskData.instance.init1();
+		instance.init1();
 		System.out.println("Init 1 complete. Next phase may take some time");
-		alignmentTaskData.instance.init2();
+		instance.init2();
 		System.out.println("Init 2 complete");
 
-//		final int maxsteps = alignmentTaskData.settings.;
-//		final int maxsteps = 150;
 		System.out.println("Set up the alignment task");
 
-		while (!alignmentTaskData.instance.isDone()) {
-			alignmentTaskData.instance.fillAlignmentInfo(0, alignmentTaskData.info);
-			alignmentTaskData.instance.update(1);
-			printInfo(alignmentTaskData.info);
+		AlignmentInfo info = new AlignmentInfo();
+
+		while (!instance.isDone()) {
+			instance.fillAlignmentInfo(0, info);
+			printInfo(info);
+			instance.update(1);
 		}
 
-		alignmentTaskData.instance.shutdown();
+		instance.shutdown();
 
+		AlignmentResult alignmentResult = instance.getAlignmentResult(0);
 
 		System.out.println("Alignment finished");
 
-		return alignmentTaskData.info.toString();
+		return info.toString();
 	}
 
 
