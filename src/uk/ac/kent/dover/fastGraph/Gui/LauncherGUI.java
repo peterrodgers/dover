@@ -34,6 +34,7 @@ public class LauncherGUI extends JFrame {
 	private DefaultListModel model = new DefaultListModel();
 	private double screenWidth; //size of the user's screen
 	private double screenHeight;
+	private int windowWidth, windowHeight;	
 	private double textHeight;
 
 
@@ -93,7 +94,7 @@ public class LauncherGUI extends JFrame {
 		tabbedPane.addTab("Motif", motifPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
-		JPanel subgraphPanel = buildSubgraphTab();
+		JPanel subgraphPanel = buildSubgraphTab(graphList, progressBar, statusBar);
 		tabbedPane.addTab("Subgraph", subgraphPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_2);
 
@@ -126,7 +127,12 @@ public class LauncherGUI extends JFrame {
 		this.setContentPane(mainPanel);
 		setTitle("Dover");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		mainPanel.setPreferredSize(new Dimension((int) Math.round(screenHeight/2),(int) Math.round(screenHeight/2))); //makes a square window
+		
+		windowWidth = (int) Math.round(screenHeight/2);
+		windowHeight = (int) Math.round(screenHeight/2);
+		mainPanel.setPreferredSize(new Dimension(windowWidth,windowHeight)); //makes a square window
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		addWindowListener(new ClosingWindowListener(false,this,this,(JLabel) statusBar.getComponent(0)));
 		pack();
 		setVisible(true);
 	}
@@ -286,27 +292,39 @@ public class LauncherGUI extends JFrame {
 	 * Builds the Panel used to house the GUI elements for the Pattern Tab
 	 * @return The Pattern Tab
 	 */
-	private JPanel buildSubgraphTab() {
+	private JPanel buildSubgraphTab(JList graphList, JProgressBar progressBar, JPanel statusBar) {
+		JLabel status = (JLabel) statusBar.getComponent(0);
+		FastGraph subgraph = null;
+		
 		JPanel subgraphPanel = new JPanel(new GridBagLayout());
 		
-		JLabel subgraphLabel = new JLabel("Find subgraphs in main graph");
+		JLabel subgraphLabel = new JLabel("Find subgraphs in main graph");		
+
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new java.io.File("."));
+		fileChooser.setDialogTitle("Select subgraph directory");
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	    
+		JButton openBtn = new JButton("Open File...");
 		
-		JPanel addPanel = new JPanel(new FlowLayout());
-		Border blackline = BorderFactory.createLineBorder(Color.black);
-		TitledBorder titled = BorderFactory.createTitledBorder(blackline, "Add New Subgraph");
-		titled.setTitleJustification(TitledBorder.LEFT);
-		addPanel.setBorder(titled);
 		
-		JButton addBtn = new JButton("Create");
-		JButton importBtn = new JButton("Import");
+		JLabel fileLabel = new JLabel("No file selected  ");
+		fileLabel.setFont(new Font(fileLabel.getFont().getFontName(), Font.ITALIC, fileLabel.getFont().getSize()));
 		
-		addPanel.add(addBtn);
-		addPanel.add(importBtn);
+		//The action for when the user chooses a file
+		openBtn.addActionListener(new LoadFileActionListener(status, fileLabel, fileChooser, subgraphPanel, openBtn));
 		
-		JLabel subgraphList = new JLabel("list will go here");
+		JButton addBtn = new JButton("Create");	
+		addBtn.addActionListener(new CreateSubgraphActionListener(this, fileChooser, subgraphPanel, subgraph, fileLabel, status));
+		
 		JButton editBtn = new JButton("Edit");
+		editBtn.addActionListener(new CreateSubgraphActionListener(this, fileChooser, subgraphPanel, subgraph, fileLabel, status));
+		
+		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
 		
 		JButton findBtn = new JButton("Find subgraphs");
+		findBtn.addActionListener(new FindSubgraphsActionListener(graphList, progressBar, status, launcher, subgraphPanel, 
+				fileChooser, subgraph));
 		
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(2,2,2,2);
@@ -315,31 +333,43 @@ public class LauncherGUI extends JFrame {
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridy = 0;
-		c.gridwidth = 3;
+		c.gridwidth = 2;
 		subgraphPanel.add(subgraphLabel, c);
 
 		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridwidth = 3;
+		c.gridwidth = 1;
 		c.gridx = 0;
 		c.gridy = 1;
-		subgraphPanel.add(addPanel, c);
+		subgraphPanel.add(openBtn, c);
 
 		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 2;
-		c.gridwidth = 2;
-		subgraphPanel.add(subgraphList, c);
+		c.gridx = 1;
+		c.gridy = 1;
+		c.gridwidth = 1;
+		subgraphPanel.add(fileLabel, c);
 
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 1;
-		c.gridx = 2;
+		c.gridx = 0;
 		c.gridy = 2;
 		subgraphPanel.add(editBtn, c);
 
 		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 1;
+		c.gridy = 2;
+		c.gridwidth = 1;
+		subgraphPanel.add(addBtn, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridy = 3;
-		c.gridwidth = 3;
+		c.gridwidth = 2;
+		subgraphPanel.add(sep, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 4;
+		c.gridwidth = 2;
 		subgraphPanel.add(findBtn, c);
 		
 		return subgraphPanel;
@@ -563,5 +593,54 @@ public class LauncherGUI extends JFrame {
 		getGedBtn.addActionListener(new GedActionListener(graphOneTextField,graphTwoTextField,launcher));
 
 		return gedPanel;
+	}
+
+	/**
+	 * @return the windowWidth
+	 */
+	public int getWindowWidth() {
+		return windowWidth;
+	}
+
+	/**
+	 * @param windowWidth the windowWidth to set
+	 */
+	public void setWindowWidth(int windowWidth) {
+		this.windowWidth = windowWidth;
+	}
+
+	/**
+	 * @return the windowHeight
+	 */
+	public int getWindowHeight() {
+		return windowHeight;
+	}
+
+	/**
+	 * @param windowHeight the windowHeight to set
+	 */
+	public void setWindowHeight(int windowHeight) {
+		this.windowHeight = windowHeight;
+	}
+
+	/**
+	 * @return the textHeight
+	 */
+	public double getTextHeight() {
+		return textHeight;
+	}
+
+	/**
+	 * @param textHeight the textHeight to set
+	 */
+	public void setTextHeight(double textHeight) {
+		this.textHeight = textHeight;
+	}
+
+	/**
+	 * @return the launcher
+	 */
+	public Launcher getLauncher() {
+		return launcher;
 	}
 }
