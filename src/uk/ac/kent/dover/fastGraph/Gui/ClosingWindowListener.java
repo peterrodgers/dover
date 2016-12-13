@@ -20,10 +20,10 @@ public class ClosingWindowListener implements WindowListener {
 	JLabel status;
 	
 	 /**
-	 * @param systemStatus
-	 * @param launcherGui
-	 * @param frame
-	 * @param status
+	 * @param systemStatus The current system status. Can switch on/off prompting if needed
+	 * @param launcherGui The launcherGui for callbacks
+	 * @param frame The frame to attach the confirmation dialog to
+	 * @param status The status bar to update
 	 */
 	public ClosingWindowListener(boolean systemStatus, LauncherGUI launcherGui, JFrame frame, JLabel status) {
 		this.systemStatus = systemStatus;
@@ -37,12 +37,15 @@ public class ClosingWindowListener implements WindowListener {
 	 */
 	public void windowClosing(WindowEvent e){
      	if(!systemStatus){
-             int i = JOptionPane.showConfirmDialog(null, "Are you sure to wish to quit?");
-             if(i == JOptionPane.YES_OPTION) {
-            	 status.setText(launcherGui.DEFAULT_STATUS_MESSAGE);
-            	 frame.setVisible(false);
-            	 System.out.println("closing");
-             }
+     		status.setText("Waiting for user input...");
+            int i = JOptionPane.showConfirmDialog(null, "Are you sure to wish to quit?");
+            if(i == JOptionPane.YES_OPTION) {
+            	status.setText(launcherGui.DEFAULT_STATUS_MESSAGE);
+            	frame.setVisible(false);
+            	frame.dispose();
+            }
+            status.setText(LauncherGUI.DEFAULT_STATUS_MESSAGE);
+             
      	}
      }
 

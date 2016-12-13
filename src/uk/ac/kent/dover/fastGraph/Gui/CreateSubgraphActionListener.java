@@ -177,6 +177,7 @@ public class CreateSubgraphActionListener implements ActionListener{
             fileLabel.setFont(new Font(fileLabel.getFont().getFontName(), Font.PLAIN, fileLabel.getFont().getSize()));
 			fileChooser.setSelectedFile(currentFile);
 			graphFrame.setVisible(false);
+			graphFrame.dispose();
 		}
 	}
 

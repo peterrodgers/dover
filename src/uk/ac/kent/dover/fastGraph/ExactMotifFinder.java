@@ -340,7 +340,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 			}
 		} else {
 			for (int i = 0; i < rewiresNeeded; i++) {
-				int rewirePercentage = (int) ((double) i / rewiresNeeded)*100;
+				int rewirePercentage = (int) (((double) i / rewiresNeeded)*100);
 				mt.publish(rewirePercentage, "Rewiring "+(i+1)+" out of "+rewiresNeeded+" times",false);	
 				Debugger.log("    rewiring for the "+i+" time");
 				currentGraph = currentGraph.generateRandomRewiredGraph(1,1); 

@@ -133,6 +133,8 @@ public class LauncherGUI extends JFrame {
 		mainPanel.setPreferredSize(new Dimension(windowWidth,windowHeight)); //makes a square window
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new ClosingWindowListener(false,this,this,(JLabel) statusBar.getComponent(0)));
+		ImageIcon icon = new ImageIcon("icon128.png");
+		setIconImage(icon.getImage());
 		pack();
 		setVisible(true);
 	}
@@ -150,7 +152,7 @@ public class LauncherGUI extends JFrame {
 		
 		JMenuItem exit = new JMenuItem("Exit");
 		exit.getAccessibleContext().setAccessibleDescription("Exit the program");
-		exit.addActionListener(new ExitActionListener());
+		exit.addActionListener(new ExitActionListener(this));
 		fileMenu.add(exit);
 
 		menuBar.add(fileMenu);
