@@ -1,7 +1,6 @@
 package uk.ac.kent.dover.fastGraph.Gui;
 
 import uk.ac.kent.dover.fastGraph.FastGraph;
-import uk.ac.kent.dover.fastGraph.GedUtil;
 import uk.ac.kent.dover.fastGraph.Launcher;
 import uk.ac.kent.dover.fastGraph.Util;
 
@@ -10,11 +9,8 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -586,11 +582,25 @@ public class LauncherGUI extends JFrame {
 		gedPanel.add(getGedBtn, c);
 		// Layout finished
 
+		JLabel scoreLabel = new JLabel("GED score:");
+
+		c.gridx=0;
+		c.gridy=4;
+		c.gridwidth=1;
+		gedPanel.add(scoreLabel, c);
+
+		JTextArea gedScore = new JTextArea("");
+
+		c.gridx=1;
+		c.gridy=4;
+		c.gridwidth=1;
+		gedPanel.add(gedScore, c);
+
 		// Set behaviour
 		selectGraphOne.addActionListener(new GraphSelectedActionListener(graphList,graphOneTextField));
 		selectGraphTwo.addActionListener(new GraphSelectedActionListener(graphList,graphTwoTextField));
 
-		getGedBtn.addActionListener(new GedActionListener(graphOneTextField,graphTwoTextField,launcher));
+		getGedBtn.addActionListener(new GedActionListener(graphOneTextField,graphTwoTextField,launcher,gedScore));
 
 		return gedPanel;
 	}

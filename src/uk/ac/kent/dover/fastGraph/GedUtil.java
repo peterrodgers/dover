@@ -1,7 +1,6 @@
 package uk.ac.kent.dover.fastGraph;
 
 import org.cytoscape.gedevo.AlignmentInfo;
-import org.cytoscape.gedevo.AlignmentResult;
 import org.cytoscape.gedevo.GedevoNative;
 import org.cytoscape.gedevo.UserSettings;
 import org.cytoscape.gedevo.simplenet.Edge;
@@ -66,14 +65,14 @@ public class GedUtil {
 	 * @param g2
      * @return The GED score as a string
      */
-	public static String getGedScore(FastGraph g1, FastGraph g2) {
+	public static float getGedScore(FastGraph g1, FastGraph g2) {
 
 		GedevoNative.Network g1Network = GedUtil.fastGraphToNetwork(g1, "Graph One");
 		GedevoNative.Network g2Network = GedUtil.fastGraphToNetwork(g2, "Graph Two");
 
 		System.out.println("Converted to native");
 
-		UserSettings userSettings = new NewUserSettings();
+		UserSettings userSettings = new DoverSettings();
 
 		GedevoNative.Instance instance = GedevoNative.Instance.create(userSettings);
 		instance.importNetwork(g1Network, 0);
@@ -94,14 +93,15 @@ public class GedUtil {
 			instance.update(1);
 		}
 
-		instance.shutdown();
+		float gedScore = instance.overallGed();
 
-		AlignmentResult alignmentResult = instance.getAlignmentResult(0);
+		instance.shutdown();
 
 		System.out.println("Alignment finished");
 
-		return info.toString();
-	}
+		System.out.println("GED score: " + gedScore);
 
+		return gedScore;
+	}
 
 }
