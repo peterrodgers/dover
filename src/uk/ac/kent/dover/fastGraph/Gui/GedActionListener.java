@@ -1,17 +1,17 @@
 package uk.ac.kent.dover.fastGraph.Gui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-
-import javax.swing.JTextField;
-
 import uk.ac.kent.dover.fastGraph.FastGraph;
 import uk.ac.kent.dover.fastGraph.GedUtil;
 import uk.ac.kent.dover.fastGraph.Launcher;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+
 public class GedActionListener implements ActionListener {
-	
+
+	private final JTextArea gedScore;
 	JTextField graphOneTextField, graphTwoTextField;
 	Launcher launcher;
 	
@@ -19,11 +19,13 @@ public class GedActionListener implements ActionListener {
 	 * @param graphOneTextField
 	 * @param graphTwoTextField
 	 * @param launcher
+	 * @param gedScore
 	 */
-	public GedActionListener(JTextField graphOneTextField, JTextField graphTwoTextField, Launcher launcher) {
+	public GedActionListener(JTextField graphOneTextField, JTextField graphTwoTextField, Launcher launcher, JTextArea gedScore) {
 		this.graphOneTextField = graphOneTextField;
 		this.graphTwoTextField = graphTwoTextField;
 		this.launcher = launcher;
+		this.gedScore = gedScore;
 	}
 
 	@Override
@@ -48,7 +50,8 @@ public class GedActionListener implements ActionListener {
 				}
 
 				if (g1 != null && g2 != null) {
-					System.out.println(GedUtil.getGedScore(g1, g2));
+					float score = GedUtil.getGedScore(g1, g2);
+					gedScore.setText(String.valueOf(score));
 				}
 			}
 		});
