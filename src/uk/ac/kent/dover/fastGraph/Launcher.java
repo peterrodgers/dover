@@ -31,6 +31,7 @@ public class Launcher {
 	 * @throws Exception Only used when testing direct access to FastGraph
 	 */
 	public static void main(String[] args) throws Exception{
+		Debugger.enabled = true;
 		new Launcher(args);
 	}
 	
@@ -95,25 +96,26 @@ public class Launcher {
 	 * @throws IOException If the files cannot be loaded
 	 */
 	public void findMotifs(MotifTask mt, String directory, String fileBaseName, int minNum, int maxNum) throws IOException {
+		double sizeDiff = maxNum - minNum;	
+		double step = 100/(sizeDiff+4);
+		
 		mt.publish(0, "Loading Buffers", 0, "");
 		mt.setSmallIndeterminate(true);
 		FastGraph g2 = FastGraph.loadBuffersGraphFactory(directory, fileBaseName);
 			
-		mt.setSmallIndeterminate(false);	
-
-		
+		mt.setSmallIndeterminate(false);			
 		ExactMotifFinder emf = new ExactMotifFinder(g2,mt);
-		mt.publish(16, "Building Reference Set", 0, "");		
-		emf.findAndExportAllMotifs(10, minNum, maxNum, 0, true);
-		HashMap<String,LinkedList<IsoHolder>> referenceBuckets = emf.getHashBuckets();	
 		
-		mt.publish(50, "Building Main Set", 0, "");	
-		emf.findAndExportAllMotifs(0, minNum, maxNum, 0, false);
-		HashMap<String,LinkedList<IsoHolder>> realBuckets = emf.getHashBuckets();
+		mt.publish((int) step, "Building Reference Set", 0, "");		
+		emf.findAllMotifs(10,4,6);
 		
-		mt.publish(83, "Comparing Motif Sets", 0, "");
+		mt.publish((int) (100-(2*step)), "Building Main Set", 0, "");
+		emf.findAllMotifs(0,4,6);
 		
-		emf.compareAndExportResults(referenceBuckets, realBuckets);
+		mt.publish((int) (100-step), "Comparing Motif Sets", 0, "");
+		emf.compareMotifDatas(4,6);
+		
+		//emf.compareAndExportResults(referenceBuckets, realBuckets);
 		//emf.outputHashBuckets(referenceBuckets);
 		Debugger.outputTime("Time total motif detection");
 		mt.publish(100, "Complete", 0, "");

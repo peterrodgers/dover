@@ -13,6 +13,7 @@ import org.json.*;
 import uk.ac.kent.displayGraph.*;
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
 import uk.ac.kent.dover.fastGraph.ExactMotifFinder.IsoHolder;
+import uk.ac.kent.dover.fastGraph.Gui.MotifTaskDummy;
 
 
 /**
@@ -124,10 +125,11 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(5,6,1,true);
 //		FastGraph g1 = randomGraphFactory(8,9,1,false);
 //		FastGraph g1 = randomGraphFactory(10,50,1,false);
-		for (int i = 0 ; i<10; i++) {
+/*		for (int i = 0 ; i<10; i++) {
 			FastGraph g = randomGraphFactory(100, 1000, 1, false); // 1 hundred nodes, 1 thousand edges
 			g.saveBuffers("test" + i, g.getName());
 		}
+		*/
 //		FastGraph g1 = randomGraphFactory(10000,100000,1,false); // 10 thousand nodes, 100 thousand edges
 //		FastGraph g1 = randomGraphFactory(100000,1000000,1,false); // 100 thousand nodes, 1 million edges
 //		FastGraph g1 = randomGraphFactory(1000000,10000000,1,false); // 1 million nodes, 10 million edges
@@ -153,34 +155,37 @@ public class FastGraph {
 		time = Debugger.createTime();
 */
 //String name = "random-n-100-e-1000";
-//String name = "random-n-2-e-1";
+String name = "random-n-8-e-9";
 //String name = "as-skitter.txt";
 //String name = "soc-pokec-relationships.txt-reduced";
 //String name = "soc-pokec-relationships.txt-veryshort-veryshort";
-String name = "Wiki-Vote.txt";
-//		String name = g1.getName();
-//		FastGraph g2 = g1;
-//		try {
-//			time = Debugger.createTime();
-//			FastGraph g2 = loadBuffersGraphFactory(null,name);
-//			//g2 = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
+//String name = "Wiki-Vote.txt";
+		//String name = g1.getName();
+		//FastGraph g2 = g1;
+		try {
+			time = Debugger.createTime();
+			FastGraph g2 = loadBuffersGraphFactory(null,name);
+			//g2 = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
+
+			Debugger.log("Connected: " + Connected.connected(g2));
+
+			Debugger.log("Number of nodes: " + g2.getNumberOfNodes());
+			Debugger.log("Number of edges: " + g2.getNumberOfEdges());
+
+			Debugger.resetTime();
+			
 //
-//			Debugger.log("Connected: " + Connected.connected(g2));
-//
-//			Debugger.log("Number of nodes: " + g2.getNumberOfNodes());
-//			Debugger.log("Number of edges: " + g2.getNumberOfEdges());
-//
-//			Debugger.resetTime();
-//
-//			ExactMotifFinder emf = new ExactMotifFinder(g2);
-//			emf.findAndExportAllMotifs(10, 4, 4, 0, true);
-//			HashMap<String,LinkedList<IsoHolder>> referenceBuckets = emf.getHashBuckets();
-//			emf.findAndExportAllMotifs(0, 4, 4, 0, false);
-//			HashMap<String,LinkedList<IsoHolder>> realBuckets = emf.getHashBuckets();
-//			emf.compareAndExportResults(referenceBuckets, realBuckets);
-////			emf.outputHashBuckets(realBuckets);
-//			Debugger.outputTime("Time total motif detection");
-//
+			ExactMotifFinder emf = new ExactMotifFinder(g2, new MotifTaskDummy());
+			emf.findAllMotifs(10,4,6);
+			emf.findAllMotifs(0,4,6);
+			emf.compareMotifDatas(4,6);
+			
+			//emf.findAndExportAllMotifs(10, 4, 4, 0, true);
+			//emf.findAndExportAllMotifs(0, 4, 4, 0, false);
+			//emf.compareAndExportResults();
+//			emf.outputHashBuckets(realBuckets);
+			Debugger.outputTime("Time total motif detection");
+
 ///*
 //			//ISO CHECK REWIRING
 //			FastGraph g1 = FastGraph.randomGraphFactory(12,24,1,true,false);
@@ -284,9 +289,9 @@ String name = "Wiki-Vote.txt";
 //Debugger.log("h "+h.checkConsistency());
 //*/
 //
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
  		
 	}

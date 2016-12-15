@@ -19,6 +19,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.parser.Tag;
 
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
+import uk.ac.kent.dover.fastGraph.ExactMotifFinder.IsoHolder;
 import uk.ac.kent.dover.fastGraph.Gui.MotifTask;
 
 public class ExactMotifFinder {
@@ -36,85 +37,257 @@ public class ExactMotifFinder {
 	private EnumerateSubgraphRandom enumeratorRandom;
 	private HashSet<FastGraph> subgraphs; // subgraphs found by the enumerator
 	
-
-	public static void main(String[] args) {
-		
-		Debugger.enabled = true;
-		
-		FastGraph g = null;
-		try {
-//			g = FastGraph.loadBuffersGraphFactory(null,"soc-pokec-relationships.txt-reduced");
-			
-//			g = FastGraph.randomGraphFactory(2,1,1000,true,false); // 1 hundred nodes, 1 thousand edges
-			g = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
-//			g = FastGraph.randomGraphFactory(200,2000,1,true,false); // 3 hundred nodes, 3 thousand edges
-//			g = FastGraph.randomGraphFactory(300,3000,1,true,false); // 3 hundred nodes, 3 thousand edges
-//			g = FastGraph.randomGraphFactory(1000,10000,1,true,false); // 1 thousand nodes, 10 thousand edges
-//			g = FastGraph.randomGraphFactory(10000,100000,1,true,false); //10 thousand nodes 100 thousand edges
-//			g = FastGraph.randomGraphFactory(6,9,1,true,false); // 5 nodes, 6 edges
-			
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-/*
-Debugger.resetTime();
-Debugger.log("Starting");
-		FastGraph h = g.generateRandomRewiredGraph(10,1);
-Debugger.log("h consistent "+h.checkConsistency());
-Debugger.log("g consistent "+g.checkConsistency());
-Debugger.log(Arrays.equals(h.degreeProfile(), g.degreeProfile())+" "+Arrays.toString(h.degreeProfile()));
-Debugger.log(Arrays.equals(h.inDegreeProfile(), g.inDegreeProfile())+" "+Arrays.toString(h.inDegreeProfile()));
-Debugger.log(Arrays.equals(h.outDegreeProfile(), g.outDegreeProfile())+" "+Arrays.toString(h.outDegreeProfile()));
-
-System.exit(0);
-*/
-		int numOfNodes = 4;
-		long time = Debugger.createTime();		
-		ExactMotifFinder emf = new ExactMotifFinder(g);
-		HashMap<String,LinkedList<IsoHolder>> hashBuckets = new HashMap<String,LinkedList<IsoHolder>>(g.getNumberOfNodes());
-		emf.findMotifs(numOfNodes, 0, hashBuckets);
-		emf.outputHashBuckets(hashBuckets);
-		//emf.findMotifs(numOfNodes, 0, hashBuckets);
-		//emf.outputHashBuckets(hashBuckets);
-		
-	//	Debugger.log("number of subgraphs "+emf.subgraphs.size());
-		Debugger.log("graph with "+g.getNumberOfNodes()+" nodes and "+g.getNumberOfEdges()+" edges");
-		Debugger.outputTime("time for motifs with "+numOfNodes+" nodes",time);
-
-		//Debugger.log(hashBuckets);
-		
-
-		
-		HashMap<String,IsoHolder> isoLists = emf.extractGraphLists(hashBuckets);
-		uk.ac.kent.displayGraph.display.GraphWindow gw = null;
-		for(String key : isoLists.keySet()) {
-			IsoHolder isoList = isoLists.get(key);
-			Debugger.log(key+" "+isoList.getNumber());
-			
-			
-			uk.ac.kent.displayGraph.Graph dg = isoList.getGraph().generateDisplayGraph();
-			dg.randomizeNodePoints(new Point(20,20),300,300);
-			dg.setLabel(key);
-			gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg, true);
-			uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
-			GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
-			se.setAnimateFlag(false);
-			se.setIterations(100);
-			se.setTimeLimit(200);
-			se.setGraphPanel(gw.getGraphPanel());
-			se.layout();
-			File saveLocation = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+g.getName()+File.separatorChar+"motifs"+key+".svg");
-			uk.ac.kent.displayGraph.ExportSVG exSVG = new uk.ac.kent.displayGraph.ExportSVG(dg);
-			exSVG.saveGraph(saveLocation);
-			//gw.fileExit();
-		}
-		if(gw != null) {
-			gw.fileExit();
-		}
-		
-
-	
+	/**
+	 * Main method to help with development
+	 * @param args
+	 * @throws Exception
+	 */
+	public static void main(String[] args) throws Exception {
+		FastGraph.main(args);	
 	}
+	
+	/**
+	 * Trivial contructor
+	 * @param g the FastGraph to find motifs in
+	 * @param numOfNodes the number of nodes in each motif
+	 */
+	public ExactMotifFinder(FastGraph g) {
+		this(g,null);
+	}
+	
+	/**
+	 * Trivial constructor
+	 * @param g the FastGraph to find motifs in
+	 * @param mf The MotifTask to report progress to
+	 */
+	public ExactMotifFinder(FastGraph g, MotifTask mt) {
+		this.g = g;
+		this.mt = mt;
+		//enumerator = new EnumerateSubgraphFanmod(g);
+		enumerator = new EnumerateSubgraphNeighbourhood(g);
+		enumeratorRandom = new EnumerateSubgraphRandom(g);
+	}
+	
+	/**
+	 * Runs the comparison of motif data for each size given
+	 * @param minSize The minimum size of motifs found
+	 * @param maxSize The maximum size of motifs found
+	 * @throws FileNotFoundException If the files cannot be loaded
+	 * @throws IOException Any other IO problems
+	 */
+	public void compareMotifDatas(int minSize, int maxSize) throws FileNotFoundException, IOException {
+		for(int size = minSize; size <= maxSize; size++) {
+			compareAndExportResults(size, minSize, maxSize);
+		}
+	}
+	
+	/**
+	 * Checks that all log files exist.<br>
+	 * This is used to avoid rewiring and finding motifs again
+	 * 
+	 * @param graphName The graph name
+	 * @param nameString Whether the reference or main set is being searched
+	 * @param minSize The minimum size of motifs found
+	 * @param maxSize The maximum size of motifs found
+	 * @return If all the log files exist
+	 */
+	private boolean allLogFilesExist(String graphName, String nameString, int minSize, int maxSize) {
+		boolean res = true;
+		for(int size = minSize; size <= maxSize; size++) {
+			File output = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"motifs_size"+size+nameString+".txt");
+			if (!output.exists()) {
+				res = false;
+			}
+		}		
+		return res;
+	}
+	
+	/**
+	 * Finds all the motifs.<br>
+	 * Will check that log files exist before running. Rewiries the graph a number of times and stores these.<br>
+	 * Then performs motif finding on each graph of between the given sizes.
+	 * For the main set, set rewiresNeeded to 0.
+	 * Will export files to disk.
+	 * 
+	 * @param rewiresNeeded The number of rewires needed. If 0, then main set.
+	 * @param minSize The minimum size of motifs to be found
+	 * @param maxSize The maximum size of motifs to be found
+	 * @throws IOException 
+	 */
+	public void findAllMotifs(int rewiresNeeded, int minSize, int maxSize) throws IOException {
+		double sizeDiff = maxSize - minSize;	
+		double step = 100/(sizeDiff+4);
+		
+		String graphName = g.getName();
+		String nameString = "_reference";
+		boolean referenceSet = true;
+		if(rewiresNeeded == 0) {
+			nameString = "_real";
+			referenceSet = false;
+		}
+		
+		//If all log files exist, then do nothing		
+		if(allLogFilesExist(graphName, nameString, minSize, maxSize)) {
+			return;
+		}
+		
+		mt.publish((int) step*1, "Rewiring graph", true);
+		
+		//rewire graph
+		if(referenceSet) {
+			//reference set
+			buildRewires(rewiresNeeded);
+		}
+
+		//for each size of motif
+		for(int size = minSize; size <= maxSize; size++) {
+			File output = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"motifs_size"+size+nameString+".txt");
+			
+			//if output exists, do nothing
+			if(output.exists()) {
+				continue;
+			}
+			
+			HashMap<String,IsoHolder> isoLists = new HashMap<>();	
+			HashMap<String,LinkedList<IsoHolder>> hashBuckets = new HashMap<String,LinkedList<IsoHolder>>();
+			
+			if(referenceSet) {
+				mt.publish((int) (step*((minSize-size)+1))+2, "Finding motifs sized " + size, true);
+
+				//for each rewired graph
+				for(int i = 0; i < rewiresNeeded; i++) {
+					FastGraph graph = FastGraph.loadBuffersGraphFactory("motifs"+File.separatorChar+graphName+File.separatorChar+"-rewire-"+i,
+							"-rewire-"+i);
+					
+					mt.publish((int) (((double) i)/rewiresNeeded)*100, "From rewire " + (i+1) + " of " + rewiresNeeded, false);	
+					//find motifs
+					findMotifsInGraph(isoLists, hashBuckets, size, graph);
+				}
+
+				mt.publish((int) (step*((minSize-size)+1))+2, "Saving motifs sized " + size, true);
+			} else {
+				findMotifsInGraph(isoLists, hashBuckets, size, g);
+			}
+			
+			//export results for this size
+			exportMotifData(isoLists, referenceSet, size, graphName, output, hashBuckets);
+			
+		}
+		
+		//TODO delete rewired graphs
+
+		
+	}
+	
+	private void findMotifsInGraph(HashMap<String,IsoHolder> isoLists, HashMap<String,LinkedList<IsoHolder>> hashBuckets, 
+			int size, FastGraph graph) {
+		
+		ExactMotifFinder emf = new ExactMotifFinder(graph);
+		Debugger.log("    finding motifs");
+		emf.findMotifs(size, 0, hashBuckets);
+		HashMap<String,IsoHolder> newIsoLists = emf.extractGraphLists(hashBuckets);
+		Debugger.log("    merging lists");
+		isoLists = mergeIsoLists(isoLists, newIsoLists);
+	}
+	
+	/**
+	 * Exports the motif data to disk.<br>
+	 * Will export a log file, buffers for each isomorphic graph, and an SVG
+	 * 
+	 * @param isoLists The isolist
+	 * @param referenceSet If this is the reference set to be saved
+	 * @param motifSize The size of motifs to be saved
+	 * @param graphName The name of the graph
+	 * @param output The output file
+	 * @param hashBuckets The hashbuckets
+	 * @throws FileNotFoundException If the output files cannot be written to
+	 */
+	private void exportMotifData(HashMap<String,IsoHolder> isoLists, boolean referenceSet, int motifSize, String graphName, 
+			File output, HashMap<String,LinkedList<IsoHolder>> hashBuckets) throws FileNotFoundException {
+		
+		long time = Debugger.createTime();
+		
+		int totalSize = 0;
+		for(LinkedList<IsoHolder> holderList : hashBuckets.values()) {
+			for(IsoHolder holder : holderList) {
+			//	Debugger.log("    "+holder.getKey() + " " + holder.getNumber());
+				totalSize+= holder.getNumber();
+			}			
+		}
+		Debugger.log("#TOTAL SIZE: "+totalSize);
+		//export the motifs
+		
+		//build the output file, and if needed, save the motif buffers
+		StringBuilder sb = new StringBuilder();
+		int outputCounter = 0;
+		long outputTime = Debugger.createTime();
+		for(String key : hashBuckets.keySet()) {
+			LinkedList<IsoHolder> holders = hashBuckets.get(key);
+			int count = 1;
+			outputCounter++;
+			
+			int outputPercentage = (int) ( ((double) outputCounter/hashBuckets.size())*100);
+			mt.publish(outputPercentage, "Saving motif " + outputCounter + " of " + hashBuckets.size(),false);
+			
+			for (IsoHolder holder : holders) {
+		//		Debugger.log("    "+holder.getKey() + " num: " + holder.getNumber() + " total: " + totalSize);
+				double percentage = ((double) holder.getNumber()/totalSize)*100;
+				sb.append(key+"-"+count+"\t"+holder.getNumber() + "\t" + String.format( "%.10f", percentage ) +"\n");
+				
+				//save buffer
+				//if(referenceSet) {
+					FastGraph gOut = holder.getGraph();
+					gOut.setName(key+"-"+count);
+					gOut.saveBuffers("motifs"+File.separatorChar+graphName+File.separatorChar+key+"-"+count, key+"-"+count);
+					
+					//save SVG
+					exportSVG(holder,count);
+				//}
+
+				count++;
+			}
+			
+			if(outputCounter % 1000 == 0) {
+				Debugger.outputTime("Saved "+outputCounter+" so far, out of " + hashBuckets.size() + " in ", outputTime);
+			}
+		}
+
+		//save the motif info file
+		//File output = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"motifs"+nameString+".txt");
+		try(PrintWriter out = new PrintWriter( output )){ //will close file after use
+		    out.println( sb );
+		}
+		
+		Debugger.outputTime("Time to save: ", time);
+	}
+	
+	/**
+	 * Builds a list of rewired graphs, each one built from the previous and saved to disk
+	 * @param numOfRewires The number of rewires to perform
+	 */
+	public void buildRewires(int numOfRewires) {
+		String graphName = g.getName();
+		FastGraph last = g;
+		for(int i = 0; i < numOfRewires; i++) {
+			
+			File output = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"-rewire-"+i);
+			//if output exists, do nothing
+			if(output.exists()) {
+				continue;
+			}
+			
+			int rewirePercentage = (int) (((double) (i+1) / numOfRewires)*100);
+			mt.publish(rewirePercentage, "Rewiring "+(i+1)+" out of "+numOfRewires+" times",false);	
+			Debugger.log("    rewiring for the "+i+" time");
+			
+			FastGraph newG = last.generateRandomRewiredGraph(1,1);
+			newG.setName(graphName);
+			mt.publish(rewirePercentage, "Saving Rewire "+(i+1),false);	
+			newG.saveBuffers("motifs"+File.separatorChar+graphName+File.separatorChar+"-rewire-"+i, "-rewire-"+i);
+
+			last = newG;
+		}
+	}	
 	
 	/**
 	 * Outputs a given map hashBuckets to the screen. Note: Not to a file!
@@ -149,27 +322,6 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		ExactIsomorphism.reportTimes();
 	}
 
-	/**
-	 * 
-	 * @param g the FastGraph to find motifs in
-	 * @param numOfNodes the number of nodes in each motif
-	 */
-	public ExactMotifFinder(FastGraph g) {
-		this(g,null);
-	}
-	
-	/**
-	 * 
-	 * @param g the FastGraph to find motifs in
-	 * @param mf The MotifTask to report progress to
-	 */
-	public ExactMotifFinder(FastGraph g, MotifTask mt) {
-		this.g = g;
-		this.mt = mt;
-		//enumerator = new EnumerateSubgraphFanmod(g);
-		enumerator = new EnumerateSubgraphNeighbourhood(g);
-		enumeratorRandom = new EnumerateSubgraphRandom(g);
-	}
 	
 	/**
 	 * Merges two isoLists together, and returns the enlarged list
@@ -206,6 +358,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * @param referenceSet Are these motifs the ones that will be referenced against? Will be saved to disk, if so
 	 * @throws IOException Files cannot be read
 	 */
+	@Deprecated
 	public void findAndExportAllMotifs(int rewiresNeeded, int minSize, int maxSize, int motifSampling, boolean referenceSet) throws IOException {
 		long time = Debugger.createTime();
 		
@@ -325,6 +478,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * @param hashBuckets The buckets to store the results in
 	 * @return The map of keys to buckets of motifs that match those keys
 	 */
+	@Deprecated
 	public HashMap<String,IsoHolder> findAllMotifs(int rewiresNeeded, int minSizeOfMotifs, int maxSizeOfMotifs, int motifSampling, HashMap<String,LinkedList<IsoHolder>> hashBuckets) {
 		HashMap<String,IsoHolder> isoLists = new HashMap<>();
 
@@ -399,7 +553,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		
 		//hashBuckets = new HashMap<String,LinkedList<LinkedList<FastGraph>>> (g.getNumberOfNodes());
 		
-		subgraphs = enumerator.enumerateSubgraphs(k, 5 ,10);
+		HashSet<FastGraph> subgraphs = enumerator.enumerateSubgraphs(k, 5 ,10);
 //		subgraphs = enumeratorRandom.randomSampleSubgraph(k,10000);		
 		
 		
@@ -450,7 +604,9 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * @throws FileNotFoundException If any of the files cannot be found
 	 * @throws IOException If there is a problem loading any of the files
 	 */
-	public void loadMotifsFromFiles(File logFile, File directory, HashMap<String,IsoHolder> isoLists, HashMap<String,LinkedList<IsoHolder>> hashBuckets) throws FileNotFoundException, IOException {
+	@Deprecated
+	private void loadMotifsFromFiles(File logFile, File directory, HashMap<String,IsoHolder> isoLists, 
+			HashMap<String,LinkedList<IsoHolder>> hashBuckets) throws FileNotFoundException, IOException {
 		
 		int directories = (int) (Files.find(Paths.get(directory.toString()),1,(path, attributes) -> attributes.isDirectory()).count() - 1);
 		int i = 0;
@@ -532,15 +688,13 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * Compares the results from the reference set to the real set.<br>
 	 * Exports these in a user friendly manner
 	 * 
-	 * @param referenceBuckets The hashbuckets of the reference set (may be loaded or calculated)
-	 * @param realBuckets The hashbuckets of the real set.
 	 * @throws IOException If the File cannot be read
 	 * @throws FileNotFoundException  If the file cannot be found
 	 */
-	public void compareAndExportResults(HashMap<String,LinkedList<IsoHolder>> referenceBuckets, HashMap<String,LinkedList<IsoHolder>> realBuckets) throws FileNotFoundException, IOException {
+	private void compareAndExportResults(int size, int minSize, int maxSize) throws FileNotFoundException, IOException {
 		String graphName = g.getName();
-		File refOutput = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"motifs_reference"+".txt");
-		File realOutput = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"motifs_real"+".txt");
+		File refOutput = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"motifs_size"+size+"_reference"+".txt");
+		File realOutput = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"motifs_size"+size+"_real"+".txt");
 		
 		HashMap<String,MotifResultHolder> results = new HashMap<String,MotifResultHolder>();
 		buildResults(results, refOutput, true);
@@ -554,14 +708,14 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		Debugger.log("length of motifResults" + motifResults.size());
 		
 		mt.publish(83, "Exporting Results", 0, "");
-		
+		buildHomePage(minSize,maxSize);
 		int sample = 1000;
 		int numberOfPages = (int) Math.ceil((double) motifResults.size()/sample);
 		for(int i = 0; i < numberOfPages; i++) {
 			int pagePercentage = (int) (((double) i/numberOfPages)*100);
 			mt.publish(pagePercentage, "Exporting page "+i+" of "+numberOfPages, false);
 			
-			buildPage(i,numberOfPages,Util.subList(motifResults,i*sample, (i*sample)+sample));
+			buildPage(i,numberOfPages,Util.subList(motifResults,i*sample, (i*sample)+sample), size, minSize, maxSize);
 		}	
 		
 		Debugger.log("number of pages required: " + numberOfPages);
@@ -579,7 +733,9 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * @throws IOException If the File cannot be read
 	 * @throws FileNotFoundException  If the file cannot be found
 	 */
-	private HashMap<String,MotifResultHolder> buildResults(HashMap<String,MotifResultHolder> results, File logFile, boolean referenceSet) throws FileNotFoundException, IOException {
+	private HashMap<String,MotifResultHolder> buildResults(HashMap<String,MotifResultHolder> results, File logFile, 
+			boolean referenceSet) throws FileNotFoundException, IOException {
+		
 		long time = Debugger.createTime();
 		try (BufferedReader br = new BufferedReader(new FileReader(logFile))) {
 		    String line;
@@ -608,15 +764,51 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	}
 	
 	/**
+	 * Builds a simple home page.
+	 * 
+	 * @param minSize The minimum size of motifs found
+	 * @param maxSize The maximum size of motifs found
+	 * @throws FileNotFoundException If the file cannot be found
+	 */
+	private void buildHomePage(int minSize, int maxSize) throws FileNotFoundException {
+		Document doc = Document.createShell("");
+		
+		doc.head().appendElement("title").text(g.getName());
+
+		Element headline = doc.body().appendElement("h1").text(g.getName());
+		
+		Element pageNumberHeader = doc.body().appendElement("h2").text("Sizes:");
+		
+		//size
+		Element linksDiv = doc.body().appendElement("div");
+		linksDiv.appendText("Sizes: ");
+		for(int i = minSize; i <= maxSize; i++) {		
+			linksDiv.appendElement("a").text(i+"").attr("href", "index-size"+i+".html");
+		}
+		
+		File output = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+g.getName()+File.separatorChar+"index.html");
+		//save the output html file
+		
+		try(PrintWriter out = new PrintWriter( output )){ //will close file after use
+		    out.println( doc.toString() );
+		}
+	}
+	
+	
+	/**
 	 * Builds and exports a particular page for the HTML output.<br>
 	 * Note: expects the results list to only contain the required results to display
 	 * 
 	 * @param pageNumber This page number
 	 * @param totalPages The total number of pages
 	 * @param results The list of results to output
+	 * @param motifSize The size of motifs this file is for
+	 * @param minSize The minimum size of motifs found
+	 * @param maxSize The maximum size of motifs found
 	 * @throws FileNotFoundException If the output file cannot be written to
 	 */
-	private void buildPage(int pageNumber, int totalPages, List<MotifResultHolder> results) throws FileNotFoundException {
+	private void buildPage(int pageNumber, int totalPages, List<MotifResultHolder> results, int motifSize, 
+			int minSize, int maxSize) throws FileNotFoundException {
 
 		Debugger.log("length of output results" + results.size());
 		
@@ -625,11 +817,21 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		doc.head().appendElement("title").text(g.getName());
 
 		Element headline = doc.body().appendElement("h1").text(g.getName());
-		Element pageNumberHeader = doc.body().appendElement("h2").text("Page "+(pageNumber+1));
+		Element pageNumberHeader = doc.body().appendElement("h2").text("Size " + motifSize + ", Page "+(pageNumber+1));
+		
+		//size
 		Element linksDiv = doc.body().appendElement("div");
+		linksDiv.appendText("Sizes: ");
+		for(int i = minSize; i <= maxSize; i++) {		
+			linksDiv.appendElement("a").text(i+"").attr("href", "index-size"+i+".html");
+		}
+		
+		//pages
+		linksDiv = doc.body().appendElement("div");
+		linksDiv.appendText("Pages: ");
 		linksDiv.appendElement("a").text("1").attr("href", "index.html");
-		for(int i = 1; i < totalPages; i++) {
-			linksDiv.appendElement("a").text((i+1)+"").attr("href", "index"+(i+1)+".html");
+		for(int i = 1; i < totalPages; i++) {			
+			linksDiv.appendElement("a").text((i+1)+"").attr("href", "index-size"+motifSize+"-"+(i+1)+".html");
 		}
 		doc.body().appendElement("br");
 		//build output table
@@ -652,16 +854,17 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		doc.body().appendElement("br");
 		//output links again
 		linksDiv = doc.body().appendElement("div");
-		linksDiv.appendElement("a").text("1").attr("href", "index.html");
-		for(int i = 1; i < totalPages; i++) {
-			linksDiv.appendElement("a").text((i+1)+"").attr("href", "index"+(i+1)+".html");
+		linksDiv.appendText("Pages: ");
+		linksDiv.appendElement("a").text("1").attr("href", "index.html");		
+		for(int i = 1; i < totalPages; i++) {			
+			linksDiv.appendElement("a").text((i+1)+"").attr("href", "index-size"+motifSize+"-"+(i+1)+".html");
 		}
 		
-		String outputNum = (pageNumber+1)+"";
+		String outputNum = "-"+(pageNumber+1)+"";
 		if(pageNumber == 0) {
 			outputNum = "";
 		}
-		File output = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+g.getName()+File.separatorChar+"index"+outputNum+".html");
+		File output = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+g.getName()+File.separatorChar+"index-size"+motifSize+outputNum+".html");
 		//save the output html file
 		
 		try(PrintWriter out = new PrintWriter( output )){ //will close file after use
