@@ -35,90 +35,66 @@ public class EnumerateSubgraphNeighbourhood {
 	 * @return A set of FastGraphs
 	 */
 	public HashSet<FastGraph> enumerateSubgraphs(int subgraphSize, int subgraphsPerNode, int attemptsToFindSubgraph) {
-		
-	//	Debugger.log("number of subgraphs per node " + subgraphsPerNode);
-	/*	
-		int failuresNeighbourhoodTooSmall = 0;
-		int failuresAttemptsMaxedOut = 0;
-		double neighbourhoodTotal = 0;
-		
-		Debugger.resetTime();
-		long time = Debugger.createTime();
-		*/
 		Random r = new Random(g.getNodeBuf().getLong(0));
 		HashSet<FastGraph> subgraphs = new HashSet<FastGraph>();
 		
 		//for each node
 		for(int n = 0; n < g.getNumberOfNodes(); n++) {
-		//for(int n = 0; n < 6002; n++) {
-			/*
-			int step = 100000;
-			if(n % step == 0 && n!=0) {
-				Debugger.log();
-				Debugger.log("Node: " + n);
-				Debugger.log("Subgraphs found so far: " + subgraphs.size());
-				double smallHoodPercentage = ( (double) failuresNeighbourhoodTooSmall/n)*100;
-				Debugger.log("Failures due to small hood so far: " + failuresNeighbourhoodTooSmall + " (" + String.format( "%.2f", smallHoodPercentage ) + "%)");
-				double maxedOutPercentage = ( (double) failuresAttemptsMaxedOut/n)*100;
-				Debugger.log("Failures due to attempts maxed out so far: " + failuresAttemptsMaxedOut + " (" + String.format( "%.2f", maxedOutPercentage ) + "%)");
-				double fullySuccessNodesPercentage = ((double) (n-(failuresNeighbourhoodTooSmall+failuresAttemptsMaxedOut))/n)*100;
-				Debugger.log("Fully sucessful nodes: " + String.format( "%.2f", fullySuccessNodesPercentage ) + "%"); 
-				double avgNeighbourhoodSize = neighbourhoodTotal / n;
-				Debugger.log("Average neighbourhood size: " + String.format( "%.2f",avgNeighbourhoodSize));
-				long timeLeft = Debugger.getTimeSinceInSeconds(time)*((g.getNumberOfNodes()-n)/step);
-				Debugger.outputTime("Time since last: ", time);
-				
-				
-				Debugger.log("Estimated time left: " + timeLeft + " seconds (" + timeLeft/60 + " mins)");
-				
-				time = Debugger.createTime();
-				Debugger.outputTime("Time so far");
-				
-			}
-			*/
-			
-			//skip if the node has no connections
-			if(g.getNodeDegree(n) == 0) {
-				continue;
-			}
-			
-			//for each subgraph at this neighbourhood
-			int foundSubgraphs = 0;
-			while(foundSubgraphs < subgraphsPerNode) {
-				//build neighbourhood
-				HashSet<Integer> nodes = new HashSet<Integer>();
-				nodes.add(n);
-				int attempts = 0; //in case we happen to pick one already in the list, but also to stop when there are no more to pick
-				while(nodes.size() < subgraphSize && attempts < attemptsToFindSubgraph) {
-					int nextNode = Util.getFromHashSet(nodes,r.nextInt(nodes.size()));
-					int[] cn = g.getNodeConnectingNodes(nextNode);
-					int nextToAdd = cn[r.nextInt(cn.length)];
-					int nSize = nodes.size();
-					nodes.add(nextToAdd);
-					if(nSize == nodes.size()) {
-						//no nodes added
-						attempts++;
-					}
-				}
-
-				//Are there enough nodes found?
-				if(nodes.size() < subgraphSize) {
-				//	failuresNeighbourhoodTooSmall++;
-					//Debugger.log("neighbourhood too small: " + nodes.size());
-					break; //don't check this node again
-				} else {
-					//add subgraph
-					HashSet<Integer> edges = new HashSet<Integer>();
-					addMissingEdges(nodes, edges);
-					FastGraph subgraph = g.generateGraphFromSubgraph(Util.convertHashSet(nodes), Util.convertHashSet(edges));
-					foundSubgraphs++;
-					subgraphs.add(subgraph);
-				}
-			}
-			
+			enumerateSubgraphsFromNode(subgraphSize, subgraphsPerNode, attemptsToFindSubgraph, n, r, subgraphs);
 		}	
-		//Debugger.log();
+
 		return subgraphs;
+	}
+	
+	/**
+	 * Generates a set of subgraphs from a given node
+	 * 
+	 * @param subgraphSize The number of nodes in each subgraph
+	 * @param subgraphsPerNode The number of subgraphs per node
+	 * @param attemptsToFindSubgraph The number of attempts to find a connected subgraph.
+	 * @param n The id of the node to build from
+	 * @param r A random number generator
+	 * @param subgraphs A set of FastGraphs to populate
+	 */
+	public void enumerateSubgraphsFromNode(int subgraphSize, int subgraphsPerNode, int attemptsToFindSubgraph, int n, Random r, HashSet<FastGraph> subgraphs) {
+		//skip if the node has no connections
+		if(g.getNodeDegree(n) == 0) {
+			return;
+		}
+		
+		//for each subgraph at this neighbourhood
+		int foundSubgraphs = 0;
+		while(foundSubgraphs < subgraphsPerNode) {
+			//build neighbourhood
+			HashSet<Integer> nodes = new HashSet<Integer>();
+			nodes.add(n);
+			int attempts = 0; //in case we happen to pick one already in the list, but also to stop when there are no more to pick
+			while(nodes.size() < subgraphSize && attempts < attemptsToFindSubgraph) {
+				int nextNode = Util.getFromHashSet(nodes,r.nextInt(nodes.size()));
+				int[] cn = g.getNodeConnectingNodes(nextNode);
+				int nextToAdd = cn[r.nextInt(cn.length)];
+				int nSize = nodes.size();
+				nodes.add(nextToAdd);
+				if(nSize == nodes.size()) {
+					//no nodes added
+					attempts++;
+				}
+			}
+
+			//Are there enough nodes found?
+			if(nodes.size() < subgraphSize) {
+			//	failuresNeighbourhoodTooSmall++;
+				//Debugger.log("neighbourhood too small: " + nodes.size());
+				break; //don't check this node again
+			} else {
+				//add subgraph
+				HashSet<Integer> edges = new HashSet<Integer>();
+				addMissingEdges(nodes, edges);
+				FastGraph subgraph = g.generateGraphFromSubgraph(Util.convertHashSet(nodes), Util.convertHashSet(edges));
+				foundSubgraphs++;
+				subgraphs.add(subgraph);
+			}
+		}
 	}
 	
 	

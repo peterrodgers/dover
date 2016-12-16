@@ -131,7 +131,9 @@ public class ExactMotifFinder {
 			return;
 		}
 		
-		mt.publish((int) step*1, "Rewiring graph", true);
+		if(referenceSet) {
+			mt.publish((int) step*1, "Rewiring graph", true);
+		}		
 		
 		//rewire graph
 		if(referenceSet) {
@@ -179,9 +181,18 @@ public class ExactMotifFinder {
 		
 	}
 	
+	/**
+	 * Finds all motifs in a given graph
+	 * 
+	 * @param isoLists The isoList to store results in
+	 * @param hashBuckets The hashbuckets to store results in
+	 * @param size The size of motif to find
+	 * @param graph The graph to find motifs in
+	 * @throws IOException If the graph cannot be loaded
+	 */
 	private void findMotifsInGraph(HashMap<String,IsoHolder> isoLists, HashMap<String,LinkedList<IsoHolder>> hashBuckets, 
-			int size, FastGraph graph) {
-		
+			int size, FastGraph graph) throws IOException {
+	
 		ExactMotifFinder emf = new ExactMotifFinder(graph);
 		Debugger.log("    finding motifs");
 		emf.findMotifs(size, 0, hashBuckets);
@@ -200,10 +211,10 @@ public class ExactMotifFinder {
 	 * @param graphName The name of the graph
 	 * @param output The output file
 	 * @param hashBuckets The hashbuckets
-	 * @throws FileNotFoundException If the output files cannot be written to
+	 * @throws IOException If the graph cannot be loaded
 	 */
 	private void exportMotifData(HashMap<String,IsoHolder> isoLists, boolean referenceSet, int motifSize, String graphName, 
-			File output, HashMap<String,LinkedList<IsoHolder>> hashBuckets) throws FileNotFoundException {
+			File output, HashMap<String,LinkedList<IsoHolder>> hashBuckets) throws IOException {
 		
 		long time = Debugger.createTime();
 		
@@ -236,12 +247,12 @@ public class ExactMotifFinder {
 				
 				//save buffer
 				//if(referenceSet) {
-					FastGraph gOut = holder.getGraph();
-					gOut.setName(key+"-"+count);
-					gOut.saveBuffers("motifs"+File.separatorChar+graphName+File.separatorChar+key+"-"+count, key+"-"+count);
+				//	FastGraph gOut = holder.getGraph();
+				//	gOut.setName(key+"-"+count);
+				//	gOut.saveBuffers("motifs"+File.separatorChar+graphName+File.separatorChar+key+"-"+count, key+"-"+count);
 					
 					//save SVG
-					exportSVG(holder,count);
+					exportSVG(key, holder.getGraph() ,count);
 				//}
 
 				count++;
@@ -436,7 +447,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 						gOut.saveBuffers("motifs"+File.separatorChar+graphName+File.separatorChar+key+"-"+count, key+"-"+count);
 						
 						//save SVG
-						exportSVG(holder,count);
+						exportSVG(key, holder.getGraph(), count);
 					//}
 
 					count++;
@@ -477,9 +488,10 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * @param motifSampling The number of motifs to sample?
 	 * @param hashBuckets The buckets to store the results in
 	 * @return The map of keys to buckets of motifs that match those keys
+	 * @throws IOException 
 	 */
 	@Deprecated
-	public HashMap<String,IsoHolder> findAllMotifs(int rewiresNeeded, int minSizeOfMotifs, int maxSizeOfMotifs, int motifSampling, HashMap<String,LinkedList<IsoHolder>> hashBuckets) {
+	public HashMap<String,IsoHolder> findAllMotifs(int rewiresNeeded, int minSizeOfMotifs, int maxSizeOfMotifs, int motifSampling, HashMap<String,LinkedList<IsoHolder>> hashBuckets) throws IOException {
 		HashMap<String,IsoHolder> isoLists = new HashMap<>();
 
 		FastGraph currentGraph = g;
@@ -534,7 +546,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 				count++;
 				
 				String retKey = key+"-"+count;
-				ret.put(retKey,new IsoHolder(retKey, list.getNumber(), list.getGraph()));
+				ret.put(retKey,new IsoHolder(retKey, list.getNumber()));
 			}
 		}
 		
@@ -548,48 +560,69 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * @param k the size of motifs in terms of number of nodes.
 	 * @param q the fraction of nodes to sample.
 	 * @param hashBuckets The buckets to store the results in
+	 * @throws IOException 
 	 */
-	public void findMotifs(int k, double q, HashMap<String,LinkedList<IsoHolder>> hashBuckets) {
+	public void findMotifs(int k, double q, HashMap<String,LinkedList<IsoHolder>> hashBuckets) throws IOException {
 		
 		//hashBuckets = new HashMap<String,LinkedList<LinkedList<FastGraph>>> (g.getNumberOfNodes());
+		Random r = new Random(g.getNodeBuf().getLong(0));
+		long time = Debugger.createTime();
 		
-		HashSet<FastGraph> subgraphs = enumerator.enumerateSubgraphs(k, 5 ,10);
-//		subgraphs = enumeratorRandom.randomSampleSubgraph(k,10000);		
-		
-		
-		for(FastGraph subgraph : subgraphs) {
-			ExactIsomorphism ei = new ExactIsomorphism(subgraph);
-			String hashString = ei.generateStringForHash();
-//Debugger.log("new subgraph, hash value "+hashString);			
-			if(hashBuckets.containsKey(hashString)) {
-				LinkedList<IsoHolder> sameHashList = hashBuckets.get(hashString); // all of the FastGraphs with the given hash value
-				boolean found = false;
-				for(IsoHolder isoList : sameHashList) { // now need to test all the same hash value buckets for isomorphism
-					// only need to test the first Graph in an isomorphic list!
-					FastGraph comparisonGraph = isoList.getGraph();
-
-					if(ei.isomorphic(comparisonGraph)) {
-						isoList.incrementNumber();
-						found = true;
-						break;
-					}
-				}
-				
-				if(!found) { // no isomorphic graphs found, so need to create a new list
-					IsoHolder newIsoList = new IsoHolder(hashString, 1, subgraph);
-					//newIsoList.setGraph(subgraph);
-					sameHashList.add(newIsoList);
-				}
-			} else {
-				LinkedList<IsoHolder> newHashList = new LinkedList<IsoHolder>();
-				hashBuckets.put(hashString, newHashList);
-				IsoHolder newIsoList = new IsoHolder(hashString, 1, subgraph);
-				//newIsoList.add(subgraph);
-				newHashList.add(newIsoList);
+		for(int n = 0; n < g.getNumberOfNodes(); n++) {
+			
+			if(n%100000 ==0) {
+				Debugger.outputTime("done node" + n, time);
 			}
+			
+			HashSet<FastGraph> subgraphs = new HashSet<FastGraph>();
+			enumerator.enumerateSubgraphsFromNode(k, 5, 10, n, r, subgraphs);
+			
+			for(FastGraph subgraph : subgraphs) {
+				ExactIsomorphism ei = new ExactIsomorphism(subgraph);
+				String hashString = ei.generateStringForHash();
+	//Debugger.log("new subgraph, hash value "+hashString);			
+				if(hashBuckets.containsKey(hashString)) {
+					LinkedList<IsoHolder> sameHashList = hashBuckets.get(hashString); // all of the FastGraphs with the given hash value
+					boolean found = false;
+					for(IsoHolder isoList : sameHashList) { // now need to test all the same hash value buckets for isomorphism
+						// only need to test the first Graph in an isomorphic list!
+						FastGraph comparisonGraph = isoList.getGraph();
 
+						if(ei.isomorphic(comparisonGraph)) {
+							isoList.incrementNumber();
+							found = true;
+							break;
+						}
+					}
+					
+					if(!found) { // no isomorphic graphs found, so need to create a new list
+						IsoHolder newIsoList = new IsoHolder(hashString+"-"+(sameHashList.size()+1), 1);
+						
+						subgraph.setName(hashString);
+						subgraph.saveBuffers("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-"+(sameHashList.size()+1), hashString+"-"+(sameHashList.size()+1));
+						
+						//newIsoList.setGraph(subgraph);
+						sameHashList.add(newIsoList);
+					}
+				} else {
+					LinkedList<IsoHolder> newHashList = new LinkedList<IsoHolder>();
+					hashBuckets.put(hashString, newHashList);
+					
+					subgraph.setName(hashString);
+					subgraph.saveBuffers("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-1", hashString+"-1");
+					
+					IsoHolder newIsoList = new IsoHolder(hashString+"-1", 1);
+					//newIsoList.add(subgraph);
+					newHashList.add(newIsoList);
+				}
+
+				//TODO force GC
+				ei = null;
+				//System.gc();
+			}
+			
 		}
-		
+	
 	}
 	
 	/**
@@ -638,7 +671,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		    	//Debugger.log("key: " + key);
 		    	//Debugger.log("index: " + isoIndex);
 		    	
-		    	IsoHolder holder = new IsoHolder(key, Integer.parseInt(lineArr[1]), h);
+		    	IsoHolder holder = new IsoHolder(key, Integer.parseInt(lineArr[1]));
 		    	
 		    	//store in isoholder
 		    	isoLists.put(key, holder);
@@ -661,13 +694,14 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * Exports the given IsoHolder (and isomorphic count) to SVG.<br>
 	 * Saves as motifs/[graph name]/[iso key]-count/motif.svg
 	 * 
-	 * @param isoList The IsoHolder for this graph
+	 * @param key The hashkey for this graph
+	 * @param graph The graph to be exported
 	 * @param count The isomorphic count
+	 * @throws IOException 
 	 */
-	private void exportSVG(IsoHolder isoList, int count) {
-		String key = isoList.getKey();
+	private void exportSVG(String key, FastGraph graph, int count) throws IOException {
 		//int count = isoList.getNumber();
-		uk.ac.kent.displayGraph.Graph dg = isoList.getGraph().generateDisplayGraph();
+		uk.ac.kent.displayGraph.Graph dg = graph.generateDisplayGraph();
 		dg.randomizeNodePoints(new Point(20,20),300,300);
 		dg.setLabel(key);
 		uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg, false);
@@ -942,7 +976,8 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	
 	
 	/**
-	 * Class to hold a FastGraph and the number of instances of that FastGraph for a particular key.
+	 * Class to hold a FastGraph key and the number of instances of that FastGraph for a particular key.<br>
+	 * Graphs are loaded from disk. 
 	 * Saves keeping big lists and lists of lists.
 	 * 
 	 * @author Rob Baker
@@ -952,19 +987,16 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		
 		private String key; //The key
 		private int number; //The number of graphs
-		private FastGraph graph; //An example of a graph
 		
 		/**
 		 * Trivial constructor
 		 * 
 		 * @param key The hashkey for this graph
 		 * @param number The number of graphs with this hashkey
-		 * @param graph An example of one of the graphs
 		 */
-		public IsoHolder(String key, int number, FastGraph graph) {
+		public IsoHolder(String key, int number) {
 			this.key = key;
 			this.number = number;
-			this.graph = graph;
 		}
 
 		/**
@@ -1007,20 +1039,14 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		}
 		
 		/**
-		 * Gets the graph
+		 * Loads the graph from disk
 		 * @return the graph
+		 * @throws IOException 
 		 */
-		public FastGraph getGraph() {
-			return graph;
+		public FastGraph getGraph() throws IOException {
+			return FastGraph.loadBuffersGraphFactory("motifs"+File.separatorChar+g.getName()+File.separatorChar+key, key);
 		}
 
-		/**
-		 * Sets the graph
-		 * @param graph the graph to set
-		 */
-		public void setGraph(FastGraph graph) {
-			this.graph = graph;
-		}
 		
 		public String toString() {
 			return key+"|"+number;

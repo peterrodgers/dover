@@ -615,7 +615,8 @@ startTime = -1;
 		AdjacencyMatrix gam = new AdjacencyMatrix(g);
 		int[][] gMatrix = gam.buildIntAdjacencyMatrix();
 		double[] gEigenvalues = gam.findEigenvalues(gMatrix);
-
+		gam = null;
+		//System.gc();
 		return compareEigenValues(gEigenvalues);
 	}
 	
