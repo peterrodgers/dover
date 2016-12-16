@@ -1,7 +1,5 @@
 package uk.ac.kent.dover.fastGraph;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.util.*;
 
@@ -67,8 +65,8 @@ public class ExactIsomorphism {
 
 		Debugger.enabled = true;
 		// Profiling code for number of required rewirings
-		int nodes = 100000;
-		int edges = 1000000;
+		int nodes = 1000000;
+		int edges = 15000000;
 		int iterations = 1;
 			
 		FastGraph g = null;
@@ -132,8 +130,6 @@ for(int i = 0; i< ga.getNumberOfEdges();i++) {
 		
 System.exit(0);
 		// end of profiling code
-		
-		// TODO test in degrees and out degrees in JUNIT
 		
 		
 		int comparisons = 1000;
@@ -234,7 +230,7 @@ g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i,true,false);
 	 * @param buckets big enough to hold all degrees, should be at least maxDegree+1
 	 * @param degrees from findDegrees
 	 */
-	private void findDegreeBuckets(int[] buckets, int[] degrees) {
+	public static void findDegreeBuckets(int[] buckets, int[] degrees) {
 		for(int i = 0; i < degrees.length; i++) {
 			buckets[degrees[i]]++;
 		}
@@ -261,13 +257,12 @@ g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i,true,false);
 
 
 	/**
-	 * gives the neighbours of nodes in g, without duplicates and without self sourcing. The returned array may be larger than
-	 * strictly necessary.
+	 * gives the neighbours of nodes in g, without duplicates and without self sourcing.
 	 * 
 	 * @param g the graph
 	 * @return the neighbours for each node in the graph
 	 */
-	private ArrayList<HashSet<Integer>> findNeighbours(FastGraph g, int maxDegree) {
+	public static ArrayList<HashSet<Integer>> findNeighbours(FastGraph g, int maxDegree) {
 		
 		ArrayList<HashSet<Integer>> ret = new ArrayList<HashSet<Integer>>(g.getNumberOfNodes());
 		for(int n = 0; n < g.getNumberOfNodes(); n++) {
@@ -295,7 +290,7 @@ g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i,true,false);
 	 * @param g the graph with the nodes
 	 * @return an array containing the degrees
 	 */
-	private int[] findDegrees(FastGraph g) {
+	public static int[] findDegrees(FastGraph g) {
 		int[] degrees = new int[g.getNumberOfNodes()];
 		for(int i = 0; i < g.getNumberOfNodes(); i++) {
 			degrees[i] = g.getNodeDegree(i);
