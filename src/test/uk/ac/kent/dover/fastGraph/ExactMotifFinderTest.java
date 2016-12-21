@@ -27,9 +27,9 @@ public class ExactMotifFinderTest {
 	public void test001() throws IOException {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get4Node5Edge(),false);
 		ExactMotifFinder emf = new ExactMotifFinder(g);
-		emf.findAndExportAllMotifs(10, 4, 8, 0, true);
+		emf.findAllMotifs(10,4,8);
 		HashMap<String,LinkedList<IsoHolder>> hashBuckets = emf.getHashBuckets();
-		emf.findAndExportAllMotifs(10, 4, 8, 0, true);
+		emf.findAllMotifs(10,4,8);
 		HashMap<String,LinkedList<IsoHolder>> hashBuckets2 = emf.getHashBuckets();
 		assertEquals(hashBuckets.toString(),hashBuckets2.toString());
 	}
@@ -38,9 +38,9 @@ public class ExactMotifFinderTest {
 	public void test002() throws IOException {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get5Node5Edge(),false);
 		ExactMotifFinder emf = new ExactMotifFinder(g);
-		emf.findAndExportAllMotifs(10, 4, 8, 0, true);
+		emf.findAllMotifs(10,4,8);
 		HashMap<String,LinkedList<IsoHolder>> hashBuckets = emf.getHashBuckets();
-		emf.findAndExportAllMotifs(10, 4, 8, 0, true);
+		emf.findAllMotifs(10,4,8);
 		HashMap<String,LinkedList<IsoHolder>> hashBuckets2 = emf.getHashBuckets();
 		assertEquals(hashBuckets.toString(),hashBuckets2.toString());
 	}

@@ -107,13 +107,13 @@ public class Launcher {
 		ExactMotifFinder emf = new ExactMotifFinder(g2,mt);
 		
 		mt.publish((int) step, "Building Reference Set", 0, "");		
-		emf.findAllMotifs(10,4,6);
+		emf.findAllMotifs(10,minNum,maxNum);
 		
 		mt.publish((int) (100-(2*step)), "Building Main Set", 0, "");
-		emf.findAllMotifs(0,4,6);
+		emf.findAllMotifs(0,minNum,maxNum);
 		
 		mt.publish((int) (100-step), "Comparing Motif Sets", 0, "");
-		emf.compareMotifDatas(4,6);
+		emf.compareMotifDatas(minNum,maxNum);
 		
 		//emf.compareAndExportResults(referenceBuckets, realBuckets);
 		//emf.outputHashBuckets(referenceBuckets);
