@@ -6,7 +6,7 @@ package uk.ac.kent.dover.fastGraph;
  * The nodeMapping and edgeMapping indexes are those of the smaller graph
  * The contents are the corresponding nodes and edges in the larger graph
  * 
- * @author pjr
+ * @author Peter Rodgers
  */
 public class SubgraphMapping {
 	

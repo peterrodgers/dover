@@ -3,6 +3,8 @@ package uk.ac.kent.dover.fastGraph;
 import java.io.IOException;
 import java.util.*;
 
+import uk.ac.kent.dover.fastGraph.comparators.*;
+
 /**
  * Testing the structural similarity of two FastGraphs
  * 
@@ -11,14 +13,14 @@ import java.util.*;
  */
 public class ExactSubgraphIsomorphism {
 
-	private FastGraph fastGraph;
-	private int maxDegreeGraph;
+	private FastGraph targetGraph;
+	private FastGraph patternGraph;
+	private NodeComparator nodeComparator;
+	private EdgeComparator edgeComparator;	
 	
-	int[] degrees1 = null;
-	int maxDegree1 = -1;
-	private int[] degreeBuckets1 = null;
-	private ArrayList<HashSet<Integer>> neighbours1;
+	private ArrayList<int[]> possibleNodeMappings = null;
 	
+
 	
 	/**
 	 * @param args
@@ -43,11 +45,11 @@ public class ExactSubgraphIsomorphism {
 //			g = FastGraph.adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false);
 //			g = FastGraph.adjacencyListGraphFactory(1696415,11095298,null,"as-skitter.txt",false);
 //			g = FastGraph.adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
-			graph = FastGraph.randomGraphFactory(graphNodes, graphEdges, 11427, true);
-			subgraph = FastGraph.randomGraphFactory(subgraphNodes, subgraphEdges, 116, true);
+			graph = FastGraph.randomGraphFactory(graphNodes, graphEdges, 1111, true);
+			subgraph = FastGraph.randomGraphFactory(subgraphNodes, subgraphEdges, 2222, true);
 		} catch(Exception e) {}
 		
-		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(graph);
+		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(graph, subgraph, null, null);
 		Debugger.resetTime();
 		HashSet<SubgraphMapping> mapping = new HashSet<SubgraphMapping>(); 
 		
@@ -55,28 +57,60 @@ public class ExactSubgraphIsomorphism {
 	}
 
 	
+
 	/**
-	 *
-	 * Create an ExactIsomorphism before running isomorphic. This makes multiple tests against
-	 * one graph to be more efficient as data for that graph does not need to be recreated.
+	 * Create an ExactSubgraphIsomorphism before running findMatches.
 	 * 
-	 * @param one graph to be tested.
-	 *
+	 * @param patternGraph the small subgraph to be found in the larger target
+	 * @param targetGraph the larger target graph in which to find the pattern
+	 * @param nodeComparator a comparator to tell when two nodes match, if null then all nodes potentially match all other nodes
+	 * @param edgeComparator a comparator to tell when two edges match, if null then all edges with two matching ends will match
 	 */
-	public ExactSubgraphIsomorphism(FastGraph fastGraph) {
+	public ExactSubgraphIsomorphism(FastGraph targetGraph, FastGraph patternGraph, NodeComparator nodeComparator, EdgeComparator edgeComparator) {
 
-		this.fastGraph = fastGraph;
-
-		degrees1 = ExactIsomorphism.findDegrees(fastGraph);
+		this.targetGraph = targetGraph;
+		this.patternGraph = patternGraph;
+		if(nodeComparator != null) {
+			this.nodeComparator = nodeComparator;
+		} else {
+			this.nodeComparator = new AlwaysTrueNodeComparator(targetGraph, patternGraph);
+		}
+		if(edgeComparator != null) {
+			this.edgeComparator = edgeComparator;
+		} else {
+			this.edgeComparator = new AlwaysTrueEdgeComparator(targetGraph, patternGraph);
+		}
 		
-		maxDegree1 = fastGraph.maximumDegree();
-
-		degreeBuckets1 = new int[maxDegree1+1];
-		ExactIsomorphism.findDegreeBuckets(degreeBuckets1,degrees1);
+		findPossibleNodeMappings();
 		
-		neighbours1 = ExactIsomorphism.findNeighbours(fastGraph,maxDegree1);
 	}
 	
+	
+
+	private void findPossibleNodeMappings() {
+		possibleNodeMappings = new ArrayList<int[]>(patternGraph.getNumberOfNodes());
+
+		for(int p = 0; p < patternGraph.getNumberOfNodes(); p++) {
+			int[] oversizeCandidates = new int[targetGraph.getNumberOfNodes()];
+			
+			// find all the candidate matches for the node in the pattern graph
+			int candidatePos = 0;
+			for(int t = 0; t < targetGraph.getNumberOfNodes(); t++) {
+				if(nodeComparator.compare(t,p) == 0) {
+					oversizeCandidates[candidatePos] = t;
+					candidatePos++;
+				}
+			}
+			
+			// chop the array down to size
+			int[] candidates = Arrays.copyOf(oversizeCandidates, candidatePos);
+			possibleNodeMappings.add(candidates);
+		}
+
+		
+	}
+
+
 
 	/**
 	 * Equality of graphs. Returns a mapping if this graph is equal

@@ -4,7 +4,7 @@ import uk.ac.kent.dover.fastGraph.FastGraph;
 
 
 /**
- * 
+ * Simple label comparison.
  * 
  * @author Peter Rodgers
  *
@@ -17,7 +17,9 @@ public class SimpleEdgeLabelComparator extends EdgeComparator {
 
 	
 	/**
-	 * Just compares the strings via standard string comparateTo
+	 * Just compares the labels via standard string comparateTo
+	 * 
+	 * @return comparison of edge label strings by standard Java compareTo
 	 */
 	@Override
 	public int compare(Integer e1, Integer e2) {
