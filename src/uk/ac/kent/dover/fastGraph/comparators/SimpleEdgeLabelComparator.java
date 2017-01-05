@@ -17,14 +17,17 @@ public class SimpleEdgeLabelComparator extends EdgeComparator {
 
 	
 	/**
-	 * Just compares the labels via standard string comparateTo
+	 * Just compares the labels via standard string comparateTo, except returns equal (0) if the pattern label is empty. 
 	 * 
 	 * @return comparison of edge label strings by standard Java compareTo
 	 */
 	@Override
-	public int compare(Integer e1, Integer e2) {
-		String label1 = g1.getEdgeLabel(e1);
-		String label2 = g1.getEdgeLabel(e2);
+	public int compare(Integer target, Integer pattern) {
+		String label1 = g1.getEdgeLabel(target);
+		String label2 = g2.getEdgeLabel(pattern);
+		if(label2.equals("")) {
+			return 0;
+		}
 		int ret = label1.compareTo(label2);
 		return ret;
 	}
