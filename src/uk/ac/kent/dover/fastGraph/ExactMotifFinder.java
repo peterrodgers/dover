@@ -219,14 +219,25 @@ public class ExactMotifFinder {
 		
 		long time = Debugger.createTime();
 		
-		int totalSize = 0;
+		int totalSize = 0; //number of motifs found
+		int totalNumber = 0; //number of different buckets
 		for(LinkedList<IsoHolder> holderList : hashBuckets.values()) {
 			for(IsoHolder holder : holderList) {
 			//	Debugger.log("    "+holder.getKey() + " " + holder.getNumber());
 				totalSize+= holder.getNumber();
+				totalNumber++;
 			}			
 		}
 		Debugger.log("#TOTAL SIZE: "+totalSize);
+		double mean = ((double) totalSize)/totalNumber;
+		
+		ArrayList<Integer> values = new ArrayList<Integer>();
+		for(LinkedList<IsoHolder> holderList : hashBuckets.values()) {
+			for(IsoHolder holder : holderList) {
+				values.add(holder.getNumber());
+			}			
+		}
+		
 		//export the motifs
 		
 		//build the output file, and if needed, save the motif buffers
