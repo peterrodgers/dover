@@ -308,7 +308,7 @@ public class Util {
 	 * @param array The array
 	 * @return The mean
 	 */
-	public double mean(double[] array) {
+	public static double mean(double[] array) {
 		if(array.length == 0) { //incase the array is empty
 			return Double.NaN;
 		}
@@ -327,7 +327,7 @@ public class Util {
 	 * @param mean The mean of the array
 	 * @return The standard deviation
 	 */
-	public double standardDeviation(double[] array, int mean) {
+	public static double standardDeviation(double[] array, double mean) {
 		if (array.length == 0) {
 			return Double.NaN;
 		}
@@ -346,13 +346,13 @@ public class Util {
 	 * @param mean The mean of the array
 	 * @return The standard deviation
 	 */
-	public double standardDeviation(ArrayList<Integer> array, int mean) {
+	public static <T extends Number> double standardDeviation(ArrayList<T> array, double mean) {
 		if (array.size() == 0) {
 			return Double.NaN;
 		}
 		double result = 0;
 		for(int i = 0; i < array.size(); i++) {
-			result += Math.pow(array.get(i) - mean, 2);
+			result += Math.pow(((double) array.get(i)) - mean, 2);
 		}
 		result = result / (array.size()-1); //variance
 		return Math.sqrt(result);

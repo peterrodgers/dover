@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.swing.text.html.parser.TagElement;
 
@@ -220,23 +221,15 @@ public class ExactMotifFinder {
 		long time = Debugger.createTime();
 		
 		int totalSize = 0; //number of motifs found
-		int totalNumber = 0; //number of different buckets
+		//int totalNumber = 0; //number of different buckets
 		for(LinkedList<IsoHolder> holderList : hashBuckets.values()) {
 			for(IsoHolder holder : holderList) {
 			//	Debugger.log("    "+holder.getKey() + " " + holder.getNumber());
 				totalSize+= holder.getNumber();
-				totalNumber++;
+				//totalNumber++;
 			}			
 		}
 		Debugger.log("#TOTAL SIZE: "+totalSize);
-		double mean = ((double) totalSize)/totalNumber;
-		
-		ArrayList<Integer> values = new ArrayList<Integer>();
-		for(LinkedList<IsoHolder> holderList : hashBuckets.values()) {
-			for(IsoHolder holder : holderList) {
-				values.add(holder.getNumber());
-			}			
-		}
 		
 		//export the motifs
 		
@@ -522,7 +515,26 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		buildResults(results, refOutput, true);
 		buildResults(results, realOutput, false);
 		
+		
 		ArrayList<MotifResultHolder> motifResults = new ArrayList<MotifResultHolder>(results.values());
+		results = null; //GC
+		
+		//find mean of real set
+		double totalSize = 0.0;
+		for(MotifResultHolder mrh : motifResults) {
+			totalSize += mrh.getRealPercentage();
+		}
+		double mean = totalSize/motifResults.size();
+		
+		//find SD of real set
+		ArrayList<Double> realPercentages = (ArrayList<Double>) motifResults.stream().map(u -> u.getRealPercentage()).collect(Collectors.toList());
+		double sd = Util.standardDeviation(realPercentages, mean);		
+		
+		//for each result, find z score
+		// = (real& - ref%)/SD
+		for(MotifResultHolder mrh : motifResults) {
+			mrh.setzScore( (mrh.getRealPercentage() - mrh.getReferencePercentage()) / sd );
+		}
 		
 		//sort by the significance method, then by the percentage of occurrences in the real set
 		motifResults.sort(Comparator.comparing(MotifResultHolder::generateSignificance).thenComparing(MotifResultHolder::getRealPercentage).reversed());
@@ -661,6 +673,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		Element headerRow = table.appendElement("tr").attr("style", "border: 2px solid;");
 		headerRow.appendElement("th").text("Image").attr("style", "border: 1px solid;");
 		headerRow.appendElement("th").text("Key").attr("style", "border: 1px solid;");
+		headerRow.appendElement("th").text("z-score").attr("style", "border: 1px solid;");
 		headerRow.appendElement("th").text("Diff in %").attr("style", "border: 1px solid;");
 		headerRow.appendElement("th").text("% of motifs").attr("style", "border: 1px solid;");
 		headerRow.appendElement("th").text("% in reference set").attr("style", "border: 1px solid;");
@@ -670,6 +683,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 			imageCell.appendElement("img").attr("src",result.getKey()+"/motif.svg");
 			row.appendElement("td").text(result.getKey()).attr("style", "border: 1px solid;");
 			row.appendElement("td").text(String.format( "%.4f", result.generateSignificance())).attr("style", "border: 1px solid;");
+			row.appendElement("td").text(String.format( "%.4f", result.generateDifference())).attr("style", "border: 1px solid;");
 			row.appendElement("td").text(String.format( "%.4f", result.getRealPercentage())).attr("style", "border: 1px solid;");
 			row.appendElement("td").text(String.format( "%.4f", result.getReferencePercentage())).attr("style", "border: 1px solid;");
 		}
@@ -702,6 +716,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	public class MotifResultHolder {
 		private String key; //the key
 		private double referencePercentage, realPercentage; //the relevant percentages
+		private double zScore;
 
 		/**
 		 * @return the key
@@ -757,7 +772,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		 * @return The significance
 		 */
 		public double generateSignificance() {
-			return getRealPercentage() - getReferencePercentage();
+			return zScore;
 		}
 		
 		/**
@@ -766,6 +781,14 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		 */
 		public double generateDifference() {
 			return getRealPercentage() - getReferencePercentage();
+		}
+
+		public double getzScore() {
+			return zScore;
+		}
+
+		public void setzScore(double zScore) {
+			this.zScore = zScore;
 		}
 		
 	}
