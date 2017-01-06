@@ -979,7 +979,7 @@ public class FastGraphTest {
 	
 	@Test
 	public void test110() {
-		Graph displayGraph = new Graph("two nodes, one edge");
+		Graph displayGraph = new Graph("four nodes, four edges");
 		Node n1 = new Node("node 1");
 		n1.setScore(4.0);
 		n1.setAge(19);

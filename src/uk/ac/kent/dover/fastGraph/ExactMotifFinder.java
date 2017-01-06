@@ -102,6 +102,7 @@ public class ExactMotifFinder {
 		return res;
 	}
 	
+	
 	/**
 	 * Finds all the motifs.<br>
 	 * Will check that log files exist before running. Rewiries the graph a number of times and stores these.<br>
@@ -161,7 +162,7 @@ public class ExactMotifFinder {
 					FastGraph graph = FastGraph.loadBuffersGraphFactory("motifs"+File.separatorChar+graphName+File.separatorChar+"-rewire-"+i,
 							"-rewire-"+i);
 					
-					mt.publish((int) (((double) i)/rewiresNeeded)*100, "From rewire " + (i+1) + " of " + rewiresNeeded, false);	
+					mt.publish((int) ((((double) i)/rewiresNeeded)*100), "From rewire " + (i+1) + " of " + rewiresNeeded, false);	
 					//find motifs
 					findMotifsInGraph(isoLists, hashBuckets, size, graph);
 				}
@@ -218,14 +219,25 @@ public class ExactMotifFinder {
 		
 		long time = Debugger.createTime();
 		
-		int totalSize = 0;
+		int totalSize = 0; //number of motifs found
+		int totalNumber = 0; //number of different buckets
 		for(LinkedList<IsoHolder> holderList : hashBuckets.values()) {
 			for(IsoHolder holder : holderList) {
 			//	Debugger.log("    "+holder.getKey() + " " + holder.getNumber());
 				totalSize+= holder.getNumber();
+				totalNumber++;
 			}			
 		}
 		Debugger.log("#TOTAL SIZE: "+totalSize);
+		double mean = ((double) totalSize)/totalNumber;
+		
+		ArrayList<Integer> values = new ArrayList<Integer>();
+		for(LinkedList<IsoHolder> holderList : hashBuckets.values()) {
+			for(IsoHolder holder : holderList) {
+				values.add(holder.getNumber());
+			}			
+		}
+		
 		//export the motifs
 		
 		//build the output file, and if needed, save the motif buffers
@@ -496,11 +508,12 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	/**
 	 * Compares the results from the reference set to the real set.<br>
 	 * Exports these in a user friendly manner
+	 * @return The results
 	 * 
 	 * @throws IOException If the File cannot be read
 	 * @throws FileNotFoundException  If the file cannot be found
 	 */
-	private void compareAndExportResults(int size, int minSize, int maxSize) throws FileNotFoundException, IOException {
+	public ArrayList<MotifResultHolder> compareAndExportResults(int size, int minSize, int maxSize) throws FileNotFoundException, IOException {
 		String graphName = g.getName();
 		File refOutput = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"motifs_size"+size+"_reference"+".txt");
 		File realOutput = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"motifs_size"+size+"_real"+".txt");
@@ -529,7 +542,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		
 		Debugger.log("number of pages required: " + numberOfPages);
 		//Debugger.log(motifResults);
-		
+		return motifResults;
 	}
 
 	/**
@@ -686,7 +699,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * @author Rob Baker
 	 *
 	 */
-	private class MotifResultHolder {
+	public class MotifResultHolder {
 		private String key; //the key
 		private double referencePercentage, realPercentage; //the relevant percentages
 
@@ -744,6 +757,14 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		 * @return The significance
 		 */
 		public double generateSignificance() {
+			return getRealPercentage() - getReferencePercentage();
+		}
+		
+		/**
+		 * Generates the difference of these results. Simple subtraction
+		 * @return The difference
+		 */
+		public double generateDifference() {
 			return getRealPercentage() - getReferencePercentage();
 		}
 		

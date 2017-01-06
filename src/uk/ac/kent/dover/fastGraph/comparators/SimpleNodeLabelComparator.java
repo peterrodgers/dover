@@ -4,7 +4,7 @@ import uk.ac.kent.dover.fastGraph.FastGraph;
 
 
 /**
- * 
+ * Simple label comparison.
  * 
  * @author Peter Rodgers
  *
@@ -17,12 +17,17 @@ public class SimpleNodeLabelComparator extends NodeComparator {
 
 	
 	/**
-	 * Just compares the strings via standard string comparateTo
+	 * Just compares the labels via standard string comparateTo
+	 * 
+	 * Just compares the labels via standard string comparateTo, except returns equal (0) if the pattern label is empty. 
 	 */
 	@Override
-	public int compare(Integer n1, Integer n2) {
-		String label1 = g1.getNodeLabel(n1);
-		String label2 = g1.getNodeLabel(n2);
+	public int compare(Integer target, Integer pattern) {
+		String label1 = g1.getNodeLabel(target);
+		String label2 = g2.getNodeLabel(pattern);
+		if(label2.equals("")) {
+			return 0;
+		}
 		int ret = label1.compareTo(label2);
 		return ret;
 	}

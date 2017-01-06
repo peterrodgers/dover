@@ -3,6 +3,13 @@ package uk.ac.kent.dover.fastGraph;
 import java.io.IOException;
 import java.util.*;
 
+import org.junit.experimental.theories.PotentialAssignment;
+
+import uk.ac.kent.displayGraph.Edge;
+import uk.ac.kent.displayGraph.Graph;
+import uk.ac.kent.displayGraph.Node;
+import uk.ac.kent.dover.fastGraph.comparators.*;
+
 /**
  * Testing the structural similarity of two FastGraphs
  * 
@@ -11,14 +18,15 @@ import java.util.*;
  */
 public class ExactSubgraphIsomorphism {
 
-	private FastGraph fastGraph;
-	private int maxDegreeGraph;
+	private FastGraph targetGraph;
+	private FastGraph patternGraph;
+	private NodeComparator nodeComparator;
+	private EdgeComparator edgeComparator;	
 	
-	int[] degrees1 = null;
-	int maxDegree1 = -1;
-	private int[] degreeBuckets1 = null;
-	private ArrayList<HashSet<Integer>> neighbours1;
+	private ArrayList<int[]> possibleNodeMappings = null;
 	
+	private MatchArrayComparator matchArrayComparitor = new MatchArrayComparator();
+
 	
 	/**
 	 * @param args
@@ -34,60 +42,164 @@ public class ExactSubgraphIsomorphism {
 		int subgraphEdges = 100;
 		int iterations = 1;
 			
-		FastGraph graph = null;
-		FastGraph subgraph = null;
+		FastGraph target = null;
+		FastGraph pattern = null;
 		try {
-//			g = FastGraph.loadBuffersGraphFactory(null, "soc-pokec-relationships-reduced");
-//			g = FastGraph.adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
-//			g = FastGraph.adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
-//			g = FastGraph.adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false);
-//			g = FastGraph.adjacencyListGraphFactory(1696415,11095298,null,"as-skitter.txt",false);
-//			g = FastGraph.adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
-			graph = FastGraph.randomGraphFactory(graphNodes, graphEdges, 11427, true);
-			subgraph = FastGraph.randomGraphFactory(subgraphNodes, subgraphEdges, 116, true);
+//			target = FastGraph.loadBuffersGraphFactory(null, "soc-pokec-relationships-reduced");
+//			target = FastGraph.adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
+//			target = FastGraph.adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
+//			target = FastGraph.adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false);
+//			target = FastGraph.adjacencyListGraphFactory(1696415,11095298,null,"as-skitter.txt",false);
+//			target = FastGraph.adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
+//			target = FastGraph.randomGraphFactory(graphNodes, graphEdges, 1111, true);
+//			pattern = FastGraph.randomGraphFactory(subgraphNodes, subgraphEdges, 2222, true);
 		} catch(Exception e) {}
 		
-		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(graph);
-		Debugger.resetTime();
-		HashSet<SubgraphMapping> mapping = new HashSet<SubgraphMapping>(); 
 		
+		Graph targetGraph = new Graph("triangle with single edge attached");
+		Node n1 = new Node("nA");
+		targetGraph.addNode(n1);
+		Node n2 = new Node("nB");
+		targetGraph.addNode(n2);
+		Node n3 = new Node("nA");
+		targetGraph.addNode(n3);
+		Node n4 = new Node("nB");
+		targetGraph.addNode(n4);
+		Edge e1 = new Edge(n1,n2,"eA");
+		targetGraph.addEdge(e1);
+		Edge e2 = new Edge(n1,n3,"eB");
+		targetGraph.addEdge(e2);
+		Edge e3 = new Edge(n2,n3,"eA");
+		targetGraph.addEdge(e3);
+		Edge e4 = new Edge(n3,n1,"eB");
+		targetGraph.addEdge(e4);
+		target = FastGraph.displayGraphFactory(targetGraph,false);
+
+		Graph patternSubgraph = new Graph("triangle");
+		n1 = new Node("nA");
+		patternSubgraph.addNode(n1);
+		n2 = new Node("nB");
+		patternSubgraph.addNode(n2);
+		n3 = new Node("nA");
+		patternSubgraph.addNode(n3);
+		e1 = new Edge(n1,n2,"eA");
+		patternSubgraph.addEdge(e1);
+		e2 = new Edge(n1,n3,"eB");
+		patternSubgraph.addEdge(e2);
+		e3 = new Edge(n2,n3,"eA");
+		patternSubgraph.addEdge(e3);
+		pattern = FastGraph.displayGraphFactory(patternSubgraph,false);
 		
+		SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(target, pattern);
+		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
+
+		
+		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
+		
+		esi.subGraphIsomorphismFinder();		
+
 	}
 
 	
+
 	/**
-	 *
-	 * Create an ExactIsomorphism before running isomorphic. This makes multiple tests against
-	 * one graph to be more efficient as data for that graph does not need to be recreated.
+	 * Create an ExactSubgraphIsomorphism before running findMatches.
 	 * 
-	 * @param one graph to be tested.
-	 *
+	 * @param patternGraph the small subgraph to be found in the larger target
+	 * @param targetGraph the larger target graph in which to find the pattern
+	 * @param nodeComparator a comparator to tell when two nodes match, if null then all nodes potentially match all other nodes
+	 * @param edgeComparator a comparator to tell when two edges match, if null then all edges with two matching ends will match
 	 */
-	public ExactSubgraphIsomorphism(FastGraph fastGraph) {
+	public ExactSubgraphIsomorphism(FastGraph targetGraph, FastGraph patternGraph, NodeComparator nodeComparator, EdgeComparator edgeComparator) {
 
-		this.fastGraph = fastGraph;
-
-		degrees1 = ExactIsomorphism.findDegrees(fastGraph);
+		this.targetGraph = targetGraph;
+		this.patternGraph = patternGraph;
+		if(nodeComparator != null) {
+			this.nodeComparator = nodeComparator;
+		} else {
+			this.nodeComparator = new AlwaysTrueNodeComparator(targetGraph, patternGraph);
+		}
+		if(edgeComparator != null) {
+			this.edgeComparator = edgeComparator;
+		} else {
+			this.edgeComparator = new AlwaysTrueEdgeComparator(targetGraph, patternGraph);
+		}
 		
-		maxDegree1 = fastGraph.maximumDegree();
-
-		degreeBuckets1 = new int[maxDegree1+1];
-		ExactIsomorphism.findDegreeBuckets(degreeBuckets1,degrees1);
+		findPossibleNodeMappings();
 		
-		neighbours1 = ExactIsomorphism.findNeighbours(fastGraph,maxDegree1);
+int pattern = 0;		
+for(int[] matches : possibleNodeMappings) {
+	for(int i = 0; i < matches.length; i++) {
+//		System.out.println("target node id "+pattern+"  possible match with target node id "+matches[i]);
+		System.out.println("target node id "+pattern+" label "+patternGraph.getNodeLabel(pattern)+" possible match with target node id "+matches[i]+" label "+targetGraph.getNodeLabel(matches[i]));
+	}
+	pattern++;
+}
+
 	}
 	
+	
+
+	private void findPossibleNodeMappings() {
+		possibleNodeMappings = new ArrayList<int[]>(patternGraph.getNumberOfNodes());
+
+		for(int p = 0; p < patternGraph.getNumberOfNodes(); p++) {
+			int[] oversizeCandidates = new int[targetGraph.getNumberOfNodes()];
+			
+			// find all the candidate matches for the node in the pattern graph
+			int candidatePos = 0;
+			for(int t = 0; t < targetGraph.getNumberOfNodes(); t++) {
+				if(targetGraph.getNodeDegree(t) < patternGraph.getNodeDegree(p)) { // don't match if the target has fewer connecting edges
+					continue;
+				}
+				if(nodeComparator.compare(t,p) == 0) {
+					oversizeCandidates[candidatePos] = t;
+					candidatePos++;
+				}
+			}
+			
+			// chop the array down to size
+			int[] candidates = Arrays.copyOf(oversizeCandidates, candidatePos);
+			possibleNodeMappings.add(candidates);
+			
+		}
+		
+	}
+
+
 
 	/**
-	 * Equality of graphs. Returns a mapping if this graph is equal
-	 * to the given graph.
+	 * Find the pattern graph in the target graph. Returns all possible mappings.
 	 *
-	 * @param g the graph to compare
-	 * @return true if there is an equality with the given graph, null if is not.
+	 * @return true if there is one or more subgraph found, false if none are found.
 	 */
-	public boolean subGraphIsomorphismFinder(FastGraph g) {
+	public boolean subGraphIsomorphismFinder() {
 		
+		int numberOfPatternNodes = patternGraph.getNumberOfNodes();
+		int numberOfTargetNodes = targetGraph.getNumberOfNodes();
 		
+		// sort the nodes in the pattern graph into fewest to most possible matches
+		
+		Integer[] patternNodeOrder = new Integer[numberOfPatternNodes];
+		for(int i = 0; i < numberOfPatternNodes; i++) {
+			patternNodeOrder[i] = i;
+		}
+		
+		Arrays.sort(patternNodeOrder,matchArrayComparitor);
+		
+		// do the backgtracking search based on order found
+
+		// all these index patternNodeOrder
+		int currentPatternOrder = 0;
+		int[] matches = new int[numberOfPatternNodes-1]; // successful node matches so far, -1 means no match
+		Arrays.fill(matches, -1);
+
+		
+		boolean searchComplete = false;
+		while(!searchComplete) {
+		
+			
+		}
 		
 /*
 numberOfIsomorphismTests++;
@@ -262,6 +374,7 @@ startTime = -1;
 	}
 
 	
+
 	
 
 	/**
@@ -365,6 +478,27 @@ startTime = -1;
 	}
 */	
 
+	
+
+
+	/**
+	 * compares potential match arrays by size for deciding which node in the pattern graph should be tested first.
+	 * 
+	 * @author Peter Rodgers
+	 *
+	 */
+	class MatchArrayComparator implements Comparator<Integer> {
+		
+	    public int compare(Integer n1, Integer n2) {
+	    	int[] array1 = possibleNodeMappings.get(n1);
+	    	int[] array2 = possibleNodeMappings.get(n2);
+	    	
+	    	Integer length1 = array1.length;
+	    	Integer length2 = array2.length;
+	    	
+	        return length1.compareTo(length2);
+	    }
+	}
 	
 	
 	

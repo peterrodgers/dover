@@ -302,5 +302,59 @@ public class Util {
 		}
 		return list.subList(start, end);
 	}
-
+	
+	/**
+	 * Returns the arithmetic mean of an array of doubles
+	 * @param array The array
+	 * @return The mean
+	 */
+	public double mean(double[] array) {
+		if(array.length == 0) { //incase the array is empty
+			return Double.NaN;
+		}
+		
+		int total = 0;
+		for(int i = 0; i < array.length; i++) {
+			total += array[i];
+		}
+		return total/array.length;
+	}
+	
+	/**
+	 * Returns the standard deviation of an array
+	 * 
+	 * @param array The array itself
+	 * @param mean The mean of the array
+	 * @return The standard deviation
+	 */
+	public double standardDeviation(double[] array, int mean) {
+		if (array.length == 0) {
+			return Double.NaN;
+		}
+		double result = 0;
+		for(int i = 0; i < array.length; i++) {
+			result += Math.pow(array[i] - mean, 2);
+		}
+		result = result / (array.length-1); //variance
+		return Math.sqrt(result);
+	}
+	
+	/**
+	 * Returns the standard deviation of an array
+	 * 
+	 * @param array The array itself
+	 * @param mean The mean of the array
+	 * @return The standard deviation
+	 */
+	public double standardDeviation(ArrayList<Integer> array, int mean) {
+		if (array.size() == 0) {
+			return Double.NaN;
+		}
+		double result = 0;
+		for(int i = 0; i < array.size(); i++) {
+			result += Math.pow(array.get(i) - mean, 2);
+		}
+		result = result / (array.size()-1); //variance
+		return Math.sqrt(result);
+	}
 }
