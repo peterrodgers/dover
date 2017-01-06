@@ -201,10 +201,26 @@ public class LauncherGUI extends JFrame {
 		JLabel status = (JLabel) statusBar.getComponent(0);
 
 		JLabel infoLabel = new JLabel("Find and export motifs", SwingConstants.CENTER);
+		
 		JLabel minLabel = new JLabel("Min Size: ");
-		JLabel maxLabel = new JLabel("Max Size: ");
 		JTextField minInput = new JTextField(3);
+		String minToolTip = "The minimum size of motif to be found";
+		minLabel.setToolTipText(minToolTip);
+		minInput.setToolTipText(minToolTip);		
+		
+		JLabel maxLabel = new JLabel("Max Size: ");
 		JTextField maxInput = new JTextField(3);
+		String maxToolTip = "The maximum size of motif to be found";
+		maxLabel.setToolTipText(maxToolTip);
+		maxInput.setToolTipText(maxToolTip);			
+		
+		JCheckBox saveAllBox = new JCheckBox("Save all motifs: ");
+		saveAllBox.setSelected(false);
+		saveAllBox.setToolTipText("This will take some time and disk space");
+		saveAllBox.setHorizontalTextPosition(SwingConstants.LEFT);
+		saveAllBox.addActionListener(new MessageActionListener(saveAllBox, motifPanel, "Save all motifs", 
+				"This may take some time to complete and potentially use a large amount of disk space", JOptionPane.WARNING_MESSAGE));
+		
 		JButton motifBtn = new JButton("Find Motifs");
 		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
 		JProgressBar bigProgress = new JProgressBar(0, 100);
@@ -216,10 +232,10 @@ public class LauncherGUI extends JFrame {
 		smallProgress.setStringPainted(true);
 		smallProgress.setString("");
 
-		//add an action when the user clickes this button
+		//add an action when the user clicks this button
 		//in an external class, so needs lots(!) of parameters
 		motifBtn.addActionListener(new MotifActionListener(launcher, this, minInput, maxInput, motifPanel,
-				bigProgress, smallProgress, progressBar, status, graphList));
+				bigProgress, smallProgress, progressBar, status, graphList, saveAllBox));
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(2,2,2,2);
@@ -256,30 +272,37 @@ public class LauncherGUI extends JFrame {
         motifPanel.add(maxInput, c);
 
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridheight = 2;
+        c.gridheight = 3;
         c.gridx = 2;
         c.gridy = 1;
         motifPanel.add(motifBtn, c);
 
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridwidth = 3;
+        c.gridwidth = 2;
         c.gridheight = 1;
         c.gridx = 0;
         c.gridy = 3;
+        motifPanel.add(saveAllBox, c);
+        
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridwidth = 3;
+        c.gridheight = 1;
+        c.gridx = 0;
+        c.gridy = 4;
         motifPanel.add(sep, c);
 
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 3;
 		c.gridheight = 1;
 		c.gridx = 0;
-		c.gridy = 4;
+		c.gridy = 5;
 		motifPanel.add(bigProgress, c);	
 		
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 3;
 		c.gridheight = 1;
 		c.gridx = 0;
-		c.gridy = 5;
+		c.gridy = 6;
 		motifPanel.add(smallProgress, c);	
 		return motifPanel;
 	}

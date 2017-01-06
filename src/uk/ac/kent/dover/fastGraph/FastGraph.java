@@ -115,7 +115,7 @@ public class FastGraph {
 	 */
 	public static void main(String[] args) throws Exception {
 		
-		Debugger.enabled = true;
+		Debugger.enabled = false;
 		
 		long time = 0;
 		
@@ -175,7 +175,7 @@ String name = "random-n-8-e-9";
 			Debugger.resetTime();
 			
 //
-			ExactMotifFinder emf = new ExactMotifFinder(g2, new MotifTaskDummy());
+			ExactMotifFinder emf = new ExactMotifFinder(g2, new MotifTaskDummy(), true);
 			emf.findAllMotifs(10,4,6);
 			emf.findAllMotifs(0,4,6);
 			emf.compareMotifDatas(4,6);

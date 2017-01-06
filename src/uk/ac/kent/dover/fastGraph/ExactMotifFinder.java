@@ -37,6 +37,7 @@ public class ExactMotifFinder {
 	private EnumerateSubgraphNeighbourhood enumerator;
 	private EnumerateSubgraphRandom enumeratorRandom;
 	private HashSet<FastGraph> subgraphs; // subgraphs found by the enumerator
+	private boolean saveAll = false;
 	
 	/**
 	 * Main method to help with development
@@ -50,25 +51,35 @@ public class ExactMotifFinder {
 	/**
 	 * Trivial contructor
 	 * @param g the FastGraph to find motifs in
-	 * @param numOfNodes the number of nodes in each motif
+	 * @param saveAll If every example is to be saved
 	 */
-	public ExactMotifFinder(FastGraph g) {
-		this(g,null);
+	public ExactMotifFinder(FastGraph g, boolean saveAll) {
+		this(g,null,saveAll);
 	}
 	
 	/**
 	 * Trivial constructor
 	 * @param g the FastGraph to find motifs in
 	 * @param mf The MotifTask to report progress to
+	 * @param saveAll If every example is to be saved
 	 */
-	public ExactMotifFinder(FastGraph g, MotifTask mt) {
+	public ExactMotifFinder(FastGraph g, MotifTask mt, boolean saveAll) {
 		this.g = g;
 		this.mt = mt;
+		this.saveAll = saveAll;
 		//enumerator = new EnumerateSubgraphFanmod(g);
 		enumerator = new EnumerateSubgraphNeighbourhood(g);
 		enumeratorRandom = new EnumerateSubgraphRandom(g);
 	}
 	
+	public boolean isSaveAll() {
+		return saveAll;
+	}
+
+	public void setSaveAll(boolean saveAll) {
+		this.saveAll = saveAll;
+	}
+
 	/**
 	 * Runs the comparison of motif data for each size given
 	 * @param minSize The minimum size of motifs found
@@ -195,7 +206,7 @@ public class ExactMotifFinder {
 	private void findMotifsInGraph(HashMap<String,IsoHolder> isoLists, HashMap<String,LinkedList<IsoHolder>> hashBuckets, 
 			int size, FastGraph graph) throws IOException {
 	
-		ExactMotifFinder emf = new ExactMotifFinder(graph);
+		ExactMotifFinder emf = new ExactMotifFinder(graph,saveAll);
 		Debugger.log("    finding motifs");
 		emf.findMotifs(size, 0, hashBuckets);
 		HashMap<String,IsoHolder> newIsoLists = emf.extractGraphLists(hashBuckets);
@@ -435,6 +446,15 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 						if(ei.isomorphic(comparisonGraph)) {
 							isoList.incrementNumber();
 							found = true;
+							
+							if(saveAll) {
+								subgraph.setName(hashString);
+								subgraph.saveBuffers("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-"+
+										sameHashList.size()+File.separatorChar+isoList.getNumber(),
+										hashString+"-"+sameHashList.size()
+								);
+							}
+							
 							break;
 						}
 					}

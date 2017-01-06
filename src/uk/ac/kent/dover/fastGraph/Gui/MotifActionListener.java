@@ -26,6 +26,7 @@ public class MotifActionListener implements ActionListener {
 	private JLabel statusBar;
 	private JProgressBar bigProgress, smallProgress, progressBar;
 	private JList graphList;
+	private JCheckBox saveAllBox;
 	
 	/**
 	 * Constructor to assign all the relevant fields
@@ -39,9 +40,11 @@ public class MotifActionListener implements ActionListener {
 	 * @param progressBar The main window progress bar
 	 * @param statusBar The main window status bar
 	 * @param graphList The list of graphs to identify which buffer the user wishes to load
+	 * @param saveAllBox If the user wishes to save every example of motif
 	 */
 	public MotifActionListener(Launcher launcher, LauncherGUI launcherGUI, JTextField minInput, JTextField maxInput, JPanel motifPanel, 
-			JProgressBar bigProgress, JProgressBar smallProgress, JProgressBar progressBar, JLabel statusBar, JList graphList) {
+			JProgressBar bigProgress, JProgressBar smallProgress, JProgressBar progressBar, JLabel statusBar, JList graphList, 
+			JCheckBox saveAllBox) {
 		this.launcher = launcher;
 		this.launcherGUI = launcherGUI;
 		this.minInput = minInput;
@@ -52,6 +55,7 @@ public class MotifActionListener implements ActionListener {
 		this.progressBar = progressBar;
 		this.statusBar = statusBar;
 		this.graphList = graphList;
+		this.saveAllBox = saveAllBox;
 	}
 	
 	@Override
@@ -67,7 +71,8 @@ public class MotifActionListener implements ActionListener {
 			String graph = (String) graphList.getSelectedValue();
 			if(graph != null) {
 				//create a Task that will run the motif code and provide updates
-				MotifTask task = new MotifTask(launcher, bigProgress, smallProgress, graph, minNumber, maxNumber, progressBar, statusBar, motifPanel);
+				MotifTask task = new MotifTask(launcher, bigProgress, smallProgress, graph, minNumber, maxNumber, 
+						progressBar, statusBar, motifPanel, saveAllBox.isSelected());
 				task.execute();
 			} else {
 				JOptionPane.showMessageDialog(motifPanel, "Please select a target graph", "No target graph selected", JOptionPane.ERROR_MESSAGE);
