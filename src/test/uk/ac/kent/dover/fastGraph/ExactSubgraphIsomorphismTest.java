@@ -122,10 +122,10 @@ public class ExactSubgraphIsomorphismTest {
 	}
 
 	
-	
+
 	@Test
 	public void test006() {
-		Graph targetGraph = new Graph("single node");
+		Graph targetGraph = new Graph("two connected nodes");
 		Node n0 = new Node("nA");
 		targetGraph.addNode(n0);
 		Node n1 = new Node("nB");
@@ -134,7 +134,7 @@ public class ExactSubgraphIsomorphismTest {
 		targetGraph.addEdge(e0);
 		FastGraph target = FastGraph.displayGraphFactory(targetGraph,false);
 
-		Graph patternGraph = new Graph("single node");
+		Graph patternGraph = new Graph("two connected nodes");
 		n0 = new Node("nB");
 		patternGraph.addNode(n0);
 		n1 = new Node("nA");
@@ -244,6 +244,50 @@ public class ExactSubgraphIsomorphismTest {
 	
 
 	
+	
+	@Test
+	public void test011() {
+		Graph targetGraph = new Graph("triangle");
+		Node n0 = new Node("nA");
+		targetGraph.addNode(n0);
+		Node n1 = new Node("nB");
+		targetGraph.addNode(n1);
+		Node n2 = new Node("nA");
+		targetGraph.addNode(n2);
+		Edge e0 = new Edge(n0,n1,"eA");
+		targetGraph.addEdge(e0);
+		Edge e1 = new Edge(n0,n2,"eB");
+		targetGraph.addEdge(e1);
+		Edge e2 = new Edge(n1,n2,"eA");
+		targetGraph.addEdge(e2);
+		FastGraph target = FastGraph.displayGraphFactory(targetGraph,false);
+
+		Graph patternGraph = new Graph("triangle");
+		n0 = new Node("nB");
+		patternGraph.addNode(n0);
+		n1 = new Node("nA");
+		patternGraph.addNode(n1);
+		n2 = new Node("nA");
+		patternGraph.addNode(n2);
+		e0 = new Edge(n0,n1,"eA");
+		patternGraph.addEdge(e0);
+		e1 = new Edge(n0,n2,"eB");
+		patternGraph.addEdge(e1);
+		e2 = new Edge(n1,n2,"eA");
+		patternGraph.addEdge(e2);
+		FastGraph pattern = FastGraph.displayGraphFactory(patternGraph,false);
+	
+		SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(target, pattern);
+		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
+		
+		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
+		
+		boolean result = esi.subGraphIsomorphismFinder();
+		assertTrue(result);
+	
+// TODO check mappings		
+	}
+
 	
 	@Test
 	public void test012() {

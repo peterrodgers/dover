@@ -1323,6 +1323,29 @@ String name = "random-n-8-e-9";
 	}
 
 
+	/**
+	 * Find the edges between two nodes
+	 * 
+	 * @param n1 a node in the graph
+	 * @param n2 a node in the graph
+	 * @return the edges connecting the two nodes
+	 */
+	public ArrayList<Integer> edgesBetween(int n1, int n2) {
+		
+		ArrayList<Integer> ret = new ArrayList<Integer>();
+		
+		int[] n1Edges = getNodeConnectingEdges(n1); 
+		for(int i = 0; i < n1Edges.length; i++) {
+			int edge = n1Edges[i];
+			if(oppositeEnd(edge, n1) == n2) {
+				ret.add(edge);
+			}
+		}
+
+		return ret;
+	}
+		
+
 	
 	
 	/**
@@ -3607,6 +3630,7 @@ Debugger.outputTime("time for rewiring");
 		se.setGraphPanel(gw.getGraphPanel());
 		se.layout();
 	}
-		
+
+
 	
 }

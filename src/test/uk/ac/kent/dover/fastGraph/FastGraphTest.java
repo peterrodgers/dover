@@ -1600,6 +1600,133 @@ public class FastGraphTest {
 	}
 	
 	
+	@Test
+	public void test134() {
+		Graph displayGraph1 = new Graph("");
+		Node n0 = new Node("nA");
+		displayGraph1.addNode(n0);
+		Node n1 = new Node("nB");
+		displayGraph1.addNode(n1);
+		Node n2 = new Node("nA");
+		displayGraph1.addNode(n2);
+		Edge e0 = new Edge(n0,n1,"eA");
+		displayGraph1.addEdge(e0);
+		Edge e1 = new Edge(n0,n2,"eB");
+		displayGraph1.addEdge(e1);
+		Edge e2 = new Edge(n1,n2,"eA");
+		displayGraph1.addEdge(e2);
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph1,false);
+
+		assertEquals(1,g1.edgesBetween(0, 1).size());
+		assertTrue(g1.edgesBetween(0, 1).get(0) == 0);
+	}
+	
+	
+	@Test
+	public void test135() {
+		Graph displayGraph1 = new Graph("");
+		Node n0 = new Node("nA");
+		displayGraph1.addNode(n0);
+		Node n1 = new Node("nB");
+		displayGraph1.addNode(n1);
+		Node n2 = new Node("nA");
+		displayGraph1.addNode(n2);
+		Edge e0 = new Edge(n0,n1,"eA");
+		displayGraph1.addEdge(e0);
+		Edge e1 = new Edge(n0,n2,"eB");
+		displayGraph1.addEdge(e1);
+		Edge e2 = new Edge(n1,n2,"eA");
+		displayGraph1.addEdge(e2);
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph1,false);
+
+		assertEquals(1,g1.edgesBetween(0, 1).size());
+		assertTrue(g1.edgesBetween(0, 1).get(0) == 0);
+	}
+	
+	
+	@Test
+	public void test136() {
+		Graph displayGraph1 = new Graph("");
+		Node n0 = new Node("nA");
+		displayGraph1.addNode(n0);
+		Node n1 = new Node("nB");
+		displayGraph1.addNode(n1);
+		Edge e0 = new Edge(n0,n1,"eA");
+		displayGraph1.addEdge(e0);
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph1,false);
+
+		assertEquals(1,g1.edgesBetween(0, 1).size());
+		assertTrue(g1.edgesBetween(0, 1).get(0) == 0);
+	}
+	
+	
+	@Test
+	public void test137() {
+		Graph displayGraph1 = new Graph("");
+		Node n0 = new Node("nA");
+		displayGraph1.addNode(n0);
+		Node n1 = new Node("nB");
+		displayGraph1.addNode(n1);
+		Node n2 = new Node("nC");
+		displayGraph1.addNode(n2);
+		Edge e0 = new Edge(n0,n1,"eA");
+		displayGraph1.addEdge(e0);
+		Edge e1 = new Edge(n1,n2,"eB");
+		displayGraph1.addEdge(e1);
+		Edge e2 = new Edge(n1,n0,"eA");
+		displayGraph1.addEdge(e2);
+		Edge e3 = new Edge(n0,n1,"eA");
+		displayGraph1.addEdge(e3);
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph1,false);
+
+		assertEquals(3,g1.edgesBetween(0, 1).size());
+		assertTrue(g1.edgesBetween(0, 1).get(0) == 2);
+		assertTrue(g1.edgesBetween(0, 1).get(1) == 0);
+		assertTrue(g1.edgesBetween(0, 1).get(2) == 3);
+	}
+	
+	
+	@Test
+	public void test138() {
+		Graph displayGraph1 = new Graph("");
+		Node n0 = new Node("nA");
+		displayGraph1.addNode(n0);
+		Node n1 = new Node("nB");
+		displayGraph1.addNode(n1);
+		Node n2 = new Node("nA");
+		displayGraph1.addNode(n2);
+		Edge e0 = new Edge(n0,n1,"eA");
+		displayGraph1.addEdge(e0);
+		Edge e1 = new Edge(n0,n2,"eB");
+		displayGraph1.addEdge(e1);
+		Edge e2 = new Edge(n1,n2,"eA");
+		displayGraph1.addEdge(e2);
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph1,false);
+
+		assertEquals(1,g1.edgesBetween(0, 1).size());
+		assertTrue(g1.edgesBetween(0, 1).get(0) == 0);
+	}
+	
+	
+	@Test
+	public void test139() {
+		Graph displayGraph1 = new Graph("");
+		Node n0 = new Node("nA");
+		displayGraph1.addNode(n0);
+		Node n1 = new Node("nB");
+		displayGraph1.addNode(n1);
+		Node n2 = new Node("nA");
+		displayGraph1.addNode(n2);
+		Edge e0 = new Edge(n2,n1,"eA");
+		displayGraph1.addEdge(e0);
+		Edge e1 = new Edge(n0,n2,"eB");
+		displayGraph1.addEdge(e1);
+		Edge e2 = new Edge(n1,n2,"eA");
+		displayGraph1.addEdge(e2);
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph1,false);
+
+		assertEquals(0,g1.edgesBetween(0, 1).size());
+	}
 	
 	
 	//TODO Add tests here

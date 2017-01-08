@@ -13,35 +13,17 @@ public class SubgraphMapping {
 	private int[] nodeMapping = null;
 	private int[] edgeMapping = null;
 	
-	int numberOfNodes = -1;
-	int numberOfEdges = -1;
-
-	public SubgraphMapping(int numberOfNodes, int numberOfEdges) {
-		this.numberOfNodes = numberOfNodes;
-		this.numberOfEdges = numberOfEdges;
-		nodeMapping = new int[numberOfNodes];
-		edgeMapping = new int[numberOfEdges];
-	}
-
-
-	/**
-	 * Sets the node mapping
-	 * 
-	 * @param i
-	 */
-	public void setNodeMapping(int i[]) {
-		nodeMapping = i;
-	}
+	FastGraph targetGraph;
+	FastGraph patternGraph;
 	
-	/**
-	 * Sets the edge mapping
-	 * 
-	 * @param i
-	 */
-	public void setEdgeMapping(int i[]) {
-		edgeMapping = i;
+	public SubgraphMapping(FastGraph targetGraph, FastGraph patternGraph, int[] nodeMapping, int[] edgeMapping) {
+		this.targetGraph = targetGraph;
+		this.patternGraph = patternGraph;
+		this.nodeMapping = nodeMapping.clone();
+		this.edgeMapping = edgeMapping.clone();
 	}
-	
+
+
 
 	/**
 	 * @return the node mapping
@@ -61,38 +43,19 @@ public class SubgraphMapping {
 	/**
 	 * @return a single node mapping
 	 */
-	public int getSingleNodeMapping(int subgraphIndex) {
-		return nodeMapping[subgraphIndex];
+	public int getSingleNodeMapping(int patternGraphIndex) {
+		return nodeMapping[patternGraphIndex];
 	}
 
 	
 	/**
 	 * @return a single edge mapping
 	 */
-	public int getSingleEdgeMapping(int subgraphIndex) {
-		return edgeMapping[subgraphIndex];
+	public int getSingleEdgeMapping(int patternGraphIndex) {
+		return edgeMapping[patternGraphIndex];
 	}
 
 	
-	/**
-	 * Adds a single node mapping.
-	 * 
-	 * @param subGraphIndex
-	 * @param graphIndex
-	 */
-	public void addSingleNodeMapping(int subGraphIndex, int graphIndex) {
-		nodeMapping[subGraphIndex] = graphIndex;
-	}
-	
-	/**
-	 * Adds a single edge mapping.
-	 * 
-	 * @param subGraphIndex
-	 * @param graphIndex
-	 */
-	public void addSingleEdgeMapping(int subGraphIndex, int graphIndex) {
-		edgeMapping[subGraphIndex] = graphIndex;
-	}
 	
 
 }
