@@ -57,42 +57,21 @@ public class ExactSubgraphIsomorphism {
 //			pattern = FastGraph.randomGraphFactory(subgraphNodes, subgraphEdges, 2222, true);
 		} catch(Exception e) {}
 		
-/*
-		Graph targetGraph = new Graph("");
-		Node n0 = new Node("a");
-		targetGraph.addNode(n0);
-		Node n1 = new Node("b");
-		targetGraph.addNode(n1);
-		Edge e0 = new Edge(n0,n1,"");
-		targetGraph.addEdge(e0);
-//		Edge e1 = new Edge(n1,n0,"");
-//		targetGraph.addEdge(e1);
-		target = FastGraph.displayGraphFactory(targetGraph,false);
 
-		Graph patternGraph = new Graph("");
-		n0 = new Node("b");
-		patternGraph.addNode(n0);
-		n1 = new Node("a");
-		patternGraph.addNode(n1);
-		e0 = new Edge(n0,n1,"");
-		patternGraph.addEdge(e0);
-//		e1 = new Edge(n1,n0,"");
-//		patternGraph.addEdge(e1);
-		pattern = FastGraph.displayGraphFactory(patternGraph,false);
-*/		
-/*		
+		
+		
 		Graph targetGraph = new Graph("triangle with single edge attached");
 		Node n0 = new Node("nA");
 		targetGraph.addNode(n0);
-		Node n1 = new Node("nB");
+		Node n1 = new Node("nA");
 		targetGraph.addNode(n1);
-		Node n2 = new Node("nA");
+		Node n2 = new Node("nB");
 		targetGraph.addNode(n2);
 //		Node n3 = new Node("nB");
 //		targetGraph.addNode(n3);
-		Edge e0 = new Edge(n0,n1,"eA");
+		Edge e0 = new Edge(n0,n1,"eB");
 		targetGraph.addEdge(e0);
-		Edge e1 = new Edge(n0,n2,"eB");
+		Edge e1 = new Edge(n0,n2,"eA");
 		targetGraph.addEdge(e1);
 		Edge e2 = new Edge(n1,n2,"eA");
 		targetGraph.addEdge(e2);
@@ -113,65 +92,69 @@ public class ExactSubgraphIsomorphism {
 //patternGraph.addNode(n3);
 		e0 = new Edge(n0,n1,"eA");
 		patternGraph.addEdge(e0);
-		e1 = new Edge(n0,n2,"eB");
+		e1 = new Edge(n0,n2,"eA");
 		patternGraph.addEdge(e1);
-		e2 = new Edge(n1,n2,"eA");
+		e2 = new Edge(n1,n2,"eB");
 		patternGraph.addEdge(e2);
 //e3 = new Edge(n2,n3,"eB");
 //patternGraph.addEdge(e3);
 //e3 = new Edge(n1,n2,"eA");
 //patternGraph.addEdge(e3);
 		pattern = FastGraph.displayGraphFactory(patternGraph,false);
-*/	
+	
 
-		
-		Graph targetGraph = new Graph("triangle");
+/*	
+		Graph targetGraph = new Graph("two connected nodes");
 		Node n0 = new Node("nA");
 		targetGraph.addNode(n0);
 		Node n1 = new Node("nB");
 		targetGraph.addNode(n1);
-		Node n2 = new Node("nA");
-		targetGraph.addNode(n2);
 		Edge e0 = new Edge(n0,n1,"eA");
 		targetGraph.addEdge(e0);
-		Edge e1 = new Edge(n0,n2,"eB");
-		targetGraph.addEdge(e1);
-		Edge e2 = new Edge(n1,n2,"eA");
-		targetGraph.addEdge(e2);
 		target = FastGraph.displayGraphFactory(targetGraph,false);
 
-		Graph patternGraph = new Graph("triangle");
+		Graph patternGraph = new Graph("two connected nodes");
 		n0 = new Node("nB");
 		patternGraph.addNode(n0);
 		n1 = new Node("nA");
 		patternGraph.addNode(n1);
-		n2 = new Node("nA");
-		patternGraph.addNode(n2);
 		e0 = new Edge(n0,n1,"eA");
 		patternGraph.addEdge(e0);
-		e1 = new Edge(n0,n2,"eB");
-		patternGraph.addEdge(e1);
-		e2 = new Edge(n1,n2,"eA");
-		patternGraph.addEdge(e2);
 		pattern = FastGraph.displayGraphFactory(patternGraph,false);
 
+*/		
+
+		
+		
+		ExactSubgraphIsomorphism esi;
+		boolean result;
+		
 		SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(target, pattern);
 		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
+		esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
+		result = esi.subGraphIsomorphismFinder();
 		
-		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
-		
-		boolean result = esi.subGraphIsomorphismFinder();
+//		AlwaysTrueNodeComparator nc = new AlwaysTrueNodeComparator(target, pattern);
+//		AlwaysTrueEdgeComparator ec = new AlwaysTrueEdgeComparator(target, pattern);
+//		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
+//		result = esi.subGraphIsomorphismFinder();
+
 		
 Debugger.log(result);
 
-int[] nodeMap = esi.getFoundMappings().get(0).getNodeMapping();
-for(int i = 0; i <nodeMap.length; i++) {
-System.out.println("node map from "+i+" label "+pattern.getNodeLabel(i)+ " to "+nodeMap[i]+" label "+target.getNodeLabel(i));
-}
-
-int[] edgeMap = esi.getFoundMappings().get(0).getEdgeMapping();
-for(int i = 0; i < edgeMap.length; i++) {
-System.out.println("edge map from "+i+" label "+pattern.getEdgeLabel(i)+ " to "+nodeMap[i]+" label "+target.getEdgeLabel(i));
+if(result) {
+	for(SubgraphMapping sgm : esi.getFoundMappings()) {
+		Debugger.log(" ");
+		int[] nodeMap = esi.getFoundMappings().get(0).getNodeMapping();
+		for(int i = 0; i <nodeMap.length; i++) {
+			System.out.println("node map from "+i+" label "+pattern.getNodeLabel(i)+ " to "+nodeMap[i]+" label "+target.getNodeLabel(i));
+		}
+		
+		int[] edgeMap = esi.getFoundMappings().get(0).getEdgeMapping();
+		for(int i = 0; i < edgeMap.length; i++) {
+			System.out.println("edge map from "+i+" label "+pattern.getEdgeLabel(i)+ " to "+nodeMap[i]+" label "+target.getEdgeLabel(i));
+		}
+	}
 }
 
 	}
@@ -212,10 +195,10 @@ System.out.println("edge map from "+i+" label "+pattern.getEdgeLabel(i)+ " to "+
 		
 		foundMappings = new LinkedList<SubgraphMapping>();
 /*		
-int pattern = 0;		
+int pattern = 0;
 for(int[] matches : possibleNodeMappings) {
 	for(int i = 0; i < matches.length; i++) {
-		Debugger.log("target node id "+pattern+" label "+patternGraph.getNodeLabel(pattern)+" possible match with target node id "+matches[i]+" label "+targetGraph.getNodeLabel(matches[i]));
+		Debugger.log("pattern node id "+pattern+" label "+patternGraph.getNodeLabel(pattern)+" possible match with target node id "+matches[i]+" label "+targetGraph.getNodeLabel(matches[i]));
 	}
 	pattern++;
 }
@@ -272,45 +255,66 @@ for(int[] matches : possibleNodeMappings) {
 		boolean mappingFound = false;
 		boolean fullSearchComplete = false;
 		while(!fullSearchComplete) {
-Debugger.log("current pattern index "+currentPatternIndex+" current target index "+currentTargetIndex);
-			
+
+/*
+Debugger.log("START OF LOOP");
+for(int q = 0; q < patternToTargetNodeMatches.length; q++) {
+	Debugger.log("patternToTargetNodeMatches["+q+"] "+patternToTargetNodeMatches[q]);
+}
+Debugger.log("------------------");
+for(int q = 0; q < targetToPatternNodeMatches.length; q++) {
+	Debugger.log("targetToPatternNodeMatches["+q+"] "+targetToPatternNodeMatches[q]);
+}
+*/
+
 			boolean match = isAMatch(currentTargetNode, currentPatternNode);
-Debugger.log("match "+match);
+//Debugger.log("match "+match);
 			if(match) {
 				indexToTargetNodeMatches[currentPatternIndex] = currentTargetNode;
 				targetToPatternNodeMatches[currentTargetNode] = currentPatternNode;
 				patternToTargetNodeMatches[currentPatternNode] = currentTargetNode;
-				currentPatternIndex++;
-//Debugger.log("current pattern index "+currentPatternIndex+" number of pattern nodes "+numberOfPatternNodes);
-				if(currentPatternIndex == numberOfPatternNodes) { // success, found full mapping!
+				if(currentPatternIndex == numberOfPatternNodes-1) { // success, found full mapping!
 					mappingFound = true;
 					findEdgeMappings(patternToTargetEdgeMatches);
 					SubgraphMapping storedMapping = new SubgraphMapping(targetGraph,patternGraph,patternToTargetNodeMatches,patternToTargetEdgeMatches);
 					foundMappings.add(storedMapping);
-					break;
-				}
+					
+					match = false; // force search onto next target index, and possibly backtracking 
 
-				// move on to next element in the patternNodeOrder
-				currentPatternNode = patternNodeOrder[currentPatternIndex];
-				currentTargetIndex = 0;
-				currentTargetNode = possibleNodeMappings.get(currentPatternNode)[currentTargetIndex];
-				
-			} else { // nodes do not match
+				} else {
+					// partial match found, so move on to next element in the patternNodeOrder
+					currentPatternIndex++;
+					currentPatternNode = patternNodeOrder[currentPatternIndex];
+					currentTargetIndex = 0;
+					currentTargetNode = possibleNodeMappings.get(currentPatternNode)[currentTargetIndex];
+				}
+			}
+			
+			if(!match){
+				// nodes do not match
 				currentTargetIndex++;
-				while(currentTargetIndex == possibleNodeMappings.get(currentPatternNode).length) { // run out of target nodes to test, so go back to the previous node in patternIndex, and try the next one, this may happen multiple times
-					 // unset the matches
+				while(currentTargetIndex >= possibleNodeMappings.get(currentPatternNode).length) { // run out of target nodes to test, so go back to the previous node in patternIndex, and try the next one, this may happen multiple times
+					 // unset the matches of last matched nodes
 					indexToTargetNodeMatches[currentPatternIndex] = -1;
 					targetToPatternNodeMatches[currentTargetNode] = -1;
 					patternToTargetNodeMatches[currentPatternNode] = -1;
 					// backtrack
 					currentPatternIndex--;
+
 					if(currentPatternIndex == -1) {
 						fullSearchComplete = true;
 						break;
 					}
-					currentTargetIndex = indexToTargetNodeMatches[currentPatternIndex]++;
+					currentTargetIndex = indexToTargetNodeMatches[currentPatternIndex]+1;
+					currentPatternNode = patternNodeOrder[currentPatternIndex];
 				}
 				if(!fullSearchComplete) {
+					
+					// unset the matches for the immediate search
+					indexToTargetNodeMatches[currentPatternIndex] = -1;
+					targetToPatternNodeMatches[currentTargetNode] = -1;
+					patternToTargetNodeMatches[currentPatternNode] = -1;
+
 					currentPatternNode = patternNodeOrder[currentPatternIndex];
 					currentTargetNode = possibleNodeMappings.get(currentPatternNode)[currentTargetIndex];
 				}
@@ -319,87 +323,12 @@ Debugger.log("match "+match);
 			
 		}
 		
-		
-if(mappingFound) {
-	Debugger.log("Found match");
-	for(int i = 0; i < numberOfPatternNodes; i++) {
-		Debugger.log("    pattern node "+patternNodeOrder[i]+" label "+patternGraph.getNodeLabel(patternNodeOrder[i]) +" target node "+indexToTargetNodeMatches[i]+" label "+targetGraph.getNodeLabel(indexToTargetNodeMatches[i]));
-	}
-	return true;
-}
-
-
-		return false;
+		return mappingFound;
 		
 	}
 
 	
 
-
-	/**
-	 * once a node mapping has been found, populate the Edge match arrays
-	 *
-	 */
-	private void findEdgeMappings(int[] edgeMatches) {
-		Arrays.fill(edgeMatches, -1); // stores matches pattern edge to target edge, -1 means no match
-
-		for(int patternEdge = 0; patternEdge < patternGraph.getNumberOfEdges(); patternEdge++) {
-			int patternNode1 = patternGraph.getEdgeNode1(patternEdge);
-			int patternNode2 = patternGraph.getEdgeNode2(patternEdge);
-			int targetNode1 = patternToTargetNodeMatches[patternNode1];
-			int targetNode2 = patternToTargetNodeMatches[patternNode2];
-			 
-			// there will be at least one of these, as the target nodes cannot have mappings
-			// in isAMatch without a connecting edge
-			int targetEdge = targetGraph.edgesBetween(targetNode1, targetNode2).get(0);
-			edgeMatches[patternEdge] = targetEdge;
-		}
-		
-		
-	}
-
-
-
-	/**
-	 * Get the possible target node mappings for all nodes in the pattern graph based on target nodes that have
-	 * the same or greater degree and also comparator between pattern node and target node.
-	 * 
-	 * @return true if all nodes have at least one possible mapping, false if one or more node has none.
-	 */
-	private boolean findPossibleNodeMappings() {
-		possibleNodeMappings = new ArrayList<int[]>(patternGraph.getNumberOfNodes());
-
-		for(int p = 0; p < patternGraph.getNumberOfNodes(); p++) {
-			int[] oversizeCandidates = new int[targetGraph.getNumberOfNodes()];
-			
-			// find all the candidate matches for the node in the pattern graph
-			int candidatePos = 0;
-			for(int t = 0; t < targetGraph.getNumberOfNodes(); t++) {
-				if(targetGraph.getNodeDegree(t) < patternGraph.getNodeDegree(p)) { // don't match if the target has fewer connecting edges
-					continue;
-				}
-				if(nodeComparator.compare(t,p) == 0) {
-					oversizeCandidates[candidatePos] = t;
-					candidatePos++;
-				}
-			}
-			
-			if(candidatePos == 0) {
-				// no possible matches, so return false
-				return false;
-			}
-			
-			// chop the array down to size
-			int[] candidates = Arrays.copyOf(oversizeCandidates, candidatePos);
-			possibleNodeMappings.add(candidates);
-			
-		}
-		
-		return true;
-		
-	}
-
-	
 
 
 
@@ -468,46 +397,73 @@ if(mappingFound) {
 		
 		return true;
 	}
-
-
-
-	/**
-	 * Check if the two graphs have the same structure.
-	 * 
-	 * @param g the FastGraph from which a subgraph will be found
-	 * @param nodes the nodes in g2 that form the subgraph
-	 * @param edges the edges in g2 that form the subgraph
-	 * @return true if the g1 and the subgraph of g2 are isomorphic, false otherwise
-	 */
-/*	public boolean isomorphic(FastGraph g, int[] nodes, int[] edges) {
-
-		FastGraph subGraph = g.generateGraphFromSubgraph(nodes,edges);
-		
-		boolean iso = isomorphic(subGraph);
-
-		return iso;
-	}
-*/
-
-		
+	
+	
 
 
 	/**
-	 * Check if two graphs have the same structure. Use the constructor and non static method if
-	 * lots of comparisons are going to be made against the same graph.
+	 * Get the possible target node mappings for all nodes in the pattern graph based on target nodes that have
+	 * the same or greater degree and also comparator between pattern node and target node.
 	 * 
-	 * @param g1 one FastGraph to be tested
-	 * @param g2 the other FastGraph to be tested
-	 * @return true if g1 and g2 are isomorphic, false otherwise
+	 * @return true if all nodes have at least one possible mapping, false if one or more node has none.
 	 */
-/*	public static boolean isomorphic(FastGraph g1, FastGraph g2) {
-		ExactSubgraphIsomorphism ei = new ExactSubgraphIsomorphism(g1);
-		boolean ret = ei.isomorphic(g2);
-		return ret;
+	private boolean findPossibleNodeMappings() {
+		possibleNodeMappings = new ArrayList<int[]>(patternGraph.getNumberOfNodes());
+
+		for(int p = 0; p < patternGraph.getNumberOfNodes(); p++) {
+			int[] oversizeCandidates = new int[targetGraph.getNumberOfNodes()];
+			
+			// find all the candidate matches for the node in the pattern graph
+			int candidatePos = 0;
+			for(int t = 0; t < targetGraph.getNumberOfNodes(); t++) {
+				if(targetGraph.getNodeDegree(t) < patternGraph.getNodeDegree(p)) { // don't match if the target has fewer connecting edges
+					continue;
+				}
+				if(nodeComparator.compare(t,p) == 0) {
+					oversizeCandidates[candidatePos] = t;
+					candidatePos++;
+				}
+			}
+			
+			if(candidatePos == 0) {
+				// no possible matches, so return false
+				return false;
+			}
+			
+			// chop the array down to size
+			int[] candidates = Arrays.copyOf(oversizeCandidates, candidatePos);
+			possibleNodeMappings.add(candidates);
+			
+		}
+		
+		return true;
+		
 	}
-*/	
 
 	
+	/**
+	 * once a node mapping has been found, populate the Edge match arrays
+	 *
+	 */
+	private void findEdgeMappings(int[] edgeMatches) {
+		Arrays.fill(edgeMatches, -1); // stores matches pattern edge to target edge, -1 means no match
+
+		for(int patternEdge = 0; patternEdge < patternGraph.getNumberOfEdges(); patternEdge++) {
+			int patternNode1 = patternGraph.getEdgeNode1(patternEdge);
+			int patternNode2 = patternGraph.getEdgeNode2(patternEdge);
+			int targetNode1 = patternToTargetNodeMatches[patternNode1];
+			int targetNode2 = patternToTargetNodeMatches[patternNode2];
+			 
+			// there will be at least one of these, as the target nodes cannot have mappings
+			// in isAMatch without a connecting edge
+			int targetEdge = targetGraph.edgesBetween(targetNode1, targetNode2).get(0);
+			edgeMatches[patternEdge] = targetEdge;
+		}
+		
+		
+	}
+
+
 
 
 	/**
@@ -529,37 +485,6 @@ if(mappingFound) {
 	    }
 	}
 	
-	
-	
-
-	/**
-	 * Output timing
-	 */
-	public static void reportTimes() {
-//		if(numberOfIsomorphismTests > 0) {
-//			System.out.println("Isomorphism test average "+(timeForIsomorphismTests/(1000.0*numberOfIsomorphismTests))+" seconds total tests "+numberOfIsomorphismTests+" total time "+(timeForIsomorphismTests/1000.0)+" seconds");
-//		} else {
-//			System.out.println("Isomorphism total tests "+numberOfIsomorphismTests);
-//		}
-	}
-
-	
-	/**
-	 * Output counts
-	 */
-	public static void reportFailRatios() {
-/*		
-		double total = failOnNodeCount+failOnEdgeCount+failOnEigenvalues+failOnDegreeComparison+failOnNodeMatches+failOnBruteForce+succeed;
-		
-		System.out.println("fail on Node Count "+failOnNodeCount+" "+(100.0*failOnNodeCount/total)+" % of calls");
-		System.out.println("fail on Edge Count "+failOnEdgeCount+" "+(100.0*failOnEdgeCount/total)+" % of calls");
-		System.out.println("fail on Degree Comparison "+failOnDegreeComparison+" "+(100.0*failOnDegreeComparison/total)+" % of calls");
-		System.out.println("fail on Eigenvalues "+failOnEigenvalues+" "+(100.0*failOnEigenvalues/total)+" % of calls");
-		System.out.println("fail on Node Matches "+failOnNodeMatches+" "+(100.0*failOnNodeMatches/total)+" % of calls");
-		System.out.println("fail on Brute Force "+failOnBruteForce+" "+(100.0*failOnBruteForce/total)+" % of calls");
-		System.out.println("succeed "+succeed+" "+(100.0*succeed/total)+" "+" % of calls");
-*/
-	}
 
 	
 
