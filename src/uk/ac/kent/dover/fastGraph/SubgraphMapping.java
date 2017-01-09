@@ -56,6 +56,25 @@ public class SubgraphMapping {
 	}
 
 	
+	public String toString() {
+		StringBuffer ret = new StringBuffer("node mapping: ");
+		for(int i = 0; i < nodeMapping.length; i++) {
+			ret.append(i+":"+nodeMapping[i]);
+			if(i < nodeMapping.length-1) {
+				ret.append(", ");
+			}
+		}
+		ret.append("; edge mapping: ");
+		for(int i = 0; i < edgeMapping.length; i++) {
+			ret.append(i+":"+edgeMapping[i]);
+			if(i < edgeMapping.length-1) {
+				ret.append(", ");
+			}
+		}
+		
+		
+		return ret.toString();
+	}
 	
 
 }

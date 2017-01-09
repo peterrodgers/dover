@@ -59,7 +59,7 @@ public class ExactSubgraphIsomorphism {
 		
 
 		
-		
+/*		
 		Graph targetGraph = new Graph("triangle with single edge attached");
 		Node n0 = new Node("nA");
 		targetGraph.addNode(n0);
@@ -80,7 +80,9 @@ public class ExactSubgraphIsomorphism {
 //Edge e4 = new Edge(n2,n1,"eA");
 //targetGraph.addEdge(e4);
 		target = FastGraph.displayGraphFactory(targetGraph,false);
-
+*/
+		
+/*
 		Graph patternGraph = new Graph("triangle");
 		n0 = new Node("nB");
 		patternGraph.addNode(n0);
@@ -102,8 +104,8 @@ public class ExactSubgraphIsomorphism {
 //patternGraph.addEdge(e3);
 		pattern = FastGraph.displayGraphFactory(patternGraph,false);
 	
-
-/*	
+*/
+	
 		Graph targetGraph = new Graph("two connected nodes");
 		Node n0 = new Node("nA");
 		targetGraph.addNode(n0);
@@ -122,26 +124,64 @@ public class ExactSubgraphIsomorphism {
 		patternGraph.addEdge(e0);
 		pattern = FastGraph.displayGraphFactory(patternGraph,false);
 
-*/		
+		
+/*
+		
+		Graph targetGraph = new Graph("triangle");
+		Node n0 = new Node("nA");
+		targetGraph.addNode(n0);
+		Node n1 = new Node("nB");
+		targetGraph.addNode(n1);
+		Node n2 = new Node("nA");
+		targetGraph.addNode(n2);
+		Edge e0 = new Edge(n2,n0,"eA");
+		targetGraph.addEdge(e0);
+		Edge e1 = new Edge(n1,n2,"eB");
+		targetGraph.addEdge(e1);
+		Edge e2 = new Edge(n1,n0,"eA");
+		targetGraph.addEdge(e2);
+		target = FastGraph.displayGraphFactory(targetGraph,false);
 
+		Graph patternGraph = new Graph("square");
+		n0 = new Node("nB");
+		patternGraph.addNode(n0);
+		n1 = new Node("nA");
+		patternGraph.addNode(n1);
+		n2 = new Node("nA");
+		patternGraph.addNode(n2);
+		Node n3 = new Node("nB");
+		patternGraph.addNode(n3);
+		e0 = new Edge(n0,n1,"eA");
+		patternGraph.addEdge(e0);
+		e1 = new Edge(n1,n2,"eB");
+		patternGraph.addEdge(e1);
+		e2 = new Edge(n2,n3,"eA");
+		patternGraph.addEdge(e2);
+		Edge e3 = new Edge(n3,n0,"eB");
+		patternGraph.addEdge(e3);
+		pattern = FastGraph.displayGraphFactory(patternGraph,false);
+*/
+//uk.ac.kent.displayGraph.display.GraphWindow gw1 = new uk.ac.kent.displayGraph.display.GraphWindow(patternGraph,true);
+//uk.ac.kent.displayGraph.display.GraphWindow gw2 = new uk.ac.kent.displayGraph.display.GraphWindow(targetGraph,true);
 		
 		
 		ExactSubgraphIsomorphism esi;
 		boolean result;
-		
+/*		
 		SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(target, pattern);
 		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
 		esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
 		result = esi.subGraphIsomorphismFinder();
+*/		
+/*		AlwaysTrueNodeComparator nc = new AlwaysTrueNodeComparator(target, pattern);
+		AlwaysTrueEdgeComparator ec = new AlwaysTrueEdgeComparator(target, pattern);
+		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
+		result = esi.subGraphIsomorphismFinder();
+System.out.println(esi.getFoundMappings());
+*/
 		
-//		AlwaysTrueNodeComparator nc = new AlwaysTrueNodeComparator(target, pattern);
-//		AlwaysTrueEdgeComparator ec = new AlwaysTrueEdgeComparator(target, pattern);
-//		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
-//		result = esi.subGraphIsomorphismFinder();
-
-		
-Debugger.log(result);
-
+//Debugger.log(result);
+/*
 if(result) {
 	for(SubgraphMapping sgm : esi.getFoundMappings()) {
 		Debugger.log(" ");
@@ -156,7 +196,72 @@ if(result) {
 		}
 	}
 }
+*/
+tempFn();
+	}
 
+	private static void tempFn() {
+	
+		Graph targetGraph = new Graph("larger graph");
+		Node nn0 = new Node("A");
+		targetGraph.addNode(nn0);
+		Node nn1 = new Node("D");
+		targetGraph.addNode(nn1);
+		Node nn2 = new Node("B");
+		targetGraph.addNode(nn2);
+		Node nn3 = new Node("C");
+		targetGraph.addNode(nn3);
+		Node nn4 = new Node("B");
+		targetGraph.addNode(nn4);
+		Node nn5 = new Node("D");
+		targetGraph.addNode(nn5);
+		
+		Edge e0 = new Edge(nn0,nn1,"");
+		targetGraph.addEdge(e0);
+		Edge e1 = new Edge(nn0,nn3,"");
+		targetGraph.addEdge(e1);
+		Edge e2 = new Edge(nn0,nn5,"");
+		targetGraph.addEdge(e2);
+		Edge e4 = new Edge(nn1,nn2,"");
+		targetGraph.addEdge(e4);
+		Edge e4a = new Edge(nn3,nn2,"");
+		targetGraph.addEdge(e4a);
+		Edge e5 = new Edge(nn4,nn3,"");
+		targetGraph.addEdge(e5);
+		Edge e6 = new Edge(nn4,nn5,"");
+		targetGraph.addEdge(e6);
+		FastGraph target = FastGraph.displayGraphFactory(targetGraph,false);
+
+
+Graph patternGraph = new Graph("square");
+Node nnX0 = new Node("B");
+patternGraph.addNode(nnX0);
+Node nnX1 = new Node("C");
+patternGraph.addNode(nnX1);
+Node nnX2 = new Node("A");
+patternGraph.addNode(nnX2);
+Node nnX3 = new Node("D");
+patternGraph.addNode(nnX3);
+Edge eeX0 = new Edge(nnX0,nnX1,"");
+patternGraph.addEdge(eeX0);
+Edge eeX1 = new Edge(nnX2,nnX1,"");
+patternGraph.addEdge(eeX1);
+Edge eeX2 = new Edge(nnX2,nnX3,"");
+patternGraph.addEdge(eeX2);
+Edge eeX3 = new Edge(nnX3,nnX0,"");
+patternGraph.addEdge(eeX3);
+FastGraph pattern = FastGraph.displayGraphFactory(patternGraph,false);
+
+SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(target, pattern);
+SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
+
+ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
+boolean result = esi.subGraphIsomorphismFinder();
+System.out.println(esi.getFoundMappings());
+
+
+new uk.ac.kent.displayGraph.display.GraphWindow(patternGraph, true);
+new uk.ac.kent.displayGraph.display.GraphWindow(targetGraph, true);
 	}
 
 	
@@ -194,15 +299,18 @@ if(result) {
 		resultPossible = findPossibleNodeMappings();
 		
 		foundMappings = new LinkedList<SubgraphMapping>();
-/*		
+		
 int pattern = 0;
 for(int[] matches : possibleNodeMappings) {
+
+	String labels = "";
 	for(int i = 0; i < matches.length; i++) {
-		Debugger.log("pattern node id "+pattern+" label "+patternGraph.getNodeLabel(pattern)+" possible match with target node id "+matches[i]+" label "+targetGraph.getNodeLabel(matches[i]));
+		labels += targetGraph.getNodeLabel(matches[i])+" ";
 	}
+	Debugger.log("pattern node id "+pattern+" label "+patternGraph.getNodeLabel(pattern)+" possible match with target node ids "+Arrays.toString(matches)+" labels "+labels);
 	pattern++;
 }
-*/
+
 		
 	}
 	
@@ -238,8 +346,8 @@ for(int[] matches : possibleNodeMappings) {
 		for(int i = 0; i < numberOfPatternNodes; i++) {
 			patternNodeOrder[i] = i;
 		}
-		
 		Arrays.sort(patternNodeOrder,matchArrayComparitor);
+Debugger.log("patternNodeOrder "+Arrays.toString(patternNodeOrder));		
 		
 		// do the backgtracking search based on order found
 
@@ -256,16 +364,7 @@ for(int[] matches : possibleNodeMappings) {
 		boolean fullSearchComplete = false;
 		while(!fullSearchComplete) {
 
-/*
-Debugger.log("START OF LOOP");
-for(int q = 0; q < patternToTargetNodeMatches.length; q++) {
-	Debugger.log("patternToTargetNodeMatches["+q+"] "+patternToTargetNodeMatches[q]);
-}
-Debugger.log("------------------");
-for(int q = 0; q < targetToPatternNodeMatches.length; q++) {
-	Debugger.log("targetToPatternNodeMatches["+q+"] "+targetToPatternNodeMatches[q]);
-}
-*/
+Debugger.log("trying match between pattern node "+currentPatternNode+" and target node "+currentTargetNode);
 
 			boolean match = isAMatch(currentTargetNode, currentPatternNode);
 //Debugger.log("match "+match);
@@ -273,6 +372,17 @@ for(int q = 0; q < targetToPatternNodeMatches.length; q++) {
 				indexToTargetNodeMatches[currentPatternIndex] = currentTargetNode;
 				targetToPatternNodeMatches[currentTargetNode] = currentPatternNode;
 				patternToTargetNodeMatches[currentPatternNode] = currentTargetNode;
+				
+Debugger.log("found a match between pattern node "+currentPatternNode+" and target node "+currentTargetNode);
+for(int q = 0; q < patternToTargetNodeMatches.length; q++) {
+	Debugger.log("patternToTargetNodeMatches["+q+"] "+patternToTargetNodeMatches[q]);
+}
+Debugger.log("------------------");
+for(int q = 0; q < targetToPatternNodeMatches.length; q++) {
+	Debugger.log("targetToPatternNodeMatches["+q+"] "+targetToPatternNodeMatches[q]);
+}
+Debugger.log();
+
 				if(currentPatternIndex == numberOfPatternNodes-1) { // success, found full mapping!
 					mappingFound = true;
 					findEdgeMappings(patternToTargetEdgeMatches);
@@ -280,6 +390,7 @@ for(int q = 0; q < targetToPatternNodeMatches.length; q++) {
 					foundMappings.add(storedMapping);
 					
 					match = false; // force search onto next target index, and possibly backtracking 
+Debugger.log("FULL MATCH FOUND");
 
 				} else {
 					// partial match found, so move on to next element in the patternNodeOrder
@@ -291,33 +402,54 @@ for(int q = 0; q < targetToPatternNodeMatches.length; q++) {
 			}
 			
 			if(!match){
+//Debugger.log("match failed between pattern node "+currentPatternNode+" and target node "+currentTargetNode);
 				// nodes do not match
 				currentTargetIndex++;
 				while(currentTargetIndex >= possibleNodeMappings.get(currentPatternNode).length) { // run out of target nodes to test, so go back to the previous node in patternIndex, and try the next one, this may happen multiple times
-					 // unset the matches of last matched nodes
-					indexToTargetNodeMatches[currentPatternIndex] = -1;
-					targetToPatternNodeMatches[currentTargetNode] = -1;
-					patternToTargetNodeMatches[currentPatternNode] = -1;
+					 // unset the matches of last matched nodes if already matched, it may be set if we are backtracking
+					if(indexToTargetNodeMatches[currentPatternIndex] != -1) {
+						int matchedTargetNode = patternToTargetNodeMatches[currentPatternNode];
+						indexToTargetNodeMatches[currentPatternIndex] = -1;
+						patternToTargetNodeMatches[currentPatternNode] = -1;
+						targetToPatternNodeMatches[matchedTargetNode] = -1;
+					}
+/*Debugger.log("backtracking, undoing match with pattern node "+currentPatternNode);
+for(int q = 0; q < patternToTargetNodeMatches.length; q++) {
+	Debugger.log("patternToTargetNodeMatches["+q+"] "+patternToTargetNodeMatches[q]);
+}
+Debugger.log("------------------");
+for(int q = 0; q < targetToPatternNodeMatches.length; q++) {
+	Debugger.log("targetToPatternNodeMatches["+q+"] "+targetToPatternNodeMatches[q]);
+}
+Debugger.log();
+*/
+Debugger.log("backtrack to currentPatternIndex "+currentPatternIndex);
+					
 					// backtrack
 					currentPatternIndex--;
-
 					if(currentPatternIndex == -1) {
 						fullSearchComplete = true;
-						break;
+						return mappingFound;
 					}
 					currentTargetIndex = indexToTargetNodeMatches[currentPatternIndex]+1;
 					currentPatternNode = patternNodeOrder[currentPatternIndex];
+Debugger.log("backtrack trying targetindex "+currentTargetIndex);
+Debugger.log("backtrack to currentPatternNode "+currentPatternNode);
+Debugger.log();
 				}
-				if(!fullSearchComplete) {
-					
-					// unset the matches for the immediate search
+				
+				// if we have been backtracking, the current patternNode may be matched, so unset it
+				if(indexToTargetNodeMatches[currentPatternIndex] != -1) {
+					 // unset the matches of last matched nodes
+					int matchedTargetNode = patternToTargetNodeMatches[currentPatternNode];
 					indexToTargetNodeMatches[currentPatternIndex] = -1;
-					targetToPatternNodeMatches[currentTargetNode] = -1;
 					patternToTargetNodeMatches[currentPatternNode] = -1;
-
-					currentPatternNode = patternNodeOrder[currentPatternIndex];
-					currentTargetNode = possibleNodeMappings.get(currentPatternNode)[currentTargetIndex];
+					targetToPatternNodeMatches[matchedTargetNode] = -1;
 				}
+				
+				currentPatternNode = patternNodeOrder[currentPatternIndex];
+				currentTargetNode = possibleNodeMappings.get(currentPatternNode)[currentTargetIndex];
+Debugger.log("after backtrack");
 					
 			}
 			
