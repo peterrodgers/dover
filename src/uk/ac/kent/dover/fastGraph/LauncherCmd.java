@@ -64,6 +64,7 @@ public class LauncherCmd {
 		options.addOption("m","motif", true, "Find motifs in this graph. Requires minSize and maxSize.");
 		options.addOption(Option.builder().longOpt("minsize").desc("The minimum size of motif to find").hasArg().build());
 		options.addOption(Option.builder().longOpt("maxsize").desc("The maximum size of motif to find").hasArg().build());
+		options.addOption(Option.builder().longOpt("saveall").desc("Saves every example of motifs. This may take some time.").build());
 		
 		// add help option
 		options.addOption("h", "help", false, "Prints this message");
@@ -128,6 +129,7 @@ public class LauncherCmd {
 	private void motif(CommandLine cmd) throws ParseException {
 		Option minFound = null;
 		Option maxFound = null;
+		Option saveAllFound = null;
 		for(Option o : cmd.getOptions()) {
 			if (o.getLongOpt().toLowerCase().equals("minsize")) {
 				minFound = o;
@@ -135,8 +137,8 @@ public class LauncherCmd {
 			if (o.getLongOpt().toLowerCase().equals("maxsize")) {
 				maxFound = o;
 			}
-			if (minFound!=null && maxFound!=null) {
-				break;
+			if (o.getLongOpt().toLowerCase().equals("saveall")) {
+				saveAllFound = o;
 			}
 		}
 		
@@ -145,9 +147,11 @@ public class LauncherCmd {
 			String minSizeVal = minFound.getValues()[0];
 			String maxSizeVal = maxFound.getValues()[0];
 			
+			boolean saveAll = saveAllFound != null; //if saveAll wasn't passed, then false.
+			
 			//ensure that the user has specified the arguments for these
 			if (mVal != null && minSizeVal != null && maxSizeVal != null) {
-				//ensure the node and egde inputs are valid
+				//ensure the node and edge inputs are valid
 				int minSize, maxSize;
 				try {
 					minSize = Util.checkForPositiveInteger(minSizeVal);
@@ -162,7 +166,7 @@ public class LauncherCmd {
 					String path = f.getParent();							
 					System.out.println("Finding motifs. This may take some time....");
 					try {
-						launcher.findMotifs(new MotifTaskDummy(), path+File.separatorChar+name, name, minSize, maxSize);
+						launcher.findMotifs(new MotifTaskDummy(), path+File.separatorChar+name, name, minSize, maxSize, saveAll);
 					} catch (IOException e) {
 						throw new ParseException("Error occurred: "+e.getMessage());
 					}

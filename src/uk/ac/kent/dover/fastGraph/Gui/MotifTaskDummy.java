@@ -23,7 +23,7 @@ public class MotifTaskDummy extends MotifTask {
 	 * Trivial constructor
 	 */
 	public MotifTaskDummy() {
-		this(null,null,null,null,0,0,null,null,null);
+		this(null,null,null,null,0,0,null,null,null,false);
 	}
 	
 	/**
@@ -37,10 +37,11 @@ public class MotifTaskDummy extends MotifTask {
 	 * @param maxSize Not Used.
 	 * @param progressBar Not Used.
 	 * @param status Not Used.
+	 * @param saveAll Not Used.
 	 */
 	public MotifTaskDummy(Launcher launcher, JProgressBar bigProgress, JProgressBar smallProgress, String graph,
-			int minSize, int maxSize, JProgressBar progressBar, JLabel status, JPanel panel) {
-		super(launcher, bigProgress, smallProgress, graph, minSize, maxSize, progressBar, status, panel);
+			int minSize, int maxSize, JProgressBar progressBar, JLabel status, JPanel panel, boolean saveAll) {
+		super(launcher, bigProgress, smallProgress, graph, minSize, maxSize, progressBar, status, panel, saveAll);
 	}
 	
 	/**

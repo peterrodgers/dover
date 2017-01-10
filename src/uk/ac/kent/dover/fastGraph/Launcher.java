@@ -31,7 +31,7 @@ public class Launcher {
 	 * @throws Exception Only used when testing direct access to FastGraph
 	 */
 	public static void main(String[] args) throws Exception{
-		Debugger.enabled = true;
+		Debugger.enabled = false;
 		new Launcher(args);
 	}
 	
@@ -93,9 +93,10 @@ public class Launcher {
 	 * @param fileBaseName The name of the graph to be loaded
 	 * @param minNum The minimum size of motifs
 	 * @param maxNum The maximum size of motifs
+	 * @param saveAll If every example is to be saved
 	 * @throws IOException If the files cannot be loaded
 	 */
-	public void findMotifs(MotifTask mt, String directory, String fileBaseName, int minNum, int maxNum) throws IOException {
+	public void findMotifs(MotifTask mt, String directory, String fileBaseName, int minNum, int maxNum, boolean saveAll) throws IOException {
 		double sizeDiff = maxNum - minNum;	
 		double step = 100/(sizeDiff+4);
 		
@@ -104,7 +105,7 @@ public class Launcher {
 		FastGraph g2 = FastGraph.loadBuffersGraphFactory(directory, fileBaseName);
 			
 		mt.setSmallIndeterminate(false);			
-		ExactMotifFinder emf = new ExactMotifFinder(g2,mt);
+		ExactMotifFinder emf = new ExactMotifFinder(g2,mt, saveAll);
 		
 		mt.publish((int) step, "Building Reference Set", 0, "");		
 		emf.findAllMotifs(10,minNum,maxNum);

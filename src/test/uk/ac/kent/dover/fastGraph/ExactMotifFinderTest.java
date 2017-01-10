@@ -29,10 +29,10 @@ public class ExactMotifFinderTest {
 	@Test
 	public void test001() throws IOException {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get4Node5Edge(),false);
-		ExactMotifFinder emf = new ExactMotifFinder(g, new MotifTaskDummy());
+		ExactMotifFinder emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
 		emf.findAllMotifs(10,4,4);
 
-		emf = new ExactMotifFinder(g, new MotifTaskDummy());
+		emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
 		emf.findAllMotifs(0,4,4);
 		
 		ArrayList<MotifResultHolder> results = emf.compareAndExportResults(4, 4, 4);
@@ -42,10 +42,10 @@ public class ExactMotifFinderTest {
 	@Test
 	public void test002() throws IOException {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get5Node5Edge(),false);
-		ExactMotifFinder emf = new ExactMotifFinder(g, new MotifTaskDummy());
+		ExactMotifFinder emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
 		emf.findAllMotifs(10,4,4);
 
-		emf = new ExactMotifFinder(g, new MotifTaskDummy());
+		emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
 		emf.findAllMotifs(0,4,4);
 		
 		ArrayList<MotifResultHolder> results = emf.compareAndExportResults(4, 4, 4);

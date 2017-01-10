@@ -747,7 +747,7 @@ public class FastGraphTest {
 
 	@Test
 	public void test095() throws Exception {
-		FastGraph g = FastGraph.adjacencyListGraphFactory(0, 0, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "testAdj1.txt", false);
+		FastGraph g = FastGraph.adjacencyListGraphFactory(0, 0, Launcher.startingWorkingDirectory+File.separatorChar+"testData", "testAdj1.txt", false);
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
 		assertTrue(Connected.connected(g));
@@ -755,7 +755,7 @@ public class FastGraphTest {
 
 	@Test
 	public void test096() throws Exception {
-		FastGraph g = FastGraph.adjacencyListGraphFactory(2, 1, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "testAdj2.txt", true);
+		FastGraph g = FastGraph.adjacencyListGraphFactory(2, 1, Launcher.startingWorkingDirectory+File.separatorChar+"testData", "testAdj2.txt", true);
 		assertEquals("testAdj2.txt",g.getName());
 		assertEquals(2,g.getNumberOfNodes());
 		assertEquals(1,g.getNumberOfEdges());
@@ -774,7 +774,7 @@ public class FastGraphTest {
 
 	@Test
 	public void test097() throws Exception {
-		FastGraph g = FastGraph.adjacencyListGraphFactory(4, 4, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "testAdj3.txt", false);
+		FastGraph g = FastGraph.adjacencyListGraphFactory(4, 4, Launcher.startingWorkingDirectory+File.separatorChar+"testData", "testAdj3.txt", false);
 		int[] connections;
 		connections = g.getNodeConnectingOutNodes(0);
 		assertEquals(1,connections.length);
@@ -1369,14 +1369,14 @@ public class FastGraphTest {
 
 	@Test
 	public void test125() throws Exception {
-		FastGraph g = FastGraph.nodeListEdgeListGraphFactory(0, 0, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "test1", false);
+		FastGraph g = FastGraph.nodeListEdgeListGraphFactory(0, 0, Launcher.startingWorkingDirectory+File.separatorChar+"testData", "test1", false);
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
 	}
 
 	@Test
 	public void test126() throws Exception {
-		FastGraph g = FastGraph.nodeListEdgeListGraphFactory(1, 0, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "test2", false);
+		FastGraph g = FastGraph.nodeListEdgeListGraphFactory(1, 0, Launcher.startingWorkingDirectory+File.separatorChar+"testData", "test2", false);
 		assertEquals(1,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
 		assertEquals("node label 1",g.getNodeLabel(0));
@@ -1388,7 +1388,7 @@ public class FastGraphTest {
 	@Test
 	public void test127() throws Exception {
 		Graph displayGraph;
-		FastGraph g = FastGraph.nodeListEdgeListGraphFactory(2, 1, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "test3", false);
+		FastGraph g = FastGraph.nodeListEdgeListGraphFactory(2, 1, Launcher.startingWorkingDirectory+File.separatorChar+"testData", "test3", false);
 
 		assertEquals(2,g.getNumberOfNodes());
 		assertEquals(1,g.getNumberOfEdges());
@@ -1410,7 +1410,7 @@ public class FastGraphTest {
 	@Test
 	public void test128() throws Exception {
 		Graph displayGraph;
-		FastGraph g = FastGraph.nodeListEdgeListGraphFactory(3, 4, Launcher.startingWorkingDirectory+File.separatorChar+"data"+File.separatorChar+"test", "test4", false);
+		FastGraph g = FastGraph.nodeListEdgeListGraphFactory(3, 4, Launcher.startingWorkingDirectory+File.separatorChar+"testData", "test4", false);
 
 		assertEquals(3,g.getNumberOfNodes());
 		assertEquals(4,g.getNumberOfEdges());
@@ -1600,6 +1600,133 @@ public class FastGraphTest {
 	}
 	
 	
+	@Test
+	public void test134() {
+		Graph displayGraph1 = new Graph("");
+		Node n0 = new Node("nA");
+		displayGraph1.addNode(n0);
+		Node n1 = new Node("nB");
+		displayGraph1.addNode(n1);
+		Node n2 = new Node("nA");
+		displayGraph1.addNode(n2);
+		Edge e0 = new Edge(n0,n1,"eA");
+		displayGraph1.addEdge(e0);
+		Edge e1 = new Edge(n0,n2,"eB");
+		displayGraph1.addEdge(e1);
+		Edge e2 = new Edge(n1,n2,"eA");
+		displayGraph1.addEdge(e2);
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph1,false);
+
+		assertEquals(1,g1.edgesBetween(0, 1).size());
+		assertTrue(g1.edgesBetween(0, 1).get(0) == 0);
+	}
+	
+	
+	@Test
+	public void test135() {
+		Graph displayGraph1 = new Graph("");
+		Node n0 = new Node("nA");
+		displayGraph1.addNode(n0);
+		Node n1 = new Node("nB");
+		displayGraph1.addNode(n1);
+		Node n2 = new Node("nA");
+		displayGraph1.addNode(n2);
+		Edge e0 = new Edge(n0,n1,"eA");
+		displayGraph1.addEdge(e0);
+		Edge e1 = new Edge(n0,n2,"eB");
+		displayGraph1.addEdge(e1);
+		Edge e2 = new Edge(n1,n2,"eA");
+		displayGraph1.addEdge(e2);
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph1,false);
+
+		assertEquals(1,g1.edgesBetween(0, 1).size());
+		assertTrue(g1.edgesBetween(0, 1).get(0) == 0);
+	}
+	
+	
+	@Test
+	public void test136() {
+		Graph displayGraph1 = new Graph("");
+		Node n0 = new Node("nA");
+		displayGraph1.addNode(n0);
+		Node n1 = new Node("nB");
+		displayGraph1.addNode(n1);
+		Edge e0 = new Edge(n0,n1,"eA");
+		displayGraph1.addEdge(e0);
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph1,false);
+
+		assertEquals(1,g1.edgesBetween(0, 1).size());
+		assertTrue(g1.edgesBetween(0, 1).get(0) == 0);
+	}
+	
+	
+	@Test
+	public void test137() {
+		Graph displayGraph1 = new Graph("");
+		Node n0 = new Node("nA");
+		displayGraph1.addNode(n0);
+		Node n1 = new Node("nB");
+		displayGraph1.addNode(n1);
+		Node n2 = new Node("nC");
+		displayGraph1.addNode(n2);
+		Edge e0 = new Edge(n0,n1,"eA");
+		displayGraph1.addEdge(e0);
+		Edge e1 = new Edge(n1,n2,"eB");
+		displayGraph1.addEdge(e1);
+		Edge e2 = new Edge(n1,n0,"eA");
+		displayGraph1.addEdge(e2);
+		Edge e3 = new Edge(n0,n1,"eA");
+		displayGraph1.addEdge(e3);
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph1,false);
+
+		assertEquals(3,g1.edgesBetween(0, 1).size());
+		assertTrue(g1.edgesBetween(0, 1).get(0) == 2);
+		assertTrue(g1.edgesBetween(0, 1).get(1) == 0);
+		assertTrue(g1.edgesBetween(0, 1).get(2) == 3);
+	}
+	
+	
+	@Test
+	public void test138() {
+		Graph displayGraph1 = new Graph("");
+		Node n0 = new Node("nA");
+		displayGraph1.addNode(n0);
+		Node n1 = new Node("nB");
+		displayGraph1.addNode(n1);
+		Node n2 = new Node("nA");
+		displayGraph1.addNode(n2);
+		Edge e0 = new Edge(n0,n1,"eA");
+		displayGraph1.addEdge(e0);
+		Edge e1 = new Edge(n0,n2,"eB");
+		displayGraph1.addEdge(e1);
+		Edge e2 = new Edge(n1,n2,"eA");
+		displayGraph1.addEdge(e2);
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph1,false);
+
+		assertEquals(1,g1.edgesBetween(0, 1).size());
+		assertTrue(g1.edgesBetween(0, 1).get(0) == 0);
+	}
+	
+	
+	@Test
+	public void test139() {
+		Graph displayGraph1 = new Graph("");
+		Node n0 = new Node("nA");
+		displayGraph1.addNode(n0);
+		Node n1 = new Node("nB");
+		displayGraph1.addNode(n1);
+		Node n2 = new Node("nA");
+		displayGraph1.addNode(n2);
+		Edge e0 = new Edge(n2,n1,"eA");
+		displayGraph1.addEdge(e0);
+		Edge e1 = new Edge(n0,n2,"eB");
+		displayGraph1.addEdge(e1);
+		Edge e2 = new Edge(n1,n2,"eA");
+		displayGraph1.addEdge(e2);
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph1,false);
+
+		assertEquals(0,g1.edgesBetween(0, 1).size());
+	}
 	
 	
 	//TODO Add tests here
