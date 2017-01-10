@@ -30,7 +30,8 @@ public class ExactSubgraphIsomorphism {
 	private int[] indexToTargetNodeMatches; // successful matches pattern index to target nodes so far for each element in patternNodeOrder, -1 means no match
 	private int[] targetToPatternNodeMatches; // stores reverse matches target node to pattern node, -1 means no match
 	private int[] patternToTargetNodeMatches; // stores matches pattern node to target node, -1 means no match
-
+	private int[] possibleMatchIndexProgress; // stores progress through possibleNodeMatches of each patternNode
+	
 	private int[] patternToTargetEdgeMatches; // successful matches pattern edge to target edge, -1 means no match
 	
 	private boolean resultPossible; // set to false if a pattern node has no possible mappings in the target graph
@@ -202,7 +203,7 @@ tempFn();
 
 	private static void tempFn() {
 	
-		Graph targetGraph = new Graph("larger graph");
+		Graph targetGraph = new Graph("two squares");
 		Node nn0 = new Node("A");
 		targetGraph.addNode(nn0);
 		Node nn1 = new Node("D");
@@ -232,25 +233,27 @@ tempFn();
 		targetGraph.addEdge(e6);
 		FastGraph target = FastGraph.displayGraphFactory(targetGraph,false);
 
-
-Graph patternGraph = new Graph("square");
-Node nnX0 = new Node("B");
-patternGraph.addNode(nnX0);
-Node nnX1 = new Node("C");
-patternGraph.addNode(nnX1);
-Node nnX2 = new Node("A");
-patternGraph.addNode(nnX2);
-Node nnX3 = new Node("D");
-patternGraph.addNode(nnX3);
-Edge eeX0 = new Edge(nnX0,nnX1,"");
-patternGraph.addEdge(eeX0);
-Edge eeX1 = new Edge(nnX2,nnX1,"");
-patternGraph.addEdge(eeX1);
-Edge eeX2 = new Edge(nnX2,nnX3,"");
-patternGraph.addEdge(eeX2);
-Edge eeX3 = new Edge(nnX3,nnX0,"");
-patternGraph.addEdge(eeX3);
-FastGraph pattern = FastGraph.displayGraphFactory(patternGraph,false);
+		Graph patternGraph = new Graph("square with cross edge");
+		Node nnX0 = new Node("B");
+		patternGraph.addNode(nnX0);
+		Node nnX1 = new Node("C");
+		patternGraph.addNode(nnX1);
+		Node nnX2 = new Node("A");
+		patternGraph.addNode(nnX2);
+		Node nnX3 = new Node("D");
+		patternGraph.addNode(nnX3);
+		Edge eeX0 = new Edge(nnX0,nnX1,"");
+		patternGraph.addEdge(eeX0);
+		Edge eeX1 = new Edge(nnX2,nnX1,"");
+		patternGraph.addEdge(eeX1);
+		Edge eeX2 = new Edge(nnX2,nnX3,"");
+		patternGraph.addEdge(eeX2);
+		Edge eeX3 = new Edge(nnX3,nnX0,"");
+		patternGraph.addEdge(eeX3);
+		Edge eeX4 = new Edge(nnX0,nnX2,"");
+		patternGraph.addEdge(eeX4);
+		
+		FastGraph pattern = FastGraph.displayGraphFactory(patternGraph,false);
 
 SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(target, pattern);
 SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
@@ -293,6 +296,7 @@ new uk.ac.kent.displayGraph.display.GraphWindow(targetGraph, true);
 		indexToTargetNodeMatches = new int[patternGraph.getNumberOfNodes()];
 		targetToPatternNodeMatches = new int[targetGraph.getNumberOfNodes()];
 		patternToTargetNodeMatches = new int[patternGraph.getNumberOfNodes()];
+		possibleMatchIndexProgress = new int[patternGraph.getNumberOfNodes()];
 		
 		patternToTargetEdgeMatches = new int[patternGraph.getNumberOfEdges()];
 		
@@ -349,11 +353,12 @@ for(int[] matches : possibleNodeMappings) {
 		Arrays.sort(patternNodeOrder,matchArrayComparitor);
 Debugger.log("patternNodeOrder "+Arrays.toString(patternNodeOrder));		
 		
-		// do the backgtracking search based on order found
+		// do the backtracking search based on order found
 
 		Arrays.fill(indexToTargetNodeMatches, -1); // successful matches pattern index to target nodes so far for each element in patternNodeOrder, -1 means no match
 		Arrays.fill(targetToPatternNodeMatches, -1); // stores reverse matches target node to pattern node, -1 means no match
-		Arrays.fill(patternToTargetNodeMatches, -1); // stores matches pattern node to target node, -1 means no match
+		Arrays.fill(patternToTargetNodeMatches, -1); // stores matches of pattern node to target node, -1 means no match
+		Arrays.fill(possibleMatchIndexProgress, -1); // stores matches of target index progress through possibleNodeMappings -1 means no match
 
 		int currentPatternIndex = 0; // the position in the patternNodeOrder we are matching
 		int currentPatternNode = patternNodeOrder[currentPatternIndex]; // the actual pattern node we are trying for a match
@@ -364,7 +369,7 @@ Debugger.log("patternNodeOrder "+Arrays.toString(patternNodeOrder));
 		boolean fullSearchComplete = false;
 		while(!fullSearchComplete) {
 
-Debugger.log("trying match between pattern node "+currentPatternNode+" and target node "+currentTargetNode);
+Debugger.log("START LOOP currentPatternIndex "+currentPatternIndex+" and current successful index node matches "+Arrays.toString(possibleMatchIndexProgress));
 
 			boolean match = isAMatch(currentTargetNode, currentPatternNode);
 //Debugger.log("match "+match);
@@ -372,7 +377,8 @@ Debugger.log("trying match between pattern node "+currentPatternNode+" and targe
 				indexToTargetNodeMatches[currentPatternIndex] = currentTargetNode;
 				targetToPatternNodeMatches[currentTargetNode] = currentPatternNode;
 				patternToTargetNodeMatches[currentPatternNode] = currentTargetNode;
-				
+				possibleMatchIndexProgress[currentPatternNode] = currentTargetIndex;
+/*				
 Debugger.log("found a match between pattern node "+currentPatternNode+" and target node "+currentTargetNode);
 for(int q = 0; q < patternToTargetNodeMatches.length; q++) {
 	Debugger.log("patternToTargetNodeMatches["+q+"] "+patternToTargetNodeMatches[q]);
@@ -382,7 +388,7 @@ for(int q = 0; q < targetToPatternNodeMatches.length; q++) {
 	Debugger.log("targetToPatternNodeMatches["+q+"] "+targetToPatternNodeMatches[q]);
 }
 Debugger.log();
-
+*/
 				if(currentPatternIndex == numberOfPatternNodes-1) { // success, found full mapping!
 					mappingFound = true;
 					findEdgeMappings(patternToTargetEdgeMatches);
@@ -390,7 +396,7 @@ Debugger.log();
 					foundMappings.add(storedMapping);
 					
 					match = false; // force search onto next target index, and possibly backtracking 
-Debugger.log("FULL MATCH FOUND");
+Debugger.log("FULL MATCH FOUND pattern node matches "+Arrays.toString(patternToTargetNodeMatches));
 
 				} else {
 					// partial match found, so move on to next element in the patternNodeOrder
@@ -398,6 +404,7 @@ Debugger.log("FULL MATCH FOUND");
 					currentPatternNode = patternNodeOrder[currentPatternIndex];
 					currentTargetIndex = 0;
 					currentTargetNode = possibleNodeMappings.get(currentPatternNode)[currentTargetIndex];
+Debugger.log("PARTIAL MATCH FOUND pattern node matches "+Arrays.toString(patternToTargetNodeMatches));
 				}
 			}
 			
@@ -405,13 +412,16 @@ Debugger.log("FULL MATCH FOUND");
 //Debugger.log("match failed between pattern node "+currentPatternNode+" and target node "+currentTargetNode);
 				// nodes do not match
 				currentTargetIndex++;
+Debugger.log("NO MATCH, targetIndex incremented to "+currentTargetIndex);
 				while(currentTargetIndex >= possibleNodeMappings.get(currentPatternNode).length) { // run out of target nodes to test, so go back to the previous node in patternIndex, and try the next one, this may happen multiple times
+Debugger.log("IN Backtracking loop");
 					 // unset the matches of last matched nodes if already matched, it may be set if we are backtracking
 					if(indexToTargetNodeMatches[currentPatternIndex] != -1) {
 						int matchedTargetNode = patternToTargetNodeMatches[currentPatternNode];
 						indexToTargetNodeMatches[currentPatternIndex] = -1;
 						patternToTargetNodeMatches[currentPatternNode] = -1;
 						targetToPatternNodeMatches[matchedTargetNode] = -1;
+						possibleMatchIndexProgress[currentPatternNode] = -1;
 					}
 /*Debugger.log("backtracking, undoing match with pattern node "+currentPatternNode);
 for(int q = 0; q < patternToTargetNodeMatches.length; q++) {
@@ -423,7 +433,7 @@ for(int q = 0; q < targetToPatternNodeMatches.length; q++) {
 }
 Debugger.log();
 */
-Debugger.log("backtrack to currentPatternIndex "+currentPatternIndex);
+//Debugger.log("backtrack to currentPatternIndex "+currentPatternIndex);
 					
 					// backtrack
 					currentPatternIndex--;
@@ -431,12 +441,13 @@ Debugger.log("backtrack to currentPatternIndex "+currentPatternIndex);
 						fullSearchComplete = true;
 						return mappingFound;
 					}
-					currentTargetIndex = indexToTargetNodeMatches[currentPatternIndex]+1;
 					currentPatternNode = patternNodeOrder[currentPatternIndex];
-Debugger.log("backtrack trying targetindex "+currentTargetIndex);
-Debugger.log("backtrack to currentPatternNode "+currentPatternNode);
-Debugger.log();
+					currentTargetIndex = possibleMatchIndexProgress[currentPatternNode]+1;
+//Debugger.log("backtrack trying targetindex "+currentTargetIndex);
+//Debugger.log("backtrack to currentPatternNode "+currentPatternNode);
+//Debugger.log();
 				}
+Debugger.log("RESETTING currentPatternIndex "+currentPatternIndex);
 				
 				// if we have been backtracking, the current patternNode may be matched, so unset it
 				if(indexToTargetNodeMatches[currentPatternIndex] != -1) {
@@ -445,11 +456,12 @@ Debugger.log();
 					indexToTargetNodeMatches[currentPatternIndex] = -1;
 					patternToTargetNodeMatches[currentPatternNode] = -1;
 					targetToPatternNodeMatches[matchedTargetNode] = -1;
+					possibleMatchIndexProgress[currentPatternNode] = -1;
 				}
 				
 				currentPatternNode = patternNodeOrder[currentPatternIndex];
 				currentTargetNode = possibleNodeMappings.get(currentPatternNode)[currentTargetIndex];
-Debugger.log("after backtrack");
+//Debugger.log("after backtrack");
 					
 			}
 			

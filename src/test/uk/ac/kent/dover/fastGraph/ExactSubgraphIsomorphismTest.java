@@ -535,6 +535,7 @@ public class ExactSubgraphIsomorphismTest {
 		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
 		result = esi.subGraphIsomorphismFinder();
 		sgm = esi.getFoundMappings();
+		
 		assertTrue(result);
 		assertEquals(6,sgm.size());
 		assertEquals(0,sgm.get(0).getNodeMapping()[0]);
@@ -677,12 +678,125 @@ public class ExactSubgraphIsomorphismTest {
 		 * B-C-B
 		 * | | |
 		 * D-A-D
+		 *   
+		 *D-B
+		 *| |
+		 *A-C
+		 *
+		 */
+		
+		LinkedList<SubgraphMapping> sgm;
+
+		Graph targetGraph = new Graph("two squares");
+		Node nn0 = new Node("A");
+		targetGraph.addNode(nn0);
+		Node nn1 = new Node("D");
+		targetGraph.addNode(nn1);
+		Node nn2 = new Node("B");
+		targetGraph.addNode(nn2);
+		Node nn3 = new Node("C");
+		targetGraph.addNode(nn3);
+		Node nn4 = new Node("B");
+		targetGraph.addNode(nn4);
+		Node nn5 = new Node("D");
+		targetGraph.addNode(nn5);
+		
+		Edge e0 = new Edge(nn0,nn1,"");
+		targetGraph.addEdge(e0);
+		Edge e1 = new Edge(nn0,nn3,"");
+		targetGraph.addEdge(e1);
+		Edge e2 = new Edge(nn0,nn5,"");
+		targetGraph.addEdge(e2);
+		Edge e4 = new Edge(nn1,nn2,"");
+		targetGraph.addEdge(e4);
+		Edge e4a = new Edge(nn3,nn2,"");
+		targetGraph.addEdge(e4a);
+		Edge e5 = new Edge(nn4,nn3,"");
+		targetGraph.addEdge(e5);
+		Edge e6 = new Edge(nn4,nn5,"");
+		targetGraph.addEdge(e6);
+		FastGraph target = FastGraph.displayGraphFactory(targetGraph,false);
+
+		Graph patternGraph = new Graph("square");
+		Node nnX0 = new Node("B");
+		patternGraph.addNode(nnX0);
+		Node nnX1 = new Node("C");
+		patternGraph.addNode(nnX1);
+		Node nnX2 = new Node("A");
+		patternGraph.addNode(nnX2);
+		Node nnX3 = new Node("D");
+		patternGraph.addNode(nnX3);
+		Edge eeX0 = new Edge(nnX0,nnX1,"");
+		patternGraph.addEdge(eeX0);
+		Edge eeX1 = new Edge(nnX2,nnX1,"");
+		patternGraph.addEdge(eeX1);
+		Edge eeX2 = new Edge(nnX2,nnX3,"");
+		patternGraph.addEdge(eeX2);
+		Edge eeX3 = new Edge(nnX3,nnX0,"");
+		patternGraph.addEdge(eeX3);
+		FastGraph pattern = FastGraph.displayGraphFactory(patternGraph,false);
+		
+		SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(target, pattern);
+		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
+		
+		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
+		boolean result = esi.subGraphIsomorphismFinder();
+		sgm = esi.getFoundMappings();
+		
+		assertTrue(result);
+		assertEquals(2,sgm.size());
+		assertEquals(2,sgm.get(0).getNodeMapping()[0]);
+		assertEquals(3,sgm.get(0).getNodeMapping()[1]);
+		assertEquals(0,sgm.get(0).getNodeMapping()[2]);
+		assertEquals(1,sgm.get(0).getNodeMapping()[3]);
+		assertEquals(4,sgm.get(0).getEdgeMapping()[0]);
+		assertEquals(1,sgm.get(0).getEdgeMapping()[1]);
+		assertEquals(0,sgm.get(0).getEdgeMapping()[2]);
+		assertEquals(3,sgm.get(0).getEdgeMapping()[3]);
+
+		assertEquals(4,sgm.get(1).getNodeMapping()[0]);
+		assertEquals(3,sgm.get(1).getNodeMapping()[1]);
+		assertEquals(0,sgm.get(1).getNodeMapping()[2]);
+		assertEquals(5,sgm.get(1).getNodeMapping()[3]);
+		assertEquals(5,sgm.get(1).getEdgeMapping()[0]);
+		assertEquals(1,sgm.get(1).getEdgeMapping()[1]);
+		assertEquals(2,sgm.get(1).getEdgeMapping()[2]);
+		assertEquals(6,sgm.get(1).getEdgeMapping()[3]);
+		
+		AlwaysTrueNodeComparator nc = new AlwaysTrueNodeComparator(target, pattern);
+		AlwaysTrueEdgeComparator ec = new AlwaysTrueEdgeComparator(target, pattern);
+		
+		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
+		result = esi.subGraphIsomorphismFinder();
+		sgm = esi.getFoundMappings();
+		
+		assertTrue(result);
+		assertEquals(16,sgm.size());
+		assertEquals(0,sgm.get(0).getNodeMapping()[0]);
+		assertEquals(1,sgm.get(0).getNodeMapping()[1]);
+		assertEquals(2,sgm.get(0).getNodeMapping()[2]);
+		assertEquals(3,sgm.get(0).getNodeMapping()[3]);
+		assertEquals(0,sgm.get(0).getEdgeMapping()[0]);
+		assertEquals(3,sgm.get(0).getEdgeMapping()[1]);
+		assertEquals(4,sgm.get(0).getEdgeMapping()[2]);
+		assertEquals(1,sgm.get(0).getEdgeMapping()[3]);
+		
+	}
+
+	
+	@Test
+	public void test016() {
+		
+		/*
+		 * B-C-B
+		 * | | |
+		 * D-A-D
 		 *  \|/|
 		 *   C-B
 		 *   
-		 *D-C
+		 *D-B
 		 *| |
-		 *A-B
+		 *A-C
 		 *
 		 */
 		
@@ -758,18 +872,178 @@ public class ExactSubgraphIsomorphismTest {
 		
 		boolean result = esi.subGraphIsomorphismFinder();
 		sgm = esi.getFoundMappings();
-System.out.println(sgm);
+		
 		assertTrue(result);
 		assertEquals(3,sgm.size());
 		assertEquals(3,sgm.get(0).getNodeMapping()[0]);
 		assertEquals(2,sgm.get(0).getNodeMapping()[1]);
-		assertEquals(1,sgm.get(0).getNodeMapping()[2]);
-		assertEquals(0,sgm.get(0).getNodeMapping()[3]);
-		assertEquals(2,sgm.get(0).getEdgeMapping()[0]);
-		assertEquals(0,sgm.get(0).getEdgeMapping()[1]);
-		assertEquals(3,sgm.get(0).getEdgeMapping()[2]);
-		assertEquals(1,sgm.get(0).getEdgeMapping()[3]);
+		assertEquals(0,sgm.get(0).getNodeMapping()[2]);
+		assertEquals(4,sgm.get(0).getNodeMapping()[3]);
+		assertEquals(6,sgm.get(0).getEdgeMapping()[0]);
+		assertEquals(1,sgm.get(0).getEdgeMapping()[1]);
+		assertEquals(2,sgm.get(0).getEdgeMapping()[2]);
+		assertEquals(7,sgm.get(0).getEdgeMapping()[3]);
 	
+	}
+
+	@Test
+	public void test017() {
+		
+		/*
+		 * B-C-B
+		 * | | |
+		 * D-A-D
+		 *   
+		 *  C
+		 * /|
+		 *A-B
+		 *
+		 */
+		
+		Graph targetGraph = new Graph("two squares");
+		Node nn0 = new Node("A");
+		targetGraph.addNode(nn0);
+		Node nn1 = new Node("D");
+		targetGraph.addNode(nn1);
+		Node nn2 = new Node("B");
+		targetGraph.addNode(nn2);
+		Node nn3 = new Node("C");
+		targetGraph.addNode(nn3);
+		Node nn4 = new Node("B");
+		targetGraph.addNode(nn4);
+		Node nn5 = new Node("D");
+		targetGraph.addNode(nn5);
+		
+		Edge e0 = new Edge(nn0,nn1,"");
+		targetGraph.addEdge(e0);
+		Edge e1 = new Edge(nn0,nn3,"");
+		targetGraph.addEdge(e1);
+		Edge e2 = new Edge(nn0,nn5,"");
+		targetGraph.addEdge(e2);
+		Edge e4 = new Edge(nn1,nn2,"");
+		targetGraph.addEdge(e4);
+		Edge e4a = new Edge(nn3,nn2,"");
+		targetGraph.addEdge(e4a);
+		Edge e5 = new Edge(nn4,nn3,"");
+		targetGraph.addEdge(e5);
+		Edge e6 = new Edge(nn4,nn5,"");
+		targetGraph.addEdge(e6);
+		FastGraph target = FastGraph.displayGraphFactory(targetGraph,false);
+
+		Graph patternGraph = new Graph("triangle");
+		Node nnX0 = new Node("B");
+		patternGraph.addNode(nnX0);
+		Node nnX1 = new Node("C");
+		patternGraph.addNode(nnX1);
+		Node nnX2 = new Node("A");
+		patternGraph.addNode(nnX2);
+		Edge eeX0 = new Edge(nnX0,nnX1,"");
+		patternGraph.addEdge(eeX0);
+		Edge eeX1 = new Edge(nnX2,nnX1,"");
+		patternGraph.addEdge(eeX1);
+		Edge eeX2 = new Edge(nnX2,nnX0,"");
+		patternGraph.addEdge(eeX2);
+		FastGraph pattern = FastGraph.displayGraphFactory(patternGraph,false);
+		
+		SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(target, pattern);
+		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
+		
+		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
+		boolean result = esi.subGraphIsomorphismFinder();
+		
+		assertFalse(result);
+		
+		AlwaysTrueNodeComparator nc = new AlwaysTrueNodeComparator(target, pattern);
+		AlwaysTrueEdgeComparator ec = new AlwaysTrueEdgeComparator(target, pattern);
+		
+		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
+		result = esi.subGraphIsomorphismFinder();
+		
+		assertFalse(result);
+		
+	}
+
+	@Test
+	public void test018() {
+		
+		/*
+		 * B-C-B
+		 * | | |
+		 * D-A-D
+		 *   
+		 *D-B
+		 *|/|
+		 *A-C
+		 *
+		 */
+		
+		Graph targetGraph = new Graph("two squares");
+		Node nn0 = new Node("A");
+		targetGraph.addNode(nn0);
+		Node nn1 = new Node("D");
+		targetGraph.addNode(nn1);
+		Node nn2 = new Node("B");
+		targetGraph.addNode(nn2);
+		Node nn3 = new Node("C");
+		targetGraph.addNode(nn3);
+		Node nn4 = new Node("B");
+		targetGraph.addNode(nn4);
+		Node nn5 = new Node("D");
+		targetGraph.addNode(nn5);
+		
+		Edge e0 = new Edge(nn0,nn1,"");
+		targetGraph.addEdge(e0);
+		Edge e1 = new Edge(nn0,nn3,"");
+		targetGraph.addEdge(e1);
+		Edge e2 = new Edge(nn0,nn5,"");
+		targetGraph.addEdge(e2);
+		Edge e4 = new Edge(nn1,nn2,"");
+		targetGraph.addEdge(e4);
+		Edge e4a = new Edge(nn3,nn2,"");
+		targetGraph.addEdge(e4a);
+		Edge e5 = new Edge(nn4,nn3,"");
+		targetGraph.addEdge(e5);
+		Edge e6 = new Edge(nn4,nn5,"");
+		targetGraph.addEdge(e6);
+		FastGraph target = FastGraph.displayGraphFactory(targetGraph,false);
+
+		Graph patternGraph = new Graph("square with cross edge");
+		Node nnX0 = new Node("B");
+		patternGraph.addNode(nnX0);
+		Node nnX1 = new Node("C");
+		patternGraph.addNode(nnX1);
+		Node nnX2 = new Node("A");
+		patternGraph.addNode(nnX2);
+		Node nnX3 = new Node("D");
+		patternGraph.addNode(nnX3);
+		Edge eeX0 = new Edge(nnX0,nnX1,"");
+		patternGraph.addEdge(eeX0);
+		Edge eeX1 = new Edge(nnX2,nnX1,"");
+		patternGraph.addEdge(eeX1);
+		Edge eeX2 = new Edge(nnX2,nnX3,"");
+		patternGraph.addEdge(eeX2);
+		Edge eeX3 = new Edge(nnX3,nnX0,"");
+		patternGraph.addEdge(eeX3);
+		Edge eeX4 = new Edge(nnX0,nnX2,"");
+		patternGraph.addEdge(eeX4);
+		FastGraph pattern = FastGraph.displayGraphFactory(patternGraph,false);
+		
+		SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(target, pattern);
+		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
+		
+		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
+		boolean result = esi.subGraphIsomorphismFinder();
+		
+		assertFalse(result);
+		
+		AlwaysTrueNodeComparator nc = new AlwaysTrueNodeComparator(target, pattern);
+		AlwaysTrueEdgeComparator ec = new AlwaysTrueEdgeComparator(target, pattern);
+		
+		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
+		result = esi.subGraphIsomorphismFinder();
+		
+		assertFalse(result);
+		
 	}
 
 	
