@@ -1046,6 +1046,73 @@ public class ExactSubgraphIsomorphismTest {
 		
 	}
 
+	@Test
+	public void test019() {
+		
+		Graph targetGraph = new Graph("four edge star");
+		Node nn0 = new Node("");
+		targetGraph.addNode(nn0);
+		Node nn1 = new Node("");
+		targetGraph.addNode(nn1);
+		Node nn2 = new Node("");
+		targetGraph.addNode(nn2);
+		Node nn3 = new Node("");
+		targetGraph.addNode(nn3);
+		Node nn4 = new Node("");
+		targetGraph.addNode(nn4);
+		Node nn5 = new Node("");
+		targetGraph.addNode(nn5);
+		
+		Edge e0 = new Edge(nn0,nn1,"");
+		targetGraph.addEdge(e0);
+		Edge e1 = new Edge(nn0,nn2,"");
+		targetGraph.addEdge(e1);
+		Edge e2 = new Edge(nn0,nn3,"");
+		targetGraph.addEdge(e2);
+		Edge e4 = new Edge(nn0,nn4,"");
+		targetGraph.addEdge(e4);
+		Edge e4a = new Edge(nn0,nn5,"");
+		targetGraph.addEdge(e4a);
+		FastGraph target = FastGraph.displayGraphFactory(targetGraph,false);
+
+		Graph patternGraph = new Graph("three edge star");
+		Node nnX0 = new Node("");
+		patternGraph.addNode(nnX0);
+		Node nnX1 = new Node("");
+		patternGraph.addNode(nnX1);
+		Node nnX2 = new Node("");
+		patternGraph.addNode(nnX2);
+		Node nnX3 = new Node("");
+		patternGraph.addNode(nnX3);
+		Edge eeX0 = new Edge(nnX0,nnX1,"");
+		patternGraph.addEdge(eeX0);
+		Edge eeX1 = new Edge(nnX2,nnX0,"");
+		patternGraph.addEdge(eeX1);
+		Edge eeX2 = new Edge(nnX0,nnX3,"");
+		patternGraph.addEdge(eeX2);
+		FastGraph pattern = FastGraph.displayGraphFactory(patternGraph,false);
+		
+		SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(target, pattern);
+		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
+		
+		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
+		boolean result = esi.subGraphIsomorphismFinder();
+		
+		assertTrue(result);
+		assertEquals(60,esi.getFoundMappings().size());
+		
+		AlwaysTrueNodeComparator nc = new AlwaysTrueNodeComparator(target, pattern);
+		AlwaysTrueEdgeComparator ec = new AlwaysTrueEdgeComparator(target, pattern);
+		
+		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
+		result = esi.subGraphIsomorphismFinder();
+		
+		assertTrue(result);
+		assertEquals(60,esi.getFoundMappings().size());
+		
+		
+	}
+
 	
 	
 	
