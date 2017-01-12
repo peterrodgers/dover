@@ -73,7 +73,7 @@ public class ExactSubgraphIsomorphismTest {
 		
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
 		
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 		assertTrue(result);
 	
 	}
@@ -94,7 +94,7 @@ public class ExactSubgraphIsomorphismTest {
 		
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
 		
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 		assertTrue(result);
 	
 	}
@@ -115,7 +115,7 @@ public class ExactSubgraphIsomorphismTest {
 		
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
 		
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 		assertFalse(result);
 	
 	}
@@ -148,7 +148,7 @@ public class ExactSubgraphIsomorphismTest {
 		
 		LinkedList<SubgraphMapping> sgm;
 		
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 		sgm = esi.getFoundMappings();
 		assertTrue(result);
 		
@@ -162,7 +162,7 @@ public class ExactSubgraphIsomorphismTest {
 		
 		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
 		
-		result = esi.subGraphIsomorphismFinder();
+		result = esi.subgraphIsomorphismFinder();
 		sgm = esi.getFoundMappings();
 
 		assertTrue(result);
@@ -206,7 +206,7 @@ public class ExactSubgraphIsomorphismTest {
 		
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
 		
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 		sgm = esi.getFoundMappings();
 		assertFalse(result);
 		assertEquals(0,sgm.size());
@@ -216,7 +216,7 @@ public class ExactSubgraphIsomorphismTest {
 		
 		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
 		
-		result = esi.subGraphIsomorphismFinder();
+		result = esi.subgraphIsomorphismFinder();
 		sgm = esi.getFoundMappings();
 
 		assertTrue(result);
@@ -262,7 +262,7 @@ public class ExactSubgraphIsomorphismTest {
 		
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
 		
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 		assertFalse(result);
 	
 		AlwaysTrueNodeComparator nc = new AlwaysTrueNodeComparator(target, pattern);
@@ -270,7 +270,7 @@ public class ExactSubgraphIsomorphismTest {
 		
 		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
 		
-		result = esi.subGraphIsomorphismFinder();
+		result = esi.subgraphIsomorphismFinder();
 		sgm = esi.getFoundMappings();
 		
 		assertTrue(result);
@@ -330,14 +330,14 @@ public class ExactSubgraphIsomorphismTest {
 		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
 		
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 		assertFalse(result);
 	
 		AlwaysTrueNodeComparator nc = new AlwaysTrueNodeComparator(target, pattern);
 		AlwaysTrueEdgeComparator ec = new AlwaysTrueEdgeComparator(target, pattern);
 		
 		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
-		result = esi.subGraphIsomorphismFinder();
+		result = esi.subgraphIsomorphismFinder();
 		assertFalse(result);
 		
 	
@@ -390,7 +390,7 @@ public class ExactSubgraphIsomorphismTest {
 		boolean result;
 		
 		esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
-		result = esi.subGraphIsomorphismFinder();
+		result = esi.subgraphIsomorphismFinder();
 		sgm = esi.getFoundMappings();
 		
 		assertTrue(result);
@@ -406,7 +406,7 @@ public class ExactSubgraphIsomorphismTest {
 		AlwaysTrueEdgeComparator ec = new AlwaysTrueEdgeComparator(target, pattern);
 		
 		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
-		result = esi.subGraphIsomorphismFinder();
+		result = esi.subgraphIsomorphismFinder();
 		sgm = esi.getFoundMappings();
 		assertTrue(result);
 		assertEquals(6,sgm.size());
@@ -460,7 +460,7 @@ public class ExactSubgraphIsomorphismTest {
 		
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
 		
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 		assertFalse(result);
 	
 	}
@@ -510,7 +510,7 @@ public class ExactSubgraphIsomorphismTest {
 		
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
 		
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 		sgm = esi.getFoundMappings();
 
 		assertTrue(result);
@@ -533,7 +533,7 @@ public class ExactSubgraphIsomorphismTest {
 		AlwaysTrueEdgeComparator ec = new AlwaysTrueEdgeComparator(target, pattern);
 		
 		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
-		result = esi.subGraphIsomorphismFinder();
+		result = esi.subgraphIsomorphismFinder();
 		sgm = esi.getFoundMappings();
 		
 		assertTrue(result);
@@ -599,7 +599,7 @@ public class ExactSubgraphIsomorphismTest {
 		
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
 		
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 		sgm = esi.getFoundMappings();
 		
 		assertTrue(result);
@@ -664,7 +664,7 @@ public class ExactSubgraphIsomorphismTest {
 		
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
 		
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 
 		assertFalse(result);
 	
@@ -740,7 +740,7 @@ public class ExactSubgraphIsomorphismTest {
 		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
 		
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 		sgm = esi.getFoundMappings();
 		
 		assertTrue(result);
@@ -767,7 +767,7 @@ public class ExactSubgraphIsomorphismTest {
 		AlwaysTrueEdgeComparator ec = new AlwaysTrueEdgeComparator(target, pattern);
 		
 		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
-		result = esi.subGraphIsomorphismFinder();
+		result = esi.subgraphIsomorphismFinder();
 		sgm = esi.getFoundMappings();
 		
 		assertTrue(result);
@@ -870,7 +870,7 @@ public class ExactSubgraphIsomorphismTest {
 		
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
 		
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 		sgm = esi.getFoundMappings();
 		
 		assertTrue(result);
@@ -949,7 +949,7 @@ public class ExactSubgraphIsomorphismTest {
 		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
 		
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 		
 		assertFalse(result);
 		
@@ -957,7 +957,7 @@ public class ExactSubgraphIsomorphismTest {
 		AlwaysTrueEdgeComparator ec = new AlwaysTrueEdgeComparator(target, pattern);
 		
 		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
-		result = esi.subGraphIsomorphismFinder();
+		result = esi.subgraphIsomorphismFinder();
 		
 		assertFalse(result);
 		
@@ -1032,7 +1032,7 @@ public class ExactSubgraphIsomorphismTest {
 		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
 		
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 		
 		assertFalse(result);
 		
@@ -1040,7 +1040,7 @@ public class ExactSubgraphIsomorphismTest {
 		AlwaysTrueEdgeComparator ec = new AlwaysTrueEdgeComparator(target, pattern);
 		
 		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
-		result = esi.subGraphIsomorphismFinder();
+		result = esi.subgraphIsomorphismFinder();
 		
 		assertFalse(result);
 		
@@ -1096,7 +1096,7 @@ public class ExactSubgraphIsomorphismTest {
 		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
 		
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 		
 		assertTrue(result);
 		assertEquals(60,esi.getFoundMappings().size());
@@ -1105,7 +1105,7 @@ public class ExactSubgraphIsomorphismTest {
 		AlwaysTrueEdgeComparator ec = new AlwaysTrueEdgeComparator(target, pattern);
 		
 		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
-		result = esi.subGraphIsomorphismFinder();
+		result = esi.subgraphIsomorphismFinder();
 		
 		assertTrue(result);
 		assertEquals(60,esi.getFoundMappings().size());

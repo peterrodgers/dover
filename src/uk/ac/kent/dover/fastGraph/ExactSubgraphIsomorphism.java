@@ -175,7 +175,7 @@ public class ExactSubgraphIsomorphism {
 		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
 		esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
 Debugger.resetTime();
-		result = esi.subGraphIsomorphismFinder();
+		result = esi.subgraphIsomorphismFinder();
 Debugger.outputTime("time for subgraph isomorphism");
 		
 /*		AlwaysTrueNodeComparator nc = new AlwaysTrueNodeComparator(target, pattern);
@@ -271,7 +271,7 @@ for(int[] matches : possibleNodeMappings) {
 	 *
 	 * @return true if there is one or more subgraph found, false if none are found.
 	 */
-	public boolean subGraphIsomorphismFinder() {
+	public boolean subgraphIsomorphismFinder() {
 		
 		if(!resultPossible) {
 			return false;
