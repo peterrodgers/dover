@@ -134,7 +134,7 @@ public class Launcher {
 		//AlwaysTrueNodeComparator atnc = new AlwaysTrueNodeComparator(targetGraph, patternGraph);
 		//AlwaysTrueEdgeComparator atec = new AlwaysTrueEdgeComparator(targetGraph, patternGraph);
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(targetGraph, patternGraph, null, null);
-		boolean result = esi.subGraphIsomorphismFinder();
+		boolean result = esi.subgraphIsomorphismFinder();
 		System.out.println("result:" + result);
 		System.out.println(esi.getFoundMappings());
 		esi = null; //GC
