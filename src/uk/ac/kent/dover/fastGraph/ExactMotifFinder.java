@@ -41,8 +41,8 @@ public class ExactMotifFinder {
 	
 	/**
 	 * Main method to help with development
-	 * @param args
-	 * @throws Exception
+	 * @param args Arguments for development
+	 * @throws Exception Catches any argument. For development
 	 */
 	public static void main(String[] args) throws Exception {
 		FastGraph.main(args);	
@@ -60,7 +60,7 @@ public class ExactMotifFinder {
 	/**
 	 * Trivial constructor
 	 * @param g the FastGraph to find motifs in
-	 * @param mf The MotifTask to report progress to
+	 * @param mt The MotifTask to report progress to
 	 * @param saveAll If every example is to be saved
 	 */
 	public ExactMotifFinder(FastGraph g, MotifTask mt, boolean saveAll) {
@@ -125,7 +125,7 @@ public class ExactMotifFinder {
 	 * @param rewiresNeeded The number of rewires needed. If 0, then main set.
 	 * @param minSize The minimum size of motifs to be found
 	 * @param maxSize The maximum size of motifs to be found
-	 * @throws IOException 
+	 * @throws IOException If the output data cannot be written
 	 */
 	public void findAllMotifs(int rewiresNeeded, int minSize, int maxSize) throws IOException {
 		double sizeDiff = maxSize - minSize;	
@@ -268,7 +268,7 @@ public class ExactMotifFinder {
 				//	gOut.saveBuffers("motifs"+File.separatorChar+graphName+File.separatorChar+key+"-"+count, key+"-"+count);
 					
 					//save SVG
-					exportSVG(key, holder.getGraph() ,count);
+					exportSVG(key, holder.getGraph(), count, false);
 				//}
 
 				count++;
@@ -415,7 +415,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * @param k the size of motifs in terms of number of nodes.
 	 * @param q the fraction of nodes to sample.
 	 * @param hashBuckets The buckets to store the results in
-	 * @throws IOException 
+	 * @throws IOException If the output files cannot be written
 	 */
 	public void findMotifs(int k, double q, HashMap<String,LinkedList<IsoHolder>> hashBuckets) throws IOException {
 		
@@ -453,6 +453,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 										sameHashList.size()+File.separatorChar+isoList.getNumber(),
 										hashString+"-"+sameHashList.size()
 								);
+								exportSVG(isoList.getKey(), subgraph, isoList.getNumber(), true);
 							}
 							
 							break;
@@ -497,9 +498,10 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * @param key The hashkey for this graph
 	 * @param graph The graph to be exported
 	 * @param count The isomorphic count
+	 * @param saveAll If this is for saving every motif found
 	 * @throws IOException 
 	 */
-	private void exportSVG(String key, FastGraph graph, int count) throws IOException {
+	private void exportSVG(String key, FastGraph graph, int count, boolean saveAll) throws IOException {
 		//int count = isoList.getNumber();
 		uk.ac.kent.displayGraph.Graph dg = graph.generateDisplayGraph();
 		dg.randomizeNodePoints(new Point(20,20),300,300);
@@ -512,7 +514,12 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		se.setTimeLimit(200);
 		se.setGraphPanel(gw.getGraphPanel());
 		se.layout();
-		File saveLocation = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+g.getName()+File.separatorChar+key+"-"+count+File.separatorChar+"motif.svg");
+		File saveLocation = null;
+		if (saveAll) {
+			saveLocation = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+g.getName()+File.separatorChar+key+File.separatorChar+count+File.separatorChar+"motif.svg");
+		} else {
+			saveLocation = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+g.getName()+File.separatorChar+key+"-"+count+File.separatorChar+"motif.svg");
+		}
 		uk.ac.kent.displayGraph.ExportSVG exSVG = new uk.ac.kent.displayGraph.ExportSVG(dg);
 		exSVG.saveGraph(saveLocation);
 		
@@ -521,6 +528,9 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	/**
 	 * Compares the results from the reference set to the real set.<br>
 	 * Exports these in a user friendly manner
+	 * @param size The size of motif being compared
+	 * @param minSize The minimum size of motifs
+	 * @param maxSize The maximum size of motifs
 	 * @return The results
 	 * 
 	 * @throws IOException If the File cannot be read
@@ -569,7 +579,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 			int pagePercentage = (int) (((double) i/numberOfPages)*100);
 			mt.publish(pagePercentage, "Exporting page "+i+" of "+numberOfPages, false);
 			
-			buildPage(i,numberOfPages,Util.subList(motifResults,i*sample, (i*sample)+sample), size, minSize, maxSize);
+			buildPage(i,numberOfPages,Util.subList(motifResults,i*sample, (i*sample)+sample), size, minSize, maxSize, saveAll);
 		}	
 		
 		Debugger.log("number of pages required: " + numberOfPages);
@@ -659,10 +669,11 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * @param motifSize The size of motifs this file is for
 	 * @param minSize The minimum size of motifs found
 	 * @param maxSize The maximum size of motifs found
+	 * @param saveAll If the user has been svaing every motif
 	 * @throws FileNotFoundException If the output file cannot be written to
 	 */
 	private void buildPage(int pageNumber, int totalPages, List<MotifResultHolder> results, int motifSize, 
-			int minSize, int maxSize) throws FileNotFoundException {
+			int minSize, int maxSize, boolean saveAll) throws FileNotFoundException {
 
 		Debugger.log("length of output results" + results.size());
 		
@@ -689,7 +700,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		}
 		doc.body().appendElement("br");
 		//build output table
-		Element table = doc.body().appendElement("table").attr("style", "border: 2px solid; border-collapse: collapse");
+		Element table = doc.body().appendElement("table").attr("style", "border: 2px solid; border-collapse: collapse; width: 100%");
 		Element headerRow = table.appendElement("tr").attr("style", "border: 2px solid;");
 		headerRow.appendElement("th").text("Image").attr("style", "border: 1px solid;");
 		headerRow.appendElement("th").text("Key").attr("style", "border: 1px solid;");
@@ -697,7 +708,13 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		headerRow.appendElement("th").text("Diff in %").attr("style", "border: 1px solid;");
 		headerRow.appendElement("th").text("% of motifs").attr("style", "border: 1px solid;");
 		headerRow.appendElement("th").text("% in reference set").attr("style", "border: 1px solid;");
+		
+		if (saveAll) {
+			headerRow.appendElement("th").text("All examples").attr("style", "border: 1px solid;");
+		}
+		
 		for(MotifResultHolder result : results) {
+			
 			Element row = table.appendElement("tr");
 			Element imageCell = row.appendElement("td").attr("style", "border: 1px solid;");
 			imageCell.appendElement("img").attr("src",result.getKey()+"/motif.svg");
@@ -706,6 +723,12 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 			row.appendElement("td").text(String.format( "%.4f", result.generateDifference())).attr("style", "border: 1px solid;");
 			row.appendElement("td").text(String.format( "%.4f", result.getRealPercentage())).attr("style", "border: 1px solid;");
 			row.appendElement("td").text(String.format( "%.4f", result.getReferencePercentage())).attr("style", "border: 1px solid;");
+			
+			if(saveAll) {
+				Element examplesCell = row.appendElement("td").attr("style", "border: 1px solid;");
+				displayAllExamples(result, examplesCell, g.getName()+File.separatorChar+result.getKey());
+			}
+			
 		}
 		doc.body().appendElement("br");
 		//output links again
@@ -725,6 +748,39 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		
 		try(PrintWriter out = new PrintWriter( output )){ //will close file after use
 		    out.println( doc.toString() );
+		}
+	}
+	
+	/**
+	 * Displays a link to every example of a given motif, if the user has selected that option
+	 * @param result The result to find each example of
+	 * @param cell The HTML table cell to append results to
+	 * @param directory The directory of the motif
+	 */
+	private void displayAllExamples(MotifResultHolder result, Element cell, String directory) {
+		File graphDir = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+directory);
+		File[] directories = graphDir.listFiles(File::isDirectory);
+		
+		Arrays.sort(directories, new Comparator<File>() {
+		    public int compare(File f1, File f2) {
+		        try {
+		            int i1 = Integer.parseInt(f1.getName());
+		            int i2 = Integer.parseInt(f2.getName());
+		            return i1 - i2;
+		        } catch(NumberFormatException e) {
+		            throw new AssertionError(e);
+		        }
+		    }
+		});
+		
+		//first one is stored in a different location
+		cell.appendElement("a").text("1").attr("href",result.getKey()+"/motif.svg");
+		cell.appendText(" ");
+		
+		for(File dir: directories) {
+			String fileName = result.getKey() + "/" + dir.getName() + "/motif.svg";
+			cell.appendElement("a").text(dir.getName()).attr("href",fileName);
+			cell.appendText(" ");
 		}
 	}
 	
@@ -880,7 +936,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		/**
 		 * Loads the graph from disk
 		 * @return the graph
-		 * @throws IOException 
+		 * @throws IOException If the buffers cannot be loaded
 		 */
 		public FastGraph getGraph() throws IOException {
 			return FastGraph.loadBuffersGraphFactory("motifs"+File.separatorChar+g.getName()+File.separatorChar+key, key);

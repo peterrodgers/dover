@@ -42,6 +42,7 @@ public class CreateSubgraphActionListener implements ActionListener{
 	private FastGraph subgraph;
 	private JLabel fileLabel, status;
 	private boolean saved = false;
+	private uk.ac.kent.displayGraph.GraphPanel gp;
 
 	/**
 	 *  Trivial constructor
@@ -112,7 +113,8 @@ public class CreateSubgraphActionListener implements ActionListener{
 	 */
 	private void buildFrame(uk.ac.kent.displayGraph.Graph dg) {
 		graphFrame = new JFrame();
-		graphFrame.setContentPane(new uk.ac.kent.displayGraph.GraphPanel(dg, graphFrame));
+		gp = new uk.ac.kent.displayGraph.GraphPanel(dg, graphFrame);
+		graphFrame.setContentPane(gp);
 		graphFrame.setTitle("Create/Edit a subgraph");
 		graphFrame.setSize(launcherGui.getWidth(), launcherGui.getHeight());
 		graphFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -135,7 +137,7 @@ public class CreateSubgraphActionListener implements ActionListener{
 
 		graphFrame.setJMenuBar(menuBar);
 
-		JMenu fileMenu = new JMenu("File");
+		JMenu fileMenu = new JMenu("Graph");
 
 		fileMenu.setMnemonic(KeyEvent.VK_F);
 		menuBar.add(fileMenu);
@@ -148,6 +150,22 @@ public class CreateSubgraphActionListener implements ActionListener{
 			}
 		});
 		fileMenu.add(fileSaveItem);
+		
+		JMenuItem drawItem = new JMenuItem("Layout with Spring Embedder",KeyEvent.VK_L);
+		drawItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				draw(false);
+			}
+		});
+		fileMenu.add(drawItem);
+		
+		JMenuItem drawAnimatedItem = new JMenuItem("Layout with Spring Embedder (Animated)",KeyEvent.VK_K);
+		drawAnimatedItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				draw(true);
+			}
+		});
+		fileMenu.add(drawAnimatedItem);
 	}
 
 	/**
@@ -179,6 +197,20 @@ public class CreateSubgraphActionListener implements ActionListener{
 			graphFrame.setVisible(false);
 			graphFrame.dispose();
 		}
+	}
+	
+	/**
+	 * Draws the graph using a spring embedder
+	 * 
+	 * @param animated If the user whish to animate the drawing
+	 */
+	protected void draw(boolean animated) {
+		GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_S,"Spring Embedder - no randomization",KeyEvent.VK_S,false);
+		se.setAnimateFlag(animated);
+		se.setIterations(100);
+		se.setTimeLimit(200);
+		se.setGraphPanel(gp);
+		se.layout();
 	}
 
 }

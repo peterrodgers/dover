@@ -4,6 +4,8 @@ import org.cytoscape.gedevo.GedevoNativeUtil;
 import uk.ac.kent.dover.fastGraph.ExactMotifFinder.IsoHolder;
 import uk.ac.kent.dover.fastGraph.Gui.LauncherGUI;
 import uk.ac.kent.dover.fastGraph.Gui.MotifTask;
+import uk.ac.kent.dover.fastGraph.comparators.AlwaysTrueEdgeComparator;
+import uk.ac.kent.dover.fastGraph.comparators.AlwaysTrueNodeComparator;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -120,5 +122,21 @@ public class Launcher {
 		//emf.outputHashBuckets(referenceBuckets);
 		Debugger.outputTime("Time total motif detection");
 		mt.publish(100, "Complete", 0, "");
+	}
+	
+	/**
+	 * Calls the method to find all subgraphs
+	 * 
+	 * @param targetGraph The graph to search in
+	 * @param patternGraph The subgraph to find
+	 */
+	public void findSubgraphMappings(FastGraph targetGraph, FastGraph patternGraph) {
+		//AlwaysTrueNodeComparator atnc = new AlwaysTrueNodeComparator(targetGraph, patternGraph);
+		//AlwaysTrueEdgeComparator atec = new AlwaysTrueEdgeComparator(targetGraph, patternGraph);
+		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(targetGraph, patternGraph, null, null);
+		boolean result = esi.subGraphIsomorphismFinder();
+		System.out.println("result:" + result);
+		System.out.println(esi.getFoundMappings());
+		esi = null; //GC
 	}
 }

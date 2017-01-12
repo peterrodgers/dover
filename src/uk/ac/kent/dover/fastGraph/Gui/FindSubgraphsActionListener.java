@@ -92,8 +92,11 @@ public class FindSubgraphsActionListener implements ActionListener {
 						status.setText("Loading Complete");
 
 						System.out.println("Finding subgraphs!");
+
 						System.out.println("Main graph nodes:" + g.getNumberOfNodes());
 						System.out.println("Subgraph nodes:" + subgraph.getNumberOfNodes());
+						
+						launcher.findSubgraphMappings(g, subgraph);
 				    	
 				    	//stop the Progress Bar
 				    	progressBar.setIndeterminate(false);
