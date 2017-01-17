@@ -1,6 +1,0 @@
-name~random-n-10-e-100
-numberOfNodes~10
-numberOfEdges~100
-numberOfNodeLabelBytes~40
-numberOfEdgeLabelBytes~580
-direct~false
