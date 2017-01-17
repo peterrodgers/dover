@@ -107,11 +107,13 @@ public class Launcher {
 		FastGraph g2 = FastGraph.loadBuffersGraphFactory(directory, fileBaseName);
 			
 		mt.setSmallIndeterminate(false);			
-		ExactMotifFinder emf = new ExactMotifFinder(g2,mt, saveAll);
+		ExactMotifFinder emf = new ExactMotifFinder(g2, mt, saveAll);
 		
+		emf.setSaveAll(false); //never want to save all examples in the rewired graph
 		mt.publish((int) step, "Building Reference Set", 0, "");		
 		emf.findAllMotifs(10,minNum,maxNum);
 		
+		emf.setSaveAll(saveAll);
 		mt.publish((int) (100-(2*step)), "Building Main Set", 0, "");
 		emf.findAllMotifs(0,minNum,maxNum);
 		
