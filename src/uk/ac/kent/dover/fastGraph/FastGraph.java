@@ -115,7 +115,7 @@ public class FastGraph {
 	 */
 	public static void main(String[] args) throws Exception {
 		
-		Debugger.enabled = false;
+		Debugger.enabled = true;
 		
 		long time = 0;
 		
@@ -154,8 +154,8 @@ public class FastGraph {
 		Debugger.outputTime("saveBuffers test time ");
 		time = Debugger.createTime();
 */
-//String name = "random-n-100-e-1000";
-String name = "random-n-8-e-9";
+String name = "random-n-100-e-1000";
+//String name = "random-n-8-e-9";
 //String name = "as-skitter.txt";
 //String name = "soc-pokec-relationships.txt-reduced";
 //String name = "soc-pokec-relationships.txt-veryshort-veryshort";
@@ -175,10 +175,19 @@ String name = "random-n-8-e-9";
 			Debugger.resetTime();
 			
 //
-			ExactMotifFinder emf = new ExactMotifFinder(g2, new MotifTaskDummy(), true);
+/*			ExactMotifFinder emf = new ExactMotifFinder(g2, new MotifTaskDummy(), true);
 			emf.findAllMotifs(10,4,6);
 			emf.findAllMotifs(0,4,6);
 			emf.compareMotifDatas(4,6);
+	*/
+			KMedoids km = new KMedoids(g2, 5, 100);
+			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g2);
+			HashSet<FastGraph> subs = esn.enumerateSubgraphs(4, 2, 10);
+			System.out.println("subs: " + subs.size());
+			
+			ArrayList<FastGraph> subgraphs = new ArrayList<FastGraph>(subs);
+			ArrayList<ArrayList<FastGraph>> clusters = km.cluster(subgraphs);
+			System.out.println(clusters);
 			
 			//emf.findAndExportAllMotifs(10, 4, 4, 0, true);
 			//emf.findAndExportAllMotifs(0, 4, 4, 0, false);

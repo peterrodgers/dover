@@ -357,4 +357,35 @@ public class Util {
 		result = result / (array.size()-1); //variance
 		return Math.sqrt(result);
 	}
+	
+	/**
+	 * Picks a random sublist of a list
+	 * 
+	 * @param r The Random generator
+	 * @param number The number of items to choose
+	 * @param target The items to choose from
+	 * @return The random sublist
+	 * @throws FastGraphException If the list is too small
+	 */
+	public static <T> ArrayList<T> randomSelection(Random r, int number, ArrayList<T> target) throws FastGraphException {
+		// not enough choices
+		if(number > target.size()) {
+			throw new FastGraphException("Number of options is larger than target size");
+		} else if (number == target.size()) {
+			//equal choices, so just shuffle list
+			ArrayList<T> result = new ArrayList<T>(number); //for storing the result
+			Collections.shuffle(result);
+			return result;
+		}
+		
+		ArrayList<T> result = new ArrayList<T>(number); //for storing the result
+		ArrayList<T> toChooseFrom = new ArrayList<T>(target); //copy of the list
+		for(int i = 0; i < number; i++) {
+			int index = r.nextInt(toChooseFrom.size());
+			result.add(toChooseFrom.get(index));
+			toChooseFrom.remove(index);
+		}
+		toChooseFrom = null; //GC
+		return result;
+	}
 }
