@@ -78,10 +78,11 @@ public class KMedoids {
 			
 			Debugger.log("subgraphs");
 			Debugger.log(subgraphs.get(i));
+			subgraphs.get(i).displayFastGraph();
 			
 			Debugger.log("medoids 0");
 			Debugger.log(medoids.get(0));
-			medoids.get(0).displayFastGraph();
+			
 			
 			double bestDistance = GedUtil.getGedScore(subgraphs.get(i), medoids.get(0));
 

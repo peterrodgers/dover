@@ -174,7 +174,6 @@ String name = "random-n-100-e-1000";
 
 			Debugger.resetTime();
 			
-//
 /*			ExactMotifFinder emf = new ExactMotifFinder(g2, new MotifTaskDummy(), true);
 			emf.findAllMotifs(10,4,6);
 			emf.findAllMotifs(0,4,6);
