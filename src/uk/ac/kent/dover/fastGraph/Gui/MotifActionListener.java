@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 
 import javax.swing.*;
 
@@ -25,7 +26,7 @@ public class MotifActionListener implements ActionListener {
 	private JPanel motifPanel;
 	private JLabel statusBar;
 	private JProgressBar bigProgress, smallProgress, progressBar;
-	private JList graphList;
+	private JFileChooser targetChooser;
 	private JCheckBox saveAllBox;
 	
 	/**
@@ -39,11 +40,11 @@ public class MotifActionListener implements ActionListener {
 	 * @param smallProgress The smaller progress bar
 	 * @param progressBar The main window progress bar
 	 * @param statusBar The main window status bar
-	 * @param graphList The list of graphs to identify which buffer the user wishes to load
+	 * @param targetChooser The chooser for the user to select the target graph
 	 * @param saveAllBox If the user wishes to save every example of motif
 	 */
 	public MotifActionListener(Launcher launcher, LauncherGUI launcherGUI, JTextField minInput, JTextField maxInput, JPanel motifPanel, 
-			JProgressBar bigProgress, JProgressBar smallProgress, JProgressBar progressBar, JLabel statusBar, JList graphList, 
+			JProgressBar bigProgress, JProgressBar smallProgress, JProgressBar progressBar, JLabel statusBar, JFileChooser targetChooser, 
 			JCheckBox saveAllBox) {
 		this.launcher = launcher;
 		this.launcherGUI = launcherGUI;
@@ -54,7 +55,7 @@ public class MotifActionListener implements ActionListener {
 		this.smallProgress = smallProgress;
 		this.progressBar = progressBar;
 		this.statusBar = statusBar;
-		this.graphList = graphList;
+		this.targetChooser = targetChooser;
 		this.saveAllBox = saveAllBox;
 	}
 	
@@ -68,7 +69,7 @@ public class MotifActionListener implements ActionListener {
 		int maxNumber = launcherGUI.checkForPositiveInteger(maxInput.getText(),motifPanel);
 		if (minNumber != -1 && maxNumber != -1) {
 
-			String graph = (String) graphList.getSelectedValue();
+			File graph = targetChooser.getSelectedFile();
 			if(graph != null) {
 				//create a Task that will run the motif code and provide updates
 				MotifTask task = new MotifTask(launcher, bigProgress, smallProgress, graph, minNumber, maxNumber, 

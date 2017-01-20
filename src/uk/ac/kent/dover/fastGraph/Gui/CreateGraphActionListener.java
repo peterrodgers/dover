@@ -31,7 +31,7 @@ import uk.ac.kent.dover.fastGraph.FastGraph;
  * @author Rob Baker
  *
  */
-public class CreateSubgraphActionListener implements ActionListener{
+public class CreateGraphActionListener implements ActionListener{
 
 	private LauncherGUI launcherGui;
 	private JFrame graphFrame;
@@ -53,7 +53,7 @@ public class CreateSubgraphActionListener implements ActionListener{
 	 * @param fileLabel The label which says the selected subgraph - for updating
 	 * @param status The status bar on the GUI to be updated
 	 */
-	public CreateSubgraphActionListener(LauncherGUI launcherGui, JFileChooser fileChooser, JPanel panel, 
+	public CreateGraphActionListener(LauncherGUI launcherGui, JFileChooser fileChooser, JPanel panel, 
 			FastGraph subgraph, JLabel fileLabel, JLabel status) {
 		this.launcherGui = launcherGui;
 		this.panel = panel;
@@ -88,7 +88,7 @@ public class CreateSubgraphActionListener implements ActionListener{
 	}
 	
 	/**
-	 * Loads a display grpah from a given file. If none is given, then loads a new display graph
+	 * Loads a display graph from a given file. If none is given, then loads a new display graph
 	 * @param file The file to load
 	 * @return A display graph from the given file, or a new one
 	 * @throws IOException If the buffers cannot be loaded
@@ -115,7 +115,7 @@ public class CreateSubgraphActionListener implements ActionListener{
 		graphFrame = new JFrame();
 		gp = new uk.ac.kent.displayGraph.GraphPanel(dg, graphFrame);
 		graphFrame.setContentPane(gp);
-		graphFrame.setTitle("Create/Edit a subgraph");
+		graphFrame.setTitle("Create/Edit a graph");
 		graphFrame.setSize(launcherGui.getWidth(), launcherGui.getHeight());
 		graphFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		

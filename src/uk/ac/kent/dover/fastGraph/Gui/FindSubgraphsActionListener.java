@@ -18,7 +18,7 @@ import uk.ac.kent.dover.fastGraph.Launcher;
  */
 public class FindSubgraphsActionListener implements ActionListener {
 
-	private JList graphList;
+	private JFileChooser targetChooser;
 	private JProgressBar progressBar;
 	private JLabel status;
 	private Launcher launcher;
@@ -29,7 +29,7 @@ public class FindSubgraphsActionListener implements ActionListener {
 	/**
 	 * Trivial constructor
 	 * 
-	 * @param graphList The list of graphs to choose from
+	 * @param targetChooser The chooser for the target graph
 	 * @param progressBar The progress bar to update
 	 * @param status The status bar to update
 	 * @param launcher The launcher for callbacks
@@ -37,9 +37,9 @@ public class FindSubgraphsActionListener implements ActionListener {
 	 * @param fileChooser The filechooser for a user to select a subgraph
 	 * @param subgraph If the've created or edited one, it will be here
 	 */
-	public FindSubgraphsActionListener(JList graphList, JProgressBar progressBar, JLabel status, Launcher launcher,
+	public FindSubgraphsActionListener(JFileChooser targetChooser, JProgressBar progressBar, JLabel status, Launcher launcher,
 			JPanel subgraphPanel, JFileChooser fileChooser, FastGraph subgraph) {
-		this.graphList = graphList;
+		this.targetChooser = targetChooser;
 		this.progressBar = progressBar;
 		this.status = status;
 		this.launcher = launcher;
@@ -53,7 +53,7 @@ public class FindSubgraphsActionListener implements ActionListener {
 	 * Handles the actual code to load the two graphs and get ready to find subgraphs
 	 */
 	public void actionPerformed(ActionEvent arg0) {
-		String graph = (String) graphList.getSelectedValue();
+		File graph = targetChooser.getSelectedFile();
 		if (graph != null) {
 			System.out.println(graph);
 			
@@ -87,7 +87,11 @@ public class FindSubgraphsActionListener implements ActionListener {
 			    	
 			    	//Display error message to the user if this is unavailable
 					try {
-						FastGraph g = launcher.loadFromBuffers(null,graph);
+						
+						String name = graph.getName();
+						String path = graph.getParent();							
+						
+						FastGraph g = launcher.loadFromBuffers(path+File.separatorChar+name, name);
 						
 						status.setText("Loading Complete");
 

@@ -29,7 +29,6 @@ public class ConvertGraphActionListener implements ActionListener{
 	private JTextField edgeField;
 	private JFileChooser fileChooser;
 	private JRadioButton directed;
-	private DefaultListModel model;
 	private JPanel convertPanel;
 	private JProgressBar progressBar;
 	private JLabel status;
@@ -43,13 +42,12 @@ public class ConvertGraphActionListener implements ActionListener{
 	 * @param edgeField The number of edges field
 	 * @param fileChooser The file Chooser to select the input file
 	 * @param directed If the graph is directed
-	 * @param model The model to store the list of buffers available
 	 * @param convertPanel The JPanel the button sits on
 	 * @param progressBar The main progress bar to be updated
 	 * @param status The main status message to be updated
 	 */
 	public ConvertGraphActionListener(Launcher launcher, LauncherGUI launcherGUI, JTextField nodeField, JTextField edgeField, 
-			JFileChooser fileChooser, JRadioButton directed, DefaultListModel model, JPanel convertPanel, JProgressBar progressBar,
+			JFileChooser fileChooser, JRadioButton directed, JPanel convertPanel, JProgressBar progressBar,
 			JLabel status) {
 		this.launcher = launcher;
 		this.launcherGUI = launcherGUI;
@@ -57,7 +55,6 @@ public class ConvertGraphActionListener implements ActionListener{
 		this.edgeField = edgeField;
 		this.fileChooser = fileChooser;
 		this.directed = directed;
-		this.model = model;
 		this.convertPanel = convertPanel;
 		this.progressBar = progressBar;
 		this.status = status;
@@ -103,7 +100,6 @@ public class ConvertGraphActionListener implements ActionListener{
 						launcher.convertGraphToBuffers(nodeNumber, edgeNumber, path, name, directedGraph);
 						
 						status.setText("Conversion Complete");
-						model.addElement(name);
 				    	//stop the Progress Bar
 				    	progressBar.setIndeterminate(false);
 					} catch (Exception e) {

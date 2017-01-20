@@ -23,7 +23,7 @@ public class MotifTask extends SwingWorker<Void, Progress> {
 	
 	private JProgressBar bigProgress, smallProgress, progressBar;
 	private Launcher launcher;
-	private String graph;
+	private File graph;
 	private int minSize, maxSize;
 	private JLabel status;
 	private Progress lastProgress;
@@ -36,7 +36,7 @@ public class MotifTask extends SwingWorker<Void, Progress> {
 	 * @param launcher The main launcher of this project. Used for call back methods
 	 * @param bigProgress The bigger progress bar
 	 * @param smallProgress The smaller progress bar
-	 * @param graph The name of the graph to be run
+	 * @param graph The file of the graph to be run
 	 * @param minSize The minimum number of nodes in a motif
 	 * @param maxSize The maximum number of nodes in a motif
 	 * @param progressBar The main window's progress bar
@@ -44,7 +44,7 @@ public class MotifTask extends SwingWorker<Void, Progress> {
 	 * @param motifPanel The panel to attach errors to
 	 * @param saveAll If the user wishes to save every motif example
 	 */
-	public MotifTask(Launcher launcher, JProgressBar bigProgress, JProgressBar smallProgress, String graph, int minSize, int maxSize,
+	public MotifTask(Launcher launcher, JProgressBar bigProgress, JProgressBar smallProgress, File graph, int minSize, int maxSize,
 			JProgressBar progressBar, JLabel status, JPanel motifPanel, boolean saveAll) {
 		this.launcher = launcher;
 		this.bigProgress = bigProgress;
@@ -119,7 +119,10 @@ public class MotifTask extends SwingWorker<Void, Progress> {
 		progressBar.setIndeterminate(true);
 		status.setText("Finding Motifs...");
 
-		launcher.findMotifs(this, null, graph, minSize, maxSize, saveAll);
+		String name = graph.getName();
+		String path = graph.getParent();							
+		
+		launcher.findMotifs(this, path+File.separatorChar+name, name, minSize, maxSize, saveAll);
 		//launcher
 		
 		return null;
@@ -133,7 +136,7 @@ public class MotifTask extends SwingWorker<Void, Progress> {
 	protected void done() {
 		progressBar.setIndeterminate(false);
 		status.setText(LauncherGUI.DEFAULT_STATUS_MESSAGE);
-		String url = "file:///"+Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graph+File.separatorChar+"index.html";
+		String url = "file:///"+Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graph.getName()+File.separatorChar+"index.html";
 		url = url.replace("\\", "/");
 		try {
             Desktop.getDesktop().browse(new URI(url));

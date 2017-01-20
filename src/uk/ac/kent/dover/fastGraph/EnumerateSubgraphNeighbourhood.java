@@ -92,6 +92,7 @@ public class EnumerateSubgraphNeighbourhood {
 				addMissingEdges(nodes, edges);
 				FastGraph subgraph = g.generateGraphFromSubgraph(Util.convertHashSet(nodes), Util.convertHashSet(edges));
 				foundSubgraphs++;
+				subgraph.setName("subgraph");
 				subgraphs.add(subgraph);
 			}
 		}

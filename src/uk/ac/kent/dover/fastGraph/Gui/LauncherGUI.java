@@ -13,6 +13,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * This class handles all the GUI for the main Launcher.
@@ -27,11 +28,12 @@ public class LauncherGUI extends JFrame {
 	public static final String DEFAULT_STATUS_MESSAGE = "Ready"; //The default message displayed to a user
 
 	private Launcher launcher;
-	private DefaultListModel model = new DefaultListModel();
 	private double screenWidth; //size of the user's screen
 	private double screenHeight;
 	private int windowWidth, windowHeight;	
 	private double textHeight;
+	private File ged1, ged2;
+	private JFileChooser targetChooser;
 
 
 	/**
@@ -55,13 +57,21 @@ public class LauncherGUI extends JFrame {
 		textHeight = screenHeight / 100;
 
 		JPanel mainPanel = new JPanel(new BorderLayout());
+		
+		//builds the status bar. Again, not used until later;
+		JPanel statusBar = buildStatusBar();
 
 		//Builds the graph selection section
 		JPanel northPanel = new JPanel(new BorderLayout());
-		JList graphList = buildSourceGraphList();
-		northPanel.add(graphList, BorderLayout.NORTH);
+		//JList graphList = buildSourceGraphList();
+		
+		
+		JPanel targetGraphPanel = buildTargetGraphPanel(statusBar);
+		//find targetChooser
+		
+		northPanel.add(targetGraphPanel, BorderLayout.NORTH);
 
-		northPanel.add(new JSeparator(JSeparator.HORIZONTAL), BorderLayout.SOUTH);
+		mainPanel.add(new JSeparator(JSeparator.HORIZONTAL), BorderLayout.NORTH);
 
 		Border blackline = BorderFactory.createLineBorder(Color.black);
 		TitledBorder titled = BorderFactory.createTitledBorder(blackline, "Target Graph");
@@ -76,9 +86,6 @@ public class LauncherGUI extends JFrame {
 		progressBar.setStringPainted(true);
 		progressBar.setString("");
 
-		//builds the status bar. Again, not used until later;
-		JPanel statusBar = buildStatusBar();
-
 		//adds the two status updates to the statusArea
 		statusArea.add(progressBar, BorderLayout.NORTH);
 		statusArea.add(statusBar, BorderLayout.SOUTH);
@@ -86,23 +93,23 @@ public class LauncherGUI extends JFrame {
 		// Builds the Tabbed area
 		JTabbedPane tabbedPane = new JTabbedPane();
 
-		JPanel motifPanel = buildMotifTab(graphList, progressBar, statusBar);
+		JPanel motifPanel = buildMotifTab(progressBar, statusBar, targetChooser);
 		tabbedPane.addTab("Motif", motifPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
-		JPanel subgraphPanel = buildSubgraphTab(graphList, progressBar, statusBar);
+		JPanel subgraphPanel = buildSubgraphTab(progressBar, statusBar, targetChooser);
 		tabbedPane.addTab("Subgraph", subgraphPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_2);
 
-		JPanel convertPanel = buildConvertTab(graphList, progressBar, statusBar);
+		JPanel convertPanel = buildConvertTab(progressBar, statusBar);
 		tabbedPane.addTab("Convert Graph", convertPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_3);
 
-		JPanel otherPanel = buildOtherTab(graphList, progressBar, statusBar);
+		JPanel otherPanel = buildOtherTab(progressBar, statusBar, targetChooser);
 		tabbedPane.addTab("Others", otherPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_4);
 
-		JPanel gedPanel = buildGedTab(graphList, progressBar, statusBar);
+		JPanel gedPanel = buildGedTab(progressBar, statusBar, targetChooser);
 		tabbedPane.addTab("GED", gedPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_5);
 
@@ -124,14 +131,23 @@ public class LauncherGUI extends JFrame {
 		setTitle("Dover");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		windowWidth = (int) Math.round(screenHeight/2);
-		windowHeight = (int) Math.round(screenHeight/2);
+		windowWidth = (int) Math.round(screenHeight/3);
+		windowHeight = (int) Math.round(screenHeight/3);
 		mainPanel.setPreferredSize(new Dimension(windowWidth,windowHeight)); //makes a square window
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new ClosingWindowListener(false,this,this,(JLabel) statusBar.getComponent(0)));
-		ImageIcon icon = new ImageIcon("icon128.png");
-		setIconImage(icon.getImage());
+		
+		List<Image> icons = new ArrayList<Image>();
+		ImageIcon icon128 = new ImageIcon("lib"+File.separatorChar+"icon128.png");
+		ImageIcon icon64 = new ImageIcon("lib"+File.separatorChar+"icon64.png");
+		ImageIcon icon32 = new ImageIcon("lib"+File.separatorChar+"icon32.png");
+		icons.add(icon128.getImage());
+		icons.add(icon64.getImage());
+		icons.add(icon32.getImage());
+		setIconImages(icons);
+		
 		pack();
+		setLocationRelativeTo(null);
 		setVisible(true);
 	}
 	
@@ -170,7 +186,7 @@ public class LauncherGUI extends JFrame {
 	 * This allows the user to choose which graph they wish to perform things on
 	 * @return The JList component containing the graphs
 	 */
-	private JList buildSourceGraphList() {
+/*	private JList buildSourceGraphList() {
 		File folder = new File(Launcher.startingWorkingDirectory+File.separatorChar+"data");
 		File[] listOfFiles = folder.listFiles();
 		ArrayList<String> graphs = new ArrayList<String>();
@@ -189,14 +205,87 @@ public class LauncherGUI extends JFrame {
 		list.setLayoutOrientation(JList.VERTICAL);
 		list.setVisibleRowCount(-1);
 		return list;
+	}*/
+	
+	/**
+	 * Builds the Panel used to house the GUI elements for the Target Graph Tab
+	 * @return The Pattern Tab
+	 */
+	private JPanel buildTargetGraphPanel(JPanel statusBar) {
+		FastGraph targetGraph = null;
+		JLabel status = (JLabel) statusBar.getComponent(0);
+		
+		JPanel targetGraphPanel = new JPanel(new GridBagLayout());
+		
+		JLabel targetGraphLabel = new JLabel("Select Target Graph");		
+
+		targetChooser = new JFileChooser();
+		targetChooser.setCurrentDirectory(new java.io.File("."));
+		targetChooser.setDialogTitle("Select target graph directory");
+		targetChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	    
+		JButton openBtn = new JButton("Open File...");	
+		openBtn.setToolTipText("Open a graph from disk");
+		
+		JLabel fileLabel = new JLabel("No file selected  ");
+		fileLabel.setFont(new Font(fileLabel.getFont().getFontName(), Font.ITALIC, fileLabel.getFont().getSize()));
+		
+		//The action for when the user chooses a file
+		openBtn.addActionListener(new LoadFileActionListener(status, fileLabel, targetChooser, targetGraphPanel, openBtn));
+		
+		JButton addBtn = new JButton("Create");	
+		addBtn.addActionListener(new CreateGraphActionListener(this, targetChooser, targetGraphPanel, targetGraph, fileLabel, status));
+		addBtn.setToolTipText("Design a graph");
+		
+		JButton editBtn = new JButton("Edit");
+		editBtn.addActionListener(new CreateGraphActionListener(this, targetChooser, targetGraphPanel, targetGraph, fileLabel, status));
+		editBtn.setToolTipText("Edit a selected graph. Only for small graphs");
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(2,2,2,2);
+		c.fill = GridBagConstraints.HORIZONTAL;
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 2;
+		targetGraphPanel.add(targetGraphLabel, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 1;
+		c.gridx = 0;
+		c.gridy = 1;
+		targetGraphPanel.add(openBtn, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 1;
+		c.gridy = 1;
+		c.gridwidth = 1;
+		targetGraphPanel.add(fileLabel, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 1;
+		c.gridx = 0;
+		c.gridy = 2;
+		targetGraphPanel.add(editBtn, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 1;
+		c.gridy = 2;
+		c.gridwidth = 1;
+		targetGraphPanel.add(addBtn, c);
+		
+		return targetGraphPanel;
 	}
 	
 	/**
 	 * Builds the Panel used to house the GUI elements for the Motif Tab
 	 * @param progressBar The main progress bar
+	 * @param statusBar The status bar to update
+	 * @param targetChooser The chooser for the target graph
 	 * @return The Motif Tab
 	 */
-	private JPanel buildMotifTab(JList graphList, JProgressBar progressBar, JPanel statusBar) {
+	private JPanel buildMotifTab(JProgressBar progressBar, JPanel statusBar, JFileChooser targetChooser) {
 		JPanel motifPanel = new JPanel(new GridBagLayout());
 		JLabel status = (JLabel) statusBar.getComponent(0);
 
@@ -235,7 +324,7 @@ public class LauncherGUI extends JFrame {
 		//add an action when the user clicks this button
 		//in an external class, so needs lots(!) of parameters
 		motifBtn.addActionListener(new MotifActionListener(launcher, this, minInput, maxInput, motifPanel,
-				bigProgress, smallProgress, progressBar, status, graphList, saveAllBox));
+				bigProgress, smallProgress, progressBar, status, targetChooser, saveAllBox));
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(2,2,2,2);
@@ -311,9 +400,12 @@ public class LauncherGUI extends JFrame {
 
 	/**
 	 * Builds the Panel used to house the GUI elements for the Pattern Tab
+	 * @param progressBar The progress bar to update
+	 * @param statusBar The status bar to update
+	 * @param targetChooser The chooser for the target graph
 	 * @return The Pattern Tab
 	 */
-	private JPanel buildSubgraphTab(JList graphList, JProgressBar progressBar, JPanel statusBar) {
+	private JPanel buildSubgraphTab(JProgressBar progressBar, JPanel statusBar, JFileChooser targetChooser) {
 		JLabel status = (JLabel) statusBar.getComponent(0);
 		FastGraph subgraph = null;
 		
@@ -336,15 +428,15 @@ public class LauncherGUI extends JFrame {
 		openBtn.addActionListener(new LoadFileActionListener(status, fileLabel, fileChooser, subgraphPanel, openBtn));
 		
 		JButton addBtn = new JButton("Create");	
-		addBtn.addActionListener(new CreateSubgraphActionListener(this, fileChooser, subgraphPanel, subgraph, fileLabel, status));
+		addBtn.addActionListener(new CreateGraphActionListener(this, fileChooser, subgraphPanel, subgraph, fileLabel, status));
 		
 		JButton editBtn = new JButton("Edit");
-		editBtn.addActionListener(new CreateSubgraphActionListener(this, fileChooser, subgraphPanel, subgraph, fileLabel, status));
+		editBtn.addActionListener(new CreateGraphActionListener(this, fileChooser, subgraphPanel, subgraph, fileLabel, status));
 		
 		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
 		
 		JButton findBtn = new JButton("Find subgraphs");
-		findBtn.addActionListener(new FindSubgraphsActionListener(graphList, progressBar, status, launcher, subgraphPanel, 
+		findBtn.addActionListener(new FindSubgraphsActionListener(targetChooser, progressBar, status, launcher, subgraphPanel, 
 				fileChooser, subgraph));
 		
 		GridBagConstraints c = new GridBagConstraints();
@@ -398,9 +490,11 @@ public class LauncherGUI extends JFrame {
 
 	/**
 	 * Builds the Panel used to house the GUI elements for the Pattern Tab
+	 * @param progressBar The progress bar to update
+	 * @param statusBar The status bar to update
 	 * @return The Pattern Tab
 	 */
-	private JPanel buildConvertTab(JList graphList, JProgressBar progressBar, JPanel statusBar) {
+	private JPanel buildConvertTab(JProgressBar progressBar, JPanel statusBar) {
 		JLabel status = (JLabel) statusBar.getComponent(0);
 		JLabel label = new JLabel("Convert from adjacency list to buffers");
 		JLabel fileLabel = new JLabel("No file selected");
@@ -432,7 +526,7 @@ public class LauncherGUI extends JFrame {
 
 		//The action for when the user converts a file
 		convertBtn.addActionListener(new ConvertGraphActionListener(launcher, this, nodeField, edgeField,
-				fileChooser, directed, model, convertPanel, progressBar, status));
+				fileChooser, directed, convertPanel, progressBar, status));
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(2,2,2,2);
@@ -499,9 +593,10 @@ public class LauncherGUI extends JFrame {
 	 *
 	 * @param graphList The JList element used to select which is the target graph
 	 * @param progressBar The JProgressBar to update when loading a graph
+	 * @param targetChooser The chooser for the target graph
 	 * @return the Other tab
 	 */
-	private JPanel buildOtherTab(JList graphList, JProgressBar progressBar, JPanel statusBar) {
+	private JPanel buildOtherTab(JProgressBar progressBar, JPanel statusBar, JFileChooser targetChooser) {
 		JPanel otherPanel = new JPanel(new BorderLayout());
 		JLabel status = (JLabel) statusBar.getComponent(0);
 
@@ -509,7 +604,7 @@ public class LauncherGUI extends JFrame {
 		otherPanel.add(selectedBtn, BorderLayout.WEST);
 
 		//The action for when the use selected the
-		selectedBtn.addActionListener(new OtherActionListener(graphList, progressBar, status, launcher, otherPanel));
+		selectedBtn.addActionListener(new OtherActionListener(targetChooser, progressBar, status, launcher, otherPanel));
 
 		otherPanel.add(new JLabel("more text"), BorderLayout.EAST);
 		return otherPanel;
@@ -529,29 +624,14 @@ public class LauncherGUI extends JFrame {
 		return statusPanel;
 	}
 	/**
-	 * Checks that a String is a positive integer
-	 * @param input The input String to be tested
-	 * @param panel The JPanel to attach the error Popup
-	 * @return The converted integer, or -1 if failed.
-	 */
-	public int checkForPositiveInteger(String input, JPanel panel) {
-		try {
-			int number = Util.checkForPositiveInteger(input);
-			return number;
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(panel, "Please enter a positive integer", "Invalid Input", JOptionPane.ERROR_MESSAGE);
-			return -1;
-		} 
-	}
-
-	/**
 	 * Builds the Panel used to house the GUI elements for the Graph Edit Distance Tab
 	 *
 	 * @param graphList   The JList element used to select which is the target graph
 	 * @param progressBar The JProgressBar to update when loading a graph
+	 * @param targetChooser The chooser for the target graph
 	 * @return the GED tab
 	 */
-	private JPanel buildGedTab(JList graphList, JProgressBar progressBar, JPanel statusBar) {
+	private JPanel buildGedTab(JProgressBar progressBar, JPanel statusBar, JFileChooser targetChooser) {
 
 		JPanel gedPanel = new JPanel(new GridBagLayout());
 
@@ -622,12 +702,28 @@ public class LauncherGUI extends JFrame {
 		gedPanel.add(gedScore, c);
 
 		// Set behaviour
-		selectGraphOne.addActionListener(new GraphSelectedActionListener(graphList,graphOneTextField));
-		selectGraphTwo.addActionListener(new GraphSelectedActionListener(graphList,graphTwoTextField));
+		selectGraphOne.addActionListener(new GraphSelectedActionListener(ged1, targetChooser, graphOneTextField, this, 1));
+		selectGraphTwo.addActionListener(new GraphSelectedActionListener(ged2, targetChooser, graphTwoTextField, this, 2));
 
-		getGedBtn.addActionListener(new GedActionListener(graphOneTextField,graphTwoTextField,launcher,gedScore));
+		getGedBtn.addActionListener(new GedActionListener(launcher, this, gedScore));
 
 		return gedPanel;
+	}
+
+	/**
+	 * Checks that a String is a positive integer
+	 * @param input The input String to be tested
+	 * @param panel The JPanel to attach the error Popup
+	 * @return The converted integer, or -1 if failed.
+	 */
+	public int checkForPositiveInteger(String input, JPanel panel) {
+		try {
+			int number = Util.checkForPositiveInteger(input);
+			return number;
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(panel, "Please enter a positive integer", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+			return -1;
+		} 
 	}
 
 	/**
@@ -677,5 +773,37 @@ public class LauncherGUI extends JFrame {
 	 */
 	public Launcher getLauncher() {
 		return launcher;
+	}
+
+	/**
+	 * Gets the first graph for GED comparison
+	 * @return the first graph for GED comparison
+	 */
+	public File getGed1() {
+		return ged1;
+	}
+
+	/**
+	 * Gets the second graph for GED comparison
+	 * @return the second graph for GED comparison
+	 */
+	public File getGed2() {
+		return ged2;
+	}
+
+	/**
+	 * Gets the first graph for GED comparison
+	 * @param ged1 the ged1 to set
+	 */
+	public void setGed1(File ged1) {
+		this.ged1 = ged1;
+	}
+
+	/**
+	 * Gets the second graph for GED comparison
+	 * @param ged2 the ged2 to set
+	 */
+	public void setGed2(File ged2) {
+		this.ged2 = ged2;
 	}
 }

@@ -1,5 +1,7 @@
 package uk.ac.kent.dover.fastGraph.Gui;
 
+import java.io.File;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -39,7 +41,7 @@ public class MotifTaskDummy extends MotifTask {
 	 * @param status Not Used.
 	 * @param saveAll Not Used.
 	 */
-	public MotifTaskDummy(Launcher launcher, JProgressBar bigProgress, JProgressBar smallProgress, String graph,
+	public MotifTaskDummy(Launcher launcher, JProgressBar bigProgress, JProgressBar smallProgress, File graph,
 			int minSize, int maxSize, JProgressBar progressBar, JLabel status, JPanel panel, boolean saveAll) {
 		super(launcher, bigProgress, smallProgress, graph, minSize, maxSize, progressBar, status, panel, saveAll);
 	}

@@ -7,24 +7,31 @@ import uk.ac.kent.dover.fastGraph.Launcher;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 
+/**
+ * Runs when the user chooses to find the Graph Edit Distance
+ * 
+ * @author Rob Baker
+ *
+ */
 public class GedActionListener implements ActionListener {
 
 	private final JTextArea gedScore;
-	JTextField graphOneTextField, graphTwoTextField;
-	Launcher launcher;
+	private Launcher launcher;
+	private LauncherGUI launcherGUI;
 	
 	/**
-	 * @param graphOneTextField
-	 * @param graphTwoTextField
-	 * @param launcher
-	 * @param gedScore
+	 * Runs when the user chooses to find the Graph Edit Distance
+	 * 
+	 * @param launcher The launcher for callbacks
+	 * @param launcherGUI The launcherGUI to find what graphs to run on
+	 * @param gedScore The label to update the score
 	 */
-	public GedActionListener(JTextField graphOneTextField, JTextField graphTwoTextField, Launcher launcher, JTextArea gedScore) {
-		this.graphOneTextField = graphOneTextField;
-		this.graphTwoTextField = graphTwoTextField;
+	public GedActionListener(Launcher launcher, LauncherGUI launcherGUI, JTextArea gedScore) {
 		this.launcher = launcher;
+		this.launcherGUI = launcherGUI;
 		this.gedScore = gedScore;
 	}
 
@@ -35,14 +42,20 @@ public class GedActionListener implements ActionListener {
 			@Override
 			public void run() {
 				System.out.println("Click");
-				String g1String = graphOneTextField.getText();
-				String g2String = graphTwoTextField.getText();
+				File f1 = launcherGUI.getGed1();
+				File f2 = launcherGUI.getGed2();
 
 				FastGraph g1 = null;
 				FastGraph g2 = null;
 				try {
-					g1 = launcher.loadFromBuffers(null, g1String);
-					g2 = launcher.loadFromBuffers(null, g2String);
+					String name = f1.getName();
+					String path = f1.getParent();				
+					g1 = launcher.loadFromBuffers(path+File.separatorChar+name, name);
+					
+					String name2 = f2.getName();
+					String path2 = f2.getParent();						
+					g2 = launcher.loadFromBuffers(path2+File.separatorChar+name2, name2);
+					
 					System.out.println("Created dover graphs");
 
 				} catch (IOException e) {

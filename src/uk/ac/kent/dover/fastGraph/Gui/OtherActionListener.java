@@ -2,9 +2,11 @@ package uk.ac.kent.dover.fastGraph.Gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -22,24 +24,22 @@ import uk.ac.kent.dover.fastGraph.Launcher;
  */
 public class OtherActionListener implements ActionListener {
 
-	private JList graphList;
+	private JFileChooser targetChooser;
 	private JProgressBar progressBar;
 	private JLabel status;
 	private Launcher launcher;
 	private JPanel otherPanel;
-	
-	
-	
+
 	/**
-	 * @param graphList The list of graphs for a user to choose from
+	 * @param targetChooser The chooser for the user to select the target graph
 	 * @param progressBar The main window's progress bar
 	 * @param status The main window's status bar
 	 * @param launcher The launcher for callback functions
 	 * @param otherPanel The panel to attach to
 	 */
-	public OtherActionListener(JList graphList, JProgressBar progressBar, JLabel status, Launcher launcher,
+	public OtherActionListener(JFileChooser targetChooser, JProgressBar progressBar, JLabel status, Launcher launcher,
 			JPanel otherPanel) {
-		this.graphList = graphList;
+		this.targetChooser = targetChooser;
 		this.progressBar = progressBar;
 		this.status = status;
 		this.launcher = launcher;
@@ -50,7 +50,7 @@ public class OtherActionListener implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent evt) {
-		String graph = (String) graphList.getSelectedValue();
+		File graph = targetChooser.getSelectedFile();
 		if (graph != null) {
 			System.out.println(graph);
 			
@@ -66,7 +66,11 @@ public class OtherActionListener implements ActionListener {
 			    	
 			    	//Display error message to the user if this is unavailable
 					try {
-						FastGraph g = launcher.loadFromBuffers(null,graph);
+						
+						String name = graph.getName();
+						String path = graph.getParent();							
+						
+						FastGraph g = launcher.loadFromBuffers(path+File.separatorChar+name, name);
 						status.setText("Loading Complete");
 				    	System.out.println("Maximum Degree: " + g.maximumDegree());
 				    	System.out.println("Degree Counts: " + Arrays.toString(g.countInstancesOfNodeDegrees(5)));
