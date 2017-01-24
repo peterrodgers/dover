@@ -48,13 +48,13 @@ public class ExactSubgraphIsomorphism {
 		FastGraph target = null;
 		FastGraph pattern = null;
 		try {
-//			target = FastGraph.loadBuffersGraphFactory(null, "soc-pokec-relationships-reduced");
+			target = FastGraph.loadBuffersGraphFactory(null, "soc-pokec-relationships-reduced");
 //			target = FastGraph.adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
 //			target = FastGraph.adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
 //			target = FastGraph.adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false);
 //			target = FastGraph.adjacencyListGraphFactory(1696415,11095298,null,"as-skitter.txt",false);
 //			target = FastGraph.adjacencyListGraphFactory(1632803,30622564,null,"soc-pokec-relationships.txt",false);
-			target = FastGraph.randomGraphFactory(1000, 10000, 123, false);
+//			target = FastGraph.randomGraphFactory(1000, 10000, 123, false);
 //			pattern = FastGraph.randomGraphFactory(subgraphNodes, subgraphEdges, 2222, true);
 		} catch(Exception e) {}
 		
@@ -144,7 +144,7 @@ public class ExactSubgraphIsomorphism {
 		target = FastGraph.displayGraphFactory(targetGraph,false);
 */
 		Graph patternGraph = new Graph("square with edge across");
-		Node nn0 = new Node("");
+		Node nn0 = new Node("David Martin");
 		patternGraph.addNode(nn0);
 		Node nn1 = new Node("");
 		patternGraph.addNode(nn1);
@@ -167,6 +167,10 @@ public class ExactSubgraphIsomorphism {
 //uk.ac.kent.displayGraph.display.GraphWindow gw1 = new uk.ac.kent.displayGraph.display.GraphWindow(patternGraph,true);
 //uk.ac.kent.displayGraph.display.GraphWindow gw2 = new uk.ac.kent.displayGraph.display.GraphWindow(targetGraph,true);
 		
+		Debugger.log("Target Number of nodes: " + target.getNumberOfNodes());
+		Debugger.log("Target Number of edges: " + target.getNumberOfEdges());
+		Debugger.log("Pattern Number of nodes: " + pattern.getNumberOfNodes());
+		Debugger.log("Pattern Number of edges: " + pattern.getNumberOfEdges());
 		
 		ExactSubgraphIsomorphism esi;
 		boolean result;
