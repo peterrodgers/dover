@@ -1,6 +1,8 @@
 package uk.ac.kent.dover.fastGraph;
 
 import java.nio.ByteBuffer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -387,5 +389,17 @@ public class Util {
 		}
 		toChooseFrom = null; //GC
 		return result;
+	}
+	
+	/**
+	 * Returns the current date as yyyyMMddHHmm
+	 * @return the current date
+	 */
+	public static String dateAsString() {
+		TimeZone tz = TimeZone.getTimeZone("UTC");
+		DateFormat df = new SimpleDateFormat("yyyyMMdd'_'HHmm"); // Quoted "Z" to indicate UTC, no timezone offset
+		df.setTimeZone(tz);
+		String nowAsISO = df.format(new Date());
+		return nowAsISO;
 	}
 }
