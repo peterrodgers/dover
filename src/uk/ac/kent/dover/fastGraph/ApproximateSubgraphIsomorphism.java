@@ -21,7 +21,7 @@ import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
  * @author Rob Baker
  *
  */
-public class InexactSubgraphIsomorphism {
+public class ApproximateSubgraphIsomorphism {
 
 	private FastGraph target, pattern;
 	private int patternNodes, subgraphsPerNode;
@@ -32,7 +32,7 @@ public class InexactSubgraphIsomorphism {
 	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
-		Debugger.enabled = true;		
+		Debugger.enabled = false;		
 		
 		FastGraph target = null;
 		FastGraph pattern = null;
@@ -46,7 +46,7 @@ public class InexactSubgraphIsomorphism {
 		} catch(Exception e) {}
 		Debugger.log("nodes in target graph: " + target.getNumberOfNodes());
 		Debugger.log("nodes in pattern graph: " + pattern.getNumberOfNodes());
-		InexactSubgraphIsomorphism isi = new InexactSubgraphIsomorphism(target, pattern, 6, 5);
+		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(target, pattern, 6, 5);
 		isi.subgraphIsomorphismFinder();
 	}
 	
@@ -57,7 +57,7 @@ public class InexactSubgraphIsomorphism {
 	 * @param pattern The pattern graph
 	 * @param patternNodes The number of nodes in the enumerated subgraphs
 	 */
-	public InexactSubgraphIsomorphism(FastGraph target, FastGraph pattern, int patternNodes) {
+	public ApproximateSubgraphIsomorphism(FastGraph target, FastGraph pattern, int patternNodes) {
 		this(target, pattern, patternNodes, 5);
 	}
 	
@@ -69,7 +69,7 @@ public class InexactSubgraphIsomorphism {
 	 * @param patternNodes The number of nodes in the enumerated subgraphs
 	 * @param subgraphsPerNode The number of subgraphs to generate per node.
 	 */
-	public InexactSubgraphIsomorphism(FastGraph target, FastGraph pattern, int patternNodes, int subgraphsPerNode) {
+	public ApproximateSubgraphIsomorphism(FastGraph target, FastGraph pattern, int patternNodes, int subgraphsPerNode) {
 		this.target = target;
 		this.pattern = pattern;
 		this.patternNodes = patternNodes;
@@ -77,14 +77,15 @@ public class InexactSubgraphIsomorphism {
 	}
 	
 	/**
-	 * Performs the inexact subgraph isomorphism
+	 * Performs the approximate subgraph isomorphism
 	 * @throws FileNotFoundException If the output file cannot be created
 	 * 
+	 * @return The number of subgraphs that match
 	 */
-	public void subgraphIsomorphismFinder() throws FileNotFoundException {
+	public int subgraphIsomorphismFinder() throws FileNotFoundException {
 		//don't want to generate potential subgraphs that are smaller than the pattern being searched for
 		if(patternNodes < pattern.getNumberOfNodes()) {
-			return;
+			return -1;
 		}		
 		
 		File mainDir = new File(
@@ -96,43 +97,64 @@ public class InexactSubgraphIsomorphism {
 		
 		Random r = new Random(target.getNodeBuf().getLong(0));
 		int count = 0;
+		long time = Debugger.createTime();
 		
 		for (int i = 0; i < target.getNumberOfNodes(); i++) {
+			
+			if(i % 10000 == 0) {
+				Debugger.outputTime("Completed node: " + i,time);
+			}
 			
 			//generate set of subgraphs
 			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(target);
 			HashSet<FastGraph> subs = new HashSet<FastGraph>();
 			esn.enumerateSubgraphsFromNode(patternNodes, subgraphsPerNode, 100, i, r, subs);
 			
-			Debugger.log("number of generated subs: " + subs.size());
+			count = testSubgraphs(subs, count, mainDir);
 			
-			//for each generated subgraph
-			for(FastGraph sub : subs) {
+			//Debugger.log("number of generated subs: " + subs.size());
+			
+			
+		}
+		
+		Debugger.log("number of found subs: " + count);
+		buildHtmlOutput(mainDir, count);
+		return count;
+	}
+	
+	/**
+	 * Tests the list of subgraphs
+	 * 
+	 * @param subs The potential subgraphs
+	 * @param count The number of subgraphs that match so far
+	 * @param mainDir The parent directory to save to
+	 * @return The number of subgraphs that match
+	 */
+	private int testSubgraphs(HashSet<FastGraph> subs, int count, File mainDir) {
+		//for each generated subgraph
+		for(FastGraph sub : subs) {
+			
+			//check isomorphism
+			ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(sub,pattern,null,null);
+			boolean result = esi.subgraphIsomorphismFinder();
+
+			if(result) {
+				LinkedList<SubgraphMapping> submaps = esi.getFoundMappings();
 				
-				//check isomorphism
-				ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(sub,pattern,null,null);
-				boolean result = esi.subgraphIsomorphismFinder();
-
-				if(result) {
-					LinkedList<SubgraphMapping> submaps = esi.getFoundMappings();
+				for(SubgraphMapping map : submaps) {
 					
-					for(SubgraphMapping map : submaps) {
-						
-						Debugger.log(map.toString());						
-						int[] nodeMapping = map.getNodeMapping();
-						int[] edgeMapping = map.getEdgeMapping();
-						FastGraph newSub = sub.generateGraphFromSubgraph(nodeMapping, edgeMapping);
-						
-						saveSubgraph(newSub, count, mainDir);
-						count++;
+					Debugger.log(map.toString());						
+					int[] nodeMapping = map.getNodeMapping();
+					int[] edgeMapping = map.getEdgeMapping();
+					FastGraph newSub = sub.generateGraphFromSubgraph(nodeMapping, edgeMapping);
+					
+					saveSubgraph(newSub, count, mainDir);
+					count++;
 
-					}
 				}
 			}
 		}
-		
-		buildHtmlOutput(mainDir, count);
-
+		return count;
 	}
 	
 	/**
