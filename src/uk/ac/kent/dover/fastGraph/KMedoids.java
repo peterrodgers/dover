@@ -57,6 +57,7 @@ public class KMedoids {
 			changed = false;
 			count++;
 			int[] assignment = assign(medoids, subgraphs);
+			Debugger.log("assignment complete");
 			changed = recalculateMedoids(assignment, medoids, output, subgraphs);
 
 		}
@@ -75,20 +76,12 @@ public class KMedoids {
 		
 		int[] out = new int[subgraphs.size()];
 		for (int i = 0; i < subgraphs.size(); i++) {
-			
-			Debugger.log("subgraphs");
-			Debugger.log(subgraphs.get(i));
-			subgraphs.get(i).displayFastGraph();
-			
-			Debugger.log("medoids 0");
-			Debugger.log(medoids.get(0));
-			
-			
-			double bestDistance = GedUtil.getGedScore(subgraphs.get(i), medoids.get(0));
+						
+			double bestDistance = comparisonScore(subgraphs.get(i), medoids.get(0));
 
 			int bestIndex = 0;
 			for (int j = 1; j < medoids.size(); j++) {
-				double tmpDistance = GedUtil.getGedScore(subgraphs.get(i), medoids.get(j));
+				double tmpDistance = comparisonScore(subgraphs.get(i), medoids.get(j));
 				if (tmpDistance < bestDistance) {
 					bestDistance = tmpDistance;
 					bestIndex = j;
@@ -115,7 +108,7 @@ public class KMedoids {
 		boolean changed = false;
 		
 		for (int i = 0; i < numberOfClusters; i++) {
-			output.set(i,new ArrayList<FastGraph>());
+			output.add(new ArrayList<FastGraph>());
 			for (int j = 0; j < assignment.length; j++) {
 				if (assignment[j] == i) {
 					output.get(i).add(subgraphs.get(j));
@@ -156,7 +149,7 @@ public class KMedoids {
 					continue;
 				}
 				
-				currentScore += GedUtil.getGedScore(g, h);
+				currentScore += comparisonScore(g, h);
 				
 			}
 			
@@ -178,10 +171,10 @@ public class KMedoids {
 	 */
 	private FastGraph findClosestGraph(FastGraph centroid, ArrayList<FastGraph> subgraphs) {
 		FastGraph closestGraph = null;
-		float bestScore = Float.POSITIVE_INFINITY;
+		double bestScore = Double.POSITIVE_INFINITY;
 		
 		for(FastGraph g : subgraphs) {
-			float currentScore = GedUtil.getGedScore(g, centroid);
+			double currentScore = comparisonScore(g, centroid);
 			
 			if(currentScore < bestScore) {
 				bestScore = currentScore;
@@ -192,6 +185,16 @@ public class KMedoids {
 		return closestGraph;
 	}
 	
-	
+	/**
+	 * Returns the comparison score of the two graphs. Normally, GED
+	 * @param g1 The first graph
+	 * @param g2 The second graph
+	 * @return The comparison score
+	 */
+	private double comparisonScore(FastGraph g1, FastGraph g2) {
+		return (g1.getNumberOfNodes() + g1.getNumberOfEdges()) - (g2.getNumberOfNodes() + g2.getNumberOfEdges());
+		
+		//return GedUtil.getGedScore(g1, g2);
+	}
 
 }
