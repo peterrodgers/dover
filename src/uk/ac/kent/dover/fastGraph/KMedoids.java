@@ -108,7 +108,12 @@ public class KMedoids {
 		boolean changed = false;
 		
 		for (int i = 0; i < numberOfClusters; i++) {
-			output.add(new ArrayList<FastGraph>());
+			if(output.size() > i) {
+				output.set(i, new ArrayList<FastGraph>());
+			} else {
+				output.add(new ArrayList<FastGraph>());
+			}			
+			
 			for (int j = 0; j < assignment.length; j++) {
 				if (assignment[j] == i) {
 					output.get(i).add(subgraphs.get(j));
@@ -192,7 +197,7 @@ public class KMedoids {
 	 * @return The comparison score
 	 */
 	private double comparisonScore(FastGraph g1, FastGraph g2) {
-		return (g1.getNumberOfNodes() + g1.getNumberOfEdges()) - (g2.getNumberOfNodes() + g2.getNumberOfEdges());
+		return (g1.getNumberOfNodes() + g1.getNumberOfEdges()) - (g2.getNumberOfNodes() + g2.getNumberOfEdges()); //placeholder
 		
 		//return GedUtil.getGedScore(g1, g2);
 	}
