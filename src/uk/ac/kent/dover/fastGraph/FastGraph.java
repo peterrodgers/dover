@@ -1,19 +1,19 @@
 package uk.ac.kent.dover.fastGraph;
 
 
-import java.awt.Point;
-import java.awt.event.KeyEvent;
-import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
-import java.util.*;
-
-import org.json.*;
-
+import org.cytoscape.gedevo.GedevoNativeUtil;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import uk.ac.kent.displayGraph.*;
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
-import uk.ac.kent.dover.fastGraph.ExactMotifFinder.IsoHolder;
-import uk.ac.kent.dover.fastGraph.Gui.MotifTaskDummy;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.*;
+import java.util.List;
 
 
 /**
@@ -114,7 +114,8 @@ public class FastGraph {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		
+		GedevoNativeUtil.initNativeLibs();
+
 		Debugger.enabled = true;
 		
 		long time = 0;
@@ -154,7 +155,7 @@ public class FastGraph {
 		Debugger.outputTime("saveBuffers test time ");
 		time = Debugger.createTime();
 */
-String name = "random-n-100-e-1000";
+String name = "random-n-8-e-9";
 //String name = "random-n-8-e-9";
 //String name = "as-skitter.txt";
 //String name = "soc-pokec-relationships.txt-reduced";
