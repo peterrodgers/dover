@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
@@ -13,7 +14,12 @@ import java.util.Random;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import uk.ac.kent.displayGraph.Edge;
+import uk.ac.kent.displayGraph.Graph;
+import uk.ac.kent.displayGraph.Node;
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
+import uk.ac.kent.dover.fastGraph.comparators.SimpleEdgeLabelComparator;
+import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
 
 /**
  * Class to perform the inexact subgraph isomorphism
@@ -25,6 +31,7 @@ public class ApproximateSubgraphIsomorphism {
 
 	private FastGraph target, pattern;
 	private int patternNodes, subgraphsPerNode;
+	private HashMap<String,Integer> uniqueSubgraphs = new HashMap<String,Integer>();
 	
 	/**
 	 * For informal testing when developing
@@ -32,22 +39,88 @@ public class ApproximateSubgraphIsomorphism {
 	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
-		Debugger.enabled = false;		
+		Debugger.enabled = true;		
 		
 		FastGraph target = null;
 		FastGraph pattern = null;
+	/*	
+		Graph patternGraph = new Graph("square with edge across");
+		Node nn0 = new Node("David Martin");
+		patternGraph.addNode(nn0);
+		Node nn1 = new Node("");
+		patternGraph.addNode(nn1);
+		Node nn2 = new Node("");
+		patternGraph.addNode(nn2);		
+		Node nn3 = new Node("");
+		patternGraph.addNode(nn3);		
+		Edge ee0 = new Edge(nn0,nn1,"");
+		patternGraph.addEdge(ee0);
+		Edge ee1 = new Edge(nn1,nn2,"");
+		patternGraph.addEdge(ee1);
+		Edge ee2 = new Edge(nn2,nn3,"");
+		patternGraph.addEdge(ee2);
+		Edge ee3 = new Edge(nn3,nn0,"");
+		patternGraph.addEdge(ee3);
+		Edge ee4 = new Edge(nn2,nn0,"");
+		patternGraph.addEdge(ee4);
+	*/
+		
+		/*	
+		Graph patternGraph = new Graph("4 clique");
+		Node nn0 = new Node("David Martin");
+		patternGraph.addNode(nn0);
+		Node nn1 = new Node("");
+		patternGraph.addNode(nn1);
+		Node nn2 = new Node("");
+		patternGraph.addNode(nn2);		
+		Node nn3 = new Node("");
+		patternGraph.addNode(nn3);		
+		Edge ee0 = new Edge(nn0,nn1,"");
+		patternGraph.addEdge(ee0);
+		Edge ee1 = new Edge(nn1,nn2,"");
+		patternGraph.addEdge(ee1);
+		Edge ee2 = new Edge(nn2,nn3,"");
+		patternGraph.addEdge(ee2);
+		Edge ee3 = new Edge(nn3,nn0,"");
+		patternGraph.addEdge(ee3);
+		Edge ee4 = new Edge(nn2,nn0,"");
+		patternGraph.addEdge(ee4);
+		Edge ee5 = new Edge(nn1,nn3,"");
+		patternGraph.addEdge(ee5);
+	*/
+
+		Graph patternGraph = new Graph("3 node straight line");
+		Node nn0 = new Node("Gary Cook");
+		patternGraph.addNode(nn0);
+		Node nn1 = new Node("");
+		patternGraph.addNode(nn1);
+		Node nn2 = new Node("");
+		patternGraph.addNode(nn2);			
+		Edge ee0 = new Edge(nn0,nn1,"");
+		patternGraph.addEdge(ee0);
+		Edge ee1 = new Edge(nn1,nn2,"");
+		patternGraph.addEdge(ee1);	
+
+
+	
+		pattern = FastGraph.displayGraphFactory(patternGraph,false);
+		
 		try {
-			//target = FastGraph.loadBuffersGraphFactory(null, "soc-pokec-relationships-reduced");
-			target = FastGraph.loadBuffersGraphFactory(null, "random-n-8-e-9");
+			target = FastGraph.loadBuffersGraphFactory(null, "simple-random-n-100-e-500");
+			//target = FastGraph.loadBuffersGraphFactory(null, "random-n-8-e-9");
 			
 			
-			pattern = FastGraph.loadBuffersGraphFactory(
-					Launcher.startingWorkingDirectory+File.separatorChar+"subgraphs"+File.separatorChar+"4line", "4line");
+			//pattern = FastGraph.loadBuffersGraphFactory(
+			//		Launcher.startingWorkingDirectory+File.separatorChar+"subgraphs"+File.separatorChar+"4line", "4line");
 		} catch(Exception e) {}
 		Debugger.log("nodes in target graph: " + target.getNumberOfNodes());
 		Debugger.log("nodes in pattern graph: " + pattern.getNumberOfNodes());
-		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(target, pattern, 6, 5);
+		Debugger.log("edges in pattern graph: " + pattern.getNumberOfEdges());
+
+		long time = Debugger.createTime();
+		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(target, pattern, 6, 30);
 		isi.subgraphIsomorphismFinder();
+		Debugger.outputTime("Completed in: ", time);
 	}
 	
 	/**
@@ -85,8 +158,11 @@ public class ApproximateSubgraphIsomorphism {
 	public int subgraphIsomorphismFinder() throws FileNotFoundException {
 		//don't want to generate potential subgraphs that are smaller than the pattern being searched for
 		if(patternNodes < pattern.getNumberOfNodes()) {
+			Debugger.log("error");
 			return -1;
 		}		
+		
+		int subgraphsTested = 0;
 		
 		File mainDir = new File(
 				Launcher.startingWorkingDirectory+File.separatorChar+"subgraph_results"+
@@ -100,9 +176,8 @@ public class ApproximateSubgraphIsomorphism {
 		long time = Debugger.createTime();
 		
 		for (int i = 0; i < target.getNumberOfNodes(); i++) {
-			
-			if(i % 10000 == 0) {
-				Debugger.outputTime("Completed node: " + i,time);
+			if(i % 50 == 0) {
+				Debugger.outputTime("Completed node: " + i + " Found subs: "+count,time);
 			}
 			
 			//generate set of subgraphs
@@ -110,13 +185,16 @@ public class ApproximateSubgraphIsomorphism {
 			HashSet<FastGraph> subs = new HashSet<FastGraph>();
 			esn.enumerateSubgraphsFromNode(patternNodes, subgraphsPerNode, 100, i, r, subs);
 			
+			subgraphsTested += subs.size();
+			
 			count = testSubgraphs(subs, count, mainDir);
 			
 			//Debugger.log("number of generated subs: " + subs.size());
-			
-			
+
 		}
 		
+		Debugger.log("number of tested subs: " + subgraphsTested);
+		Debugger.log("number of unique subs: " + uniqueSubgraphs.size());
 		Debugger.log("number of found subs: " + count);
 		buildHtmlOutput(mainDir, count);
 		return count;
@@ -135,7 +213,9 @@ public class ApproximateSubgraphIsomorphism {
 		for(FastGraph sub : subs) {
 			
 			//check isomorphism
-			ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(sub,pattern,null,null);
+			SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(sub, pattern);
+			SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(sub, pattern);
+			ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(sub,pattern,snlc,null);
 			boolean result = esi.subgraphIsomorphismFinder();
 
 			if(result) {
@@ -143,7 +223,7 @@ public class ApproximateSubgraphIsomorphism {
 				
 				for(SubgraphMapping map : submaps) {
 					
-					Debugger.log(map.toString());						
+					//Debugger.log(map.toString());						
 					int[] nodeMapping = map.getNodeMapping();
 					int[] edgeMapping = map.getEdgeMapping();
 					FastGraph newSub = sub.generateGraphFromSubgraph(nodeMapping, edgeMapping);
@@ -151,6 +231,14 @@ public class ApproximateSubgraphIsomorphism {
 					saveSubgraph(newSub, count, mainDir);
 					count++;
 
+					//add to unique list
+					String key = newSub.getNodeLabelString() + newSub.getEdgeLabelString();
+					if(uniqueSubgraphs.containsKey(key)) {
+						uniqueSubgraphs.put(key, uniqueSubgraphs.get(key)+1);
+					} else {
+						uniqueSubgraphs.put(key,1);
+					}
+					
 				}
 			}
 		}
