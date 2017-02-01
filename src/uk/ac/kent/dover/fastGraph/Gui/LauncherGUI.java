@@ -98,20 +98,24 @@ public class LauncherGUI extends JFrame {
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
 		JPanel subgraphPanel = buildSubgraphTab(progressBar, statusBar, targetChooser);
-		tabbedPane.addTab("Subgraph", subgraphPanel);
-		tabbedPane.setMnemonicAt(0, KeyEvent.VK_2);
+		tabbedPane.addTab("Exact Subgraph", subgraphPanel);
+		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
+		
+		JPanel approxSubgraphPanel = buildApproximateSubgraphTab(progressBar, statusBar, targetChooser);
+		tabbedPane.addTab("Approximate Subgraph", approxSubgraphPanel);
+		tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
 
 		JPanel convertPanel = buildConvertTab(progressBar, statusBar);
 		tabbedPane.addTab("Convert Graph", convertPanel);
-		tabbedPane.setMnemonicAt(0, KeyEvent.VK_3);
+		tabbedPane.setMnemonicAt(3, KeyEvent.VK_4);
 
 		JPanel otherPanel = buildOtherTab(progressBar, statusBar, targetChooser);
 		tabbedPane.addTab("Others", otherPanel);
-		tabbedPane.setMnemonicAt(0, KeyEvent.VK_4);
+		tabbedPane.setMnemonicAt(4, KeyEvent.VK_5);
 
 		JPanel gedPanel = buildGedTab(progressBar, statusBar, targetChooser);
 		tabbedPane.addTab("GED", gedPanel);
-		tabbedPane.setMnemonicAt(0, KeyEvent.VK_5);
+		tabbedPane.setMnemonicAt(5, KeyEvent.VK_6);
 
 		blackline = BorderFactory.createLineBorder(Color.black);
 		titled = BorderFactory.createTitledBorder(blackline, "Task");
@@ -131,8 +135,8 @@ public class LauncherGUI extends JFrame {
 		setTitle("Dover");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		windowWidth = (int) Math.round(screenHeight/3);
-		windowHeight = (int) Math.round(screenHeight/3);
+		windowWidth = (int) Math.round(screenHeight/2.5);
+		windowHeight = (int) Math.round(screenHeight/2.5);
 		mainPanel.setPreferredSize(new Dimension(windowWidth,windowHeight)); //makes a square window
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new ClosingWindowListener(false,this,this,(JLabel) statusBar.getComponent(0)));
@@ -420,7 +424,6 @@ public class LauncherGUI extends JFrame {
 	    
 		JButton openBtn = new JButton("Open File...");
 		
-		
 		JLabel fileLabel = new JLabel("No file selected  ");
 		fileLabel.setFont(new Font(fileLabel.getFont().getFontName(), Font.ITALIC, fileLabel.getFont().getSize()));
 		
@@ -482,6 +485,147 @@ public class LauncherGUI extends JFrame {
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridy = 4;
+		c.gridwidth = 2;
+		subgraphPanel.add(findBtn, c);
+		
+		return subgraphPanel;
+	}
+	
+	/**
+	 * Builds the Panel used to house the GUI elements for the Pattern Tab
+	 * @param progressBar The progress bar to update
+	 * @param statusBar The status bar to update
+	 * @param targetChooser The chooser for the target graph
+	 * @return The Pattern Tab
+	 */
+	private JPanel buildApproximateSubgraphTab(JProgressBar progressBar, JPanel statusBar, JFileChooser targetChooser) {
+		JLabel status = (JLabel) statusBar.getComponent(0);
+		FastGraph subgraph = null;
+		
+		JPanel subgraphPanel = new JPanel(new GridBagLayout());
+		
+		JLabel subgraphLabel = new JLabel("Find subgraphs in main graph", SwingConstants.CENTER);		
+
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new java.io.File("."));
+		fileChooser.setDialogTitle("Select subgraph directory");
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	    
+		JButton openBtn = new JButton("Open File...");
+		
+		JLabel fileLabel = new JLabel("No file selected  ");
+		fileLabel.setFont(new Font(fileLabel.getFont().getFontName(), Font.ITALIC, fileLabel.getFont().getSize()));
+		
+		//The action for when the user chooses a file
+		openBtn.addActionListener(new LoadFileActionListener(status, fileLabel, fileChooser, subgraphPanel, openBtn));
+		
+		JButton addBtn = new JButton("Create");	
+		addBtn.addActionListener(new CreateGraphActionListener(this, fileChooser, subgraphPanel, subgraph, fileLabel, status));
+		
+		JButton editBtn = new JButton("Edit");
+		editBtn.addActionListener(new CreateGraphActionListener(this, fileChooser, subgraphPanel, subgraph, fileLabel, status));
+		
+		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
+		
+		JLabel tuningLabel = new JLabel("Tuning parameters:", SwingConstants.CENTER);			
+		
+		JLabel patternNodesLabel = new JLabel("Number of Nodes in Subgraphs:");
+		JTextField patternNodesField = new JTextField(12);
+		String patternNodesTip = "The number of nodes in generated subgraphs";
+		patternNodesLabel.setToolTipText(patternNodesTip);
+		patternNodesField.setToolTipText(patternNodesTip);
+		
+		JLabel subgraphsPerNodeLabel = new JLabel("Number of Subgraphs per Node:");
+		JTextField subgraphsPerNodeField = new JTextField(12);
+		String subgraphsPerNodeTip = "The number of subgraphs generated for each node in the target graph";
+		subgraphsPerNodeLabel.setToolTipText(subgraphsPerNodeTip);
+		subgraphsPerNodeField.setToolTipText(subgraphsPerNodeTip);
+		
+		JSeparator sep2 = new JSeparator(SwingConstants.HORIZONTAL);
+		
+		JButton findBtn = new JButton("Find subgraphs");
+		findBtn.addActionListener(new FindApproximateSubgraphsActionListener(targetChooser, progressBar, status, launcher, subgraphPanel, 
+				fileChooser, subgraph, patternNodesField, subgraphsPerNodeField, this));
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(2,2,2,2);
+		c.fill = GridBagConstraints.HORIZONTAL;
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 2;
+		subgraphPanel.add(subgraphLabel, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 1;
+		c.gridx = 0;
+		c.gridy = 1;
+		subgraphPanel.add(openBtn, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 1;
+		c.gridy = 1;
+		c.gridwidth = 1;
+		subgraphPanel.add(fileLabel, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 1;
+		c.gridx = 0;
+		c.gridy = 2;
+		subgraphPanel.add(editBtn, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 1;
+		c.gridy = 2;
+		c.gridwidth = 1;
+		subgraphPanel.add(addBtn, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 3;
+		c.gridwidth = 2;
+		subgraphPanel.add(sep, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 4;
+		c.gridwidth = 2;
+		subgraphPanel.add(tuningLabel, c);		
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 5;
+		c.gridwidth = 1;
+		subgraphPanel.add(patternNodesLabel, c);	
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 1;
+		c.gridy = 5;
+		c.gridwidth = 1;
+		subgraphPanel.add(patternNodesField, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 6;
+		c.gridwidth = 1;
+		subgraphPanel.add(subgraphsPerNodeLabel, c);	
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 1;
+		c.gridy = 6;
+		c.gridwidth = 1;
+		subgraphPanel.add(subgraphsPerNodeField, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 7;
+		c.gridwidth = 2;
+		subgraphPanel.add(sep2, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 8;
 		c.gridwidth = 2;
 		subgraphPanel.add(findBtn, c);
 		

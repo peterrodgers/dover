@@ -27,7 +27,7 @@ import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
  * @author Rob Baker
  *
  */
-public class ApproximateSubgraphIsomorphism {
+public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 
 	private FastGraph target, pattern;
 	private int patternNodes, subgraphsPerNode;
@@ -196,7 +196,7 @@ public class ApproximateSubgraphIsomorphism {
 		Debugger.log("number of tested subs: " + subgraphsTested);
 		Debugger.log("number of unique subs: " + uniqueSubgraphs.size());
 		Debugger.log("number of found subs: " + count);
-		buildHtmlOutput(mainDir, count);
+		buildHtmlOutput(target, mainDir, count);
 		return count;
 	}
 	
@@ -228,7 +228,7 @@ public class ApproximateSubgraphIsomorphism {
 					int[] edgeMapping = map.getEdgeMapping();
 					FastGraph newSub = sub.generateGraphFromSubgraph(nodeMapping, edgeMapping);
 					
-					saveSubgraph(newSub, count, mainDir);
+					saveSubgraph(target, newSub, count, mainDir);
 					count++;
 
 					//add to unique list
@@ -245,66 +245,7 @@ public class ApproximateSubgraphIsomorphism {
 		return count;
 	}
 	
-	/**
-	 * Saves the given subgraph into the relevant folder with the key of count
-	 * @param sub The FastGraph to save
-	 * @param count The number of this FastGraph
-	 * @param mainDir The parent directory to save to
-	 */
-	private void saveSubgraph(FastGraph sub, int count, File mainDir) {
-		//save graph
-		File dir = new File(mainDir.getAbsolutePath()+File.separatorChar+count);
-		dir.mkdir();
-		sub.saveBuffers(mainDir.getAbsolutePath()+File.separatorChar+count, target.getName());
-		
-		//save SVG
-		uk.ac.kent.displayGraph.Graph dg = sub.generateDisplayGraph();
-		dg.randomizeNodePoints(new Point(20,20),300,300);
-		uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg, false);
-		uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
-		GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
-		se.setAnimateFlag(false);
-		se.setIterations(100);
-		se.setTimeLimit(200);
-		se.setGraphPanel(gw.getGraphPanel());
-		se.layout();
-		File saveLocation = null;
-		saveLocation = new File(mainDir.getAbsolutePath()+File.separatorChar+count+File.separatorChar+"subgraph.svg");
-		uk.ac.kent.displayGraph.ExportSVG exSVG = new uk.ac.kent.displayGraph.ExportSVG(dg);
-		exSVG.saveGraph(saveLocation);
-		
-	}
-	
-	/**
-	 * Exports the results to a HTML file
-	 * 
-	 * @param mainDir The parent directory
-	 * @param count The number of results
-	 * @throws FileNotFoundException If the output file cannot be created
-	 */
-	private void buildHtmlOutput(File mainDir, int count) throws FileNotFoundException {
-		Document doc = Document.createShell("");
-		
-		doc.head().appendElement("title").text(target.getName());
 
-		Element headline = doc.body().appendElement("h1").text(target.getName());
-		
-		Element pageNumberHeader = doc.body().appendElement("h2").text("Inexact Subgraph Isomorphism");
-		
-		//size
-		Element linksDiv = doc.body().appendElement("div");
-		linksDiv.appendText("Subgraphs found: ");
-		for(int i = 0; i < count; i++) {		
-			linksDiv.appendElement("a").text(i+"").attr("href", i+"/subgraph.svg");
-		}
-		
-		File output = new File(mainDir.getAbsolutePath()+File.separatorChar+"index.html");
-		//save the output html file
-		
-		try(PrintWriter out = new PrintWriter( output )){ //will close file after use
-		    out.println( doc.toString() );
-		}
-	}
 	
 	
 }

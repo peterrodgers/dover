@@ -16,7 +16,7 @@ import uk.ac.kent.dover.fastGraph.Launcher;
  * @author Rob Baker
  *
  */
-public class FindSubgraphsActionListener implements ActionListener {
+public class FindApproximateSubgraphsActionListener implements ActionListener {
 
 	private JFileChooser targetChooser;
 	private JProgressBar progressBar;
@@ -25,6 +25,8 @@ public class FindSubgraphsActionListener implements ActionListener {
 	private JPanel subgraphPanel;
 	private JFileChooser fileChooser;
 	private FastGraph subgraph;
+	private JTextField patternNodesField, subgraphsPerNodeField;
+	private LauncherGUI launcherGui;
 	
 	/**
 	 * Trivial constructor
@@ -37,8 +39,9 @@ public class FindSubgraphsActionListener implements ActionListener {
 	 * @param fileChooser The filechooser for a user to select a subgraph
 	 * @param subgraph If the've created or edited one, it will be here
 	 */
-	public FindSubgraphsActionListener(JFileChooser targetChooser, JProgressBar progressBar, JLabel status, Launcher launcher,
-			JPanel subgraphPanel, JFileChooser fileChooser, FastGraph subgraph) {
+	public FindApproximateSubgraphsActionListener(JFileChooser targetChooser, JProgressBar progressBar, JLabel status, Launcher launcher,
+			JPanel subgraphPanel, JFileChooser fileChooser, FastGraph subgraph, 
+			JTextField patternNodesField, JTextField subgraphsPerNodeField, LauncherGUI launcherGui) {
 		this.targetChooser = targetChooser;
 		this.progressBar = progressBar;
 		this.status = status;
@@ -46,6 +49,9 @@ public class FindSubgraphsActionListener implements ActionListener {
 		this.subgraphPanel = subgraphPanel;
 		this.fileChooser = fileChooser;
 		this.subgraph = subgraph;
+		this.patternNodesField = patternNodesField;
+		this.subgraphsPerNodeField = subgraphsPerNodeField;
+		this.launcherGui = launcherGui;
 	}
 
 	@Override
@@ -94,13 +100,11 @@ public class FindSubgraphsActionListener implements ActionListener {
 						FastGraph g = launcher.loadFromBuffers(path+File.separatorChar+name, name);
 						
 						status.setText("Finding subgraphs");
-
-						//System.out.println("Finding subgraphs!");
-
-						//System.out.println("Main graph nodes:" + g.getNumberOfNodes());
-						//System.out.println("Subgraph nodes:" + subgraph.getNumberOfNodes());
 						
-						launcher.exactSubgraphs(g, subgraph);
+						int patternNodes = launcherGui.checkForPositiveInteger(patternNodesField.getText(),subgraphPanel);
+						int subgraphsPerNode = launcherGui.checkForPositiveInteger(subgraphsPerNodeField.getText(),subgraphPanel);
+						
+						launcher.approximateSubgraphs(g, subgraph, patternNodes, subgraphsPerNode);
 				    	
 				    	//stop the Progress Bar
 				    	progressBar.setIndeterminate(false);
@@ -127,3 +131,4 @@ public class FindSubgraphsActionListener implements ActionListener {
 	}
 
 }
+

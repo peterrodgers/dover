@@ -3677,4 +3677,30 @@ Debugger.outputTime("time for rewiring");
 		return Arrays.toString(output);
 	}
 	
+	/**
+	 * Do any of the nodes have a label?
+	 * @return if any nodes have a label
+	 */
+	public boolean isAnyNodesLabelled() {
+		for(int i = 0; i < this.getNumberOfNodes(); i++) {
+			if(!this.getNodeLabel(i).equals("")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Do any of the Edges have a label?
+	 * @return if any Edges have a label
+	 */
+	public boolean isAnyEdgesLabelled() {
+		for(int i = 0; i < this.getNumberOfEdges(); i++) {
+			if(!this.getEdgeLabel(i).equals("")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 }

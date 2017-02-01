@@ -1,11 +1,16 @@
 package uk.ac.kent.dover.fastGraph;
 
+import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
 import uk.ac.kent.displayGraph.Edge;
 import uk.ac.kent.displayGraph.Graph;
 import uk.ac.kent.displayGraph.Node;
+import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
 import uk.ac.kent.dover.fastGraph.comparators.*;
 
 /**
@@ -14,7 +19,7 @@ import uk.ac.kent.dover.fastGraph.comparators.*;
  * @author Peter Rodgers
  *
  */
-public class ExactSubgraphIsomorphism {
+public class ExactSubgraphIsomorphism extends SubgraphIsomorphism{
 
 	private FastGraph targetGraph;
 	private FastGraph patternGraph;
@@ -564,7 +569,29 @@ Debugger.log();
 		
 	}
 
-
+	/**
+	 * Output the results of this subgraph finder
+	 * @throws FileNotFoundException 
+	 */
+	public void outputResults() throws FileNotFoundException {
+		File mainDir = new File(
+				Launcher.startingWorkingDirectory+File.separatorChar+"subgraph_results"+
+				File.separatorChar+targetGraph.getName()+"_"+Util.dateAsString()
+			);
+		mainDir.mkdirs(); //make directory
+		int count = 0;
+		for(SubgraphMapping map : foundMappings) {
+			
+			//Debugger.log(map.toString());						
+			int[] nodeMapping = map.getNodeMapping();
+			int[] edgeMapping = map.getEdgeMapping();
+			FastGraph newSub = targetGraph.generateGraphFromSubgraph(nodeMapping, edgeMapping);
+			saveSubgraph(targetGraph, newSub, count, mainDir);
+			
+			count++;
+		}
+		buildHtmlOutput(targetGraph, mainDir, count);
+	}
 
 
 	/**
@@ -585,10 +612,5 @@ Debugger.log();
 	        return length1.compareTo(length2);
 	    }
 	}
-	
-
-	
-
-
 
 }
