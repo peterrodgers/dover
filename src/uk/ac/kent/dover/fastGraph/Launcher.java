@@ -1,15 +1,12 @@
 package uk.ac.kent.dover.fastGraph;
 
 import org.cytoscape.gedevo.GedevoNativeUtil;
-import uk.ac.kent.dover.fastGraph.ExactMotifFinder.IsoHolder;
 import uk.ac.kent.dover.fastGraph.Gui.LauncherGUI;
 import uk.ac.kent.dover.fastGraph.Gui.MotifTask;
-import uk.ac.kent.dover.fastGraph.comparators.AlwaysTrueEdgeComparator;
-import uk.ac.kent.dover.fastGraph.comparators.AlwaysTrueNodeComparator;
+import uk.ac.kent.dover.fastGraph.comparators.*;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
 
 /**
  * Main class from which all the other functionality is called.
@@ -127,18 +124,45 @@ public class Launcher {
 	}
 	
 	/**
-	 * Calls the method to find all subgraphs
+	 * Calls the method to find subgraphs using the exact subgraph finder
 	 * 
 	 * @param targetGraph The graph to search in
 	 * @param patternGraph The subgraph to find
+	 * @throws FileNotFoundException If the output file cannot be saved
 	 */
-	public void findSubgraphMappings(FastGraph targetGraph, FastGraph patternGraph) {
-		//AlwaysTrueNodeComparator atnc = new AlwaysTrueNodeComparator(targetGraph, patternGraph);
-		//AlwaysTrueEdgeComparator atec = new AlwaysTrueEdgeComparator(targetGraph, patternGraph);
-		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(targetGraph, patternGraph, null, null);
+	public void exactSubgraphs(FastGraph targetGraph, FastGraph patternGraph) throws FileNotFoundException {
+		
+		NodeComparator nc = null;
+		if(patternGraph.isAnyNodesLabelled()) {
+			System.out.println("node labelled");
+			nc = new SimpleNodeLabelComparator(targetGraph, patternGraph);
+		}
+		EdgeComparator ec = null;
+		if(patternGraph.isAnyEdgesLabelled()) {
+			System.out.println("edge labelled");
+			ec = new SimpleEdgeLabelComparator(targetGraph, patternGraph);
+		}
+
+		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(targetGraph, patternGraph, nc, ec);
 		boolean result = esi.subgraphIsomorphismFinder();
-		System.out.println("result:" + result);
-		System.out.println(esi.getFoundMappings());
+		esi.outputResults();
+		//System.out.println("result:" + result);
+		//System.out.println(esi.getFoundMappings());
 		esi = null; //GC
+	}
+	
+	/**
+	 * Calls the method to find subgraphs using the approximate subgraph finder
+	 * 
+	 * @param targetGraph The graph to search in
+	 * @param patternGraph The subgraph to find
+	 * @throws FileNotFoundException If the output file cannot be saved
+	 */
+	public void approximateSubgraphs(FastGraph targetGraph, FastGraph patternGraph,
+			int patternNodes, int subgraphsPerNode) throws FileNotFoundException {
+
+		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(targetGraph, patternGraph, 6, 30);
+		isi.subgraphIsomorphismFinder();
+		isi = null; //GC
 	}
 }
