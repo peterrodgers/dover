@@ -81,7 +81,6 @@ public class GedUtil {
 
 		float gedScore = instance.overallGed();
 
-		instance.shutdown();
 		return gedScore;
 	}
 
@@ -106,6 +105,7 @@ public class GedUtil {
 		instance.importNetwork(g2Network, 1);
 
 		Float gedScore = calculateScore(instance);
+		instance.shutdown();
 
 		return gedScore;
 	}

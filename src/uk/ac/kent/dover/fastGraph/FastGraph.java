@@ -1,19 +1,19 @@
 package uk.ac.kent.dover.fastGraph;
 
 
-import java.awt.Point;
-import java.awt.event.KeyEvent;
-import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
-import java.util.*;
-
-import org.json.*;
-
+import org.cytoscape.gedevo.GedevoNativeUtil;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import uk.ac.kent.displayGraph.*;
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
-import uk.ac.kent.dover.fastGraph.ExactMotifFinder.IsoHolder;
-import uk.ac.kent.dover.fastGraph.Gui.MotifTaskDummy;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.*;
+import java.util.List;
 
 
 /**
@@ -114,7 +114,8 @@ public class FastGraph {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		
+		GedevoNativeUtil.initNativeLibs();
+
 		Debugger.enabled = true;
 		
 		long time = 0;
@@ -185,7 +186,7 @@ String name = "simple-random-n-100-e-500";
 			emf.findAllMotifs(0,4,6);
 			emf.compareMotifDatas(4,6);
 	*/
-			/*
+
 			KMedoids km = new KMedoids(g2, 5, 100);
 			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g2);
 			HashSet<FastGraph> subs = esn.enumerateSubgraphs(4, 2, 10);
@@ -197,7 +198,7 @@ String name = "simple-random-n-100-e-500";
 			for(ArrayList<FastGraph> cluster : clusters) {
 				System.out.println("Cluster size: " + cluster.size());
 			}
-			*/
+
 			//emf.findAndExportAllMotifs(10, 4, 4, 0, true);
 			//emf.findAndExportAllMotifs(0, 4, 4, 0, false);
 			//emf.compareAndExportResults();
