@@ -1,19 +1,19 @@
 package uk.ac.kent.dover.fastGraph;
 
 
-import org.cytoscape.gedevo.GedevoNativeUtil;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import uk.ac.kent.displayGraph.*;
-import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
-
-import java.awt.*;
+import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+import java.nio.*;
+import java.nio.channels.*;
 import java.util.*;
-import java.util.List;
+
+import org.json.*;
+
+import uk.ac.kent.displayGraph.*;
+import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
+import uk.ac.kent.dover.fastGraph.ExactMotifFinder.IsoHolder;
+import uk.ac.kent.dover.fastGraph.Gui.MotifTaskDummy;
 
 
 /**
@@ -114,18 +114,20 @@ public class FastGraph {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		GedevoNativeUtil.initNativeLibs();
-
+		
 		Debugger.enabled = true;
 		
 		long time = 0;
-		
 		
 //		FastGraph g1 = randomGraphFactory(1,0,false);
 //		FastGraph g1 = randomGraphFactory(2,1,false);
 //		FastGraph g1 = randomGraphFactory(5,6,1,true);
 //		FastGraph g1 = randomGraphFactory(8,9,1,false);
-//		FastGraph g1 = randomGraphFactory(10,50,1,false);
+		FastGraph g1 = randomGraphFactory(100,500,1,true,false);
+		g1.relabelFastGraph(g1.getNumberOfNodes()/10);
+		g1.setName("simple-random-n-100-e-500");
+		g1.saveBuffers(null,"simple-random-n-100-e-500");
+		
 /*		for (int i = 0 ; i<10; i++) {
 			FastGraph g = randomGraphFactory(100, 1000, 1, false); // 1 hundred nodes, 1 thousand edges
 			g.saveBuffers("test" + i, g.getName());
@@ -155,7 +157,7 @@ public class FastGraph {
 		Debugger.outputTime("saveBuffers test time ");
 		time = Debugger.createTime();
 */
-String name = "random-n-8-e-9";
+String name = "simple-random-n-100-e-500";
 //String name = "random-n-8-e-9";
 //String name = "as-skitter.txt";
 //String name = "soc-pokec-relationships.txt-reduced";
@@ -172,12 +174,18 @@ String name = "random-n-8-e-9";
 
 			Debugger.log("Number of nodes: " + g2.getNumberOfNodes());
 			Debugger.log("Number of edges: " + g2.getNumberOfEdges());
+			
+			for(int i = 0; i < g2.getNumberOfNodes(); i++) {
+				System.out.println(g2.getNodeLabel(i));
+			}
+			
 		/*	
 			ExactMotifFinder emf = new ExactMotifFinder(g2, new MotifTaskDummy(), true);
 			emf.findAllMotifs(10,4,6);
 			emf.findAllMotifs(0,4,6);
 			emf.compareMotifDatas(4,6);
 	*/
+			/*
 			KMedoids km = new KMedoids(g2, 5, 100);
 			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g2);
 			HashSet<FastGraph> subs = esn.enumerateSubgraphs(4, 2, 10);
@@ -189,7 +197,7 @@ String name = "random-n-8-e-9";
 			for(ArrayList<FastGraph> cluster : clusters) {
 				System.out.println("Cluster size: " + cluster.size());
 			}
-			
+			*/
 			//emf.findAndExportAllMotifs(10, 4, 4, 0, true);
 			//emf.findAndExportAllMotifs(0, 4, 4, 0, false);
 			//emf.compareAndExportResults();
@@ -3640,7 +3648,59 @@ Debugger.outputTime("time for rewiring");
 		se.setGraphPanel(gw.getGraphPanel());
 		se.layout();
 	}
+	
+	/**
+	 * Gets a big string of the node labels.
+	 * Useful for identifying unique subgraphs/motifs
+	 * @return a big string of the node labels
+	 */
+	public String getNodeLabelString() {
+		String[] output = new String[this.getNumberOfNodes()];
+		for(int i = 0; i < this.getNumberOfNodes(); i++) {
+			output[i] = this.getNodeLabel(i);
+		}
+		Arrays.sort(output);
+		return Arrays.toString(output);
+	}
 
-
+	/**
+	 * Gets a big string of the edge labels.
+	 * Useful for identifying unique subgraphs/motifs
+	 * @return a big string of the edge labels
+	 */
+	public String getEdgeLabelString() {
+		String[] output = new String[this.getNumberOfEdges()];
+		for(int i = 0; i < this.getNumberOfEdges(); i++) {
+			output[i] =  this.getEdgeLabel(i);
+		}
+		Arrays.sort(output);
+		return Arrays.toString(output);
+	}
+	
+	/**
+	 * Do any of the nodes have a label?
+	 * @return if any nodes have a label
+	 */
+	public boolean isAnyNodesLabelled() {
+		for(int i = 0; i < this.getNumberOfNodes(); i++) {
+			if(!this.getNodeLabel(i).equals("")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Do any of the Edges have a label?
+	 * @return if any Edges have a label
+	 */
+	public boolean isAnyEdgesLabelled() {
+		for(int i = 0; i < this.getNumberOfEdges(); i++) {
+			if(!this.getEdgeLabel(i).equals("")) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 }

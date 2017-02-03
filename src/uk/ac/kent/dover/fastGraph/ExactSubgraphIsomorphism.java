@@ -1,11 +1,16 @@
 package uk.ac.kent.dover.fastGraph;
 
+import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
 import uk.ac.kent.displayGraph.Edge;
 import uk.ac.kent.displayGraph.Graph;
 import uk.ac.kent.displayGraph.Node;
+import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
 import uk.ac.kent.dover.fastGraph.comparators.*;
 
 /**
@@ -14,7 +19,7 @@ import uk.ac.kent.dover.fastGraph.comparators.*;
  * @author Peter Rodgers
  *
  */
-public class ExactSubgraphIsomorphism {
+public class ExactSubgraphIsomorphism extends SubgraphIsomorphism{
 
 	private FastGraph targetGraph;
 	private FastGraph patternGraph;
@@ -48,7 +53,8 @@ public class ExactSubgraphIsomorphism {
 		FastGraph target = null;
 		FastGraph pattern = null;
 		try {
-			target = FastGraph.loadBuffersGraphFactory(null, "soc-pokec-relationships-reduced");
+			target = FastGraph.loadBuffersGraphFactory(null, "simple-random-n-100-e-500");
+		//target = FastGraph.loadBuffersGraphFactory(null, "soc-pokec-relationships-reduced");
 //			target = FastGraph.adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
 //			target = FastGraph.adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
 //			target = FastGraph.adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false);
@@ -143,7 +149,7 @@ public class ExactSubgraphIsomorphism {
 		targetGraph.addEdge(e2);
 		target = FastGraph.displayGraphFactory(targetGraph,false);
 */
-		Graph patternGraph = new Graph("square with edge across");
+/*		Graph patternGraph = new Graph("square with edge across");
 		Node nn0 = new Node("David Martin");
 		patternGraph.addNode(nn0);
 		Node nn1 = new Node("");
@@ -163,9 +169,23 @@ public class ExactSubgraphIsomorphism {
 		Edge ee4 = new Edge(nn2,nn0,"");
 		patternGraph.addEdge(ee4);
 		pattern = FastGraph.displayGraphFactory(patternGraph,false);
-		
+	*/	
 //uk.ac.kent.displayGraph.display.GraphWindow gw1 = new uk.ac.kent.displayGraph.display.GraphWindow(patternGraph,true);
 //uk.ac.kent.displayGraph.display.GraphWindow gw2 = new uk.ac.kent.displayGraph.display.GraphWindow(targetGraph,true);
+		
+		Graph patternGraph = new Graph("3 node straight line");
+		Node nn0 = new Node("Gary Cook");
+		patternGraph.addNode(nn0);
+		Node nn1 = new Node("");
+		patternGraph.addNode(nn1);
+		Node nn2 = new Node("");
+		patternGraph.addNode(nn2);			
+		Edge ee0 = new Edge(nn0,nn1,"");
+		patternGraph.addEdge(ee0);
+		Edge ee1 = new Edge(nn1,nn2,"");
+		patternGraph.addEdge(ee1);	
+
+		pattern = FastGraph.displayGraphFactory(patternGraph,false);		
 		
 		Debugger.log("Target Number of nodes: " + target.getNumberOfNodes());
 		Debugger.log("Target Number of edges: " + target.getNumberOfEdges());
@@ -177,7 +197,7 @@ public class ExactSubgraphIsomorphism {
 		
 		SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(target, pattern);
 		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
-		esi = new ExactSubgraphIsomorphism(target, pattern, snlc, selc);
+		esi = new ExactSubgraphIsomorphism(target, pattern, snlc, null);
 Debugger.resetTime();
 		result = esi.subgraphIsomorphismFinder();
 Debugger.outputTime("time for subgraph isomorphism");
@@ -187,7 +207,28 @@ Debugger.outputTime("time for subgraph isomorphism");
 		esi = new ExactSubgraphIsomorphism(target, pattern, nc, ec);
 		result = esi.subGraphIsomorphismFinder();
 */
-		System.out.println("number of mappings found "+esi.getFoundMappings().size());
+		long time = Debugger.createTime();
+		HashMap<String,Integer> uniqueSubgraphs = new HashMap<String,Integer>();
+		LinkedList<SubgraphMapping> submaps = esi.getFoundMappings();
+		for(SubgraphMapping map : submaps) {
+			
+			//Debugger.log(map.toString());						
+			int[] nodeMapping = map.getNodeMapping();
+			int[] edgeMapping = map.getEdgeMapping();
+			FastGraph newSub = target.generateGraphFromSubgraph(nodeMapping, edgeMapping);
+
+			//add to unique list
+			String key = newSub.getNodeLabelString() + newSub.getEdgeLabelString();
+			if(uniqueSubgraphs.containsKey(key)) {
+				uniqueSubgraphs.put(key, uniqueSubgraphs.get(key)+1);
+			} else {
+				uniqueSubgraphs.put(key,1);
+			}
+			
+		}
+		System.out.println("number of mappings found "+submaps.size());
+		Debugger.log("number of unique subs: " + uniqueSubgraphs.size());
+		Debugger.outputTime("Time to complete: ", time);
 		
 //Debugger.log(result);
 /*
@@ -528,7 +569,29 @@ Debugger.log();
 		
 	}
 
-
+	/**
+	 * Output the results of this subgraph finder
+	 * @throws FileNotFoundException 
+	 */
+	public void outputResults() throws FileNotFoundException {
+		File mainDir = new File(
+				Launcher.startingWorkingDirectory+File.separatorChar+"subgraph_results"+
+				File.separatorChar+targetGraph.getName()+"_"+Util.dateAsString()
+			);
+		mainDir.mkdirs(); //make directory
+		int count = 0;
+		for(SubgraphMapping map : foundMappings) {
+			
+			//Debugger.log(map.toString());						
+			int[] nodeMapping = map.getNodeMapping();
+			int[] edgeMapping = map.getEdgeMapping();
+			FastGraph newSub = targetGraph.generateGraphFromSubgraph(nodeMapping, edgeMapping);
+			saveSubgraph(targetGraph, newSub, count, mainDir);
+			
+			count++;
+		}
+		buildHtmlOutput(targetGraph, mainDir, count);
+	}
 
 
 	/**
@@ -549,10 +612,5 @@ Debugger.log();
 	        return length1.compareTo(length2);
 	    }
 	}
-	
-
-	
-
-
 
 }

@@ -354,7 +354,7 @@ public class Util {
 		}
 		double result = 0;
 		for(int i = 0; i < array.size(); i++) {
-			result += Math.pow(((double) array.get(i)) - mean, 2);
+			result += Math.pow(((Double) array.get(i)) - mean, 2);
 		}
 		result = result / (array.size()-1); //variance
 		return Math.sqrt(result);
