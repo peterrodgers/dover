@@ -91,7 +91,7 @@ public class LauncherGUI extends JFrame {
 		statusArea.add(statusBar, BorderLayout.SOUTH);
 
 		// Builds the Tabbed area
-		JTabbedPane tabbedPane = new JTabbedPane();
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP,JTabbedPane.SCROLL_TAB_LAYOUT);
 
 		JPanel motifPanel = buildMotifTab(progressBar, statusBar, targetChooser);
 		tabbedPane.addTab("Motif", motifPanel);
@@ -108,14 +108,18 @@ public class LauncherGUI extends JFrame {
 		JPanel convertPanel = buildConvertTab(progressBar, statusBar);
 		tabbedPane.addTab("Convert Graph", convertPanel);
 		tabbedPane.setMnemonicAt(3, KeyEvent.VK_4);
+		
+		JPanel randomGraphPanel = buildRandomGraphTab(progressBar, statusBar);
+		tabbedPane.addTab("Random Graph", randomGraphPanel);
+		tabbedPane.setMnemonicAt(4, KeyEvent.VK_5);
 
 		JPanel otherPanel = buildOtherTab(progressBar, statusBar, targetChooser);
 		tabbedPane.addTab("Others", otherPanel);
-		tabbedPane.setMnemonicAt(4, KeyEvent.VK_5);
+		tabbedPane.setMnemonicAt(5, KeyEvent.VK_6);
 
 		JPanel gedPanel = buildGedTab(progressBar, statusBar, targetChooser);
 		tabbedPane.addTab("GED", gedPanel);
-		tabbedPane.setMnemonicAt(5, KeyEvent.VK_6);
+		tabbedPane.setMnemonicAt(6, KeyEvent.VK_7);
 
 		blackline = BorderFactory.createLineBorder(Color.black);
 		titled = BorderFactory.createTitledBorder(blackline, "Task");
@@ -767,6 +771,7 @@ public class LauncherGUI extends JFrame {
 		statusPanel.add(statusLabel);
 		return statusPanel;
 	}
+	
 	/**
 	 * Builds the Panel used to house the GUI elements for the Graph Edit Distance Tab
 	 *
@@ -852,6 +857,110 @@ public class LauncherGUI extends JFrame {
 		getGedBtn.addActionListener(new GedActionListener(launcher, this, gedScore));
 
 		return gedPanel;
+	}
+	
+	/**
+	 * Builds the Panel used to house the GUI elements for the Graph Edit Distance Tab
+	 *
+	 * @param graphList   The JList element used to select which is the target graph
+	 * @param progressBar The JProgressBar to update when loading a graph
+	 * @param targetChooser The chooser for the target graph
+	 * @return the GED tab
+	 */
+	private JPanel buildRandomGraphTab(JProgressBar progressBar, JPanel statusBar) {
+		JPanel randomPanel = new JPanel(new GridBagLayout());
+		JLabel status = (JLabel) statusBar.getComponent(0);
+		
+		JLabel label = new JLabel("Generate Random Graph", SwingConstants.CENTER);
+		JLabel fileLabel = new JLabel("No file selected");
+		fileLabel.setFont(new Font(fileLabel.getFont().getFontName(), Font.ITALIC, fileLabel.getFont().getSize()));
+
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new java.io.File("."));
+		fileChooser.setDialogTitle("Select graph directory to save");
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		
+		JButton openBtn = new JButton("Open File...");
+
+		//The action for when the user chooses a file
+		openBtn.addActionListener(new LoadFileActionListener(status, fileLabel, fileChooser, randomPanel, openBtn));
+
+		JLabel nodeLabel = new JLabel("Number of Nodes:");
+		JTextField nodeField = new JTextField(12);
+
+		JLabel edgeLabel = new JLabel("Number of Edges:");
+		JTextField edgeField = new JTextField(12);
+		
+		JCheckBox simpleBox = new JCheckBox("Simple graph");
+		simpleBox.setToolTipText("If checked, no duplicate or self-sourcing edges are created");
+		simpleBox.setSelected(true);
+		
+		JCheckBox directedBox = new JCheckBox("Directed");
+		directedBox.setToolTipText("If checked, graph will have directed edges");
+		directedBox.setSelected(false);
+		
+		JButton buildGraphBtn = new JButton("Create Random Graph");
+		buildGraphBtn.addActionListener(new CreateRandomGraphActionListener(fileChooser, randomPanel, this, 
+				nodeField, edgeField, directedBox, simpleBox, launcher, progressBar, status));
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(2,2,2,2);
+		c.fill = GridBagConstraints.HORIZONTAL;
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 3;
+		randomPanel.add(label, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 1;
+		c.gridx = 0;
+		c.gridy = 1;
+		randomPanel.add(openBtn, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 1;
+		c.gridy = 1;
+		randomPanel.add(fileLabel, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 2;
+		randomPanel.add(nodeLabel, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 1;
+		c.gridy = 2;
+		randomPanel.add(nodeField, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 3;
+		randomPanel.add(edgeLabel, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 1;
+		c.gridy = 3;
+		randomPanel.add(edgeField, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 4;
+		randomPanel.add(simpleBox, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 1;
+		c.gridy = 4;
+		randomPanel.add(directedBox, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 5;
+		c.gridwidth = 2;
+		randomPanel.add(buildGraphBtn, c);
+		
+		return randomPanel;
 	}
 
 	/**

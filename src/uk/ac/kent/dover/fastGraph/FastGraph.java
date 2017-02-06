@@ -123,10 +123,11 @@ public class FastGraph {
 //		FastGraph g1 = randomGraphFactory(2,1,false);
 //		FastGraph g1 = randomGraphFactory(5,6,1,true);
 //		FastGraph g1 = randomGraphFactory(8,9,1,false);
-		FastGraph g1 = randomGraphFactory(100,500,1,true,false);
+		String name = "simple-random-n-4-e-4";
+		FastGraph g1 = randomGraphFactory(4,4,1,true,false);
 		g1.relabelFastGraph(g1.getNumberOfNodes()/10);
-		g1.setName("simple-random-n-100-e-500");
-		g1.saveBuffers(null,"simple-random-n-100-e-500");
+		g1.setName(name);
+		g1.saveBuffers(null,name);
 		
 /*		for (int i = 0 ; i<10; i++) {
 			FastGraph g = randomGraphFactory(100, 1000, 1, false); // 1 hundred nodes, 1 thousand edges
@@ -157,7 +158,7 @@ public class FastGraph {
 		Debugger.outputTime("saveBuffers test time ");
 		time = Debugger.createTime();
 */
-String name = "simple-random-n-100-e-500";
+//String name = "simple-random-n-4-e-6";
 //String name = "random-n-8-e-9";
 //String name = "as-skitter.txt";
 //String name = "soc-pokec-relationships.txt-reduced";

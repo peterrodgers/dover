@@ -53,7 +53,8 @@ public class ExactSubgraphIsomorphism extends SubgraphIsomorphism{
 		FastGraph target = null;
 		FastGraph pattern = null;
 		try {
-			target = FastGraph.loadBuffersGraphFactory(null, "simple-random-n-100-e-500");
+			target = FastGraph.loadBuffersGraphFactory(null, "simple-random-n-1000-e-5000");
+			pattern = FastGraph.loadBuffersGraphFactory(null, "simple-random-n-8-e-12");
 		//target = FastGraph.loadBuffersGraphFactory(null, "soc-pokec-relationships-reduced");
 //			target = FastGraph.adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
 //			target = FastGraph.adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
@@ -172,20 +173,22 @@ public class ExactSubgraphIsomorphism extends SubgraphIsomorphism{
 	*/	
 //uk.ac.kent.displayGraph.display.GraphWindow gw1 = new uk.ac.kent.displayGraph.display.GraphWindow(patternGraph,true);
 //uk.ac.kent.displayGraph.display.GraphWindow gw2 = new uk.ac.kent.displayGraph.display.GraphWindow(targetGraph,true);
-		
+		/*
 		Graph patternGraph = new Graph("3 node straight line");
-		Node nn0 = new Node("Gary Cook");
+		Node nn0 = new Node("Edward Price");
 		patternGraph.addNode(nn0);
 		Node nn1 = new Node("");
 		patternGraph.addNode(nn1);
 		Node nn2 = new Node("");
-		patternGraph.addNode(nn2);			
+		patternGraph.addNode(nn2);
 		Edge ee0 = new Edge(nn0,nn1,"");
 		patternGraph.addEdge(ee0);
 		Edge ee1 = new Edge(nn1,nn2,"");
-		patternGraph.addEdge(ee1);	
+		patternGraph.addEdge(ee1);
 
 		pattern = FastGraph.displayGraphFactory(patternGraph,false);		
+		*/
+		
 		
 		Debugger.log("Target Number of nodes: " + target.getNumberOfNodes());
 		Debugger.log("Target Number of edges: " + target.getNumberOfEdges());
@@ -197,7 +200,7 @@ public class ExactSubgraphIsomorphism extends SubgraphIsomorphism{
 		
 		SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(target, pattern);
 		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
-		esi = new ExactSubgraphIsomorphism(target, pattern, snlc, null);
+		esi = new ExactSubgraphIsomorphism(target, pattern, null, null);
 Debugger.resetTime();
 		result = esi.subgraphIsomorphismFinder();
 Debugger.outputTime("time for subgraph isomorphism");
