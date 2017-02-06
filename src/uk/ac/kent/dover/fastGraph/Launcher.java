@@ -31,7 +31,7 @@ public class Launcher {
 	 * @throws Exception Only used when testing direct access to FastGraph
 	 */
 	public static void main(String[] args) throws Exception{
-		Debugger.enabled = false;
+		Debugger.enabled = true;
 		new Launcher(args);
 	}
 	
@@ -162,7 +162,7 @@ public class Launcher {
 	public void approximateSubgraphs(FastGraph targetGraph, FastGraph patternGraph,
 			int patternNodes, int subgraphsPerNode) throws FileNotFoundException {
 
-		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(targetGraph, patternGraph, 6, 30);
+		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(targetGraph, patternGraph, patternNodes, subgraphsPerNode);
 		isi.subgraphIsomorphismFinder();
 		isi = null; //GC
 	}

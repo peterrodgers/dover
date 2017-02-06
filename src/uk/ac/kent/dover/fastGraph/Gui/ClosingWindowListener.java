@@ -43,6 +43,7 @@ public class ClosingWindowListener implements WindowListener {
             	status.setText(launcherGui.DEFAULT_STATUS_MESSAGE);
             	frame.setVisible(false);
             	frame.dispose();
+            	System.exit(0);
             }
             status.setText(LauncherGUI.DEFAULT_STATUS_MESSAGE);
              

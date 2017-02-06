@@ -14,6 +14,11 @@ import javax.swing.JTextField;
 
 import uk.ac.kent.dover.fastGraph.Launcher;
 
+/**
+ * Creates a random graph
+ * @author Rob Baker
+ *
+ */
 public class CreateRandomGraphActionListener implements ActionListener {
 
 	private JFileChooser saveChooser;

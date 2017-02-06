@@ -104,6 +104,9 @@ public class FindApproximateSubgraphsActionListener implements ActionListener {
 						int patternNodes = launcherGui.checkForPositiveInteger(patternNodesField.getText(),subgraphPanel);
 						int subgraphsPerNode = launcherGui.checkForPositiveInteger(subgraphsPerNodeField.getText(),subgraphPanel);
 						
+						//System.out.println("patternNodes " + patternNodes);
+						//System.out.println("subgraphsPerNode " + subgraphsPerNode);
+						
 						launcher.approximateSubgraphs(g, subgraph, patternNodes, subgraphsPerNode);
 				    	
 				    	//stop the Progress Bar

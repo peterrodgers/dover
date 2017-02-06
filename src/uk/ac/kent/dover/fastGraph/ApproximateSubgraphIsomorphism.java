@@ -174,7 +174,7 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 		long time = Debugger.createTime();
 		
 		for (int i = 0; i < target.getNumberOfNodes(); i++) {
-			if(i % 100 == 0) {
+			if(i % 5000 == 0) {
 				Debugger.outputTime("Completed node: " + i + " Found subs: "+count+" Unique subs: " + uniqueSubgraphs.size(),time);
 			}
 			
@@ -194,7 +194,7 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 		Debugger.log("number of tested subs: " + subgraphsTested);
 		Debugger.log("number of unique subs: " + uniqueSubgraphs.size());
 		Debugger.log("number of found subs: " + count);
-		buildHtmlOutput(target, mainDir, count);
+		buildHtmlOutput(target, mainDir, count, "Approximate");
 		return count;
 	}
 	
@@ -213,7 +213,7 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 			//check isomorphism
 			SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(sub, pattern);
 			SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(sub, pattern);
-			ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(sub,pattern,null,null);
+			ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(sub,pattern,snlc,selc);
 			boolean result = esi.subgraphIsomorphismFinder();
 
 			if(result) {

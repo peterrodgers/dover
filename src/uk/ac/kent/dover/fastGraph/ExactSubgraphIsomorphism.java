@@ -593,7 +593,7 @@ Debugger.log();
 			
 			count++;
 		}
-		buildHtmlOutput(targetGraph, mainDir, count);
+		buildHtmlOutput(targetGraph, mainDir, count, "Exact");
 	}
 
 

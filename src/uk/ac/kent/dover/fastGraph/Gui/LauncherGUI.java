@@ -26,6 +26,7 @@ import java.util.List;
 public class LauncherGUI extends JFrame {
 	
 	public static final String DEFAULT_STATUS_MESSAGE = "Ready"; //The default message displayed to a user
+	public static final String DEFAULT_FILE_MESSAGE = "No file selected  ";
 
 	private Launcher launcher;
 	private double screenWidth; //size of the user's screen
@@ -225,7 +226,7 @@ public class LauncherGUI extends JFrame {
 		
 		JPanel targetGraphPanel = new JPanel(new GridBagLayout());
 		
-		JLabel targetGraphLabel = new JLabel("Select Target Graph");		
+		JLabel targetGraphLabel = new JLabel("Select Target Graph", SwingConstants.CENTER);		
 
 		targetChooser = new JFileChooser();
 		targetChooser.setCurrentDirectory(new java.io.File("."));
@@ -235,7 +236,7 @@ public class LauncherGUI extends JFrame {
 		JButton openBtn = new JButton("Open File...");	
 		openBtn.setToolTipText("Open a graph from disk");
 		
-		JLabel fileLabel = new JLabel("No file selected  ");
+		JLabel fileLabel = new JLabel(DEFAULT_FILE_MESSAGE);
 		fileLabel.setFont(new Font(fileLabel.getFont().getFontName(), Font.ITALIC, fileLabel.getFont().getSize()));
 		
 		//The action for when the user chooses a file
@@ -248,6 +249,10 @@ public class LauncherGUI extends JFrame {
 		JButton editBtn = new JButton("Edit");
 		editBtn.addActionListener(new CreateGraphActionListener(this, targetChooser, targetGraphPanel, targetGraph, fileLabel, status));
 		editBtn.setToolTipText("Edit a selected graph. Only for small graphs");
+		
+		JButton clearBtn = new JButton("Clear Selection");
+		clearBtn.addActionListener(new ClearGraphActionListener(this, targetChooser, targetGraph, fileLabel));
+		clearBtn.setToolTipText("Clear selected graph");
 		
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(2,2,2,2);
@@ -282,6 +287,12 @@ public class LauncherGUI extends JFrame {
 		c.gridy = 2;
 		c.gridwidth = 1;
 		targetGraphPanel.add(addBtn, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 3;
+		c.gridwidth = 2;
+		targetGraphPanel.add(clearBtn, c);
 		
 		return targetGraphPanel;
 	}
