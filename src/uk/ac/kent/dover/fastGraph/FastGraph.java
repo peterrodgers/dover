@@ -162,15 +162,16 @@ public class FastGraph {
 //String name = "simple-random-n-1000-e-5000";
 //String name = "random-n-8-e-9";
 //String name = "as-skitter.txt";
-String name = "soc-pokec-relationships.txt-reduced";
+//String name = "soc-pokec-relationships.txt-reduced";
 //String name = "soc-pokec-relationships.txt-veryshort-veryshort";
 //String name = "Wiki-Vote.txt";
 		//String name = g1.getName();
 		//FastGraph g2 = g1;
 		try {
 			time = Debugger.createTime();
-			FastGraph g2 = loadBuffersGraphFactory(null,name);
-			//g2 = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
+			FastGraph g2;
+//			FastGraph g2 = loadBuffersGraphFactory(null,name);
+			g2 = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
 
 			Debugger.log("Connected: " + Connected.connected(g2));
 

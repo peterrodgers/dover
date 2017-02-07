@@ -75,7 +75,7 @@ public class GedUtil {
 
 		while (!instance.isDone()) {
 //			printInfo(info);
-			instance.fillAlignmentInfo(0, info);  // FAILING ON THIS LINE
+			instance.fillAlignmentInfo(0, info);
 			instance.update(1);
 		}
 
