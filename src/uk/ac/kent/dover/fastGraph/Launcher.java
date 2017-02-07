@@ -5,6 +5,7 @@ import uk.ac.kent.dover.fastGraph.Gui.LauncherGUI;
 import uk.ac.kent.dover.fastGraph.Gui.MotifTask;
 import uk.ac.kent.dover.fastGraph.comparators.*;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -30,7 +31,7 @@ public class Launcher {
 	 * @throws Exception Only used when testing direct access to FastGraph
 	 */
 	public static void main(String[] args) throws Exception{
-		Debugger.enabled = false;
+		Debugger.enabled = true;
 		new Launcher(args);
 	}
 	
@@ -161,8 +162,27 @@ public class Launcher {
 	public void approximateSubgraphs(FastGraph targetGraph, FastGraph patternGraph,
 			int patternNodes, int subgraphsPerNode) throws FileNotFoundException {
 
-		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(targetGraph, patternGraph, 6, 30);
+		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(targetGraph, patternGraph, patternNodes, subgraphsPerNode);
 		isi.subgraphIsomorphismFinder();
 		isi = null; //GC
+	}
+	
+	/**
+	 * Generates a random graph
+	 * @param saveLocation Where to save the graph
+	 * @param nodes Number of nodes in the graph
+	 * @param edges Number of edges in the graph
+	 * @param directed If the graph is directed
+	 * @param simple If the graph is simple
+	 * @throws Exception 
+	 */
+	public void generateRandomGraph(File saveLocation, int nodes, int edges, boolean directed, boolean simple) throws Exception {
+		String directory = saveLocation.getPath();
+		String name = saveLocation.getName();					
+		
+		FastGraph r = FastGraph.randomGraphFactory(nodes, edges, -1, simple, directed);
+		r.setName(name);
+		r.saveBuffers(directory, name);
+		r = null; //GC
 	}
 }

@@ -48,16 +48,17 @@ public abstract class SubgraphIsomorphism {
 	 * 
 	 * @param mainDir The parent directory
 	 * @param count The number of results
+	 * @param type The type of subgraph isomorphism
 	 * @throws FileNotFoundException If the output file cannot be created
 	 */
-	protected void buildHtmlOutput(FastGraph target, File mainDir, int count) throws FileNotFoundException {
+	protected void buildHtmlOutput(FastGraph target, File mainDir, int count, String type) throws FileNotFoundException {
 		Document doc = Document.createShell("");
 		
 		doc.head().appendElement("title").text(target.getName());
 
 		Element headline = doc.body().appendElement("h1").text(target.getName());
 		
-		Element pageNumberHeader = doc.body().appendElement("h2").text("Inexact Subgraph Isomorphism");
+		Element pageNumberHeader = doc.body().appendElement("h2").text(type+" Subgraph Isomorphism");
 		
 		//size
 		Element linksDiv = doc.body().appendElement("div");

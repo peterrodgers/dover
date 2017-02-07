@@ -44,8 +44,8 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 		FastGraph target = null;
 		FastGraph pattern = null;
 	/*	
-		Graph patternGraph = new Graph("square with edge across");
-		Node nn0 = new Node("David Martin");
+		Graph patternGraph = new Graph("square");
+		Node nn0 = new Node("Gary Cook");
 		patternGraph.addNode(nn0);
 		Node nn1 = new Node("");
 		patternGraph.addNode(nn1);
@@ -61,8 +61,6 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 		patternGraph.addEdge(ee2);
 		Edge ee3 = new Edge(nn3,nn0,"");
 		patternGraph.addEdge(ee3);
-		Edge ee4 = new Edge(nn2,nn0,"");
-		patternGraph.addEdge(ee4);
 	*/
 		
 		/*	
@@ -90,12 +88,12 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 	*/
 
 		Graph patternGraph = new Graph("3 node straight line");
-		Node nn0 = new Node("Gary Cook");
+		Node nn0 = new Node("Edward Price");
 		patternGraph.addNode(nn0);
 		Node nn1 = new Node("");
 		patternGraph.addNode(nn1);
 		Node nn2 = new Node("");
-		patternGraph.addNode(nn2);			
+		patternGraph.addNode(nn2);
 		Edge ee0 = new Edge(nn0,nn1,"");
 		patternGraph.addEdge(ee0);
 		Edge ee1 = new Edge(nn1,nn2,"");
@@ -103,11 +101,11 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 
 
 	
-		pattern = FastGraph.displayGraphFactory(patternGraph,false);
+		//pattern = FastGraph.displayGraphFactory(patternGraph,false);
 		
 		try {
-			target = FastGraph.loadBuffersGraphFactory(null, "simple-random-n-100-e-500");
-			//target = FastGraph.loadBuffersGraphFactory(null, "random-n-8-e-9");
+			target = FastGraph.loadBuffersGraphFactory(null, "simple-random-n-1000-e-5000");
+			pattern = FastGraph.loadBuffersGraphFactory(null, "simple-random-n-8-e-12");
 			
 			
 			//pattern = FastGraph.loadBuffersGraphFactory(
@@ -118,7 +116,7 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 		Debugger.log("edges in pattern graph: " + pattern.getNumberOfEdges());
 
 		long time = Debugger.createTime();
-		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(target, pattern, 6, 30);
+		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(target, pattern, 12, 1000);
 		isi.subgraphIsomorphismFinder();
 		Debugger.outputTime("Completed in: ", time);
 	}
@@ -176,8 +174,8 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 		long time = Debugger.createTime();
 		
 		for (int i = 0; i < target.getNumberOfNodes(); i++) {
-			if(i % 50 == 0) {
-				Debugger.outputTime("Completed node: " + i + " Found subs: "+count,time);
+			if(i % 5000 == 0) {
+				Debugger.outputTime("Completed node: " + i + " Found subs: "+count+" Unique subs: " + uniqueSubgraphs.size(),time);
 			}
 			
 			//generate set of subgraphs
@@ -196,7 +194,7 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 		Debugger.log("number of tested subs: " + subgraphsTested);
 		Debugger.log("number of unique subs: " + uniqueSubgraphs.size());
 		Debugger.log("number of found subs: " + count);
-		buildHtmlOutput(target, mainDir, count);
+		buildHtmlOutput(target, mainDir, count, "Approximate");
 		return count;
 	}
 	
@@ -215,7 +213,7 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 			//check isomorphism
 			SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(sub, pattern);
 			SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(sub, pattern);
-			ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(sub,pattern,snlc,null);
+			ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(sub,pattern,snlc,selc);
 			boolean result = esi.subgraphIsomorphismFinder();
 
 			if(result) {

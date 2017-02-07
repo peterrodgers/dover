@@ -128,6 +128,8 @@ public class ExactMotifFinder {
 	 * @throws IOException If the output data cannot be written
 	 */
 	public void findAllMotifs(int rewiresNeeded, int minSize, int maxSize) throws IOException {
+		System.out.println("Saving all? "+saveAll);
+		
 		double sizeDiff = maxSize - minSize;	
 		double step = 100/(sizeDiff+4);
 		
