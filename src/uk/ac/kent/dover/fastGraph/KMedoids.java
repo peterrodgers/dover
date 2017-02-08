@@ -76,7 +76,7 @@ public class KMedoids {
 		
 		int[] out = new int[subgraphs.size()];
 		for (int i = 0; i < subgraphs.size(); i++) {
-						
+
 			double bestDistance = comparisonScore(subgraphs.get(i), medoids.get(0));
 
 			int bestIndex = 0;
@@ -197,9 +197,9 @@ public class KMedoids {
 	 * @return The comparison score
 	 */
 	private double comparisonScore(FastGraph g1, FastGraph g2) {
-		return (g1.getNumberOfNodes() + g1.getNumberOfEdges()) - (g2.getNumberOfNodes() + g2.getNumberOfEdges()); //placeholder
+//		return (g1.getNumberOfNodes() + g1.getNumberOfEdges()) - (g2.getNumberOfNodes() + g2.getNumberOfEdges()); //placeholder
 		
-		//return GedUtil.getGedScore(g1, g2);
+		return GedUtil.getGedScore(g1, g2);
 	}
 
 }

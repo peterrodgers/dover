@@ -1,7 +1,5 @@
 package uk.ac.kent.dover.fastGraph;
 
-import java.util.Arrays;
-
 import org.cytoscape.gedevo.AlignmentInfo;
 import org.cytoscape.gedevo.GedevoNative;
 import org.cytoscape.gedevo.UserSettings;
@@ -50,8 +48,8 @@ public class GedUtil {
 		
 		// This is a graph from the cytogedevo library, not this one
 		
-		GedevoNative.Network n = GedevoNative.Network.convertToNative(cytograph);		
-		
+		GedevoNative.Network n = GedevoNative.Network.convertToNative(cytograph);
+
 		return n;
 	}
 
@@ -64,6 +62,26 @@ public class GedUtil {
 		System.out.println("EC: " + info.edgeCorrectness);
 		System.out.println("Life: " + info.lifeTime);
 		System.out.println("");
+	}
+
+
+	private static float calculateScore(GedevoNative.Instance instance)
+	{
+		if (!instance.init1() || !instance.init2()) {
+			System.exit(1);
+		}
+
+		AlignmentInfo info = new AlignmentInfo();
+
+		while (!instance.isDone()) {
+//			printInfo(info);
+			instance.fillAlignmentInfo(0, info);
+			instance.update(1);
+		}
+
+		float gedScore = instance.overallGed();
+
+		return gedScore;
 	}
 
 	/**
@@ -79,36 +97,15 @@ public class GedUtil {
 		GedevoNative.Network g1Network = GedUtil.fastGraphToNetwork(g1, "Graph One");
 		GedevoNative.Network g2Network = GedUtil.fastGraphToNetwork(g2, "Graph Two");
 
-		System.out.println("Converted to native");
-
 		UserSettings userSettings = new DoverSettings();
 
 		GedevoNative.Instance instance = GedevoNative.Instance.create(userSettings);
+
 		instance.importNetwork(g1Network, 0);
 		instance.importNetwork(g2Network, 1);
 
-		instance.init1();
-		System.out.println("Init 1 complete. Next phase may take some time");
-		instance.init2();
-		System.out.println("Init 2 complete");
-
-		System.out.println("Set up the alignment task");
-
-		AlignmentInfo info = new AlignmentInfo();
-
-		while (!instance.isDone()) {
-			instance.fillAlignmentInfo(0, info);
-			printInfo(info);
-			instance.update(1);
-		}
-
-		float gedScore = instance.overallGed();
-
+		Float gedScore = calculateScore(instance);
 		instance.shutdown();
-
-		System.out.println("Alignment finished");
-
-		System.out.println("GED score: " + gedScore);
 
 		return gedScore;
 	}
