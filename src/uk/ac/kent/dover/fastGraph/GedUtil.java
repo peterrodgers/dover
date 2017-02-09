@@ -37,12 +37,12 @@ public class GedUtil {
 		for (int i=0; i < numNodes; i++) {
 			Node n = new Node(i, fastgraph.getNodeLabel(i));
 			cytograph.nodes[i] = n;
-			Debugger.log("node: " + n.name + " id: " + n.id);
+			//Debugger.log("node: " + n.name + " id: " + n.id);
 		}
 
 		for (int i = 0; i < cytograph.edges.length; i++) {
 			Edge e = cytograph.edges[i];
-			Debugger.log("to: " + e.node1 + "  from: " + e.node2);
+			//Debugger.log("to: " + e.node1 + "  from: " + e.node2);
 			
 		}
 		

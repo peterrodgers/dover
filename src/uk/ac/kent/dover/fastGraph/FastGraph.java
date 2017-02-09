@@ -159,7 +159,7 @@ public class FastGraph {
 		Debugger.outputTime("saveBuffers test time ");
 		time = Debugger.createTime();
 */
-//String name = "simple-random-n-1000-e-5000";
+String name = "simple-random-n-100-e-500";
 //String name = "random-n-8-e-9";
 //String name = "as-skitter.txt";
 //String name = "soc-pokec-relationships.txt-reduced";
@@ -169,19 +169,19 @@ public class FastGraph {
 		//FastGraph g2 = g1;
 		try {
 			time = Debugger.createTime();
-			FastGraph g2;
-//			FastGraph g2 = loadBuffersGraphFactory(null,name);
-			g2 = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
+//			FastGraph g2;
+			FastGraph g2 = loadBuffersGraphFactory(null,name);
+//			g2 = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
 
 			Debugger.log("Connected: " + Connected.connected(g2));
 
 			Debugger.log("Number of nodes: " + g2.getNumberOfNodes());
 			Debugger.log("Number of edges: " + g2.getNumberOfEdges());
-			
+			/*
 			for(int i = 0; i < 100; i++) {
 				System.out.println(g2.getNodeLabel(i));
 			}
-			
+			*/
 		/*	
 			ExactMotifFinder emf = new ExactMotifFinder(g2, new MotifTaskDummy(), true);
 			emf.findAllMotifs(10,4,6);
@@ -189,9 +189,9 @@ public class FastGraph {
 			emf.compareMotifDatas(4,6);
 	*/
 
-			KMedoids km = new KMedoids(g2, 5, 100);
+			KMedoids km = new KMedoids(g2, 5, 2);
 			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g2);
-			HashSet<FastGraph> subs = esn.enumerateSubgraphs(4, 2, 10);
+			HashSet<FastGraph> subs = esn.enumerateSubgraphs(4, 1, 10);
 			System.out.println("subs: " + subs.size());
 			
 			ArrayList<FastGraph> subgraphs = new ArrayList<FastGraph>(subs);
@@ -200,6 +200,7 @@ public class FastGraph {
 			for(ArrayList<FastGraph> cluster : clusters) {
 				System.out.println("Cluster size: " + cluster.size());
 			}
+			km.saveClusters(clusters);
 
 			//emf.findAndExportAllMotifs(10, 4, 4, 0, true);
 			//emf.findAndExportAllMotifs(0, 4, 4, 0, false);

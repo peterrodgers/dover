@@ -1,7 +1,17 @@
 package uk.ac.kent.dover.fastGraph;
 
+import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Random;
+
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
 
 /**
  * Algorithm to implement the KMedoids
@@ -34,6 +44,7 @@ public class KMedoids {
 	public KMedoids(FastGraph targetGraph, int numberOfClusters, int maxIterations) {
 		this.numberOfClusters = numberOfClusters;
 		this.maxIterations = maxIterations;
+		this.targetGraph = targetGraph;
 		r = new Random(targetGraph.getNodeBuf().getLong(1));
 	}
 	
@@ -53,13 +64,14 @@ public class KMedoids {
 		
 		boolean changed = true;
 		int count = 0;
+		long time = Debugger.createTime();
 		while (changed && count < maxIterations) {
 			changed = false;
 			count++;
 			int[] assignment = assign(medoids, subgraphs);
-			Debugger.log("assignment complete");
+			Debugger.outputTime("assignment complete. Count: "+count, time);
 			changed = recalculateMedoids(assignment, medoids, output, subgraphs);
-
+			Debugger.outputTime("recalculateMedoids complete.", time);
 		}
 
 		return output;
@@ -202,4 +214,86 @@ public class KMedoids {
 		return GedUtil.getGedScore(g1, g2);
 	}
 
+	/**
+	 * Save clusters to disk
+	 * @param clusters The clusters to save
+	 * @throws FileNotFoundException If the files cannot be saved
+	 */
+	public void saveClusters(ArrayList<ArrayList<FastGraph>> clusters) throws FileNotFoundException {
+		File mainDir = new File(
+				Launcher.startingWorkingDirectory+File.separatorChar+"kmedoids_results"+
+				File.separatorChar+targetGraph.getName()+"_"+Util.dateAsString()
+			);
+		mainDir.mkdirs();
+		for(int i = 0; i < clusters.size(); i++) {
+			File innerDir = new File(mainDir.getAbsolutePath()+File.separatorChar+i);
+			innerDir.mkdirs();
+			ArrayList<FastGraph> cluster = clusters.get(i);
+			
+			for(int j = 0; j < cluster.size(); j++) {
+				FastGraph g = cluster.get(j);
+				
+				File thisDir = new File(innerDir.getAbsolutePath()+File.separatorChar+j);
+				thisDir.mkdirs();
+				g.saveBuffers(innerDir.getAbsolutePath()+File.separatorChar+j, targetGraph.getName());
+				
+				//save SVG
+				uk.ac.kent.displayGraph.Graph dg = g.generateDisplayGraph();
+				dg.randomizeNodePoints(new Point(20,20),300,300);
+				uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg, false);
+				uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
+				GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
+				se.setAnimateFlag(false);
+				se.setIterations(100);
+				se.setTimeLimit(200);
+				se.setGraphPanel(gw.getGraphPanel());
+				se.layout();
+				File saveLocation = null;
+				saveLocation = new File(innerDir.getAbsolutePath()+File.separatorChar+j+File.separatorChar+"subgraph.svg");
+				uk.ac.kent.displayGraph.ExportSVG exSVG = new uk.ac.kent.displayGraph.ExportSVG(dg);
+				exSVG.saveGraph(saveLocation);
+				
+			}
+		}
+		buildHtmlOutput(clusters, mainDir);
+	}
+	
+	/**
+	 * Exports the results to a HTML file
+	 * 
+	 * @param clusters The clusters to save
+	 * @param mainDir The parent directory
+	 * @throws FileNotFoundException If the output file cannot be created
+	 */
+	private void buildHtmlOutput(ArrayList<ArrayList<FastGraph>> clusters, File mainDir) throws FileNotFoundException {
+		Document doc = Document.createShell("");
+		
+		doc.head().appendElement("title").text(targetGraph.getName());
+
+		Element headline = doc.body().appendElement("h1").text(targetGraph.getName());
+		
+		Element pageNumberHeader = doc.body().appendElement("h2").text("kMedoids");
+		
+		Element table = doc.body().appendElement("table").attr("style", "border: 2px solid; border-collapse: collapse; width: 100%");
+		Element headerRow = table.appendElement("tr").attr("style", "border: 2px solid;");
+		headerRow.appendElement("th").text("Cluster Num").attr("style", "border: 1px solid;");
+		headerRow.appendElement("th").text("Graphs").attr("style", "border: 1px solid;");
+		
+		for(int i = 0; i < clusters.size(); i++) {
+			Element row = table.appendElement("tr").attr("style", "border: 2px solid;");
+			row.appendElement("td").text(i+"").attr("style", "border: 1px solid;");
+			Element cell = row.appendElement("td").attr("style", "border: 1px solid;");
+			for(int j = 0; j < clusters.get(i).size(); j++) {
+				cell.appendElement("a").text(j+"").attr("href",i+"/"+j+"/subgraph.svg");
+				cell.appendText(" ");
+			}
+		}
+		
+		File output = new File(mainDir.getAbsolutePath()+File.separatorChar+"index.html");
+		//save the output html file
+		
+		try(PrintWriter out = new PrintWriter( output )){ //will close file after use
+		    out.println( doc.toString() );
+		}
+	}
 }
