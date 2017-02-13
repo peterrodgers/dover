@@ -14,11 +14,23 @@ import org.cytoscape.gedevo.simplenet.Node;
  * from the uk.ac.kent.dover package. Care should be taken not to confuse them.
  */
 public class GedUtil {
+	/**
+	 * Initiliases the native code and returns True for success
+	 *
+	 * @return Success of initialising native libraries.
+     */
 	public static boolean initNativeCode() {
 		return GedevoNativeUtil.initNativeLibs();
 	}
 
 
+	/**
+	 * 
+	 *
+	 * @param fastgraph The graph to be converted
+	 * @param name Name of the graph to be converted
+     * @return The GedevoNative.Network version of the fastGraph object
+     */
 	public static GedevoNative.Network fastGraphToNetwork(FastGraph fastgraph, String name) {
 		Graph cytograph = new Graph(name);
 
@@ -59,7 +71,12 @@ public class GedUtil {
 	}
 
 
-
+	/**
+	 * For debugging purposes, prints the status of the GED algorithm using
+	 * an AlignmentInfo object
+	 *
+	 * @param info The AlignmentInfo object to print
+     */
 	private static void printInfo(AlignmentInfo info) {
 		System.out.println("Iterations: " + info.iterations);
 		System.out.println("Without change: " + info.iterationsWithoutScoreChange);
@@ -69,7 +86,14 @@ public class GedUtil {
 		System.out.println("");
 	}
 
-
+	/**
+	 * Calculates the GED score from a native instance containing two graphs
+	 *
+	 * 0 is better (ie less edit distance, ie more similar graphs)
+	 *
+	 * @param instance The instance contianing two graphs
+	 * @return The GED score, between 0 and 1
+     */
 	private static float calculateScore(GedevoNative.Instance instance)
 	{
 		if (!instance.init1() || !instance.init2()) {
@@ -79,7 +103,6 @@ public class GedUtil {
 		AlignmentInfo info = new AlignmentInfo();
 
 		while (!instance.isDone()) {
-//			printInfo(info);
 			instance.fillAlignmentInfo(0, info);
 			instance.update(1);
 		}
@@ -93,9 +116,9 @@ public class GedUtil {
 	 *
 	 * Converts the FastGraph objects to native Network objects and uses these to calculate the GED score.
 	 *
-	 * @param g1
-	 * @param g2
-     * @return The GED score as a string
+	 * @param g1 FastGraph
+	 * @param g2 FastGraph
+     * @return The GED score as a float
      */
 	public static float getGedScore(FastGraph g1, FastGraph g2) {
 
@@ -105,17 +128,17 @@ public class GedUtil {
 		return getGedScore(g1Network, g2Network);
 	}
 
-	
+
 	/**
 	 *
 	 * Uses these GedevoNative.Network to calculate the GED score.
 	 *
 	 * @param g1
 	 * @param g2
-    * @return The GED score as a string
+    * @return The GED score as a float
     */
 	public static float getGedScore(GedevoNative.Network g1Network, GedevoNative.Network g2Network) {
-		
+
 		UserSettings userSettings = new DoverSettings();
 
 		GedevoNative.Instance instance = GedevoNative.Instance.create(userSettings);
