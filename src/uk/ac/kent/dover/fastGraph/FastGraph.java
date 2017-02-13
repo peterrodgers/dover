@@ -171,14 +171,14 @@ public class FastGraph {
 			time = Debugger.createTime();
 			FastGraph g2;
 //			FastGraph g2 = loadBuffersGraphFactory(null,name);
-			g2 = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
+			g2 = FastGraph.randomGraphFactory(5,5,1,true,true); // 2 hundred nodes, 2 thousand edges
 
 			Debugger.log("Connected: " + Connected.connected(g2));
 
 			Debugger.log("Number of nodes: " + g2.getNumberOfNodes());
 			Debugger.log("Number of edges: " + g2.getNumberOfEdges());
 			
-			for(int i = 0; i < 100; i++) {
+			for(int i = 0; i < g2.getNumberOfNodes(); i++) {
 				System.out.println(g2.getNodeLabel(i));
 			}
 			
