@@ -6,8 +6,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
+import org.cytoscape.gedevo.GedevoNative;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -33,6 +35,11 @@ public class KMedoids {
 	private int maxIterations;
 	
 	private FastGraph targetGraph;
+	
+	private HashMap<FastGraph, GedevoNative.Network> map = new HashMap<>();
+	
+	public int numberOfGedCalcs = 0;
+	public long gedTime = 0;
 	
 	/**
 	 * Constructor
@@ -61,6 +68,10 @@ public class KMedoids {
 		
 		ArrayList<FastGraph> medoids = Util.randomSelection(r, numberOfClusters, subgraphs);	
 		ArrayList<ArrayList<FastGraph>> output = new ArrayList<ArrayList<FastGraph>>(numberOfClusters);
+		
+		for(FastGraph sub : subgraphs) {
+			map.put(sub, GedUtil.fastGraphToNetwork(sub, sub.getName()));
+		}
 		
 		boolean changed = true;
 		int count = 0;
@@ -210,8 +221,12 @@ public class KMedoids {
 	 */
 	private double comparisonScore(FastGraph g1, FastGraph g2) {
 //		return (g1.getNumberOfNodes() + g1.getNumberOfEdges()) - (g2.getNumberOfNodes() + g2.getNumberOfEdges()); //placeholder
-		
-		return GedUtil.getGedScore(g1, g2);
+		numberOfGedCalcs++;
+		long time = Debugger.createTime();
+		double result = GedUtil.getGedScore(map.get(g1), map.get(g2));
+		long diff = Debugger.createTime() - time;
+		gedTime += diff;
+		return result;
 	}
 
 	/**

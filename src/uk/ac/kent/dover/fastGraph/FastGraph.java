@@ -201,6 +201,9 @@ String name = "simple-random-n-100-e-500";
 				System.out.println("Cluster size: " + cluster.size());
 			}
 			km.saveClusters(clusters);
+			
+			System.out.println("Ged scores: " + km.numberOfGedCalcs);
+			System.out.println("Gedtime (s): " + (km.gedTime/1000.0));
 
 			//emf.findAndExportAllMotifs(10, 4, 4, 0, true);
 			//emf.findAndExportAllMotifs(0, 4, 4, 0, false);
