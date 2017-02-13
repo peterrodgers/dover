@@ -1,9 +1,11 @@
 package uk.ac.kent.dover.fastGraph;
 
-import org.cytoscape.gedevo.GedevoNativeUtil;
 import uk.ac.kent.dover.fastGraph.Gui.LauncherGUI;
 import uk.ac.kent.dover.fastGraph.Gui.MotifTask;
-import uk.ac.kent.dover.fastGraph.comparators.*;
+import uk.ac.kent.dover.fastGraph.comparators.EdgeComparator;
+import uk.ac.kent.dover.fastGraph.comparators.NodeComparator;
+import uk.ac.kent.dover.fastGraph.comparators.SimpleEdgeLabelComparator;
+import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,7 +48,7 @@ public class Launcher {
 		//System.out.println(Arrays.toString(args));
 		//System.out.println(args.length);
 
-		GedevoNativeUtil.initNativeLibs();
+		GedUtil.initNativeCode();
 		//if there are no arguments given, then load the GUI. Otherwise, load the command line interface
 		if (args.length == 0) {
 			new LauncherGUI(this);

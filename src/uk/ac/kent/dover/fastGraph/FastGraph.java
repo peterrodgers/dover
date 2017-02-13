@@ -1,7 +1,6 @@
 package uk.ac.kent.dover.fastGraph;
 
 
-import org.cytoscape.gedevo.GedevoNativeUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import uk.ac.kent.displayGraph.*;
@@ -114,7 +113,7 @@ public class FastGraph {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		GedevoNativeUtil.initNativeLibs();
+		GedUtil.initNativeCode();
 
 		Debugger.enabled = true;
 		
