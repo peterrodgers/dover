@@ -14,7 +14,7 @@ import org.cytoscape.gedevo.simplenet.Node;
  */
 public class GedUtil {
 
-	private static GedevoNative.Network fastGraphToNetwork(FastGraph fastgraph, String name) {
+	public static GedevoNative.Network fastGraphToNetwork(FastGraph fastgraph, String name) {
 		Graph cytograph = new Graph(name);
 
 		int numEdges = fastgraph.getNumberOfEdges();
@@ -37,12 +37,12 @@ public class GedUtil {
 		for (int i=0; i < numNodes; i++) {
 			Node n = new Node(i, fastgraph.getNodeLabel(i));
 			cytograph.nodes[i] = n;
-			Debugger.log("node: " + n.name + " id: " + n.id);
+			//Debugger.log("node: " + n.name + " id: " + n.id);
 		}
 
 		for (int i = 0; i < cytograph.edges.length; i++) {
 			Edge e = cytograph.edges[i];
-			Debugger.log("to: " + e.node1 + "  from: " + e.node2);
+			//Debugger.log("to: " + e.node1 + "  from: " + e.node2);
 			
 		}
 		
@@ -97,6 +97,20 @@ public class GedUtil {
 		GedevoNative.Network g1Network = GedUtil.fastGraphToNetwork(g1, "Graph One");
 		GedevoNative.Network g2Network = GedUtil.fastGraphToNetwork(g2, "Graph Two");
 
+		return getGedScore(g1Network, g2Network);
+	}
+
+	
+	/**
+	 *
+	 * Uses these GedevoNative.Network to calculate the GED score.
+	 *
+	 * @param g1
+	 * @param g2
+    * @return The GED score as a string
+    */
+	public static float getGedScore(GedevoNative.Network g1Network, GedevoNative.Network g2Network) {
+		
 		UserSettings userSettings = new DoverSettings();
 
 		GedevoNative.Instance instance = GedevoNative.Instance.create(userSettings);
@@ -109,5 +123,4 @@ public class GedUtil {
 
 		return gedScore;
 	}
-
 }

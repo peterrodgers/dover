@@ -10,4 +10,5 @@ dover.jar
 desktop.ini
 *.svg
 *.log
-subgraph_results/*.log
+subgraph_results/*
+kmedoids_results/*
