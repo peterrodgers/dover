@@ -6,51 +6,49 @@ import org.cytoscape.gedevo.UserSettings;
  * Created by dw3 on 07/12/2016.
  */
 public class GedSettings extends UserSettings {
-    // Algorithm settings
-    public double weightPairsum = 1;
-    public double weightGraphlets = 0;
-    public double weightGED = 0;
 
-    public double pairWeightGraphlets = 0.5;
-    public double pairWeightGED = 1;
+    /**
+     * This constructor allows the values of the superclass to be overriden
+     */
+    public GedSettings() {
+        // Algorithm settings
+        weightPairsum = 1;
+        weightGraphlets = 0;
+        weightGED = 0;
 
-    public float basicHealth = 100;
-    public float maxHealthDrop = 100;
+        pairWeightGraphlets = 0.5;
+        pairWeightGED = 1;
 
-    public double pairNullValue = 1;
+        basicHealth = 100;
+        maxHealthDrop = 100;
 
-    public boolean forceUndirectedEdges = true;
-    public boolean matchSameNames = false;
-    public boolean trimNames = false;
-    public boolean ignoreSelfLoops = false;
+        pairNullValue = 1;
 
-    public double ged_eAdd = 1.0;
-    public double ged_eRm = 1.0;
-    public double ged_eSub = 0.0;
-    public double ged_eFlip = 0.8;
-    public double ged_eD2U = 0.2;
-    public double ged_eU2D = 0.2;
-    public double ged_nAdd = 0.0;
-    public double ged_nRm = 0.0;
+        forceUndirectedEdges = true;
+        matchSameNames = false;
+        trimNames = false;
+        ignoreSelfLoops = false;
 
-    public boolean evo_greedyInitOnInit = false;
+        ged_eAdd = 1.0;
+        ged_eRm = 1.0;
+        ged_eSub = 0.0;
+        ged_eFlip = 0.8;
+        ged_eD2U = 0.2;
+        ged_eU2D = 0.2;
+        ged_nAdd = 0.0;
+        ged_nRm = 0.0;
 
-    // varGroup is not needed, can leave this at default
+        evo_greedyInitOnInit = false;
 
-    public int maxAgents = 400;
+        maxAgents = 400;
 
-    public int abort_seconds = 10;
-    public int abort_iterations = 100;
-    public int abort_nochange = 10;
+        abort_seconds = 10;
+        abort_iterations = 100;
+        abort_nochange = 10;
 
-    public int numThreads = 0;
-    public int autosaveSecs = DEFAULT_AUTOSAVE_TIME;
-    public boolean keepWorkfiles = false; // they would be just in the way
+        numThreads = 0;
+        autosaveSecs = DEFAULT_AUTOSAVE_TIME;
+        keepWorkfiles = false; // they would be just in the way
 
-    int logger_iterations = 0;
-    String logger_file = "";
-
-    String saveResultsFileName = "";
-    boolean saveResultsAddTimeStamp;
-
+    }
 }
