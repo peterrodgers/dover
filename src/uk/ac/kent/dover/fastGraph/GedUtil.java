@@ -2,6 +2,7 @@ package uk.ac.kent.dover.fastGraph;
 
 import org.cytoscape.gedevo.AlignmentInfo;
 import org.cytoscape.gedevo.GedevoNative;
+import org.cytoscape.gedevo.GedevoNativeUtil;
 import org.cytoscape.gedevo.UserSettings;
 import org.cytoscape.gedevo.simplenet.Edge;
 import org.cytoscape.gedevo.simplenet.Graph;
@@ -13,6 +14,10 @@ import org.cytoscape.gedevo.simplenet.Node;
  * from the uk.ac.kent.dover package. Care should be taken not to confuse them.
  */
 public class GedUtil {
+	public static boolean initNativeCode() {
+		return GedevoNativeUtil.initNativeLibs();
+	}
+
 
 	public static GedevoNative.Network fastGraphToNetwork(FastGraph fastgraph, String name) {
 		Graph cytograph = new Graph(name);

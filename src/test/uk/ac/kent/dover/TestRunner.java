@@ -51,8 +51,12 @@ public class TestRunner {
 			System.out.println(failure.toString());
 		}
 		System.out.println(result.wasSuccessful());
-		
-		
+
+		result = JUnitCore.runClasses(GedTest.class);
+		for (Failure failure : result.getFailures()) {
+			System.out.println(failure.toString());
+		}
+		System.out.println(result.wasSuccessful());
    }
 	
 	public static String get0Node0Edge() {
