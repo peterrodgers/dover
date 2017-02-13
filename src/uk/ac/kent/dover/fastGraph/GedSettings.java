@@ -40,7 +40,7 @@ public class GedSettings extends UserSettings {
 
         evo_greedyInitOnInit = false;
 
-        maxAgents = 400;
+        maxAgents = 20;
 
         abort_seconds = 10;
         abort_iterations = 100;
@@ -49,6 +49,9 @@ public class GedSettings extends UserSettings {
         numThreads = 0;
         autosaveSecs = DEFAULT_AUTOSAVE_TIME;
         keepWorkfiles = false; // they would be just in the way
+
+        agreementFraction = 0.2f; // % of agents to consider when calculating overall agreement
+
 
     }
 }
