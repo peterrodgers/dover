@@ -139,7 +139,7 @@ public class GedUtil {
     */
 	public static float getGedScore(GedevoNative.Network g1Network, GedevoNative.Network g2Network) {
 
-		UserSettings userSettings = new DoverSettings();
+		UserSettings userSettings = new GedSettings();
 
 		GedevoNative.Instance instance = GedevoNative.Instance.create(userSettings);
 
