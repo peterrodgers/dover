@@ -19,6 +19,7 @@ import java.io.IOException;
 public class GedActionListener implements ActionListener {
 
 	private final JTextArea gedScore;
+	private final JLabel lastComputed;
 	private Launcher launcher;
 	private LauncherGUI launcherGUI;
 	
@@ -29,10 +30,11 @@ public class GedActionListener implements ActionListener {
 	 * @param launcherGUI The launcherGUI to find what graphs to run on
 	 * @param gedScore The label to update the score
 	 */
-	public GedActionListener(Launcher launcher, LauncherGUI launcherGUI, JTextArea gedScore) {
+	public GedActionListener(Launcher launcher, LauncherGUI launcherGUI, JTextArea gedScore, JLabel lastComputed) {
 		this.launcher = launcher;
 		this.launcherGUI = launcherGUI;
 		this.gedScore = gedScore;
+		this.lastComputed = lastComputed;
 	}
 
 	@Override
@@ -54,7 +56,7 @@ public class GedActionListener implements ActionListener {
 					String name2 = f2.getName();
 					String path2 = f2.getParent();						
 					g2 = launcher.loadFromBuffers(path2+File.separatorChar+name2, name2);
-					
+
 
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -63,6 +65,7 @@ public class GedActionListener implements ActionListener {
 				if (g1 != null && g2 != null) {
 					float score = GedUtil.getGedScore(g1, g2);
 					gedScore.setText(String.valueOf(score));
+					lastComputed.setText("Calculated: " + g1.getName() + " and " + g2.getName());
 				}
 			}
 		});
