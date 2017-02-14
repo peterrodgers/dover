@@ -41,7 +41,6 @@ public class GedActionListener implements ActionListener {
 
 			@Override
 			public void run() {
-				System.out.println("Click");
 				File f1 = launcherGUI.getGed1();
 				File f2 = launcherGUI.getGed2();
 
@@ -56,7 +55,6 @@ public class GedActionListener implements ActionListener {
 					String path2 = f2.getParent();						
 					g2 = launcher.loadFromBuffers(path2+File.separatorChar+name2, name2);
 					
-					System.out.println("Created dover graphs");
 
 				} catch (IOException e) {
 					e.printStackTrace();
