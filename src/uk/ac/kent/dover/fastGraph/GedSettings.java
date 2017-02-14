@@ -40,7 +40,7 @@ public class GedSettings extends UserSettings {
 
         evo_greedyInitOnInit = false;
 
-        maxAgents = 20;
+        maxAgents = 10;
 
         abort_seconds = 10;
         abort_iterations = 100;
