@@ -12,7 +12,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -861,11 +860,18 @@ public class LauncherGUI extends JFrame {
 		c.gridwidth=1;
 		gedPanel.add(gedScore, c);
 
+		JLabel gedLastComputed = new JLabel("");
+
+		c.gridx=0;
+		c.gridy=5;
+		c.gridwidth=2;
+		gedPanel.add(gedLastComputed, c);
+
 		// Set behaviour
 		selectGraphOne.addActionListener(new GraphSelectedActionListener(ged1, targetChooser, graphOneTextField, this, 1));
 		selectGraphTwo.addActionListener(new GraphSelectedActionListener(ged2, targetChooser, graphTwoTextField, this, 2));
 
-		getGedBtn.addActionListener(new GedActionListener(launcher, this, gedScore));
+		getGedBtn.addActionListener(new GedActionListener(launcher, this, gedScore, gedLastComputed));
 
 		return gedPanel;
 	}
