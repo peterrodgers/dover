@@ -72,6 +72,8 @@ public class FastGraph {
 	
 	public static final String INFO_SPLIT_STRING = "~";
 	
+	public static final byte TIME_EDGE_TYPE = 127;
+	
 	public static final int MAX_BYTE_BUFFER_SIZE = Integer.MAX_VALUE-5000;
 	
 
@@ -86,9 +88,12 @@ public class FastGraph {
 	
 	
 	private String name = "";
-	private boolean direct;
+	private boolean direct; // true if off heap storage for byte buffers, false if on heap
+	
+	private byte generation = 0; // the oldest generation time slice
 	
 		
+
 	/**
 	 * No direct access to constructor, as a number of data structures need to be created when
 	 * graph nodes and edges are added.
@@ -104,7 +109,6 @@ public class FastGraph {
 		this.direct = direct;
 		
 		init();
-		
 	}
 
 	
@@ -114,10 +118,56 @@ public class FastGraph {
 	 */
 	public static void main(String[] args) throws Exception {
 		GedUtil.initNativeCode();
+		
+		long time;
 
 		Debugger.enabled = true;
 		
-		long time = 0;
+		FastGraph g1 = randomGraphFactory(5,6,1,false,false);
+//		FastGraph g1 = randomGraphFactory(1000000,10000000,1,false,false);
+		
+		Collection<Integer> deleteNodes = new ArrayList<Integer>();
+		Collection<Integer> deleteEdges = new ArrayList<Integer>();
+		Collection<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		Collection<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+		
+		deleteNodes.add(3);
+		deleteNodes.add(1);
+		deleteEdges.add(0);
+		deleteEdges.add(2);
+		
+		NodeStructure ns1 = new NodeStructure(111,"ns1", 33, (byte)8, (byte)112);
+		EdgeStructure es1 = new EdgeStructure(1,"es1", 99, (byte)9, (byte)88, 111, 2);
+		EdgeStructure es2 = new EdgeStructure(2,"es2", 99, (byte)9, (byte)88, 0, 4);
+		
+		addNodes.add(ns1);
+		addEdges.add(es1);
+		addEdges.add(es2);
+
+Debugger.resetTime();		
+		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfNodes()+" edges "+g2.getNumberOfEdges());		
+
+/*		
+Debugger.log("AFTER ADDING TIME SLICE");		
+for(int i = 0; i< g2.getNumberOfNodes(); i++) {
+Debugger.log("node "+i+" type "+g2.getNodeType(i)+" age "+g2.getNodeAge(i)+" label "+g2.getNodeLabel(i));
+}
+for(int i = 0; i< g2.getNumberOfEdges(); i++) {
+Debugger.log("edge "+i+" type "+g2.getEdgeType(i)+" age "+g2.getEdgeAge(i)+" label "+g2.getEdgeLabel(i)+" node1 "+g2.getEdgeNode1(i)+" node2 "+g2.getEdgeNode2(i));
+}
+*/
+
+		
+/*		
+		for(int i = 0; i < g2.numberOfNodes; i++) {
+			System.out.println("Node "+i+" age "+g2.getNodeAge(i)+" type "+g2.getNodeType(i));
+		}
+					
+		for(int i = 0; i < g2.numberOfEdges; i++) {
+			System.out.println("Edge "+i+" age "+g2.getEdgeAge(i)+" type "+g2.getEdgeType(i));
+		}
+*/		
 		
 //		FastGraph g1 = randomGraphFactory(1,0,false);
 //		FastGraph g1 = randomGraphFactory(2,1,false);
@@ -167,7 +217,7 @@ String name = "simple-random-n-100-e-500";
 		//String name = g1.getName();
 		//FastGraph g2 = g1;
 		try {
-			time = Debugger.createTime();
+/*			time = Debugger.createTime();
 //			FastGraph g2;
 			FastGraph g2 = loadBuffersGraphFactory(null,name);
 //			g2 = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
@@ -176,7 +226,7 @@ String name = "simple-random-n-100-e-500";
 
 			Debugger.log("Number of nodes: " + g2.getNumberOfNodes());
 			Debugger.log("Number of edges: " + g2.getNumberOfEdges());
-			/*
+*/			/*
 			for(int i = 0; i < 100; i++) {
 				System.out.println(g2.getNodeLabel(i));
 			}
@@ -187,7 +237,7 @@ String name = "simple-random-n-100-e-500";
 			emf.findAllMotifs(0,4,6);
 			emf.compareMotifDatas(4,6);
 	*/
-
+/*
 			KMedoids km = new KMedoids(g2, 5, 2);
 			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g2);
 			HashSet<FastGraph> subs = esn.enumerateSubgraphs(4, 1, 10);
@@ -203,7 +253,7 @@ String name = "simple-random-n-100-e-500";
 			
 			System.out.println("Ged scores: " + km.numberOfGedCalcs);
 			System.out.println("Gedtime (s): " + (km.gedTime/1000.0));
-
+*/
 			//emf.findAndExportAllMotifs(10, 4, 4, 0, true);
 			//emf.findAndExportAllMotifs(0, 4, 4, 0, false);
 			//emf.compareAndExportResults();
@@ -674,6 +724,19 @@ String name = "simple-random-n-100-e-500";
 	}
 	
 
+	/**
+	 * 
+	 * @return the oldest time slice generation, usually equates to the oldest node age in the graph.
+	 */
+	public byte getGeneration() {
+		byte maxAge = findMaximumNodeAge();
+		if(generation < maxAge) { // this is required because factory methods do not set generation
+			generation = maxAge;
+		}
+		return generation;
+	}
+
+	
 	/**
 	 * @return the number of nodes in the graph
 	 */
@@ -2432,7 +2495,7 @@ if(edgeIndex%1000000==0 ) {
 		int outLength = -2;
 		int weight = -5;
 		byte type = -7;
-		byte age = -9;
+		byte age = 0;
 		//generate the nodes
 		for(int i = 0; i < numberOfNodes; i++) {
 			weight = r.nextInt(100);
@@ -2470,7 +2533,7 @@ if(edgeIndex%1000000==0 ) {
 		int node2;
 		weight = -101;
 		type = -103;
-		age = -105;
+		age = 0;
 		//generate the edges, with random node connections
 		HashSet<String> nodePairs = new HashSet<String>();
 		if(simple) {
@@ -3708,5 +3771,329 @@ Debugger.outputTime("time for rewiring");
 		}
 		return false;
 	}
+	
+	
+	/**
+	 * @return the largest node age in the graph
+	 */
+	public byte findMaximumNodeAge() {
+		byte ret = Byte.MIN_VALUE;
+		for(int i = 0; i < this.getNumberOfNodes(); i++) {
+			if(this.getNodeAge(i) > ret) {
+				ret = this.getNodeAge(i);
+			}
+		}
+		return ret;
+	}
+	
+	
+	/**
+	 * @return the smallest node age in the graph
+	 */
+	public byte findMinimumNodeAge() {
+		byte ret = Byte.MAX_VALUE;
+		for(int i = 0; i < this.getNumberOfNodes(); i++) {
+			if(this.getNodeAge(i) < ret) {
+				ret = this.getNodeAge(i);
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 * @return the largest node age in the graph
+	 */
+	public byte findMaximumEdgeAge() {
+		byte ret = Byte.MIN_VALUE;
+		for(int i = 0; i < this.getNumberOfEdges(); i++) {
+			if(this.getEdgeAge(i) > ret) {
+				ret = this.getEdgeAge(i);
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 * @return the smallest node age in the graph
+	 */
+	public byte findMinimumEdgeAge() {
+		byte ret = Byte.MAX_VALUE;
+		for(int i = 0; i < this.getNumberOfEdges(); i++) {
+			if(this.getEdgeAge(i) < ret) {
+				ret = this.getEdgeAge(i);
+			}
+		}
+		return ret;
+	}
+	
+
+	/**
+	 * Creates a new FastGraph with a new time slice, the nodes and edges in the new time slice are those in the current oldest
+	 * time slice, with the edits given by the parameters. Time type edges are created between
+	 * nodes that persist from the current generation the new time slice. Orphaned edges (created by node delete) are also
+	 * deleted. Time slice of nodes and edges is given by the age attribute. New generation nodes and edges get an age of current oldest plus one, so any new edges and nodes have their current
+	 * age discarded.
+	 * addNodes should contain node with unique ids greater than the number of nodes in the current graph.
+	 * 
+	 * @param deleteNodes nodes in the oldest generation that should not appear in the new time slice
+	 * @param deleteEdges edges in the oldest generation that should not appear in the new time slice
+	 * @param addNodes extra nodes to appear in the new time slice. Ids must not appear in the current FastGraph
+	 * @param addEdges extra edges to appear in the new time slice. They can use addNode indexes or indexes in the current graph from nodes in the current oldest time slice
+	 * @return the new graph with time slice added. Information about added indexes and mappings is stored in various 
+	 */
+	public FastGraph addNewTimeSlice(Collection<Integer> deleteNodes, Collection<Integer> deleteEdges, Collection<NodeStructure> addNodes, Collection<EdgeStructure> addEdges, boolean direct) {
+		
+
+		// find the greatest age in the current FastGraph to get the nextGeneration, has to be maximum node generation, as edges cannot exist alone
+		byte oldGeneration = getGeneration();
+		generation++;
+		HashMap<Integer,Integer> oldToNewNodeMapping = new HashMap<Integer,Integer>();
+		
+		LinkedList<NodeStructure> allNodes = new LinkedList<NodeStructure>();
+		LinkedList<EdgeStructure> allEdges = new LinkedList<EdgeStructure>();
+		
+		// store the previous generation nodes in the list
+		for(int i = 0; i < numberOfNodes; i++) {
+			String label = getNodeLabel(i);
+			int weight = getNodeWeight(i);
+			byte type = getNodeType(i);
+			byte age = getNodeAge(i);
+			NodeStructure ns = new NodeStructure(i,label,weight,type,age);
+			allNodes.add(ns);
+		}
+		
+		int nodeId = numberOfNodes;
+		int edgeId = numberOfEdges;
+
+		LinkedList<EdgeStructure> timeEdges = new LinkedList<EdgeStructure>();
+		
+		// duplicate the existing nodes first, and create the time edges
+		for(int i = 0 ; i < numberOfNodes; i++) {
+			if(getNodeAge(i) != oldGeneration) { // only want nodes in the latest generation
+				continue;
+			}
+			if(deleteNodes.contains(i)) {
+				continue;
+			}
+			String label = getNodeLabel(i);
+			int weight = getNodeWeight(i);
+			byte type = getNodeType(i);
+			byte age = generation;
+			NodeStructure ns = new NodeStructure(nodeId,label,weight,type,age);
+			allNodes.add(ns);
+			
+			oldToNewNodeMapping.put(i,nodeId);
+			
+			// add the time edges
+			String timeLabel = "";
+			int timeWeight = 0;
+			byte timeType = TIME_EDGE_TYPE;
+			byte timeAge = generation;
+			int timeNode1 = i;
+			int timeNode2 = nodeId;
+			EdgeStructure es = new EdgeStructure(edgeId,timeLabel,timeWeight,timeType,timeAge,timeNode1,timeNode2);
+			timeEdges.add(es);
+			edgeId++;
+			nodeId++;
+		}
+		// add the new nodes
+		for(NodeStructure addNS : addNodes) {
+			NodeStructure ns = new NodeStructure(nodeId, addNS.getLabel(), addNS.getWeight(), addNS.getType(), generation); 
+			allNodes.add(ns);
+			oldToNewNodeMapping.put(addNS.getId(),nodeId);
+			nodeId++;
+		}
+		
+		HashSet<Integer> fullDeleteEdges = new HashSet<Integer>(deleteEdges.size()*3);
+		
+		for(Integer n : deleteNodes) {
+			for(int e : getNodeConnectingEdges(n)) {
+				fullDeleteEdges.add(e);
+			}
+		}
+		fullDeleteEdges.addAll(deleteEdges);
+
+		// store the previous generation edges in the list
+		for(int i = 0; i < numberOfEdges; i++) {
+			String label = getEdgeLabel(i);
+			int weight = getEdgeWeight(i);
+			byte type = getEdgeType(i);
+			byte age = getEdgeAge(i);
+			int node1 = getEdgeNode1(i);
+			int node2 = getEdgeNode2(i);
+			EdgeStructure es = new EdgeStructure(i,label,weight,type,age,node1,node2);
+			allEdges.add(es);
+		}
+		// duplicate edges in the new time slice
+		LinkedList<EdgeStructure> edgesInTimeSlice = new LinkedList<EdgeStructure>();
+		for(int i = 0; i < numberOfEdges; i++) {
+			if(getEdgeAge(i) != oldGeneration) { // only want edges in the latest generation
+				continue;
+			}
+			if(getEdgeType(i) == TIME_EDGE_TYPE) { // don't duplicate time edges
+				continue;
+			}
+			if(fullDeleteEdges.contains(i)) { // don't duplcicate deleted edges
+				continue;
+			}
+			String label = getEdgeLabel(i);
+			int weight = getEdgeWeight(i);
+			byte type = getEdgeType(i);
+			byte age = generation;
+			int node1 = oldToNewNodeMapping.get(getEdgeNode1(i));
+			int node2 = oldToNewNodeMapping.get(getEdgeNode2(i));
+			EdgeStructure es = new EdgeStructure(edgeId,label,weight,type,age,node1,node2);
+			edgesInTimeSlice.add(es);
+			edgeId++;
+		}
+		// add the new edges
+		for(EdgeStructure addES : addEdges) {
+			int node1 = oldToNewNodeMapping.get(addES.getNode1());
+			int node2 = oldToNewNodeMapping.get(addES.getNode2());
+			EdgeStructure es = new EdgeStructure(edgeId, addES.getLabel(), addES.getWeight(), addES.getType(), generation,node1,node2); 
+			edgesInTimeSlice.add(es);
+			edgeId++;
+		}
+
+
+		// fix the node1 and node2 for each edge to match the new node ids
+		for(EdgeStructure es : edgesInTimeSlice) {
+			int node1 = es.getNode1();
+			int node2 = es.getNode2();
+			es.setNode1(node1);
+			es.setNode2(node2);
+		}
+		
+		allEdges.addAll(timeEdges);
+		allEdges.addAll(edgesInTimeSlice); 
+/*		
+for(NodeStructure ns : allNodes) {
+	System.out.println(ns);
+}
+for(EdgeStructure es : allEdges) {
+	System.out.println(es);
+}
+*/
+
+		// create and populate the byteBuffers
+
+		int nodeCount = allNodes.size();
+		int edgeCount = allEdges.size();
+		FastGraph g = new FastGraph(nodeCount,edgeCount,direct);
+		g.setName(getName()+"-"+generation);
+		g.generation = generation;
+		
+		String[] nodeLabels = new String[nodeCount];
+		String[] edgeLabels = new String[edgeCount];
+
+		for(NodeStructure ns : allNodes) {
+			int i = ns.getId();
+			g.nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE,-1); // offset for inward connecting edges/nodes
+			g.nodeBuf.putInt(NODE_IN_DEGREE_OFFSET+i*NODE_BYTE_SIZE,-1); // number of inward connecting edges/nodes
+			g.nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE,-1); // offset for outward connecting edges/nodes
+			g.nodeBuf.putInt(NODE_OUT_DEGREE_OFFSET+i*NODE_BYTE_SIZE,-1); // number of outward connecting edges/nodes
+			g.nodeBuf.putInt(NODE_WEIGHT_OFFSET+i*NODE_BYTE_SIZE,ns.getWeight()); // weight
+			g.nodeBuf.put(NODE_TYPE_OFFSET+i*NODE_BYTE_SIZE,ns.getType()); // type
+			g.nodeBuf.put(NODE_AGE_OFFSET+i*NODE_BYTE_SIZE,ns.getAge()); // age
+
+			// save labels for later
+			nodeLabels[i] = ns.getLabel();
+		}
+
+		g.setAllNodeLabels(nodeLabels);
+
+		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(nodeCount); // temporary store of inward edges
+		for(int i = 0; i < nodeCount; i++) {
+			ArrayList<Integer> edges = new ArrayList<Integer>(100);
+			nodeIn.add(i,edges);
+		}
+		
+		ArrayList<ArrayList<Integer>> nodeOut = new ArrayList<ArrayList<Integer>>(nodeCount); // temporary store of outward edges
+		for(int i = 0; i < nodeCount; i++) {
+			ArrayList<Integer> edges = new ArrayList<Integer>(100);
+			nodeOut.add(i,edges);
+		}
+		
+		ArrayList<Integer> inEdgeList;	
+		ArrayList<Integer> outEdgeList;	
+		for(EdgeStructure es : allEdges) {
+			int i = es.getId();
+			g.edgeBuf.putInt(EDGE_NODE1_OFFSET+i*EDGE_BYTE_SIZE,es.getNode1()); // one end of edge
+			g.edgeBuf.putInt(EDGE_NODE2_OFFSET+i*EDGE_BYTE_SIZE,es.getNode2()); // other end of edge
+			g.edgeBuf.putInt(EDGE_WEIGHT_OFFSET+i*EDGE_BYTE_SIZE,es.getWeight()); // weight
+			g.edgeBuf.put(EDGE_TYPE_OFFSET+i*EDGE_BYTE_SIZE,es.getType()); // type
+			g.edgeBuf.put(EDGE_AGE_OFFSET+i*EDGE_BYTE_SIZE,es.getAge()); // age
+			
+			// store labels for later
+			edgeLabels[i] = es.getLabel();
+			
+			// store connecting nodes
+			inEdgeList = nodeIn.get(es.getNode2());
+			inEdgeList.add(i);
+			outEdgeList = nodeOut.get(es.getNode1());
+			outEdgeList.add(i);
+			
+		}
+		
+		g.setAllEdgeLabels(edgeLabels);
+
+		// Initialise the connection buffer, modifying the node buffer connection data
+		//time = Debugger.createTime();
+		int offset = 0;
+		for(int i = 0; i < nodeCount; i++) {
+			// setting the in connection offset and length
+			ArrayList<Integer> inEdges = nodeIn.get(i);
+			int inEdgeLength = inEdges.size();
+			g.nodeBuf.putInt(i*NODE_BYTE_SIZE+NODE_IN_CONNECTION_START_OFFSET,offset);
+			g.nodeBuf.putInt(i*NODE_BYTE_SIZE+NODE_IN_DEGREE_OFFSET,inEdgeLength);
+		
+			// now put the in edge/node pairs
+			for(int e : inEdges) {
+				int n = -1;
+				int n1 = g.edgeBuf.getInt(EDGE_NODE1_OFFSET+e*EDGE_BYTE_SIZE);
+				int n2 = g.edgeBuf.getInt(EDGE_NODE2_OFFSET+e*EDGE_BYTE_SIZE);
+				if(n1 == i) {
+					n = n2;
+				} else if(n2 == i) {
+					n = n1;
+				} else {
+					Debugger.log("ERROR When finding connections for node "+i+" connecting edge "+e+ " has connecting nodes "+n1+" "+n2);
+				}
+				g.connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,e);
+				g.connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,n);
+				offset += CONNECTION_PAIR_SIZE;
+			}
+			
+			// setting the out connection offset and length
+			ArrayList<Integer> outEdges = nodeOut.get(i);
+			int outEdgeLength = outEdges.size();
+			g.nodeBuf.putInt(i*NODE_BYTE_SIZE+NODE_OUT_CONNECTION_START_OFFSET,offset);
+			g.nodeBuf.putInt(i*NODE_BYTE_SIZE+NODE_OUT_DEGREE_OFFSET,outEdgeLength);
+		
+			// now put the out edge/node pairs
+			for(int e : outEdges) {
+				int n = -1;
+				int n1 = g.edgeBuf.getInt(EDGE_NODE1_OFFSET+e*EDGE_BYTE_SIZE);
+				int n2 = g.edgeBuf.getInt(EDGE_NODE2_OFFSET+e*EDGE_BYTE_SIZE);
+				if(n1 == i) {
+					n = n2;
+				} else if(n2 == i) {
+					n = n1;
+				} else {
+					Debugger.log("ERROR When finding connections for node "+i+" connecting edge "+e+ " has connecting nodes "+n1+" "+n2);
+				}
+				g.connectionBuf.putInt(CONNECTION_EDGE_OFFSET+offset,e);
+				g.connectionBuf.putInt(CONNECTION_NODE_OFFSET+offset,n);
+				offset += CONNECTION_PAIR_SIZE;
+			}
+		}
+		
+		return g;
+		
+	}
+		
+	
+	
+	
 	
 }

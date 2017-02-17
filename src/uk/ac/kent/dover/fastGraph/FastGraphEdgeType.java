@@ -2,7 +2,7 @@ package uk.ac.kent.dover.fastGraph;
 
 /**
  * Enum to hold the various edge types in the data. <br>
- * Each has a byte value which is stoed in the edge type area in the edge buffer.
+ * Each has a byte value which is stored in the edge type area in the edge buffer.
  * 
  * Also stored in /techreport/Node and Edge Types.txt
  * 
@@ -25,6 +25,7 @@ public enum FastGraphEdgeType {
 	NEIGHBOUR(11),
 	BUSINESS_PARTNER(12),
 	DOCTOR(13);
+
 	
 	private byte value; //the value of this type
 	

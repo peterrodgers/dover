@@ -3,7 +3,9 @@ package test.uk.ac.kent.dover.fastGraph;
 import static org.junit.Assert.*;
 
 import java.nio.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.io.*;
 
@@ -1729,6 +1731,904 @@ public class FastGraphTest {
 	}
 	
 	
+	@Test
+	public void test140() {
+		FastGraph g = FastGraph.jsonStringGraphFactory(get4Node5Edge(),false);
+		
+		assertEquals(33,g.findMaximumNodeAge());
+		assertEquals(0,g.findMinimumNodeAge());
+		assertEquals(47,g.findMaximumEdgeAge());
+		assertEquals(0,g.findMinimumEdgeAge());
+	}
+	
+	
+	
+	@Test
+	public void test141() {
+		Graph displayGraph = new Graph();
+	
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph, false);
+		Collection<Integer> deleteNodes = new ArrayList<Integer>();
+		Collection<Integer> deleteEdges = new ArrayList<Integer>();
+		Collection<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		Collection<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+		
+		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+		
+		assertEquals(0,g2.getNumberOfNodes());
+		assertEquals(0,g2.getNumberOfEdges());
+
+	}
+
+	
+	@Test
+	public void test142() {
+		Graph displayGraph = new Graph();
+		Node n0 = new Node("n0");
+		displayGraph.addNode(n0);
+		n0.setAge(0);
+		n0.setScore(77);
+	
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph, false);
+		Collection<Integer> deleteNodes = new ArrayList<Integer>();
+		Collection<Integer> deleteEdges = new ArrayList<Integer>();
+		Collection<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		Collection<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+
+		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+		
+		assertEquals(2,g2.getNumberOfNodes());
+		assertEquals(1,g2.getNumberOfEdges());
+		
+		assertEquals(g2.getNodeLabel(0),g2.getNodeLabel(1));
+		assertEquals(g2.getNodeType(0),g2.getNodeType(1));
+		assertEquals(g2.getNodeWeight(0),g2.getNodeWeight(1));
+		assertEquals(0,g2.getNodeAge(0));
+		assertEquals(1,g2.getNodeAge(1));
+
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(0));
+		assertEquals(1,g2.getEdgeAge(0));
+		
+		FastGraph g3 = g2.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+		
+		assertEquals(3,g3.getNumberOfNodes());
+		assertEquals(2,g3.getNumberOfEdges());
+		
+		assertEquals(g3.getNodeLabel(0),g1.getNodeLabel(0));
+		assertEquals(g3.getNodeType(0),g1.getNodeType(0));
+		assertEquals(g3.getNodeWeight(0),g1.getNodeWeight(0));
+		assertEquals(g3.getNodeLabel(0),g3.getNodeLabel(1));
+		assertEquals(g3.getNodeType(0),g3.getNodeType(1));
+		assertEquals(g3.getNodeWeight(0),g3.getNodeWeight(1));
+		assertEquals(g3.getNodeLabel(1),g3.getNodeLabel(2));
+		assertEquals(g3.getNodeType(1),g3.getNodeType(2));
+		assertEquals(g3.getNodeWeight(1),g3.getNodeWeight(2));
+		assertEquals(0,g3.getNodeAge(0));
+		assertEquals(1,g3.getNodeAge(1));
+		assertEquals(2,g3.getNodeAge(2));
+
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g3.getEdgeType(0));
+		assertEquals(1,g3.getEdgeAge(0));
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g3.getEdgeType(1));
+		assertEquals(2,g3.getEdgeAge(1));
+		
+		assertEquals(0,g3.getEdgeNode1(0));
+		assertEquals(1,g3.getEdgeNode2(0));
+		assertEquals(1,g3.getEdgeNode1(1));
+		assertEquals(2,g3.getEdgeNode2(1));
+		
+
+	}
+	
+	@Test
+	public void test143() {
+		
+		Graph displayGraph = new Graph();
+		Node n0 = new Node("n0");
+		Node n1 = new Node("n1");
+		displayGraph.addNode(n0);
+		displayGraph.addNode(n1);
+		n0.setAge(0);
+		n1.setAge(0);
+		n0.setScore(77);
+		n1.setScore(77);
+		Edge e0 = new Edge(n0,n1,"e0");
+		e0.setAge(0);
+		e0.setScore(88);
+		displayGraph.addEdge(e0);
+
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph, false);
+		Collection<Integer> deleteNodes = new ArrayList<Integer>();
+		Collection<Integer> deleteEdges = new ArrayList<Integer>();
+		Collection<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		Collection<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+		
+		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		assertEquals(4,g2.getNumberOfNodes());
+		assertEquals(4,g2.getNumberOfEdges());
+		
+		assertEquals(g2.getNodeLabel(0),g2.getNodeLabel(2));
+		assertEquals(g2.getNodeType(0),g2.getNodeType(2));
+		assertEquals(g2.getNodeWeight(0),g2.getNodeWeight(2));
+		assertEquals(0,g2.getNodeAge(0));
+		assertEquals(0,g2.getNodeAge(1));
+		assertEquals(1,g2.getNodeAge(2));
+		assertEquals(1,g2.getNodeAge(3));
+		
+		assertEquals(g2.getEdgeLabel(0),g2.getEdgeLabel(3));
+		assertEquals(g2.getEdgeType(0),g2.getEdgeType(3));
+		assertEquals(g2.getEdgeWeight(0),g2.getEdgeWeight(3));
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(0));
+		assertEquals(0,g2.getEdgeAge(0));
+		assertEquals(1,g2.getEdgeAge(3));
+
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(1));
+		assertEquals(1,g2.getEdgeAge(1));
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(2));
+		assertEquals(1,g2.getEdgeAge(1));
+
+		assertEquals(0,g2.getEdgeNode1(0));
+		assertEquals(1,g2.getEdgeNode2(0));
+		assertEquals(0,g2.getEdgeNode1(1));
+		assertEquals(2,g2.getEdgeNode2(1));
+		assertEquals(1,g2.getEdgeNode1(2));
+		assertEquals(3,g2.getEdgeNode2(2));
+		assertEquals(2,g2.getEdgeNode1(3));
+		assertEquals(3,g2.getEdgeNode2(3));
+
+	}
+	
+	@Test
+	public void test144() {
+		
+		Graph displayGraph = new Graph();
+		Node n0 = new Node("n0");
+		Node n1 = new Node("n1");
+		Node n2 = new Node("n2");
+		displayGraph.addNode(n0);
+		displayGraph.addNode(n1);
+		displayGraph.addNode(n2);
+		n0.setAge(0);
+		n1.setAge(0);
+		n2.setAge(0);
+		n0.setScore(77);
+		n1.setScore(66);
+		n2.setScore(55);
+		Edge e0 = new Edge(n0,n1,"e0");
+		Edge e1 = new Edge(n2,n1,"e1");
+		Edge e2 = new Edge(n0,n2,"e2");
+		e0.setAge(0);
+		e1.setAge(0);
+		e2.setAge(0);
+		e0.setScore(11);
+		e1.setScore(12);
+		e2.setScore(13);
+		displayGraph.addEdge(e0);
+		displayGraph.addEdge(e1);
+		displayGraph.addEdge(e2);
+
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph, false);
+		Collection<Integer> deleteNodes = new ArrayList<Integer>();
+		Collection<Integer> deleteEdges = new ArrayList<Integer>();
+		Collection<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		Collection<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+		
+		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		assertEquals(6,g2.getNumberOfNodes());
+		assertEquals(9,g2.getNumberOfEdges());
+		
+		assertEquals(g2.getNodeLabel(2),g2.getNodeLabel(5));
+		assertEquals(g2.getNodeType(2),g2.getNodeType(5));
+		assertEquals(g2.getNodeWeight(2),g2.getNodeWeight(5));
+		assertEquals(0,g2.getNodeAge(0));
+		assertEquals(0,g2.getNodeAge(1));
+		assertEquals(0,g2.getNodeAge(2));
+		assertEquals(1,g2.getNodeAge(3));
+		assertEquals(1,g2.getNodeAge(4));
+		assertEquals(1,g2.getNodeAge(5));
+		
+		assertEquals(g2.getEdgeLabel(2),g2.getEdgeLabel(8));
+		assertEquals(g2.getEdgeType(2),g2.getEdgeType(8));
+		assertEquals(g2.getEdgeWeight(2),g2.getEdgeWeight(8));
+		assertEquals(0,g2.getEdgeAge(0));
+		assertEquals(0,g2.getEdgeAge(1));
+		assertEquals(0,g2.getEdgeAge(2));
+		assertEquals(1,g2.getEdgeAge(3));
+		assertEquals(1,g2.getEdgeAge(4));
+		assertEquals(1,g2.getEdgeAge(5));
+		assertEquals(1,g2.getEdgeAge(6));
+		assertEquals(1,g2.getEdgeAge(7));
+		assertEquals(1,g2.getEdgeAge(8));
+
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(3));
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(4));
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(5));
+
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(2));
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(8));
+
+		assertEquals(0,g2.getEdgeNode1(3));
+		assertEquals(3,g2.getEdgeNode2(3));
+		assertEquals(1,g2.getEdgeNode1(4));
+		assertEquals(4,g2.getEdgeNode2(4));
+		assertEquals(2,g2.getEdgeNode1(5));
+		assertEquals(5,g2.getEdgeNode2(5));
+
+		assertEquals(0,g2.getEdgeNode1(2));
+		assertEquals(2,g2.getEdgeNode2(2));
+		
+		assertEquals(3,g2.getEdgeNode1(8));
+		assertEquals(5,g2.getEdgeNode2(8));
+		
+		
+		FastGraph g3 = g2.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		assertEquals(9,g3.getNumberOfNodes());
+		assertEquals(15,g3.getNumberOfEdges());
+		
+		assertEquals(g3.getNodeLabel(5),g3.getNodeLabel(8));
+		assertEquals(g3.getNodeType(5),g3.getNodeType(8));
+		assertEquals(g3.getNodeWeight(5),g3.getNodeWeight(8));
+		assertEquals(0,g3.getNodeAge(0));
+		assertEquals(0,g3.getNodeAge(1));
+		assertEquals(0,g3.getNodeAge(2));
+		assertEquals(1,g3.getNodeAge(3));
+		assertEquals(1,g3.getNodeAge(4));
+		assertEquals(1,g3.getNodeAge(5));
+		assertEquals(2,g3.getNodeAge(6));
+		assertEquals(2,g3.getNodeAge(7));
+		assertEquals(2,g3.getNodeAge(8));
+		
+		assertEquals(g3.getEdgeLabel(2),g3.getEdgeLabel(14));
+		assertEquals(g3.getEdgeType(2),g3.getEdgeType(14));
+		assertEquals(g3.getEdgeWeight(2),g3.getEdgeWeight(14));
+		assertEquals(g3.getEdgeLabel(8),g3.getEdgeLabel(14));
+		assertEquals(g3.getEdgeType(8),g3.getEdgeType(14));
+		assertEquals(g3.getEdgeWeight(8),g3.getEdgeWeight(14));
+		assertEquals(0,g3.getEdgeAge(0));
+		assertEquals(0,g3.getEdgeAge(1));
+		assertEquals(0,g3.getEdgeAge(2));
+		assertEquals(1,g3.getEdgeAge(3));
+		assertEquals(1,g3.getEdgeAge(4));
+		assertEquals(1,g3.getEdgeAge(5));
+		assertEquals(1,g3.getEdgeAge(6));
+		assertEquals(1,g3.getEdgeAge(7));
+		assertEquals(1,g3.getEdgeAge(8));
+		assertEquals(2,g3.getEdgeAge(9));
+		assertEquals(2,g3.getEdgeAge(10));
+		assertEquals(2,g3.getEdgeAge(11));
+		assertEquals(2,g3.getEdgeAge(12));
+		assertEquals(2,g3.getEdgeAge(13));
+		assertEquals(2,g3.getEdgeAge(14));
+
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g3.getEdgeType(3));
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g3.getEdgeType(9));
+
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g3.getEdgeType(1));
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g3.getEdgeType(7));
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g3.getEdgeType(13));
+
+		assertEquals(0,g3.getEdgeNode1(3));
+		assertEquals(3,g3.getEdgeNode2(3));
+		assertEquals(3,g3.getEdgeNode1(9));
+		assertEquals(6,g3.getEdgeNode2(9));
+
+		assertEquals(0,g3.getEdgeNode1(2));
+		assertEquals(2,g3.getEdgeNode2(2));
+		
+		assertEquals(3,g3.getEdgeNode1(8));
+		assertEquals(5,g3.getEdgeNode2(8));
+		
+		assertEquals(6,g3.getEdgeNode1(14));
+		assertEquals(8,g3.getEdgeNode2(14));
+
+	}
+	
+	
+	@Test
+	public void test145() {
+		
+		Graph displayGraph = new Graph();
+		Node n0 = new Node("n0");
+		Node n1 = new Node("n1");
+		Node n2 = new Node("n2");
+		displayGraph.addNode(n0);
+		displayGraph.addNode(n1);
+		displayGraph.addNode(n2);
+		n0.setAge(0);
+		n1.setAge(0);
+		n2.setAge(0);
+		n0.setScore(77);
+		n1.setScore(66);
+		n2.setScore(55);
+		Edge e0 = new Edge(n0,n1,"e0");
+		Edge e1 = new Edge(n2,n1,"e1");
+		Edge e2 = new Edge(n0,n2,"e2");
+		e0.setAge(0);
+		e1.setAge(0);
+		e2.setAge(0);
+		e0.setScore(11);
+		e1.setScore(12);
+		e2.setScore(13);
+		displayGraph.addEdge(e0);
+		displayGraph.addEdge(e1);
+		displayGraph.addEdge(e2);
+
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph, false);
+		Collection<Integer> deleteNodes = new ArrayList<Integer>();
+		Collection<Integer> deleteEdges = new ArrayList<Integer>();
+		Collection<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		Collection<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+		
+		deleteNodes.add(1);
+		
+		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+		
+		assertEquals(5,g2.getNumberOfNodes());
+		assertEquals(6,g2.getNumberOfEdges());
+		
+		assertEquals(g2.getNodeLabel(2),g2.getNodeLabel(4));
+		assertEquals(g2.getNodeType(2),g2.getNodeType(4));
+		assertEquals(g2.getNodeWeight(2),g2.getNodeWeight(4));
+		assertEquals(0,g2.getNodeAge(0));
+		assertEquals(0,g2.getNodeAge(1));
+		assertEquals(0,g2.getNodeAge(2));
+		assertEquals(1,g2.getNodeAge(3));
+		assertEquals(1,g2.getNodeAge(4));
+		
+		assertEquals(g2.getEdgeLabel(2),g2.getEdgeLabel(5));
+		assertEquals(g2.getEdgeType(2),g2.getEdgeType(5));
+		assertEquals(g2.getEdgeWeight(2),g2.getEdgeWeight(5));
+		assertEquals(0,g2.getEdgeAge(0));
+		assertEquals(0,g2.getEdgeAge(1));
+		assertEquals(0,g2.getEdgeAge(2));
+		assertEquals(1,g2.getEdgeAge(3));
+		assertEquals(1,g2.getEdgeAge(4));
+		assertEquals(1,g2.getEdgeAge(5));
+
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(3));
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(4));
+		
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(0));
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(5));
+
+		assertEquals(0,g2.getEdgeNode1(3));
+		assertEquals(3,g2.getEdgeNode2(3));
+		assertEquals(2,g2.getEdgeNode1(4));
+		assertEquals(4,g2.getEdgeNode2(4));
+
+		assertEquals(0,g2.getEdgeNode1(2));
+		assertEquals(2,g2.getEdgeNode2(2));
+		
+		assertEquals(3,g2.getEdgeNode1(5));
+		assertEquals(4,g2.getEdgeNode2(5));
+
+	}
+	
+	@Test
+	public void test146() {
+		
+		Graph displayGraph = new Graph();
+		Node n0 = new Node("n0");
+		Node n1 = new Node("n1");
+		Node n2 = new Node("n2");
+		displayGraph.addNode(n0);
+		displayGraph.addNode(n1);
+		displayGraph.addNode(n2);
+		n0.setAge(0);
+		n1.setAge(0);
+		n2.setAge(0);
+		n0.setScore(77);
+		n1.setScore(66);
+		n2.setScore(55);
+		Edge e0 = new Edge(n0,n1,"e0");
+		Edge e1 = new Edge(n2,n1,"e1");
+		Edge e2 = new Edge(n0,n2,"e2");
+		e0.setAge(0);
+		e1.setAge(0);
+		e2.setAge(0);
+		e0.setScore(11);
+		e1.setScore(12);
+		e2.setScore(13);
+		displayGraph.addEdge(e0);
+		displayGraph.addEdge(e1);
+		displayGraph.addEdge(e2);
+
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph, false);
+		Collection<Integer> deleteNodes = new ArrayList<Integer>();
+		Collection<Integer> deleteEdges = new ArrayList<Integer>();
+		Collection<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		Collection<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+		
+		deleteEdges.add(1);
+		
+		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+		
+		assertEquals(6,g2.getNumberOfNodes());
+		assertEquals(8,g2.getNumberOfEdges());
+		
+		assertEquals(g2.getNodeLabel(1),g2.getNodeLabel(4));
+		assertEquals(g2.getNodeType(1),g2.getNodeType(4));
+		assertEquals(g2.getNodeWeight(1),g2.getNodeWeight(4));
+		assertEquals(0,g2.getNodeAge(0));
+		assertEquals(0,g2.getNodeAge(1));
+		assertEquals(0,g2.getNodeAge(2));
+		assertEquals(1,g2.getNodeAge(3));
+		assertEquals(1,g2.getNodeAge(4));
+		assertEquals(1,g2.getNodeAge(5));
+		
+		assertEquals(g2.getEdgeLabel(2),g2.getEdgeLabel(7));
+		assertEquals(g2.getEdgeType(2),g2.getEdgeType(7));
+		assertEquals(g2.getEdgeWeight(2),g2.getEdgeWeight(7));
+		assertEquals(0,g2.getEdgeAge(0));
+		assertEquals(0,g2.getEdgeAge(1));
+		assertEquals(0,g2.getEdgeAge(2));
+		assertEquals(1,g2.getEdgeAge(3));
+		assertEquals(1,g2.getEdgeAge(4));
+		assertEquals(1,g2.getEdgeAge(5));
+		assertEquals(1,g2.getEdgeAge(6));
+		assertEquals(1,g2.getEdgeAge(7));
+
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(3));
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(4));
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(5));
+
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(2));
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(6));
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(7));
+
+		assertEquals(0,g2.getEdgeNode1(3));
+		assertEquals(3,g2.getEdgeNode2(3));
+		assertEquals(1,g2.getEdgeNode1(4));
+		assertEquals(4,g2.getEdgeNode2(4));
+		assertEquals(2,g2.getEdgeNode1(5));
+		assertEquals(5,g2.getEdgeNode2(5));
+
+		assertEquals(0,g2.getEdgeNode1(2));
+		assertEquals(2,g2.getEdgeNode2(2));
+		
+		assertEquals(3,g2.getEdgeNode1(7));
+		assertEquals(5,g2.getEdgeNode2(7));
+		
+
+	}
+	
+	
+	@Test
+	public void test147() {
+		
+		Graph displayGraph = new Graph();
+		Node n0 = new Node("n0");
+		Node n1 = new Node("n1");
+		Node n2 = new Node("n2");
+		displayGraph.addNode(n0);
+		displayGraph.addNode(n1);
+		displayGraph.addNode(n2);
+		n0.setAge(0);
+		n1.setAge(0);
+		n2.setAge(0);
+		n0.setScore(77);
+		n1.setScore(66);
+		n2.setScore(55);
+		Edge e0 = new Edge(n0,n1,"e0");
+		Edge e1 = new Edge(n2,n1,"e1");
+		Edge e2 = new Edge(n0,n2,"e2");
+		e0.setAge(0);
+		e1.setAge(0);
+		e2.setAge(0);
+		e0.setScore(11);
+		e1.setScore(12);
+		e2.setScore(13);
+		displayGraph.addEdge(e0);
+		displayGraph.addEdge(e1);
+		displayGraph.addEdge(e2);
+
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph, false);
+		Collection<Integer> deleteNodes = new ArrayList<Integer>();
+		Collection<Integer> deleteEdges = new ArrayList<Integer>();
+		Collection<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		Collection<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+		
+		NodeStructure ns1 = new NodeStructure(111,"ns1", 33, (byte)8, (byte)112);
+		addNodes.add(ns1);
+		
+		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		assertEquals(7,g2.getNumberOfNodes());
+		assertEquals(9,g2.getNumberOfEdges());
+		
+		assertEquals(g2.getNodeLabel(2),g2.getNodeLabel(5));
+		assertEquals(g2.getNodeType(2),g2.getNodeType(5));
+		assertEquals(g2.getNodeWeight(2),g2.getNodeWeight(5));
+		assertEquals("ns1",g2.getNodeLabel(6));
+		assertEquals(8,g2.getNodeType(6));
+		assertEquals(33,g2.getNodeWeight(6));
+		assertEquals(0,g2.getNodeAge(0));
+		assertEquals(0,g2.getNodeAge(1));
+		assertEquals(0,g2.getNodeAge(2));
+		assertEquals(1,g2.getNodeAge(3));
+		assertEquals(1,g2.getNodeAge(4));
+		assertEquals(1,g2.getNodeAge(5));
+		assertEquals(1,g2.getNodeAge(6));
+		
+		assertEquals(g2.getEdgeLabel(2),g2.getEdgeLabel(8));
+		assertEquals(g2.getEdgeType(2),g2.getEdgeType(8));
+		assertEquals(g2.getEdgeWeight(2),g2.getEdgeWeight(8));
+		assertEquals(0,g2.getEdgeAge(0));
+		assertEquals(1,g2.getEdgeAge(4));
+		assertEquals(1,g2.getEdgeAge(8));
+
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(5));
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(8));
+
+		assertEquals(0,g2.getEdgeNode1(3));
+		assertEquals(3,g2.getEdgeNode2(3));
+		assertEquals(1,g2.getEdgeNode1(4));
+		assertEquals(4,g2.getEdgeNode2(4));
+		assertEquals(2,g2.getEdgeNode1(5));
+		assertEquals(5,g2.getEdgeNode2(5));
+
+		assertEquals(0,g2.getEdgeNode1(2));
+		assertEquals(2,g2.getEdgeNode2(2));
+		
+		assertEquals(3,g2.getEdgeNode1(8));
+		assertEquals(5,g2.getEdgeNode2(8));
+	}
+	
+	
+	@Test
+	public void test148() {
+		
+		Graph displayGraph = new Graph();
+		Node n0 = new Node("n0");
+		Node n1 = new Node("n1");
+		Node n2 = new Node("n2");
+		displayGraph.addNode(n0);
+		displayGraph.addNode(n1);
+		displayGraph.addNode(n2);
+		n0.setAge(0);
+		n1.setAge(0);
+		n2.setAge(0);
+		n0.setScore(77);
+		n1.setScore(66);
+		n2.setScore(55);
+		Edge e0 = new Edge(n0,n1,"e0");
+		Edge e1 = new Edge(n2,n1,"e1");
+		e0.setAge(0);
+		e1.setAge(0);
+		e0.setScore(11);
+		e1.setScore(12);
+		displayGraph.addEdge(e0);
+		displayGraph.addEdge(e1);
+
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph, false);
+		Collection<Integer> deleteNodes = new ArrayList<Integer>();
+		Collection<Integer> deleteEdges = new ArrayList<Integer>();
+		Collection<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		Collection<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+		
+		EdgeStructure es1 = new EdgeStructure(1,"es1", 54, (byte)64, (byte)74, 0, 2);
+		addEdges.add(es1);
+		
+		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+		
+		assertEquals(6,g2.getNumberOfNodes());
+		assertEquals(8,g2.getNumberOfEdges());
+		
+		assertEquals(g2.getNodeLabel(0),g2.getNodeLabel(3));
+		assertEquals(g2.getNodeType(0),g2.getNodeType(3));
+		assertEquals(g2.getNodeWeight(0),g2.getNodeWeight(3));
+		assertEquals(0,g2.getNodeAge(0));
+		assertEquals(0,g2.getNodeAge(1));
+		assertEquals(0,g2.getNodeAge(2));
+		assertEquals(1,g2.getNodeAge(3));
+		assertEquals(1,g2.getNodeAge(4));
+		assertEquals(1,g2.getNodeAge(5));
+		
+		assertEquals(g2.getEdgeLabel(0),g2.getEdgeLabel(5));
+		assertEquals(g2.getEdgeType(0),g2.getEdgeType(5));
+		assertEquals(g2.getEdgeWeight(0),g2.getEdgeWeight(5));
+		assertEquals("es1",g2.getEdgeLabel(7));
+		assertEquals(64,g2.getEdgeType(7));
+		assertEquals(54,g2.getEdgeWeight(7));
+		assertEquals(0,g2.getEdgeAge(0));
+		assertEquals(0,g2.getEdgeAge(1));
+		assertEquals(1,g2.getEdgeAge(2));
+		assertEquals(1,g2.getEdgeAge(3));
+		assertEquals(1,g2.getEdgeAge(4));
+		assertEquals(1,g2.getEdgeAge(5));
+		assertEquals(1,g2.getEdgeAge(6));
+		assertEquals(1,g2.getEdgeAge(7));
+
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(2));
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(3));
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(4));
+
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(1));
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(7));
+
+		assertEquals(0,g2.getEdgeNode1(2));
+		assertEquals(3,g2.getEdgeNode2(2));
+		assertEquals(1,g2.getEdgeNode1(3));
+		assertEquals(4,g2.getEdgeNode2(3));
+		assertEquals(2,g2.getEdgeNode1(4));
+		assertEquals(5,g2.getEdgeNode2(4));
+
+		assertEquals(3,g2.getEdgeNode1(5));
+		assertEquals(4,g2.getEdgeNode2(5));
+		
+		assertEquals(3,g2.getEdgeNode1(7));
+		assertEquals(5,g2.getEdgeNode2(7));
+		
+	}
+	
+	
+	@Test
+	public void test149() {
+		
+		Graph displayGraph = new Graph();
+		Node n0 = new Node("n0");
+		Node n1 = new Node("n1");
+		n0.setAge(0);
+		n1.setAge(0);
+		displayGraph.addNode(n0);
+		displayGraph.addNode(n1);
+		Edge e0 = new Edge(n0,n1,"e0");
+		e0.setAge(0);
+		displayGraph.addEdge(e0);
+
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph, false);
+		
+		Collection<Integer> deleteNodes = new ArrayList<Integer>();
+		Collection<Integer> deleteEdges = new ArrayList<Integer>();
+		Collection<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		Collection<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+		
+		deleteNodes.add(0);
+		deleteNodes.add(1);
+		
+		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		assertEquals(2,g2.getNumberOfNodes());
+		assertEquals(1,g2.getNumberOfEdges());
+
+		assertEquals(0,g2.getNodeAge(0));
+		assertEquals(0,g2.getNodeAge(1));
+		
+		assertEquals(0,g2.getEdgeAge(0));
+
+		
+		deleteNodes = new ArrayList<Integer>();
+		deleteEdges = new ArrayList<Integer>();
+		addNodes = new ArrayList<NodeStructure>();
+		addEdges = new ArrayList<EdgeStructure>();
+		
+		NodeStructure ns1 = new NodeStructure(111,"ns1", 33, (byte)8, (byte)112);
+		NodeStructure ns2 = new NodeStructure(222,"ns2", 44, (byte)9, (byte)113);
+		addNodes.add(ns1);
+		addNodes.add(ns2);
+		EdgeStructure es1 = new EdgeStructure(1,"es1", 54, (byte)64, (byte)74, 111, 222);
+		addEdges.add(es1);
+		
+		FastGraph g3 = g2.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		assertEquals(4,g3.getNumberOfNodes());
+		assertEquals(2,g3.getNumberOfEdges());
+		
+		assertEquals(0,g3.getNodeAge(0));
+		assertEquals(0,g3.getNodeAge(1));
+		assertEquals(2,g3.getNodeAge(2));
+		assertEquals(2,g3.getNodeAge(3));
+
+		assertEquals(0,g3.getEdgeAge(0));
+		assertEquals(2,g3.getEdgeAge(1));
+		
+	}
+		
+	
+	@Test
+	public void test150() {
+		Graph displayGraph = new Graph();
+		Node n0 = new Node("n0");
+		Node n1 = new Node("n1");
+		n0.setAge(0);
+		n1.setAge(0);
+		displayGraph.addNode(n0);
+		displayGraph.addNode(n1);
+		Edge e0 = new Edge(n0,n1,"e0");
+		e0.setAge(0);
+		displayGraph.addEdge(e0);
+		
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph, false);
+
+		assertEquals(0,g1.getGeneration());
+
+	}
+		
+	@Test
+	public void test151() {
+		Graph displayGraph = new Graph();
+		Node n0 = new Node("n0");
+		Node n1 = new Node("n1");
+		n0.setAge(0);
+		n1.setAge(7);
+		displayGraph.addNode(n0);
+		displayGraph.addNode(n1);
+		Edge e0 = new Edge(n0,n1,"e0");
+		e0.setAge(0);
+		displayGraph.addEdge(e0);
+		
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph, false);
+
+		assertEquals(7,g1.getGeneration());
+
+	}
+		
+
+	@Test
+	public void test152() {
+		
+		Graph displayGraph = new Graph();
+
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph, false);
+		
+		Collection<Integer> deleteNodes = new ArrayList<Integer>();
+		Collection<Integer> deleteEdges = new ArrayList<Integer>();
+		Collection<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		Collection<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+		
+		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		assertEquals(0,g2.getNumberOfNodes());
+		assertEquals(0,g2.getNumberOfEdges());
+
+		
+		deleteNodes = new ArrayList<Integer>();
+		deleteEdges = new ArrayList<Integer>();
+		addNodes = new ArrayList<NodeStructure>();
+		addEdges = new ArrayList<EdgeStructure>();
+		
+		NodeStructure ns0 = new NodeStructure(100, "ns0", 33, (byte)8, (byte)112);
+		NodeStructure ns1 = new NodeStructure(101, "ns1", 44, (byte)18, (byte)112);
+		EdgeStructure es0 = new EdgeStructure(201, "es0", 99, (byte)9, (byte)88, 101, 100);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addEdges.add(es0);
+		
+		FastGraph g3 = g2.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		assertEquals(2,g3.getNumberOfNodes());
+		assertEquals(1,g3.getNumberOfEdges());
+		
+		assertEquals("ns1",g3.getNodeLabel(1));
+		assertEquals(18,g3.getNodeType(1));
+		assertEquals(44,g3.getNodeWeight(1));
+		
+		assertEquals(2,g3.getNodeAge(0));
+		assertEquals(2,g3.getNodeAge(1));
+		
+		assertEquals("es0",g3.getEdgeLabel(0));
+		assertEquals(9,g3.getEdgeType(0));
+		assertEquals(99,g3.getEdgeWeight(0));
+		
+		assertEquals(2,g3.getEdgeAge(0));
+
+		assertEquals(1,g3.getEdgeNode1(0));
+		assertEquals(0,g3.getEdgeNode2(0));
+		
+		
+		deleteNodes = new ArrayList<Integer>();
+		deleteEdges = new ArrayList<Integer>();
+		addNodes = new ArrayList<NodeStructure>();
+		addEdges = new ArrayList<EdgeStructure>();
+		
+		NodeStructure ns2 = new NodeStructure(12,"ns2", 24, (byte)25, (byte)9);
+		addNodes.add(ns2);
+		EdgeStructure es1 = new EdgeStructure(99,"es1", 34, (byte)44, (byte)54, 12, 0);
+		addEdges.add(es1);
+
+		FastGraph g4 = g3.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		assertEquals(5,g4.getNumberOfNodes());
+		assertEquals(5,g4.getNumberOfEdges());
+		
+		assertEquals("ns2",g4.getNodeLabel(4));
+		assertEquals(25,g4.getNodeType(4));
+		assertEquals(24,g4.getNodeWeight(4));
+		
+		assertEquals(2,g4.getNodeAge(0));
+		assertEquals(2,g4.getNodeAge(1));
+		assertEquals(3,g4.getNodeAge(2));
+		assertEquals(3,g4.getNodeAge(3));
+		assertEquals(3,g4.getNodeAge(4));
+		
+		assertEquals("es1",g4.getEdgeLabel(4));
+		assertEquals(44,g4.getEdgeType(4));
+		assertEquals(34,g4.getEdgeWeight(4));
+		
+		assertEquals(2,g4.getEdgeAge(0));
+		assertEquals(3,g4.getEdgeAge(1));
+		assertEquals(3,g4.getEdgeAge(2));
+		assertEquals(3,g4.getEdgeAge(3));
+		assertEquals(3,g4.getEdgeAge(4));
+		
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g4.getEdgeType(0));
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g4.getEdgeType(1));
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g4.getEdgeType(2));
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g4.getEdgeType(3));
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g4.getEdgeType(4));
+
+		assertEquals(4,g4.getEdgeNode1(4));
+		assertEquals(2,g4.getEdgeNode2(4));
+
+		
+		deleteNodes = new ArrayList<Integer>();
+		deleteEdges = new ArrayList<Integer>();
+		addNodes = new ArrayList<NodeStructure>();
+		addEdges = new ArrayList<EdgeStructure>();
+		
+		deleteNodes.add(2);
+		deleteEdges.add(3);
+		deleteEdges.add(4);
+		NodeStructure ns3 = new NodeStructure(37,"ns3", 31, (byte)32, (byte)-1);
+		addNodes.add(ns3);
+		EdgeStructure es2 = new EdgeStructure(99,"es2", 71, (byte)72, (byte)-1, 3, 4);
+		addEdges.add(es2);
+		
+		FastGraph g5 = g4.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		assertEquals(8,g5.getNumberOfNodes());
+		assertEquals(8,g5.getNumberOfEdges());
+		
+		assertEquals("ns3",g5.getNodeLabel(7));
+		assertEquals(32,g5.getNodeType(7));
+		assertEquals(31,g5.getNodeWeight(7));
+		
+		assertEquals(2,g5.getNodeAge(0));
+		assertEquals(2,g5.getNodeAge(1));
+		assertEquals(3,g5.getNodeAge(2));
+		assertEquals(3,g5.getNodeAge(3));
+		assertEquals(3,g5.getNodeAge(4));
+		assertEquals(4,g5.getNodeAge(5));
+		assertEquals(4,g5.getNodeAge(6));
+		assertEquals(4,g5.getNodeAge(7));
+				
+		assertEquals("es2",g5.getEdgeLabel(7));
+		assertEquals(72,g5.getEdgeType(7));
+		assertEquals(71,g5.getEdgeWeight(7));
+		
+		assertEquals(2,g5.getEdgeAge(0));
+		assertEquals(3,g5.getEdgeAge(1));
+		assertEquals(3,g5.getEdgeAge(2));
+		assertEquals(3,g5.getEdgeAge(3));
+		assertEquals(3,g5.getEdgeAge(4));
+		assertEquals(4,g5.getEdgeAge(5));
+		assertEquals(4,g5.getEdgeAge(6));
+		assertEquals(4,g5.getEdgeAge(7));
+		
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g5.getEdgeType(0));
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g5.getEdgeType(1));
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g5.getEdgeType(2));
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g5.getEdgeType(3));
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g5.getEdgeType(4));
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g5.getEdgeType(5));
+		assertEquals(FastGraph.TIME_EDGE_TYPE,g5.getEdgeType(6));
+		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g5.getEdgeType(7));
+
+		assertEquals(5,g5.getEdgeNode1(7));
+		assertEquals(6,g5.getEdgeNode2(7));
+		
+		assertEquals(4,g5.getEdgeNode1(6));
+		assertEquals(6,g5.getEdgeNode2(6));
+		
+
+
+
+	}
+	
+	
 	//TODO Add tests here
 
 	
@@ -2165,5 +3065,8 @@ public class FastGraphTest {
 	int[][] get4Node5EdgeAdjMatrix() {
 		return new int[][]{{0,1,1,0},{1,0,1,1},{1,1,0,1},{0,1,1,0}};
 	}
+	
+	
+
 
 }
