@@ -6,6 +6,8 @@ import org.json.JSONObject;
 import uk.ac.kent.displayGraph.*;
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
 
+import static org.junit.Assert.assertEquals;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.*;
@@ -120,7 +122,7 @@ public class FastGraph {
 		GedUtil.initNativeCode();
 		
 		long time;
-
+		
 		Debugger.enabled = true;
 		
 		FastGraph g1 = randomGraphFactory(5,6,1,false,false);
@@ -3839,14 +3841,14 @@ Debugger.outputTime("time for rewiring");
 	 * @param deleteEdges edges in the oldest generation that should not appear in the new time slice
 	 * @param addNodes extra nodes to appear in the new time slice. Ids must not appear in the current FastGraph
 	 * @param addEdges extra edges to appear in the new time slice. They can use addNode indexes or indexes in the current graph from nodes in the current oldest time slice
+	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
 	 * @return the new graph with time slice added. Information about added indexes and mappings is stored in various 
 	 */
 	public FastGraph addNewTimeSlice(Collection<Integer> deleteNodes, Collection<Integer> deleteEdges, Collection<NodeStructure> addNodes, Collection<EdgeStructure> addEdges, boolean direct) {
 		
-
 		// find the greatest age in the current FastGraph to get the nextGeneration, has to be maximum node generation, as edges cannot exist alone
 		byte oldGeneration = getGeneration();
-		generation++;
+		byte newGeneration = (byte)(oldGeneration+1);
 		HashMap<Integer,Integer> oldToNewNodeMapping = new HashMap<Integer,Integer>();
 		
 		LinkedList<NodeStructure> allNodes = new LinkedList<NodeStructure>();
@@ -3875,10 +3877,11 @@ Debugger.outputTime("time for rewiring");
 			if(deleteNodes.contains(i)) {
 				continue;
 			}
+
 			String label = getNodeLabel(i);
 			int weight = getNodeWeight(i);
 			byte type = getNodeType(i);
-			byte age = generation;
+			byte age = newGeneration;
 			NodeStructure ns = new NodeStructure(nodeId,label,weight,type,age);
 			allNodes.add(ns);
 			
@@ -3888,7 +3891,7 @@ Debugger.outputTime("time for rewiring");
 			String timeLabel = "";
 			int timeWeight = 0;
 			byte timeType = TIME_EDGE_TYPE;
-			byte timeAge = generation;
+			byte timeAge = newGeneration;
 			int timeNode1 = i;
 			int timeNode2 = nodeId;
 			EdgeStructure es = new EdgeStructure(edgeId,timeLabel,timeWeight,timeType,timeAge,timeNode1,timeNode2);
@@ -3896,9 +3899,10 @@ Debugger.outputTime("time for rewiring");
 			edgeId++;
 			nodeId++;
 		}
+
 		// add the new nodes
 		for(NodeStructure addNS : addNodes) {
-			NodeStructure ns = new NodeStructure(nodeId, addNS.getLabel(), addNS.getWeight(), addNS.getType(), generation); 
+			NodeStructure ns = new NodeStructure(nodeId, addNS.getLabel(), addNS.getWeight(), addNS.getType(), newGeneration); 
 			allNodes.add(ns);
 			oldToNewNodeMapping.put(addNS.getId(),nodeId);
 			nodeId++;
@@ -3939,7 +3943,7 @@ Debugger.outputTime("time for rewiring");
 			String label = getEdgeLabel(i);
 			int weight = getEdgeWeight(i);
 			byte type = getEdgeType(i);
-			byte age = generation;
+			byte age = newGeneration;
 			int node1 = oldToNewNodeMapping.get(getEdgeNode1(i));
 			int node2 = oldToNewNodeMapping.get(getEdgeNode2(i));
 			EdgeStructure es = new EdgeStructure(edgeId,label,weight,type,age,node1,node2);
@@ -3950,7 +3954,7 @@ Debugger.outputTime("time for rewiring");
 		for(EdgeStructure addES : addEdges) {
 			int node1 = oldToNewNodeMapping.get(addES.getNode1());
 			int node2 = oldToNewNodeMapping.get(addES.getNode2());
-			EdgeStructure es = new EdgeStructure(edgeId, addES.getLabel(), addES.getWeight(), addES.getType(), generation,node1,node2); 
+			EdgeStructure es = new EdgeStructure(edgeId, addES.getLabel(), addES.getWeight(), addES.getType(), newGeneration,node1,node2); 
 			edgesInTimeSlice.add(es);
 			edgeId++;
 		}
@@ -3966,72 +3970,136 @@ Debugger.outputTime("time for rewiring");
 		
 		allEdges.addAll(timeEdges);
 		allEdges.addAll(edgesInTimeSlice); 
-/*		
-for(NodeStructure ns : allNodes) {
-	System.out.println(ns);
-}
-for(EdgeStructure es : allEdges) {
-	System.out.println(es);
-}
-*/
+		
+		
+		FastGraph g = structureFactory(getName()+"-"+newGeneration,newGeneration,allNodes,allEdges,direct);
+		
+		return g;
+	}
+	
+	
+	/**
+	 * Return a new FastGraph that is the nodes and edges of a particular generation
+	 * of this FastGraph. Does not include time edge. Assumes all other edges connect
+	 * only with nodes of the same generation.
+	 * 
+	 * @param generation the generation of nodes and edges which will form the new FastGraph
+	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
+	 * @return
+	 */
+	public FastGraph findGenerationSubGraph(byte inGeneration, boolean direct) {
+		
+		LinkedList<NodeStructure> nodes = new LinkedList<NodeStructure>();
+		LinkedList<EdgeStructure> edges = new LinkedList<EdgeStructure>();
 
-		// create and populate the byteBuffers
 
-		int nodeCount = allNodes.size();
-		int edgeCount = allEdges.size();
+		HashMap<Integer,Integer> oldToNewNodeIds = new HashMap<Integer,Integer>();
+		int nodeId = 0;
+		for(int i = 0; i < getNumberOfNodes();i++) {
+			
+			if(getNodeAge(i) != inGeneration) {
+				continue;
+			}
+			
+			NodeStructure ns = new NodeStructure(nodeId, getNodeLabel(i), getNodeWeight(i), getNodeType(i), getNodeAge(i));
+			nodes.add(ns);
+			oldToNewNodeIds.put(i, nodeId);
+			
+			nodeId++;
+		}
+		
+		int edgeId = 0;
+		for(int i = 0; i < getNumberOfEdges();i++) {
+			
+			if(getEdgeAge(i) != inGeneration) {
+				continue;
+			}
+			if(getEdgeType(i) == TIME_EDGE_TYPE) {
+				continue;
+			}
+
+			int node1 = oldToNewNodeIds.get(getEdgeNode1(i));
+			int node2 = oldToNewNodeIds.get(getEdgeNode2(i));
+			EdgeStructure es = new EdgeStructure(edgeId, getEdgeLabel(i), getEdgeWeight(i), getEdgeType(i), getEdgeAge(i), node1, node2);
+			edges.add(es);
+			
+			edgeId++;
+		}
+		
+		FastGraph g = structureFactory(getName()+"-sub"+inGeneration,inGeneration,nodes,edges,direct);
+		
+		return g;
+	}
+
+
+	/**
+	 * Given a collection of NodeStructure and EdgeStructure, create a new graph.
+	 * Edges node1 and node2 refer to the ids in the nodes list. The ids in both lists
+	 * must start at 0 and increase by 1 for each element.
+	 * 
+	 * @param inName the name of the new FastGraph
+	 * @param inGeneration the generation of the new FastGraph, put 0 if unsure
+	 * @param nodes the nodes to be in the new FastGraph. ids must start at 0 and end at nodes.size()-1
+	 * @param edges the edges to be in the new FastGraph. ids must start at 0 and end at edges.size()-1
+	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
+	 * @return the new FastGraph with the nodes and edges from the input
+	 */
+	public static FastGraph structureFactory(String inName, byte inGeneration, List<NodeStructure> nodes, List<EdgeStructure> edges, boolean direct) {
+		int nodeCount = nodes.size();
+		int edgeCount = edges.size();
 		FastGraph g = new FastGraph(nodeCount,edgeCount,direct);
-		g.setName(getName()+"-"+generation);
-		g.generation = generation;
+		g.setName(inName);
+		g.generation = inGeneration;
 		
 		String[] nodeLabels = new String[nodeCount];
 		String[] edgeLabels = new String[edgeCount];
 
-		for(NodeStructure ns : allNodes) {
-			int i = ns.getId();
-			g.nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE,-1); // offset for inward connecting edges/nodes
-			g.nodeBuf.putInt(NODE_IN_DEGREE_OFFSET+i*NODE_BYTE_SIZE,-1); // number of inward connecting edges/nodes
-			g.nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE,-1); // offset for outward connecting edges/nodes
-			g.nodeBuf.putInt(NODE_OUT_DEGREE_OFFSET+i*NODE_BYTE_SIZE,-1); // number of outward connecting edges/nodes
-			g.nodeBuf.putInt(NODE_WEIGHT_OFFSET+i*NODE_BYTE_SIZE,ns.getWeight()); // weight
-			g.nodeBuf.put(NODE_TYPE_OFFSET+i*NODE_BYTE_SIZE,ns.getType()); // type
-			g.nodeBuf.put(NODE_AGE_OFFSET+i*NODE_BYTE_SIZE,ns.getAge()); // age
+		for(NodeStructure ns : nodes) {
+			int nodeId = ns.getId();
+			g.nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE,-1); // offset for inward connecting edges/nodes
+			g.nodeBuf.putInt(NODE_IN_DEGREE_OFFSET+nodeId*NODE_BYTE_SIZE,-1); // number of inward connecting edges/nodes
+			g.nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE,-1); // offset for outward connecting edges/nodes
+			g.nodeBuf.putInt(NODE_OUT_DEGREE_OFFSET+nodeId*NODE_BYTE_SIZE,-1); // number of outward connecting edges/nodes
+			g.nodeBuf.putInt(NODE_WEIGHT_OFFSET+nodeId*NODE_BYTE_SIZE,ns.getWeight()); // weight
+			g.nodeBuf.put(NODE_TYPE_OFFSET+nodeId*NODE_BYTE_SIZE,ns.getType()); // type
+			g.nodeBuf.put(NODE_AGE_OFFSET+nodeId*NODE_BYTE_SIZE,ns.getAge()); // age
 
 			// save labels for later
-			nodeLabels[i] = ns.getLabel();
+			nodeLabels[nodeId] = ns.getLabel();
 		}
 
 		g.setAllNodeLabels(nodeLabels);
 
 		ArrayList<ArrayList<Integer>> nodeIn = new ArrayList<ArrayList<Integer>>(nodeCount); // temporary store of inward edges
 		for(int i = 0; i < nodeCount; i++) {
-			ArrayList<Integer> edges = new ArrayList<Integer>(100);
-			nodeIn.add(i,edges);
+			ArrayList<Integer> connectingEdges = new ArrayList<Integer>(100);
+			nodeIn.add(i,connectingEdges);
 		}
 		
 		ArrayList<ArrayList<Integer>> nodeOut = new ArrayList<ArrayList<Integer>>(nodeCount); // temporary store of outward edges
 		for(int i = 0; i < nodeCount; i++) {
-			ArrayList<Integer> edges = new ArrayList<Integer>(100);
-			nodeOut.add(i,edges);
+			ArrayList<Integer> connectingEdges = new ArrayList<Integer>(100);
+			nodeOut.add(i,connectingEdges);
 		}
 		
 		ArrayList<Integer> inEdgeList;	
 		ArrayList<Integer> outEdgeList;	
-		for(EdgeStructure es : allEdges) {
-			int i = es.getId();
-			g.edgeBuf.putInt(EDGE_NODE1_OFFSET+i*EDGE_BYTE_SIZE,es.getNode1()); // one end of edge
-			g.edgeBuf.putInt(EDGE_NODE2_OFFSET+i*EDGE_BYTE_SIZE,es.getNode2()); // other end of edge
-			g.edgeBuf.putInt(EDGE_WEIGHT_OFFSET+i*EDGE_BYTE_SIZE,es.getWeight()); // weight
-			g.edgeBuf.put(EDGE_TYPE_OFFSET+i*EDGE_BYTE_SIZE,es.getType()); // type
-			g.edgeBuf.put(EDGE_AGE_OFFSET+i*EDGE_BYTE_SIZE,es.getAge()); // age
+		for(EdgeStructure es : edges) {
+			int edgeId = es.getId();
+			g.edgeBuf.putInt(EDGE_NODE1_OFFSET+edgeId*EDGE_BYTE_SIZE,es.getNode1()); // one end of edge
+			g.edgeBuf.putInt(EDGE_NODE2_OFFSET+edgeId*EDGE_BYTE_SIZE,es.getNode2()); // other end of edge
+			g.edgeBuf.putInt(EDGE_WEIGHT_OFFSET+edgeId*EDGE_BYTE_SIZE,es.getWeight()); // weight
+			g.edgeBuf.put(EDGE_TYPE_OFFSET+edgeId*EDGE_BYTE_SIZE,es.getType()); // type
+			g.edgeBuf.put(EDGE_AGE_OFFSET+edgeId*EDGE_BYTE_SIZE,es.getAge()); // age
 			
 			// store labels for later
-			edgeLabels[i] = es.getLabel();
+			edgeLabels[edgeId] = es.getLabel();
 			
 			// store connecting nodes
 			inEdgeList = nodeIn.get(es.getNode2());
-			inEdgeList.add(i);
+			inEdgeList.add(edgeId);
 			outEdgeList = nodeOut.get(es.getNode1());
-			outEdgeList.add(i);
+			outEdgeList.add(edgeId);
 			
 		}
 		

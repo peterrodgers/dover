@@ -2381,6 +2381,8 @@ public class FastGraphTest {
 
 		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph, false);
 		
+		assertEquals(0,g1.getGeneration());
+		
 		Collection<Integer> deleteNodes = new ArrayList<Integer>();
 		Collection<Integer> deleteEdges = new ArrayList<Integer>();
 		Collection<NodeStructure> addNodes = new ArrayList<NodeStructure>();
@@ -2391,6 +2393,8 @@ public class FastGraphTest {
 		
 		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
 
+		assertEquals(1,g2.getGeneration());
+		
 		assertEquals(2,g2.getNumberOfNodes());
 		assertEquals(1,g2.getNumberOfEdges());
 
@@ -2413,6 +2417,8 @@ public class FastGraphTest {
 		addEdges.add(es1);
 		
 		FastGraph g3 = g2.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		assertEquals(2,g3.getGeneration());
 
 		assertEquals(4,g3.getNumberOfNodes());
 		assertEquals(2,g3.getNumberOfEdges());
@@ -2473,6 +2479,7 @@ public class FastGraphTest {
 		Graph displayGraph = new Graph();
 
 		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph, false);
+		g1.setName("g1");
 		
 		Collection<Integer> deleteNodes = new ArrayList<Integer>();
 		Collection<Integer> deleteEdges = new ArrayList<Integer>();
@@ -2480,6 +2487,8 @@ public class FastGraphTest {
 		Collection<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
 		
 		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		assertEquals("g1-1",g2.getName());
 
 		assertEquals(0,g2.getNumberOfNodes());
 		assertEquals(0,g2.getNumberOfEdges());
@@ -2498,6 +2507,8 @@ public class FastGraphTest {
 		addEdges.add(es0);
 		
 		FastGraph g3 = g2.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		assertEquals("g1-1-2",g3.getName());
 
 		assertEquals(2,g3.getNumberOfNodes());
 		assertEquals(1,g3.getNumberOfEdges());
@@ -2530,6 +2541,8 @@ public class FastGraphTest {
 		addEdges.add(es1);
 
 		FastGraph g4 = g3.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		assertEquals("g1-1-2-3",g4.getName());
 
 		assertEquals(5,g4.getNumberOfNodes());
 		assertEquals(5,g4.getNumberOfEdges());
@@ -2579,6 +2592,8 @@ public class FastGraphTest {
 		
 		FastGraph g5 = g4.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
 
+		assertEquals("g1-1-2-3-4",g5.getName());
+
 		assertEquals(8,g5.getNumberOfNodes());
 		assertEquals(8,g5.getNumberOfEdges());
 		
@@ -2622,12 +2637,280 @@ public class FastGraphTest {
 		
 		assertEquals(4,g5.getEdgeNode1(6));
 		assertEquals(6,g5.getEdgeNode2(6));
-		
-
-
 
 	}
 	
+	
+	@Test
+	public void test153() {
+
+		ArrayList<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		ArrayList<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+
+		FastGraph g1 = FastGraph.structureFactory("g1", (byte)3, addNodes, addEdges, true);
+		
+		assertEquals("g1",g1.getName());
+		assertEquals(3,g1.getGeneration());
+		assertEquals(0,g1.getNumberOfNodes());
+		assertEquals(0,g1.getNumberOfEdges());
+		
+		addNodes = new ArrayList<NodeStructure>();
+		addEdges = new ArrayList<EdgeStructure>();
+		NodeStructure ns1 = new NodeStructure(0,"ns1", 31, (byte)32, (byte)4);
+		NodeStructure ns2 = new NodeStructure(1,"ns2", 44, (byte)67, (byte)5);
+		addNodes.add(ns1);
+		addNodes.add(ns2);
+		EdgeStructure es1 = new EdgeStructure(0,"es1", 31, (byte)32, (byte)5, 1, 0);
+		addEdges.add(es1);
+
+		g1 = FastGraph.structureFactory("g1", (byte)3, addNodes, addEdges, false);
+		
+		assertEquals("g1",g1.getName());
+		assertEquals(5,g1.getGeneration());
+		assertEquals(2,g1.getNumberOfNodes());
+		assertEquals(1,g1.getNumberOfEdges());
+		
+		assertEquals("ns1",g1.getNodeLabel(0));
+		assertEquals(31,g1.getNodeWeight(0));
+		assertEquals(32,g1.getNodeType(0));
+		assertEquals(4,g1.getNodeAge(0));
+		
+		assertEquals("ns2",g1.getNodeLabel(1));
+		assertEquals(44,g1.getNodeWeight(1));
+		assertEquals(67,g1.getNodeType(1));
+		assertEquals(5,g1.getNodeAge(1));
+		
+		assertEquals("es1",g1.getEdgeLabel(0));
+		assertEquals(31,g1.getEdgeWeight(0));
+		assertEquals(32,g1.getEdgeType(0));
+		assertEquals(5,g1.getEdgeAge(0));
+		assertEquals(1,g1.getEdgeNode1(0));
+		assertEquals(0,g1.getEdgeNode2(0));
+		
+	}		
+
+	
+	@Test
+	public void test154() {
+
+		ArrayList<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		ArrayList<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+
+		FastGraph g1 = FastGraph.structureFactory("g1", (byte)3, addNodes, addEdges, true);
+		
+		FastGraph g2 = g1.findGenerationSubGraph((byte)0, true);
+		
+		assertEquals(0,g2.getNumberOfNodes());
+		assertEquals(0,g2.getNumberOfEdges());
+		
+		g2 = g1.findGenerationSubGraph((byte)3, true);
+		
+		assertEquals(0,g2.getNumberOfNodes());
+		assertEquals(0,g2.getNumberOfEdges());
+		
+	}
+
+	@Test
+	public void test155() {
+
+		ArrayList<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		ArrayList<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+		
+		NodeStructure ns1 = new NodeStructure(0,"ns1", 31, (byte)32, (byte)3);
+		NodeStructure ns2 = new NodeStructure(1,"ns2", 44, (byte)67, (byte)3);
+		addNodes.add(ns1);
+		addNodes.add(ns2);
+		EdgeStructure es1 = new EdgeStructure(0,"es1", 31, (byte)32, (byte)3, 1, 0);
+		addEdges.add(es1);
+
+		FastGraph g1 = FastGraph.structureFactory("g1", (byte)3, addNodes, addEdges, true);
+		
+		FastGraph g2 = g1.findGenerationSubGraph((byte)0, true);
+		
+		assertEquals(0,g2.getNumberOfNodes());
+		assertEquals(0,g2.getNumberOfEdges());
+		
+		g2 = g1.findGenerationSubGraph((byte)3, true);
+		
+		assertEquals(2,g2.getNumberOfNodes());
+		assertEquals(1,g2.getNumberOfEdges());
+		
+	}
+
+	@Test
+	public void test156() {
+
+		Collection<Integer> deleteNodes = new ArrayList<Integer>();
+		Collection<Integer> deleteEdges = new ArrayList<Integer>();
+		ArrayList<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		ArrayList<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+		
+		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, addNodes, addEdges, true);
+		
+		NodeStructure ns1 = new NodeStructure(0,"ns1", 31, (byte)32, (byte)1);
+		NodeStructure ns2 = new NodeStructure(1,"ns2", 44, (byte)67, (byte)1);
+		addNodes.add(ns1);
+		addNodes.add(ns2);
+		EdgeStructure es1 = new EdgeStructure(0,"es1", 31, (byte)32, (byte)1, 0, 1);
+		addEdges.add(es1);
+		
+		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		FastGraph ga = g2.findGenerationSubGraph((byte)0, true);
+		
+		assertEquals("g1-1-sub0",ga.getName());
+		
+		assertEquals(0,ga.getNumberOfNodes());
+		assertEquals(0,ga.getNumberOfEdges());
+		
+		ga = g2.findGenerationSubGraph((byte)1, true);
+		
+		assertEquals("g1-1-sub1",ga.getName());
+		
+		assertEquals(2,ga.getNumberOfNodes());
+		assertEquals(1,ga.getNumberOfEdges());
+		
+		assertEquals("ns1",ga.getNodeLabel(0));
+		assertEquals(31,ga.getNodeWeight(0));
+		assertEquals(32,ga.getNodeType(0));
+		assertEquals(1,ga.getNodeAge(0));
+		
+		assertEquals("ns2",ga.getNodeLabel(1));
+		assertEquals(44,ga.getNodeWeight(1));
+		assertEquals(67,ga.getNodeType(1));
+		assertEquals(1,ga.getNodeAge(1));
+		
+		assertEquals("es1",ga.getEdgeLabel(0));
+		assertEquals(31,ga.getEdgeWeight(0));
+		assertEquals(32,ga.getEdgeType(0));
+		assertEquals(1,ga.getEdgeAge(0));
+		assertEquals(0,ga.getEdgeNode1(0));
+		assertEquals(1,ga.getEdgeNode2(0));
+		
+
+		
+	}
+
+	
+	@Test
+	public void test157() {
+		
+		Graph displayGraph = new Graph();
+
+		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph, false);
+		g1.setName("g1");
+		
+		Collection<Integer> deleteNodes = new ArrayList<Integer>();
+		Collection<Integer> deleteEdges = new ArrayList<Integer>();
+		Collection<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		Collection<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+		
+		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		deleteNodes = new ArrayList<Integer>();
+		deleteEdges = new ArrayList<Integer>();
+		addNodes = new ArrayList<NodeStructure>();
+		addEdges = new ArrayList<EdgeStructure>();
+		
+		NodeStructure ns0 = new NodeStructure(100, "ns0", 33, (byte)8, (byte)112);
+		NodeStructure ns1 = new NodeStructure(101, "ns1", 44, (byte)18, (byte)112);
+		EdgeStructure es0 = new EdgeStructure(201, "es0", 99, (byte)9, (byte)88, 101, 100);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addEdges.add(es0);
+		
+		FastGraph g3 = g2.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+		
+		deleteNodes = new ArrayList<Integer>();
+		deleteEdges = new ArrayList<Integer>();
+		addNodes = new ArrayList<NodeStructure>();
+		addEdges = new ArrayList<EdgeStructure>();
+		
+		NodeStructure ns2 = new NodeStructure(12,"ns2", 24, (byte)25, (byte)9);
+		addNodes.add(ns2);
+		EdgeStructure es1 = new EdgeStructure(99,"es1", 34, (byte)44, (byte)54, 12, 0);
+		addEdges.add(es1);
+
+		FastGraph g4 = g3.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+		
+for(int i = 0; i< g4.getNumberOfNodes(); i++) {
+	System.out.println(i+" "+g4.getNodeLabel(i)+" "+g4.getNodeAge(i));
+}
+
+for(int i = 0; i< g4.getNumberOfEdges(); i++) {
+	System.out.println(i+" "+g4.getEdgeLabel(i)+" "+g4.getEdgeAge(i));
+}
+
+		FastGraph ga = g4.findGenerationSubGraph((byte)0, true);
+		
+		assertEquals("g1-1-2-3-sub0",ga.getName());
+		
+		assertEquals(0,ga.getNumberOfNodes());
+		assertEquals(0,ga.getNumberOfEdges());
+		
+		ga = g4.findGenerationSubGraph((byte)2, true);
+		
+		assertEquals("g1-1-2-3-sub2",ga.getName());
+		
+		assertEquals(2,ga.getNumberOfNodes());
+		assertEquals(1,ga.getNumberOfEdges());
+		
+		assertEquals("ns0",ga.getNodeLabel(0));
+		assertEquals(33,ga.getNodeWeight(0));
+		assertEquals(8,ga.getNodeType(0));
+		assertEquals(2,ga.getNodeAge(0));
+		
+		assertEquals("ns1",ga.getNodeLabel(1));
+		assertEquals(44,ga.getNodeWeight(1));
+		assertEquals(18,ga.getNodeType(1));
+		assertEquals(2,ga.getNodeAge(1));
+		
+		assertEquals("es0",ga.getEdgeLabel(0));
+		assertEquals(99,ga.getEdgeWeight(0));
+		assertEquals(9,ga.getEdgeType(0));
+		assertEquals(2,ga.getEdgeAge(0));
+		assertEquals(1,ga.getEdgeNode1(0));
+		assertEquals(0,ga.getEdgeNode2(0));
+		
+		ga = g4.findGenerationSubGraph((byte)3, true);
+		
+		assertEquals("g1-1-2-3-sub3",ga.getName());
+		
+		assertEquals(3,ga.getNumberOfNodes());
+		assertEquals(2,ga.getNumberOfEdges());
+		
+		assertEquals("ns0",ga.getNodeLabel(0));
+		assertEquals(33,ga.getNodeWeight(0));
+		assertEquals(8,ga.getNodeType(0));
+		assertEquals(3,ga.getNodeAge(0));
+		
+		assertEquals("ns1",ga.getNodeLabel(1));
+		assertEquals(44,ga.getNodeWeight(1));
+		assertEquals(18,ga.getNodeType(1));
+		assertEquals(3,ga.getNodeAge(1));
+		
+		assertEquals("ns2",ga.getNodeLabel(2));
+		assertEquals(24,ga.getNodeWeight(2));
+		assertEquals(25,ga.getNodeType(2));
+		assertEquals(3,ga.getNodeAge(2));
+		
+		assertEquals("es0",ga.getEdgeLabel(0));
+		assertEquals(99,ga.getEdgeWeight(0));
+		assertEquals(9,ga.getEdgeType(0));
+		assertEquals(3,ga.getEdgeAge(0));
+		assertEquals(1,ga.getEdgeNode1(0));
+		assertEquals(0,ga.getEdgeNode2(0));
+		
+		assertEquals("es1",ga.getEdgeLabel(1));
+		assertEquals(34,ga.getEdgeWeight(1));
+		assertEquals(44,ga.getEdgeType(1));
+		assertEquals(3,ga.getEdgeAge(1));
+		assertEquals(2,ga.getEdgeNode1(1));
+		assertEquals(0,ga.getEdgeNode2(1));
+		
+
+	}
+
 	
 	//TODO Add tests here
 
