@@ -552,7 +552,7 @@ public class GraphPanel extends JPanel implements MouseInputListener, KeyListene
 		if(nodes.size() == 0) {
 			return;
 		}
-		new EditNodeDialog(nodes,this,containerFrame,selection);
+		new EditNodeDialog(nodes,this,containerFrame,selection, graph);
 	}
 	/** Call this to edit edges in the graph panel */
 	public void editEdges(ArrayList<Edge> edges) {

@@ -24,27 +24,28 @@ public class EditNodeDialog extends JDialog implements ActionListener {
 	Node node;
 	JPanel parentPanel;
 	GraphSelection selection;
+	Graph graph;
 	
 	String label;
 	NodeType type;
 	int x;
 	int y;
 	boolean visited;
-	double score;
+	int age;
 
 	JPanel panel;
 	JTextField labelField;
 	JTextField xField;
 	JTextField yField;
 	JTextField visitedField;
-	JTextField scoreField;
+	JTextField ageField;
 	JComboBox<String> typeBox;
 	JButton okButton;
 	JButton cancelButton;
 
 
 /** Node list must have at least one element */
-	public EditNodeDialog(ArrayList<Node> nodeList, JPanel inPanel, Frame containerFrame, GraphSelection inSelection) {
+	public EditNodeDialog(ArrayList<Node> nodeList, JPanel inPanel, Frame containerFrame, GraphSelection inSelection, Graph graph) {
 
 		super(containerFrame,"Edit Node",true);
 
@@ -55,6 +56,7 @@ public class EditNodeDialog extends JDialog implements ActionListener {
 		nodes = nodeList;
 		parentPanel = inPanel;
 		selection = inSelection;
+		this.graph = graph;
 
 		node = (Node)nodes.get(0);
 		label = node.getLabel();
@@ -62,8 +64,7 @@ public class EditNodeDialog extends JDialog implements ActionListener {
 		x = node.getX();
 		y = node.getY();
 		visited = node.getVisited();
-		score = node.getScore();
-
+		age = node.getAge();
 
 		panel = new JPanel();
 
@@ -101,9 +102,9 @@ public class EditNodeDialog extends JDialog implements ActionListener {
 		}
 		JLabel visitedLabel = new JLabel("Visited: ", SwingConstants.LEFT);
 
-		scoreField = new JTextField(6);
-		scoreField.setText(Double.toString(score));
-		JLabel scoreLabel = new JLabel("Score: ", SwingConstants.LEFT);
+		ageField = new JTextField(6);
+		ageField.setText(age+"");
+		JLabel ageLabel = new JLabel("Age: ", SwingConstants.LEFT);
 
 		Vector<String> types = new Vector<String>();
 		for(NodeType nt : NodeType.getExistingTypes()){
@@ -199,14 +200,14 @@ public class EditNodeDialog extends JDialog implements ActionListener {
 			c.gridx = 0;
 			c.gridy = yLevel;
 			c.anchor = GridBagConstraints.EAST;
-			gridbag.setConstraints(scoreLabel,c);
-			widgetPanel.add(scoreLabel);
+			gridbag.setConstraints(ageLabel,c);
+			widgetPanel.add(ageLabel);
 
 			c.gridx = 1;
 			c.gridy = yLevel;
 			c.anchor = GridBagConstraints.WEST;
-			gridbag.setConstraints(scoreField,c);
-			widgetPanel.add(scoreField);
+			gridbag.setConstraints(ageField,c);
+			widgetPanel.add(ageField);
 
 			yLevel++;
 		}
@@ -266,8 +267,10 @@ public class EditNodeDialog extends JDialog implements ActionListener {
 			} else {
 				node.setVisited(false);
 			}
-			node.setScore(Double.parseDouble(scoreField.getText()));
+			int newAge = Integer.parseInt(ageField.getText());
+			node.setAge(newAge);
 			node.setLabel(labelField.getText());
+			graph.updateColors();
 		}
 
 		selection.clear();

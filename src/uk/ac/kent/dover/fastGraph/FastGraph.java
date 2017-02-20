@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import uk.ac.kent.displayGraph.*;
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
+import uk.ac.kent.dover.displayGraph.ColorBrewer;
 
 import static org.junit.Assert.assertEquals;
 
@@ -3331,8 +3332,8 @@ if(node%100000 == 0) {
 		
 		int oldestAge = findMaximumNodeAge();
 		Color[] colors = new Color[oldestAge];
-		if(oldestAge <= 11) {
-			colors = uk.ac.kent.dover.fastGraph.Gui.ColorBrewer.BuGn.getColorPalette(oldestAge+1);
+		if(oldestAge >= 0 && oldestAge <= 11) {
+			colors = ColorBrewer.BuGn.getColorPalette(oldestAge+1);
 		} else {
 			Arrays.fill(colors, 0xFFFFFF); //fill with white
 		}

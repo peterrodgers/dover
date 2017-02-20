@@ -44,7 +44,7 @@
  *
  */ 
 
-package uk.ac.kent.dover.fastGraph.Gui;
+package uk.ac.kent.dover.displayGraph;
 
 import java.awt.Color;
 import java.util.ArrayList;

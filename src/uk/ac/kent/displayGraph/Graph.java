@@ -6,6 +6,7 @@ import java.io.*;
 import java.awt.*;
 
 import uk.ac.kent.displayGraph.comparators.*;
+import uk.ac.kent.dover.displayGraph.ColorBrewer;
 
 /**
  * This is a graph containing nodes and edges.
@@ -3445,6 +3446,37 @@ private Node start = null;
 		return ret;
 	}
 
+	/**
+	 * Gets the age of the oldest node in the graph
+	 * @return The age of the oldest node in the graph
+	 */
+	public int getOldestNodeAge() {
+		int oldest = 0;
+		for(Node n : this.getNodes()) {
+			if (n.getAge() > oldest) {
+				oldest = n.getAge();
+			}
+		}
+		return oldest;
+	}
+	
+	/**
+	 * Updates the colours of all nodes, based on their age, using the ColorBrewer library
+	 */
+	public void updateColors() {
+		int oldest = getOldestNodeAge();		
+		if(oldest >= 0 && oldest < 11) {
+			Color[] colors = ColorBrewer.BuGn.getColorPalette(oldest+1);
+			
+			for(Node node : this.getNodes()) {
+				int age = node.getAge();
+				NodeType type = new NodeType("age"+age);
+				type.setFillColor(colors[age]);
+				node.setType(type);
+			}			
+
+		}
+	}
 
 }
 
