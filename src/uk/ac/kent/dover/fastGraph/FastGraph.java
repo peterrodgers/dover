@@ -3330,17 +3330,28 @@ if(node%100000 == 0) {
 		Graph g = new Graph(getName());
 		
 		int oldestAge = findMaximumNodeAge();
-		
+		Color[] colors = new Color[oldestAge];
+		if(oldestAge <= 11) {
+			colors = uk.ac.kent.dover.fastGraph.Gui.ColorBrewer.BuGn.getColorPalette(oldestAge+1);
+		} else {
+			Arrays.fill(colors, 0xFFFFFF); //fill with white
+		}
+		Debugger.log(Arrays.toString(colors));
 		for(int i = 0; i < numberOfNodes; i++) {
 			Node n = new Node();
 			n.setLabel(getNodeLabel(i));
 			n.setScore(getNodeWeight(i));
-			n.setAge(getNodeAge(i));
+			
+			byte age = getNodeAge(i);
+			n.setAge(age);
 			String typeLabel = Integer.toString(getNodeType(i));
-			NodeType type = NodeType.withLabel(typeLabel);
+			
+			NodeType type = NodeType.withLabel("age"+age);
 			if(type == null) {
-				type = new NodeType(typeLabel);
+				type = new NodeType("age"+age);
+				type.setFillColor(colors[age]);
 			}
+			
 			n.setType(type);
 			g.addNode(n);
 		}
