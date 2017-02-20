@@ -42,9 +42,9 @@ public class GedSettings extends UserSettings {
 
         maxAgents = 10;
 
-        abort_seconds = 10;
-        abort_iterations = 100;
-        abort_nochange = 10;
+        abort_seconds = 5;
+        abort_iterations = 10;
+        abort_nochange = 5;
 
         numThreads = 0;
         autosaveSecs = DEFAULT_AUTOSAVE_TIME;

@@ -72,7 +72,7 @@ public class KMedoids {
 		for(FastGraph sub : subgraphs) {
 			map.put(sub, GedUtil.fastGraphToNetwork(sub, sub.getName()));
 		}
-		
+		Debugger.log("Map created. Not included in time");
 		boolean changed = true;
 		int count = 0;
 		long time = Debugger.createTime();

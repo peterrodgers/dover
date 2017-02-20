@@ -16,7 +16,7 @@ public class ApproximateSubgraphIsomorphismTest {
 		FastGraph pattern = FastGraph.jsonStringGraphFactory(TestRunner.get4Node5Edge(), false);
 		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(target, pattern, 4, 1);
 		int count = isi.subgraphIsomorphismFinder();
-		assertEquals(count,20);
+		assertEquals(count,2);
 	}
 	
 	@Test
@@ -25,7 +25,7 @@ public class ApproximateSubgraphIsomorphismTest {
 		FastGraph pattern = FastGraph.jsonStringGraphFactory(TestRunner.get5Node5Edge(), false);
 		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(target, pattern, 5, 1);
 		int count = isi.subgraphIsomorphismFinder();
-		assertEquals(count,60);
+		assertEquals(count,0);
 	}
 	
 }
