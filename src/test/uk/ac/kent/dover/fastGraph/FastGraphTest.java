@@ -1786,7 +1786,7 @@ public class FastGraphTest {
 		assertEquals(0,g2.getNodeAge(0));
 		assertEquals(1,g2.getNodeAge(1));
 
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(0));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(0));
 		assertEquals(1,g2.getEdgeAge(0));
 		
 		FastGraph g3 = g2.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
@@ -1807,9 +1807,9 @@ public class FastGraphTest {
 		assertEquals(1,g3.getNodeAge(1));
 		assertEquals(2,g3.getNodeAge(2));
 
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g3.getEdgeType(0));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g3.getEdgeType(0));
 		assertEquals(1,g3.getEdgeAge(0));
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g3.getEdgeType(1));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g3.getEdgeType(1));
 		assertEquals(2,g3.getEdgeAge(1));
 		
 		assertEquals(0,g3.getEdgeNode1(0));
@@ -1859,13 +1859,13 @@ public class FastGraphTest {
 		assertEquals(g2.getEdgeLabel(0),g2.getEdgeLabel(3));
 		assertEquals(g2.getEdgeType(0),g2.getEdgeType(3));
 		assertEquals(g2.getEdgeWeight(0),g2.getEdgeWeight(3));
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(0));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(0));
 		assertEquals(0,g2.getEdgeAge(0));
 		assertEquals(1,g2.getEdgeAge(3));
 
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(1));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(1));
 		assertEquals(1,g2.getEdgeAge(1));
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(2));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(2));
 		assertEquals(1,g2.getEdgeAge(1));
 
 		assertEquals(0,g2.getEdgeNode1(0));
@@ -1942,12 +1942,12 @@ public class FastGraphTest {
 		assertEquals(1,g2.getEdgeAge(7));
 		assertEquals(1,g2.getEdgeAge(8));
 
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(3));
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(4));
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(5));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(3));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(4));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(5));
 
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(2));
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(8));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(2));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(8));
 
 		assertEquals(0,g2.getEdgeNode1(3));
 		assertEquals(3,g2.getEdgeNode2(3));
@@ -2003,12 +2003,12 @@ public class FastGraphTest {
 		assertEquals(2,g3.getEdgeAge(13));
 		assertEquals(2,g3.getEdgeAge(14));
 
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g3.getEdgeType(3));
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g3.getEdgeType(9));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g3.getEdgeType(3));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g3.getEdgeType(9));
 
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g3.getEdgeType(1));
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g3.getEdgeType(7));
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g3.getEdgeType(13));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g3.getEdgeType(1));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g3.getEdgeType(7));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g3.getEdgeType(13));
 
 		assertEquals(0,g3.getEdgeNode1(3));
 		assertEquals(3,g3.getEdgeNode2(3));
@@ -2088,11 +2088,11 @@ public class FastGraphTest {
 		assertEquals(1,g2.getEdgeAge(4));
 		assertEquals(1,g2.getEdgeAge(5));
 
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(3));
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(4));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(3));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(4));
 		
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(0));
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(5));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(0));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(5));
 
 		assertEquals(0,g2.getEdgeNode1(3));
 		assertEquals(3,g2.getEdgeNode2(3));
@@ -2171,13 +2171,13 @@ public class FastGraphTest {
 		assertEquals(1,g2.getEdgeAge(6));
 		assertEquals(1,g2.getEdgeAge(7));
 
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(3));
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(4));
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(5));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(3));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(4));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(5));
 
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(2));
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(6));
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(7));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(2));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(6));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(7));
 
 		assertEquals(0,g2.getEdgeNode1(3));
 		assertEquals(3,g2.getEdgeNode2(3));
@@ -2260,8 +2260,8 @@ public class FastGraphTest {
 		assertEquals(1,g2.getEdgeAge(4));
 		assertEquals(1,g2.getEdgeAge(8));
 
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(5));
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(8));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(5));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(8));
 
 		assertEquals(0,g2.getEdgeNode1(3));
 		assertEquals(3,g2.getEdgeNode2(3));
@@ -2342,12 +2342,12 @@ public class FastGraphTest {
 		assertEquals(1,g2.getEdgeAge(6));
 		assertEquals(1,g2.getEdgeAge(7));
 
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(2));
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(3));
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(4));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(2));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(3));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(4));
 
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(1));
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g2.getEdgeType(7));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(1));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g2.getEdgeType(7));
 
 		assertEquals(0,g2.getEdgeNode1(2));
 		assertEquals(3,g2.getEdgeNode2(2));
@@ -2567,11 +2567,11 @@ public class FastGraphTest {
 		assertEquals(3,g4.getEdgeAge(3));
 		assertEquals(3,g4.getEdgeAge(4));
 		
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g4.getEdgeType(0));
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g4.getEdgeType(1));
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g4.getEdgeType(2));
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g4.getEdgeType(3));
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g4.getEdgeType(4));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g4.getEdgeType(0));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g4.getEdgeType(1));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g4.getEdgeType(2));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g4.getEdgeType(3));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g4.getEdgeType(4));
 
 		assertEquals(4,g4.getEdgeNode1(4));
 		assertEquals(2,g4.getEdgeNode2(4));
@@ -2623,14 +2623,14 @@ public class FastGraphTest {
 		assertEquals(4,g5.getEdgeAge(6));
 		assertEquals(4,g5.getEdgeAge(7));
 		
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g5.getEdgeType(0));
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g5.getEdgeType(1));
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g5.getEdgeType(2));
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g5.getEdgeType(3));
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g5.getEdgeType(4));
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g5.getEdgeType(5));
-		assertEquals(FastGraph.TIME_EDGE_TYPE,g5.getEdgeType(6));
-		assertNotEquals(FastGraph.TIME_EDGE_TYPE,g5.getEdgeType(7));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g5.getEdgeType(0));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g5.getEdgeType(1));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g5.getEdgeType(2));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g5.getEdgeType(3));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g5.getEdgeType(4));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g5.getEdgeType(5));
+		assertEquals(FastGraphEdgeType.TIME.getValue(),g5.getEdgeType(6));
+		assertNotEquals(FastGraphEdgeType.TIME.getValue(),g5.getEdgeType(7));
 
 		assertEquals(5,g5.getEdgeNode1(7));
 		assertEquals(6,g5.getEdgeNode2(7));

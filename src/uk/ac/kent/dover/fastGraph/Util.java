@@ -402,4 +402,23 @@ public class Util {
 		String nowAsISO = df.format(new Date());
 		return nowAsISO;
 	}
+	
+	/**
+	 * Picks a random int in the range of 0(inc) to size(exc) where the int is not in deleteList
+	 * @param r Random number generator
+	 * @param size The range of items to pick
+	 * @param deleteList But not in this list
+	 * @return The random result
+	 */
+	public static int pickValidItem(Random r, int size, Collection<Integer> deleteList) {
+		if(size == 0 || (deleteList.size() >= size)) { //no results possible
+			return -1;
+		}
+		while(true) {
+			int pick = r.nextInt(size);			
+			if(!deleteList.contains(pick)) {
+				return pick;
+			}
+		}
+	}
 }

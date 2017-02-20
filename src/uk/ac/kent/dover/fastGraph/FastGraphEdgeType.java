@@ -1,5 +1,9 @@
 package uk.ac.kent.dover.fastGraph;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
+
 /**
  * Enum to hold the various edge types in the data. <br>
  * Each has a byte value which is stored in the edge type area in the edge buffer.
@@ -45,6 +49,23 @@ public enum FastGraphEdgeType {
 	 */
 	public byte getValue() {
 		return value;
+	}
+	
+	/**
+	 * Picks a random edge type, that isn't a family or time relation
+	 * @param r A random number generator
+	 * @return The random type
+	 */
+	public static FastGraphEdgeType pickRandomExceptFamilyAndTime(Random r) {
+		ArrayList<FastGraphEdgeType> notAllowed = new ArrayList<FastGraphEdgeType>(Arrays.asList(TIME, UNKNOWN, SIBLING, MARRIED, PARENT));
+		
+		FastGraphEdgeType[] values = FastGraphEdgeType.values();
+		while(true) {
+			FastGraphEdgeType pick = values[r.nextInt(values.length)]; //the choice of type
+			if(!notAllowed.contains(pick)) { //if this isn't in the not allowed list
+				return pick; 
+			}
+		}	
 	}
 	
 }

@@ -125,7 +125,7 @@ public class FastGraph {
 		
 		FastGraph g1 = randomGraphFactory(5,6,1,false,false);
 //		FastGraph g1 = randomGraphFactory(1000000,10000000,1,false,false);
-		
+/*		
 		Collection<Integer> deleteNodes = new ArrayList<Integer>();
 		Collection<Integer> deleteEdges = new ArrayList<Integer>();
 		Collection<NodeStructure> addNodes = new ArrayList<NodeStructure>();
@@ -147,8 +147,8 @@ public class FastGraph {
 Debugger.resetTime();		
 		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
 Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfNodes()+" edges "+g2.getNumberOfEdges());		
-
-/*		
+*/
+		FastGraph g2 = g1.randomTimeSeriesFactory(0.5, 0.2, 2, 2, false);
 Debugger.log("AFTER ADDING TIME SLICE");		
 for(int i = 0; i< g2.getNumberOfNodes(); i++) {
 Debugger.log("node "+i+" type "+g2.getNodeType(i)+" age "+g2.getNodeAge(i)+" label "+g2.getNodeLabel(i));
@@ -156,7 +156,7 @@ Debugger.log("node "+i+" type "+g2.getNodeType(i)+" age "+g2.getNodeAge(i)+" lab
 for(int i = 0; i< g2.getNumberOfEdges(); i++) {
 Debugger.log("edge "+i+" type "+g2.getEdgeType(i)+" age "+g2.getEdgeAge(i)+" label "+g2.getEdgeLabel(i)+" node1 "+g2.getEdgeNode1(i)+" node2 "+g2.getEdgeNode2(i));
 }
-*/
+
 
 		
 /*		
@@ -482,9 +482,11 @@ String name = "simple-random-n-100-e-500";
 		for(int j = 0; j < edgeTypes.length; j++) {						
 			if (edgeTypes[j] == FastGraphEdgeType.UNKNOWN.getValue()) {
 				//pick a random relationship
-				byte relationship = (byte) (r.nextInt(values.length - 4)+4); //ignore the family relationships
+				//byte relationship = (byte) (r.nextInt(values.length - 5)+4); //ignore the family relationships
+				FastGraphEdgeType type = FastGraphEdgeType.pickRandomExceptFamilyAndTime(r);
+				byte relationship = type.getValue();
 				edgeTypes[j] = relationship;
-				edgeLabels[j] = values[relationship].toString();
+				edgeLabels[j] = type.toString();
 			}
 		}		
 		
@@ -4158,8 +4160,84 @@ Debugger.outputTime("time for rewiring");
 		
 	}
 		
-	
-	
-	
-	
+	/**
+	 * Creates a random time slice based on the current graph.
+	 * 
+	 * @param deleteNodeProbability The probability a node will be removed
+	 * @param deleteEdgeProbability The probability an edge will be removed. Note edges will be removed if orphaned
+	 * @param nodesToAdd The number of nodes to add
+	 * @param edgesToAdd The number of edges to add
+	 * @param sensibleLabels If the new nodes and edges will have realistic labels. Increases the time and memory usage
+	 * @return The new graph with the added timeslice
+	 * @throws IOException If the names file cannot be loaded
+	 */
+	public FastGraph randomTimeSeriesFactory(double deleteNodeProbability, double deleteEdgeProbability, int nodesToAdd, int edgesToAdd, 
+			boolean sensibleLabels) throws IOException {
+		int nodeSize = this.getNumberOfNodes();
+		int edgeSize = this.getNumberOfEdges();
+		
+		Random r = new Random(this.getNodeBuf().getLong(0));
+		//create Name Picker class
+		NamePicker np = null;
+		if(sensibleLabels) {
+			np = new NamePicker();
+		}		
+		
+		Collection<Integer> deleteNodes = new ArrayList<Integer>();
+		Collection<Integer> deleteEdges = new ArrayList<Integer>();
+		Collection<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		Collection<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
+		
+		//select nodes to remove
+		for(int i = 0; i < nodeSize; i++) {
+			double prob = r.nextDouble();
+			if (prob < deleteNodeProbability) {
+				deleteNodes.add(i);
+			}
+		}
+		
+		//select edges to remove
+		for(int i = 0; i < edgeSize; i++) {
+			double prob = r.nextDouble();
+			if (prob < deleteEdgeProbability) {
+				deleteEdges.add(i);
+			}
+		}
+		
+		//add nodes
+		for(int i = 0; i < nodesToAdd; i++) {
+			String name = "added"+i;
+			if(sensibleLabels) {
+				name = np.getName();
+			}
+			NodeStructure ns = new NodeStructure(nodeSize, name, 0, FastGraphNodeType.UNKNOWN.getValue(), (byte) 0);
+			addNodes.add(ns);
+			nodeSize++;
+		}
+		
+		//add edges
+		for(int i = 0; i < edgesToAdd; i++) {
+			
+			FastGraphEdgeType type = FastGraphEdgeType.UNKNOWN;
+			if(sensibleLabels) {
+				type = FastGraphEdgeType.pickRandomExceptFamilyAndTime(r);
+			}
+			byte relationship = type.getValue();
+			String label = type.toString();
+			
+			int n1 = Util.pickValidItem(r,nodeSize,deleteNodes);
+			int n2 = Util.pickValidItem(r,nodeSize,deleteNodes);
+			
+			EdgeStructure es = new EdgeStructure(edgeSize, label, 0, relationship, (byte) 0, n1, n2);
+			addEdges.add(es);
+			edgeSize++;
+		}
+
+Debugger.resetTime();		
+		FastGraph g2 = this.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfNodes()+" edges "+g2.getNumberOfEdges());		
+		
+		return g2;
+	}
+		
 }
