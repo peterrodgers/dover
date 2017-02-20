@@ -74,8 +74,6 @@ public class FastGraph {
 	
 	public static final String INFO_SPLIT_STRING = "~";
 	
-	public static final byte TIME_EDGE_TYPE = 127;
-	
 	public static final int MAX_BYTE_BUFFER_SIZE = Integer.MAX_VALUE-5000;
 	
 
@@ -3890,7 +3888,7 @@ Debugger.outputTime("time for rewiring");
 			// add the time edges
 			String timeLabel = "";
 			int timeWeight = 0;
-			byte timeType = TIME_EDGE_TYPE;
+			byte timeType = FastGraphEdgeType.TIME.getValue();
 			byte timeAge = newGeneration;
 			int timeNode1 = i;
 			int timeNode2 = nodeId;
@@ -3934,7 +3932,7 @@ Debugger.outputTime("time for rewiring");
 			if(getEdgeAge(i) != oldGeneration) { // only want edges in the latest generation
 				continue;
 			}
-			if(getEdgeType(i) == TIME_EDGE_TYPE) { // don't duplicate time edges
+			if(getEdgeType(i) == FastGraphEdgeType.TIME.getValue()) { // don't duplicate time edges
 				continue;
 			}
 			if(fullDeleteEdges.contains(i)) { // don't duplcicate deleted edges
@@ -4014,7 +4012,7 @@ Debugger.outputTime("time for rewiring");
 			if(getEdgeAge(i) != inGeneration) {
 				continue;
 			}
-			if(getEdgeType(i) == TIME_EDGE_TYPE) {
+			if(getEdgeType(i) == FastGraphEdgeType.TIME.getValue()) {
 				continue;
 			}
 

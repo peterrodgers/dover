@@ -11,6 +11,7 @@ package uk.ac.kent.dover.fastGraph;
  */
 public enum FastGraphEdgeType {
 
+	TIME(127),
 	UNKNOWN(0),
 	SIBLING(1),
 	MARRIED(2),
