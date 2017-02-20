@@ -1,7 +1,7 @@
 package uk.ac.kent.dover.fastGraph;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -57,7 +57,7 @@ public enum FastGraphEdgeType {
 	 * @return The random type
 	 */
 	public static FastGraphEdgeType pickRandomExceptFamilyAndTime(Random r) {
-		ArrayList<FastGraphEdgeType> notAllowed = new ArrayList<FastGraphEdgeType>(Arrays.asList(TIME, UNKNOWN, SIBLING, MARRIED, PARENT));
+		List<FastGraphEdgeType> notAllowed = Arrays.asList(TIME, UNKNOWN, SIBLING, MARRIED, PARENT);
 		
 		FastGraphEdgeType[] values = FastGraphEdgeType.values();
 		while(true) {
