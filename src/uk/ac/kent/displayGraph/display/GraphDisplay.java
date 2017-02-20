@@ -31,6 +31,10 @@ public class GraphDisplay {
 		blue.setLineColor(Color.blue);
 		blue.setSelectedLineColor(Color.gray);
 		blue.setPriority(1019);
+		
+		EdgeType time = new EdgeType("time");
+		time.setLineColor(Color.magenta);
+		time.setSelectedLineColor(Color.gray);
 
 		Graph graph = new Graph("Display");
 

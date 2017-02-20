@@ -148,7 +148,7 @@ Debugger.resetTime();
 		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
 Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfNodes()+" edges "+g2.getNumberOfEdges());		
 */
-		FastGraph g2 = g1.randomTimeSeriesFactory(0.5, 0.2, 2, 2, false);
+		FastGraph g2 = g1.randomTimeSeriesFactory(0.5, 0, 2, 2, true);
 Debugger.log("AFTER ADDING TIME SLICE");		
 for(int i = 0; i< g2.getNumberOfNodes(); i++) {
 Debugger.log("node "+i+" type "+g2.getNodeType(i)+" age "+g2.getNodeAge(i)+" label "+g2.getNodeLabel(i));
@@ -3355,6 +3355,8 @@ if(node%100000 == 0) {
 			EdgeType type = EdgeType.withLabel(typeLabel);
 			if(type == null) {
 				type = new EdgeType(typeLabel);
+			} else if(getEdgeType(i) == FastGraphEdgeType.TIME.getValue()) {
+				type = EdgeType.withLabel("time");
 			}
 			e.setType(type);
 			g.addEdge(e);
