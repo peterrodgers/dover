@@ -75,7 +75,6 @@ public class FastGraph {
 	public static final String INFO_SPLIT_STRING = "~";
 	
 	public static final int MAX_BYTE_BUFFER_SIZE = Integer.MAX_VALUE-5000;
-	
 
 	private ByteBuffer nodeBuf;
 	private ByteBuffer edgeBuf;
@@ -156,7 +155,7 @@ Debugger.log("node "+i+" type "+g2.getNodeType(i)+" age "+g2.getNodeAge(i)+" lab
 for(int i = 0; i< g2.getNumberOfEdges(); i++) {
 Debugger.log("edge "+i+" type "+g2.getEdgeType(i)+" age "+g2.getEdgeAge(i)+" label "+g2.getEdgeLabel(i)+" node1 "+g2.getEdgeNode1(i)+" node2 "+g2.getEdgeNode2(i));
 }
-
+g2.displayFastGraph();
 
 		
 /*		
@@ -3330,6 +3329,8 @@ if(node%100000 == 0) {
 		
 		Graph g = new Graph(getName());
 		
+		int oldestAge = findMaximumNodeAge();
+		
 		for(int i = 0; i < numberOfNodes; i++) {
 			Node n = new Node();
 			n.setLabel(getNodeLabel(i));
@@ -3355,8 +3356,10 @@ if(node%100000 == 0) {
 			EdgeType type = EdgeType.withLabel(typeLabel);
 			if(type == null) {
 				type = new EdgeType(typeLabel);
-			} else if(getEdgeType(i) == FastGraphEdgeType.TIME.getValue()) {
-				type = EdgeType.withLabel("time");
+			}
+			
+			if(getEdgeType(i) == FastGraphEdgeType.TIME.getValue()) {
+				type = getTimeEdgeType();
 			}
 			e.setType(type);
 			g.addEdge(e);
@@ -4240,6 +4243,13 @@ Debugger.resetTime();
 Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfNodes()+" edges "+g2.getNumberOfEdges());		
 		
 		return g2;
+	}
+	
+	public static EdgeType getTimeEdgeType() {
+		EdgeType time = new EdgeType("timeEdge");
+		time.setLineColor(Color.magenta);
+		time.setSelectedLineColor(Color.gray);
+		return time;
 	}
 		
 }

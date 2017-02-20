@@ -112,6 +112,7 @@ public class CreateGraphActionListener implements ActionListener{
 	 * @param dg The display graph to show in this frame
 	 */
 	private void buildFrame(uk.ac.kent.displayGraph.Graph dg) {
+		FastGraph.getTimeEdgeType();
 		graphFrame = new JFrame();
 		gp = new uk.ac.kent.displayGraph.GraphPanel(dg, graphFrame);
 		graphFrame.setContentPane(gp);
