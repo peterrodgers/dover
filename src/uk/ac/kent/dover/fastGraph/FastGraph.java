@@ -201,17 +201,33 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		Debugger.outputTime("saveBuffers test time ");
 		time = Debugger.createTime();
 */
-String name = "simple-random-n-4-e-4";
-//String name = "random-n-8-e-9";
+//String name = "simple-random-n-4-e-4";
+//String name = "simple-random-n-10-e-20";
 //String name = "as-skitter.txt";
-//String name = "soc-pokec-relationships.txt-reduced";
-//String name = "soc-pokec-relationships.txt-veryshort-veryshort";
+String name = "soc-pokec-relationships-reduced";
 //String name = "Wiki-Vote.txt";
+
 		//String name = g1.getName();
 		//FastGraph g2 = g1;
 		try {
 			FastGraph g1 = loadBuffersGraphFactory(null,name);
+			name+="-time-00";
+			for(int i = 0; i < 12; i++) {
+				if(i != 0) {
+					g1 = loadBuffersGraphFactory(null,name);
+				}
+				
+				FastGraph g2 = g1.randomTimeSeriesFactory(0.2, 0.05, 1, 1, true);
+				name = name.substring(0,name.length()-2)+String.format("%02d", i);
+				g2.setName(name);
+				g2.saveBuffers(null, name);
+				Debugger.outputTime("Created time slice "+i, time);
+				g1 = null; //gc
+				g2 = null; //gc
+			}
 			/*
+			FastGraph g1 = loadBuffersGraphFactory(null,name);
+			
 			for(int i = 0; i < g1.getNumberOfNodes(); i++) {
 				if(g1.getNodeAge(i) < 0) {
 					g1.setNodeAge(i, (byte) 0);
@@ -220,8 +236,8 @@ String name = "simple-random-n-4-e-4";
 			}
 			g1.saveBuffers(null, name);
 			*/
-			FastGraph g2 = g1.randomTimeSeriesFactory(0.2, 0.05, 1000, 300, true);
-			g2.saveBuffers(null, name+"-time");
+			//FastGraph g2 = g1.randomTimeSeriesFactory(0.2, 0.05, 1000, 300, true);
+			//g2.saveBuffers(null, name+"-time");
 			
 			
 			
@@ -3357,9 +3373,9 @@ if(node%100000 == 0) {
 		if(oldestAge >= 0 && oldestAge <= 11) {
 			colors = ColorBrewer.BuGn.getColorPalette(oldestAge+1);
 		} else {
-			Arrays.fill(colors, 0xFFFFFF); //fill with white
+			Arrays.fill(colors, Color.WHITE); //fill with white
 		}
-		Debugger.log(Arrays.toString(colors));
+		
 		for(int i = 0; i < numberOfNodes; i++) {
 			Node n = new Node();
 			n.setLabel(getNodeLabel(i));
@@ -3887,6 +3903,7 @@ Debugger.outputTime("time for rewiring");
 		
 		// find the greatest age in the current FastGraph to get the nextGeneration, has to be maximum node generation, as edges cannot exist alone
 		byte oldGeneration = getGeneration();
+		Debugger.log("oldGen " + oldGeneration);
 		byte newGeneration = (byte)(oldGeneration+1);
 		HashMap<Integer,Integer> oldToNewNodeMapping = new HashMap<Integer,Integer>();
 		
@@ -3947,6 +3964,9 @@ Debugger.outputTime("time for rewiring");
 			nodeId++;
 		}
 		
+		Debugger.log("oldToNewMapping "+oldToNewNodeMapping);
+		Debugger.log("deleteNodes "+deleteNodes);
+		
 		HashSet<Integer> fullDeleteEdges = new HashSet<Integer>(deleteEdges.size()*3);
 		
 		for(Integer n : deleteNodes) {
@@ -3991,7 +4011,7 @@ Debugger.outputTime("time for rewiring");
 		}
 		// add the new edges
 		for(EdgeStructure addES : addEdges) {
-			
+			Debugger.log("edgestructure "+addES);
 			int node1 = oldToNewNodeMapping.get(addES.getNode1());
 			int node2 = oldToNewNodeMapping.get(addES.getNode2());
 			EdgeStructure es = new EdgeStructure(edgeId, addES.getLabel(), addES.getWeight(), addES.getType(), newGeneration,node1,node2); 
@@ -4213,8 +4233,15 @@ Debugger.outputTime("time for rewiring");
 	 */
 	public FastGraph randomTimeSeriesFactory(double deleteNodeProbability, double deleteEdgeProbability, int nodesToAdd, int edgesToAdd, 
 			boolean sensibleLabels) throws IOException {
-		int nodeSize = this.getNumberOfNodes();
-		int edgeSize = this.getNumberOfEdges();
+		
+		byte oldGeneration = getGeneration();
+		byte newGeneration = (byte)(oldGeneration+1);
+		
+		//int nodeSize = this.getNumberOfNodes();
+		ArrayList<Integer> thisGenNodes = this.findAllNodesOfAge(oldGeneration);
+		ArrayList<Integer> thisGenEdges = this.findAllEdgesOfAge(oldGeneration);
+		//int edgeSize = this.getNumberOfEdges();
+		
 		
 		Random r = new Random(this.getNodeBuf().getLong(0));
 		//create Name Picker class
@@ -4229,20 +4256,22 @@ Debugger.outputTime("time for rewiring");
 		Collection<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
 		
 		//select nodes to remove
-		for(int i = 0; i < nodeSize; i++) {
+		for(int i : thisGenNodes) {
 			double prob = r.nextDouble();
 			if (prob < deleteNodeProbability) {
 				deleteNodes.add(i);
 			}
 		}
+		thisGenNodes.removeAll(deleteNodes);
 		
 		//select edges to remove
-		for(int i = 0; i < edgeSize; i++) {
+		for(int i : thisGenEdges) {
 			double prob = r.nextDouble();
 			if (prob < deleteEdgeProbability) {
 				deleteEdges.add(i);
 			}
 		}
+		thisGenEdges.removeAll(deleteEdges);
 		
 		//add nodes
 		for(int i = 0; i < nodesToAdd; i++) {
@@ -4250,9 +4279,9 @@ Debugger.outputTime("time for rewiring");
 			if(sensibleLabels) {
 				name = np.getName();
 			}
-			NodeStructure ns = new NodeStructure(nodeSize, name, 0, FastGraphNodeType.UNKNOWN.getValue(), (byte) 0);
+			NodeStructure ns = new NodeStructure(thisGenNodes.size()+i, name, 0, FastGraphNodeType.UNKNOWN.getValue(), newGeneration);
 			addNodes.add(ns);
-			nodeSize++;
+			//nodeSize++;
 		}
 		
 		//add edges
@@ -4265,12 +4294,12 @@ Debugger.outputTime("time for rewiring");
 			byte relationship = type.getValue();
 			String label = type.toString();
 			
-			int n1 = Util.pickValidItem(r,nodeSize,deleteNodes);
-			int n2 = Util.pickValidItem(r,nodeSize,deleteNodes);
+			int n1 = Util.pickRandom(r,thisGenNodes);
+			int n2 = Util.pickRandom(r,thisGenNodes);
 			
-			EdgeStructure es = new EdgeStructure(edgeSize, label, 0, relationship, (byte) 0, n1, n2);
+			EdgeStructure es = new EdgeStructure(thisGenEdges.size()+i, label, 0, relationship, newGeneration, n1, n2);
 			addEdges.add(es);
-			edgeSize++;
+			//edgeSize++;
 		}
 		
 Debugger.resetTime();		
@@ -4280,11 +4309,45 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		return g2;
 	}
 	
+	/**
+	 * Creates the Display EdgeType for time edges.
+	 * @return The edgeType
+	 */
 	public static EdgeType getTimeEdgeType() {
 		EdgeType time = new EdgeType("timeEdge");
 		time.setLineColor(Color.magenta);
 		time.setSelectedLineColor(Color.gray);
 		return time;
+	}
+	
+	/**
+	 * Finds a list of all nodes of the given age
+	 * @param age The given age
+	 * @return a list of all nodes of the given age
+	 */
+	public ArrayList<Integer> findAllNodesOfAge(int age){
+		ArrayList<Integer> ret = new ArrayList<Integer>();
+		for(int i = 0; i < this.getNumberOfNodes(); i++) {
+			if(age == this.getNodeAge(i)) {
+				ret.add(i);
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 * Finds a list of all edges of the given age
+	 * @param age The given age
+	 * @return a list of all edges of the given age
+	 */
+	public ArrayList<Integer> findAllEdgesOfAge(int age){
+		ArrayList<Integer> ret = new ArrayList<Integer>();
+		for(int i = 0; i < this.getNumberOfEdges(); i++) {
+			if(age == this.getEdgeAge(i)) {
+				ret.add(i);
+			}
+		}
+		return ret;
 	}
 		
 }

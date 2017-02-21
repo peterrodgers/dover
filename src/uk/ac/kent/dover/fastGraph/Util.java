@@ -421,4 +421,15 @@ public class Util {
 			}
 		}
 	}
+
+	/**
+	 * Picks a random item from a list
+	 * @param r Random number generator
+	 * @param list The list to pick from
+	 * @return The random item
+	 */
+	public static <T> T pickRandom(Random r, ArrayList<T> list) {
+		int i = r.nextInt(list.size());
+		return list.get(i);
+	}
 }
