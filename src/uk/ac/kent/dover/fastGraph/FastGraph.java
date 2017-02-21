@@ -204,7 +204,7 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 //String name = "simple-random-n-4-e-4";
 //String name = "simple-random-n-10-e-20";
 //String name = "as-skitter.txt";
-String name = "soc-pokec-relationships-reduced";
+String name = "soc-pokec-relationships.txt-reduced";
 //String name = "Wiki-Vote.txt";
 
 		//String name = g1.getName();
@@ -217,7 +217,7 @@ String name = "soc-pokec-relationships-reduced";
 					g1 = loadBuffersGraphFactory(null,name);
 				}
 				
-				FastGraph g2 = g1.randomTimeSeriesFactory(0.2, 0.05, 1, 1, true);
+				FastGraph g2 = g1.randomTimeSeriesFactory(0.1, 0.01, 100, 100, true);
 				name = name.substring(0,name.length()-2)+String.format("%02d", i);
 				g2.setName(name);
 				g2.saveBuffers(null, name);
@@ -226,6 +226,8 @@ String name = "soc-pokec-relationships-reduced";
 				g2 = null; //gc
 			}
 			/*
+			 * CLEANING
+			 */ /*
 			FastGraph g1 = loadBuffersGraphFactory(null,name);
 			
 			for(int i = 0; i < g1.getNumberOfNodes(); i++) {
@@ -3903,7 +3905,6 @@ Debugger.outputTime("time for rewiring");
 		
 		// find the greatest age in the current FastGraph to get the nextGeneration, has to be maximum node generation, as edges cannot exist alone
 		byte oldGeneration = getGeneration();
-		Debugger.log("oldGen " + oldGeneration);
 		byte newGeneration = (byte)(oldGeneration+1);
 		HashMap<Integer,Integer> oldToNewNodeMapping = new HashMap<Integer,Integer>();
 		
@@ -3964,9 +3965,6 @@ Debugger.outputTime("time for rewiring");
 			nodeId++;
 		}
 		
-		Debugger.log("oldToNewMapping "+oldToNewNodeMapping);
-		Debugger.log("deleteNodes "+deleteNodes);
-		
 		HashSet<Integer> fullDeleteEdges = new HashSet<Integer>(deleteEdges.size()*3);
 		
 		for(Integer n : deleteNodes) {
@@ -4011,7 +4009,6 @@ Debugger.outputTime("time for rewiring");
 		}
 		// add the new edges
 		for(EdgeStructure addES : addEdges) {
-			Debugger.log("edgestructure "+addES);
 			int node1 = oldToNewNodeMapping.get(addES.getNode1());
 			int node2 = oldToNewNodeMapping.get(addES.getNode2());
 			EdgeStructure es = new EdgeStructure(edgeId, addES.getLabel(), addES.getWeight(), addES.getType(), newGeneration,node1,node2); 

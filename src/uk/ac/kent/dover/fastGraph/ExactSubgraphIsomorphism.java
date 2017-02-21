@@ -53,9 +53,9 @@ public class ExactSubgraphIsomorphism extends SubgraphIsomorphism{
 		FastGraph target = null;
 		FastGraph pattern = null;
 		try {
-			target = FastGraph.loadBuffersGraphFactory(null, "simple-random-n-1000-e-5000");
-			pattern = FastGraph.loadBuffersGraphFactory(null, "simple-random-n-8-e-12");
-		//target = FastGraph.loadBuffersGraphFactory(null, "soc-pokec-relationships-reduced");
+			target = FastGraph.loadBuffersGraphFactory(null, "2-line-time-2");
+			pattern = FastGraph.loadBuffersGraphFactory(null, "2-line-time-2");
+//			target = FastGraph.loadBuffersGraphFactory(null, "soc-pokec-relationships-reduced");
 //			target = FastGraph.adjacencyListGraphFactory(7115,103689,null,"Wiki-Vote.txt",false);
 //			target = FastGraph.adjacencyListGraphFactory(36692,367662,null,"Email-Enron1.txt",false);
 //			target = FastGraph.adjacencyListGraphFactory(81306,2420766,null,"twitter_combined.txt",false);
@@ -65,141 +65,24 @@ public class ExactSubgraphIsomorphism extends SubgraphIsomorphism{
 //			pattern = FastGraph.randomGraphFactory(subgraphNodes, subgraphEdges, 2222, true);
 		} catch(Exception e) {}
 		
-
-		
-/*		
-		Graph targetGraph = new Graph("triangle with single edge attached");
-		Node n0 = new Node("nA");
-		targetGraph.addNode(n0);
-		Node n1 = new Node("nA");
-		targetGraph.addNode(n1);
-		Node n2 = new Node("nB");
-		targetGraph.addNode(n2);
-//		Node n3 = new Node("nB");
-//		targetGraph.addNode(n3);
-		Edge e0 = new Edge(n0,n1,"eB");
-		targetGraph.addEdge(e0);
-		Edge e1 = new Edge(n0,n2,"eA");
-		targetGraph.addEdge(e1);
-		Edge e2 = new Edge(n1,n2,"eA");
-		targetGraph.addEdge(e2);
-//		Edge e3 = new Edge(n3,n0,"eB");
-//		targetGraph.addEdge(e3);
-//Edge e4 = new Edge(n2,n1,"eA");
-//targetGraph.addEdge(e4);
-		target = FastGraph.displayGraphFactory(targetGraph,false);
-*/
-		
-/*
-		Graph patternGraph = new Graph("triangle");
-		n0 = new Node("nB");
-		patternGraph.addNode(n0);
-		n1 = new Node("nA");
-		patternGraph.addNode(n1);
-		n2 = new Node("nA");
-		patternGraph.addNode(n2);
-//n3 = new Node("nB");
-//patternGraph.addNode(n3);
-		e0 = new Edge(n0,n1,"eA");
-		patternGraph.addEdge(e0);
-		e1 = new Edge(n0,n2,"eA");
-		patternGraph.addEdge(e1);
-		e2 = new Edge(n1,n2,"eB");
-		patternGraph.addEdge(e2);
-//e3 = new Edge(n2,n3,"eB");
-//patternGraph.addEdge(e3);
-//e3 = new Edge(n1,n2,"eA");
-//patternGraph.addEdge(e3);
-		pattern = FastGraph.displayGraphFactory(patternGraph,false);
-	
-
-	
-		Graph targetGraph = new Graph("two connected nodes");
-		Node n0 = new Node("nA");
-		targetGraph.addNode(n0);
-		Node n1 = new Node("nB");
-		targetGraph.addNode(n1);
-		Edge e0 = new Edge(n0,n1,"eA");
-		targetGraph.addEdge(e0);
-		target = FastGraph.displayGraphFactory(targetGraph,false);
-
-		Graph patternGraph = new Graph("two connected nodes");
-		n0 = new Node("nB");
-		patternGraph.addNode(n0);
-		n1 = new Node("nA");
-		patternGraph.addNode(n1);
-		e0 = new Edge(n0,n1,"eA");
-		patternGraph.addEdge(e0);
-		pattern = FastGraph.displayGraphFactory(patternGraph,false);
-
-		
-
-		
-		Graph targetGraph = new Graph("triangle");
-		Node n0 = new Node("nA");
-		targetGraph.addNode(n0);
-		Node n1 = new Node("nB");
-		targetGraph.addNode(n1);
-		Node n2 = new Node("nA");
-		targetGraph.addNode(n2);
-		Edge e0 = new Edge(n2,n0,"eA");
-		targetGraph.addEdge(e0);
-		Edge e1 = new Edge(n1,n2,"eB");
-		targetGraph.addEdge(e1);
-		Edge e2 = new Edge(n1,n0,"eA");
-		targetGraph.addEdge(e2);
-		target = FastGraph.displayGraphFactory(targetGraph,false);
-*/
-/*		Graph patternGraph = new Graph("square with edge across");
-		Node nn0 = new Node("David Martin");
-		patternGraph.addNode(nn0);
-		Node nn1 = new Node("");
-		patternGraph.addNode(nn1);
-		Node nn2 = new Node("");
-		patternGraph.addNode(nn2);
-		Node nn3 = new Node("");
-		patternGraph.addNode(nn3);
-		Edge ee0 = new Edge(nn0,nn1,"");
-		patternGraph.addEdge(ee0);
-		Edge ee1 = new Edge(nn1,nn2,"");
-		patternGraph.addEdge(ee1);
-		Edge ee2 = new Edge(nn2,nn3,"");
-		patternGraph.addEdge(ee2);
-		Edge ee3 = new Edge(nn3,nn0,"");
-		patternGraph.addEdge(ee3);
-		Edge ee4 = new Edge(nn2,nn0,"");
-		patternGraph.addEdge(ee4);
-		pattern = FastGraph.displayGraphFactory(patternGraph,false);
-	*/	
-//uk.ac.kent.displayGraph.display.GraphWindow gw1 = new uk.ac.kent.displayGraph.display.GraphWindow(patternGraph,true);
-//uk.ac.kent.displayGraph.display.GraphWindow gw2 = new uk.ac.kent.displayGraph.display.GraphWindow(targetGraph,true);
-		/*
-		Graph patternGraph = new Graph("3 node straight line");
-		Node nn0 = new Node("Edward Price");
-		patternGraph.addNode(nn0);
-		Node nn1 = new Node("");
-		patternGraph.addNode(nn1);
-		Node nn2 = new Node("");
-		patternGraph.addNode(nn2);
-		Edge ee0 = new Edge(nn0,nn1,"");
-		patternGraph.addEdge(ee0);
-		Edge ee1 = new Edge(nn1,nn2,"");
-		patternGraph.addEdge(ee1);
-
-		pattern = FastGraph.displayGraphFactory(patternGraph,false);		
-		*/
-		
-		
 		Debugger.log("Target Number of nodes: " + target.getNumberOfNodes());
 		Debugger.log("Target Number of edges: " + target.getNumberOfEdges());
 		Debugger.log("Pattern Number of nodes: " + pattern.getNumberOfNodes());
 		Debugger.log("Pattern Number of edges: " + pattern.getNumberOfEdges());
+		pattern.displayFastGraph();
+		target.displayFastGraph();
+		
+		for(int i = 0; i < pattern.getNumberOfEdges(); i++) {
+			Debugger.log("id: " + i + " type: " + pattern.getEdgeType(i));
+		}
 		
 		ExactSubgraphIsomorphism esi;
 		boolean result;
 		
-		SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(target, pattern);
-		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
+		//SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(target, pattern);
+		//SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
+		TimeEdgeComparator tec = new TimeEdgeComparator(target, pattern);
+		
 		esi = new ExactSubgraphIsomorphism(target, pattern, null, null);
 Debugger.resetTime();
 		result = esi.subgraphIsomorphismFinder();
