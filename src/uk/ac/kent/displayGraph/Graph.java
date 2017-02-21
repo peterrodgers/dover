@@ -3470,8 +3470,12 @@ private Node start = null;
 			
 			for(Node node : this.getNodes()) {
 				int age = node.getAge();
-				NodeType type = new NodeType("age"+age);
-				type.setFillColor(colors[age]);
+				
+				NodeType type = NodeType.withLabel("age"+age); //if it already exists, use that
+				if(type == null) {
+					type = new NodeType("age"+age);	
+				}
+				type.setFillColor(colors[age]); //always update the colour though, as this may have changed
 				node.setType(type);
 			}			
 

@@ -32,7 +32,7 @@ public class ExportSVG {
 			//System.out.println("Exporting SVG...");
 			
 			int[] border = graph.findBorder();
-			int padding = 20;
+			int padding = 40;
 			border[0] -= (padding);
 			border[1] += (padding)-border[0];
 			border[2] -= (padding);

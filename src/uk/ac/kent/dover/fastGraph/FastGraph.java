@@ -123,7 +123,7 @@ public class FastGraph {
 		
 		Debugger.enabled = true;
 		
-		FastGraph g1 = randomGraphFactory(5,6,1,false,false);
+//		FastGraph g1 = randomGraphFactory(5,6,1,false,false);
 //		FastGraph g1 = randomGraphFactory(1000000,10000000,1,false,false);
 /*		
 		Collection<Integer> deleteNodes = new ArrayList<Integer>();
@@ -148,15 +148,7 @@ Debugger.resetTime();
 		FastGraph g2 = g1.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
 Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfNodes()+" edges "+g2.getNumberOfEdges());		
 */
-		FastGraph g2 = g1.randomTimeSeriesFactory(0.5, 0, 2, 2, true);
-Debugger.log("AFTER ADDING TIME SLICE");		
-for(int i = 0; i< g2.getNumberOfNodes(); i++) {
-Debugger.log("node "+i+" type "+g2.getNodeType(i)+" age "+g2.getNodeAge(i)+" label "+g2.getNodeLabel(i));
-}
-for(int i = 0; i< g2.getNumberOfEdges(); i++) {
-Debugger.log("edge "+i+" type "+g2.getEdgeType(i)+" age "+g2.getEdgeAge(i)+" label "+g2.getEdgeLabel(i)+" node1 "+g2.getEdgeNode1(i)+" node2 "+g2.getEdgeNode2(i));
-}
-g2.displayFastGraph();
+
 
 		
 /*		
@@ -173,12 +165,13 @@ g2.displayFastGraph();
 //		FastGraph g1 = randomGraphFactory(2,1,false);
 //		FastGraph g1 = randomGraphFactory(5,6,1,true);
 //		FastGraph g1 = randomGraphFactory(8,9,1,false);
-/*		String name = "simple-random-n-4-e-4";
-		FastGraph g1 = randomGraphFactory(4,4,1,true,false);
+/*		
+		String name = "simple-random-n-2000-e-10000";
+		FastGraph g1 = randomGraphFactory(2000,10000,1,true,false);
 		g1.relabelFastGraph(g1.getNumberOfNodes()/10);
 		g1.setName(name);
 		g1.saveBuffers(null,name);
-	*/	
+	*/
 /*		for (int i = 0 ; i<10; i++) {
 			FastGraph g = randomGraphFactory(100, 1000, 1, false); // 1 hundred nodes, 1 thousand edges
 			g.saveBuffers("test" + i, g.getName());
@@ -208,7 +201,7 @@ g2.displayFastGraph();
 		Debugger.outputTime("saveBuffers test time ");
 		time = Debugger.createTime();
 */
-String name = "simple-random-n-100-e-500";
+String name = "simple-random-n-4-e-4";
 //String name = "random-n-8-e-9";
 //String name = "as-skitter.txt";
 //String name = "soc-pokec-relationships.txt-reduced";
@@ -217,7 +210,32 @@ String name = "simple-random-n-100-e-500";
 		//String name = g1.getName();
 		//FastGraph g2 = g1;
 		try {
-/*			time = Debugger.createTime();
+			FastGraph g1 = loadBuffersGraphFactory(null,name);
+			/*
+			for(int i = 0; i < g1.getNumberOfNodes(); i++) {
+				if(g1.getNodeAge(i) < 0) {
+					g1.setNodeAge(i, (byte) 0);
+				}
+				//Debugger.log();
+			}
+			g1.saveBuffers(null, name);
+			*/
+			FastGraph g2 = g1.randomTimeSeriesFactory(0.2, 0.05, 1000, 300, true);
+			g2.saveBuffers(null, name+"-time");
+			
+			
+			
+			/*Debugger.log("AFTER ADDING TIME SLICE");		
+			for(int i = 0; i< g2.getNumberOfNodes(); i++) {
+			Debugger.log("node "+i+" type "+g2.getNodeType(i)+" age "+g2.getNodeAge(i)+" label "+g2.getNodeLabel(i));
+			}
+			for(int i = 0; i< g2.getNumberOfEdges(); i++) {
+			Debugger.log("edge "+i+" type "+g2.getEdgeType(i)+" age "+g2.getEdgeAge(i)+" label "+g2.getEdgeLabel(i)+" node1 "+g2.getEdgeNode1(i)+" node2 "+g2.getEdgeNode2(i));
+			}
+			g2.displayFastGraph();
+			*/
+			
+			/*			time = Debugger.createTime();
 //			FastGraph g2;
 			FastGraph g2 = loadBuffersGraphFactory(null,name);
 //			g2 = FastGraph.randomGraphFactory(100,1000,1,true,false); // 2 hundred nodes, 2 thousand edges
@@ -2739,7 +2757,11 @@ if(edgeIndex%1000000==0 ) {
 			bb.putInt(0,dge.getAge());
 			age = bb.get(3); // get least significant byte of age
 			try {
-				type = Byte.parseByte(dge.getType().getLabel());
+				if(dge.getType().getLabel().equals("timeEdge")) {
+					type = FastGraphEdgeType.TIME.getValue();
+				} else {
+					type = Byte.parseByte(dge.getType().getLabel());
+				}
 			} catch(NumberFormatException e) {
 				type = -1;
 			}
@@ -3969,6 +3991,7 @@ Debugger.outputTime("time for rewiring");
 		}
 		// add the new edges
 		for(EdgeStructure addES : addEdges) {
+			
 			int node1 = oldToNewNodeMapping.get(addES.getNode1());
 			int node2 = oldToNewNodeMapping.get(addES.getNode2());
 			EdgeStructure es = new EdgeStructure(edgeId, addES.getLabel(), addES.getWeight(), addES.getType(), newGeneration,node1,node2); 
@@ -4249,7 +4272,7 @@ Debugger.outputTime("time for rewiring");
 			addEdges.add(es);
 			edgeSize++;
 		}
-
+		
 Debugger.resetTime();		
 		FastGraph g2 = this.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
 Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfNodes()+" edges "+g2.getNumberOfEdges());		
