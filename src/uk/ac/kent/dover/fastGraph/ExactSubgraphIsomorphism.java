@@ -64,26 +64,59 @@ public class ExactSubgraphIsomorphism extends SubgraphIsomorphism{
 //			target = FastGraph.randomGraphFactory(1000, 10000, 123, false);
 //			pattern = FastGraph.randomGraphFactory(subgraphNodes, subgraphEdges, 2222, true);
 		} catch(Exception e) {}
+/*
+		ArrayList<Integer> deleteNodes = new ArrayList<Integer>();
+		ArrayList<Integer> deleteEdges = new ArrayList<Integer>();
+		ArrayList<NodeStructure> addNodes = new ArrayList<NodeStructure>();
+		ArrayList<EdgeStructure> addEdges = new ArrayList<EdgeStructure>();
 		
-		Debugger.log("Target Number of nodes: " + target.getNumberOfNodes());
-		Debugger.log("Target Number of edges: " + target.getNumberOfEdges());
-		Debugger.log("Pattern Number of nodes: " + pattern.getNumberOfNodes());
-		Debugger.log("Pattern Number of edges: " + pattern.getNumberOfEdges());
+		NodeStructure ns0 = new NodeStructure(0, "ns0", 33, (byte)8, (byte)0);
+		NodeStructure ns1 = new NodeStructure(1, "ns1", 44, (byte)9, (byte)0);
+		EdgeStructure es0 = new EdgeStructure(0,"es0", 27, (byte)7, (byte)0, 0, 1);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addEdges.add(es0);
+		target = FastGraph.structureFactory("target",(byte)0 , addNodes, addEdges, false);
+		deleteNodes = new ArrayList<Integer>();
+		deleteEdges = new ArrayList<Integer>();
+		addNodes = new ArrayList<NodeStructure>();
+		addEdges = new ArrayList<EdgeStructure>();
+		target = target.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+		
+		deleteNodes = new ArrayList<Integer>();
+		deleteEdges = new ArrayList<Integer>();
+		addNodes = new ArrayList<NodeStructure>();
+		addEdges = new ArrayList<EdgeStructure>();
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addEdges.add(es0);
+		pattern = FastGraph.structureFactory("pattern",(byte)0 , addNodes, addEdges, false);
+		deleteNodes = new ArrayList<Integer>();
+		deleteEdges = new ArrayList<Integer>();
+		addNodes = new ArrayList<NodeStructure>();
+		addEdges = new ArrayList<EdgeStructure>();
+		pattern = pattern.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+
+		
+//		Debugger.log("Target Number of nodes: " + target.getNumberOfNodes());
+//		Debugger.log("Target Number of edges: " + target.getNumberOfEdges());
+//		Debugger.log("Pattern Number of nodes: " + pattern.getNumberOfNodes());
+//		Debugger.log("Pattern Number of edges: " + pattern.getNumberOfEdges());
 		pattern.displayFastGraph();
 		target.displayFastGraph();
-		
-		for(int i = 0; i < pattern.getNumberOfEdges(); i++) {
-			Debugger.log("id: " + i + " type: " + pattern.getEdgeType(i));
-		}
+*/		
+//		for(int i = 0; i < pattern.getNumberOfEdges(); i++) {
+//			Debugger.log("id: " + i + " type: " + pattern.getEdgeType(i));
+//		}
 		
 		ExactSubgraphIsomorphism esi;
 		boolean result;
 		
-		//SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(target, pattern);
+		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
 		//SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
 		TimeEdgeComparator tec = new TimeEdgeComparator(target, pattern);
 		
-		esi = new ExactSubgraphIsomorphism(target, pattern, null, null);
+		esi = new ExactSubgraphIsomorphism(target, pattern, null, selc);
 Debugger.resetTime();
 		result = esi.subgraphIsomorphismFinder();
 Debugger.outputTime("time for subgraph isomorphism");

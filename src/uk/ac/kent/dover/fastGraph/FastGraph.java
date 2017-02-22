@@ -3994,9 +3994,10 @@ Debugger.outputTime("time for rewiring");
 			if(getEdgeType(i) == FastGraphEdgeType.TIME.getValue()) { // don't duplicate time edges
 				continue;
 			}
-			if(fullDeleteEdges.contains(i)) { // don't duplcicate deleted edges
+			if(fullDeleteEdges.contains(i)) { // don't duplicate deleted edges
 				continue;
 			}
+
 			String label = getEdgeLabel(i);
 			int weight = getEdgeWeight(i);
 			byte type = getEdgeType(i);
@@ -4023,6 +4024,7 @@ Debugger.outputTime("time for rewiring");
 			int node2 = es.getNode2();
 			es.setNode1(node1);
 			es.setNode2(node2);
+System.out.println("DDD "+es);
 		}
 		
 		allEdges.addAll(timeEdges);
