@@ -116,7 +116,7 @@ public class ExactSubgraphIsomorphism extends SubgraphIsomorphism{
 		//SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(target, pattern);
 		TimeEdgeComparator tec = new TimeEdgeComparator(target, pattern);
 		
-		esi = new ExactSubgraphIsomorphism(target, pattern, null, selc);
+		esi = new ExactSubgraphIsomorphism(target, pattern, null, tec);
 Debugger.resetTime();
 		result = esi.subgraphIsomorphismFinder();
 Debugger.outputTime("time for subgraph isomorphism");

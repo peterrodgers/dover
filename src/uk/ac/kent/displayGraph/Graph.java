@@ -6,7 +6,6 @@ import java.io.*;
 import java.awt.*;
 
 import uk.ac.kent.displayGraph.comparators.*;
-import uk.ac.kent.dover.displayGraph.ColorBrewer;
 
 /**
  * This is a graph containing nodes and edges.

@@ -5,7 +5,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import uk.ac.kent.displayGraph.*;
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
-import uk.ac.kent.dover.displayGraph.ColorBrewer;
 
 import static org.junit.Assert.assertEquals;
 
