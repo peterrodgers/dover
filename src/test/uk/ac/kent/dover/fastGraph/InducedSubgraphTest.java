@@ -1,18 +1,17 @@
 package test.uk.ac.kent.dover.fastGraph;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+
 import test.uk.ac.kent.dover.TestRunner;
-import uk.ac.kent.dover.fastGraph.InducedSubgraph;
 import uk.ac.kent.dover.fastGraph.FastGraph;
 import uk.ac.kent.dover.fastGraph.FastGraphException;
-import uk.ac.kent.dover.fastGraph.Util;
+import uk.ac.kent.dover.fastGraph.InducedSubgraph;
 
 public class InducedSubgraphTest {
 	

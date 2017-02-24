@@ -1,10 +1,10 @@
 package uk.ac.kent.displayGraph.utilities;
 
-import java.util.*;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.util.Random;
 
-
-import uk.ac.kent.displayGraph.*;
+import uk.ac.kent.displayGraph.Edge;
+import uk.ac.kent.displayGraph.Graph;
 
 /**
  * Randomize the location of the nodes in a graph in a given rectangle

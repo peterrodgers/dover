@@ -1,12 +1,14 @@
 package uk.ac.kent.displayGraph.utilities;
 
-import java.util.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
 
-import uk.ac.kent.displayGraph.*;
-import uk.ac.kent.displayGraph.drawers.*;
+import uk.ac.kent.displayGraph.Edge;
+import uk.ac.kent.displayGraph.Graph;
+import uk.ac.kent.displayGraph.Node;
+import uk.ac.kent.displayGraph.drawers.GraphDrawerEdgeLength;
 
 /**
  * Outputs statistics on node and edge distances

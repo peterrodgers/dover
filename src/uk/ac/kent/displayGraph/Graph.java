@@ -1,11 +1,28 @@
 package uk.ac.kent.displayGraph;
 
-import java.util.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.io.*;
-import java.awt.*;
+import java.util.Random;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
-import uk.ac.kent.displayGraph.comparators.*;
+import uk.ac.kent.displayGraph.comparators.NodeScoreComparator;
 
 /**
  * This is a graph containing nodes and edges.

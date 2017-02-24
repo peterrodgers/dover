@@ -1,16 +1,21 @@
 package uk.ac.kent.displayGraph.experiments;
 
-import java.util.*;
-import java.io.*;
-import java.text.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.filechooser.*;
+import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
-import uk.ac.kent.displayGraph.*;
-import uk.ac.kent.displayGraph.drawers.*;
-import uk.ac.kent.displayGraph.utilities.*;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileSystemView;
+
+import uk.ac.kent.displayGraph.Graph;
+import uk.ac.kent.displayGraph.drawers.GraphDrawerEdgeLength;
+import uk.ac.kent.displayGraph.utilities.GraphUtilityDistanceStats;
 
 /**
  * Attempts to find the best values for k and r when metric spring embedding the current graph.

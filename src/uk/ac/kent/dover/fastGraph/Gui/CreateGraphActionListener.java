@@ -7,8 +7,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -79,7 +77,7 @@ public class CreateGraphActionListener implements ActionListener{
 			initMenu();
 			graphFrame.setVisible(true);
 		} catch (IOException e) {
-			status.setText(launcherGui.DEFAULT_STATUS_MESSAGE);
+			status.setText(LauncherGUI.DEFAULT_STATUS_MESSAGE);
 			JOptionPane.showMessageDialog(panel, "This buffer could not be found. \n" + e.getMessage(), 
 					"Error: IOException", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();

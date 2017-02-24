@@ -1,14 +1,27 @@
 package uk.ac.kent.displayGraph.dialogs;
 
-import javax.swing.*;
-import javax.swing.border.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Vector;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.Border;
 
 import uk.ac.kent.displayGraph.GraphPanel;
 import uk.ac.kent.displayGraph.NodeType;
-
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
 
 
 /**

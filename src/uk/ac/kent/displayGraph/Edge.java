@@ -1,8 +1,11 @@
 package uk.ac.kent.displayGraph;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Point;
+import java.awt.Shape;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.util.ArrayList;
+import java.util.Collections;
 
 //import graphStructure.*;
 

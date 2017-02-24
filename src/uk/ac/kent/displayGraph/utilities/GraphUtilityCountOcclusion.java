@@ -1,13 +1,15 @@
 package uk.ac.kent.displayGraph.utilities;
 
-import java.util.*;
-import java.awt.event.*;
-import java.awt.geom.*;
+import java.awt.event.KeyEvent;
+import java.awt.geom.Area;
+import java.util.ArrayList;
+import java.util.Random;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
 
-
-import uk.ac.kent.displayGraph.*;
+import uk.ac.kent.displayGraph.Edge;
+import uk.ac.kent.displayGraph.Graph;
+import uk.ac.kent.displayGraph.Node;
 
 /**
  *

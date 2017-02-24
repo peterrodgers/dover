@@ -1,6 +1,6 @@
 package test.uk.ac.kent.dover.fastGraph;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 

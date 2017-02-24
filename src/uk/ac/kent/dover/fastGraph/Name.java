@@ -38,7 +38,7 @@ public class Name {
 	/**
 	 * Overwrites the toString() for this class
 	 * 
-	 * @returns String representation of a name
+	 * @return String representation of a name
 	 */
 	public String toString() {
 		return name + "(" + prob + ")";

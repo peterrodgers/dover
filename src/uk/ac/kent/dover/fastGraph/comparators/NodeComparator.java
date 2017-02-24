@@ -1,8 +1,8 @@
 package uk.ac.kent.dover.fastGraph.comparators;
 
-import java.util.*;
+import java.util.Comparator;
 
-import uk.ac.kent.dover.fastGraph.*;
+import uk.ac.kent.dover.fastGraph.FastGraph;
 
 
 /**

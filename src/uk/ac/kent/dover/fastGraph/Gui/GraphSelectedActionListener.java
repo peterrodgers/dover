@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.JFileChooser;
-import javax.swing.JList;
 import javax.swing.JTextField;
 
 /**

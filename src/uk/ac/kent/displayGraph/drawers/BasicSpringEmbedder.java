@@ -1,6 +1,6 @@
 package uk.ac.kent.displayGraph.drawers;
 
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
 
 /**
  * Randomize the location of the nodes in a graph in a given rectangle,

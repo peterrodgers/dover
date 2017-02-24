@@ -8,19 +8,20 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
-
-import javax.swing.text.html.parser.TagElement;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.parser.Tag;
 
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
-import uk.ac.kent.dover.fastGraph.ExactMotifFinder.IsoHolder;
 import uk.ac.kent.dover.fastGraph.Gui.MotifTask;
 
 public class ExactMotifFinder {

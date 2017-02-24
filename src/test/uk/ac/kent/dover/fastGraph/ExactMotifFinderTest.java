@@ -1,23 +1,17 @@
 package test.uk.ac.kent.dover.fastGraph;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.nio.*;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.io.*;
 
-import uk.ac.kent.displayGraph.*;
-import uk.ac.kent.dover.fastGraph.*;
-import uk.ac.kent.dover.fastGraph.ExactMotifFinder.IsoHolder;
-import uk.ac.kent.dover.fastGraph.ExactMotifFinder.MotifResultHolder;
-import uk.ac.kent.dover.fastGraph.Gui.MotifTaskDummy;
-
-import org.junit.*;
+import org.junit.Test;
 
 import test.uk.ac.kent.dover.TestRunner;
+import uk.ac.kent.dover.fastGraph.ExactMotifFinder;
+import uk.ac.kent.dover.fastGraph.ExactMotifFinder.MotifResultHolder;
+import uk.ac.kent.dover.fastGraph.FastGraph;
+import uk.ac.kent.dover.fastGraph.Gui.MotifTaskDummy;
 
 /**
  * 

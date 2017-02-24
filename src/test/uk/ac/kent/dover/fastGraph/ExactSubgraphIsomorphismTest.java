@@ -1,16 +1,24 @@
 package test.uk.ac.kent.dover.fastGraph;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import java.util.*;
+import java.util.LinkedList;
 
 import org.junit.Test;
 
 import uk.ac.kent.displayGraph.Edge;
 import uk.ac.kent.displayGraph.Graph;
 import uk.ac.kent.displayGraph.Node;
-import uk.ac.kent.dover.fastGraph.*;
-import uk.ac.kent.dover.fastGraph.comparators.*;
+import uk.ac.kent.dover.fastGraph.ExactIsomorphism;
+import uk.ac.kent.dover.fastGraph.ExactSubgraphIsomorphism;
+import uk.ac.kent.dover.fastGraph.FastGraph;
+import uk.ac.kent.dover.fastGraph.SubgraphMapping;
+import uk.ac.kent.dover.fastGraph.comparators.AlwaysTrueEdgeComparator;
+import uk.ac.kent.dover.fastGraph.comparators.AlwaysTrueNodeComparator;
+import uk.ac.kent.dover.fastGraph.comparators.SimpleEdgeLabelComparator;
+import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
 
 public class ExactSubgraphIsomorphismTest {
 

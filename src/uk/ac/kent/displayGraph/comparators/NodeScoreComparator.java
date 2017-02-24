@@ -1,6 +1,6 @@
 package uk.ac.kent.displayGraph.comparators;
 
-import java.util.*;
+import java.util.Comparator;
 
 import uk.ac.kent.displayGraph.Node;
 

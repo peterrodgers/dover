@@ -1,12 +1,13 @@
 package uk.ac.kent.displayGraph.utilities;
 
-import java.util.*;
-import java.io.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.util.ArrayList;
 
+import javax.swing.JFileChooser;
 
-import uk.ac.kent.displayGraph.*;
+import uk.ac.kent.displayGraph.Edge;
+import uk.ac.kent.displayGraph.Graph;
 import uk.ac.kent.displayGraph.experiments.GraphExperimentEdgeLengthData;
 
 /**

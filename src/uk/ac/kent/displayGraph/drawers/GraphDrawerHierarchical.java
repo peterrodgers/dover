@@ -1,11 +1,18 @@
 package uk.ac.kent.displayGraph.drawers;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 
-
-import uk.ac.kent.displayGraph.*;
+import uk.ac.kent.displayGraph.Edge;
+import uk.ac.kent.displayGraph.Graph;
+import uk.ac.kent.displayGraph.GraphPanel;
+import uk.ac.kent.displayGraph.GraphSelection;
+import uk.ac.kent.displayGraph.Node;
+import uk.ac.kent.displayGraph.NodeType;
 import uk.ac.kent.displayGraph.comparators.NodeScoreComparator;
 import uk.ac.kent.displayGraph.utilities.GraphUtilityRemoveDummyNodes;
 

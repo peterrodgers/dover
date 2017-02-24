@@ -40,7 +40,7 @@ public class ClosingWindowListener implements WindowListener {
      		status.setText("Waiting for user input...");
             int i = JOptionPane.showConfirmDialog(null, "Are you sure to wish to quit?");
             if(i == JOptionPane.YES_OPTION) {
-            	status.setText(launcherGui.DEFAULT_STATUS_MESSAGE);
+            	status.setText(LauncherGUI.DEFAULT_STATUS_MESSAGE);
             	frame.setVisible(false);
             	frame.dispose();
             	System.exit(0);

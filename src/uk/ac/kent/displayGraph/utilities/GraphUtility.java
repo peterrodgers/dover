@@ -1,6 +1,7 @@
 package uk.ac.kent.displayGraph.utilities;
 
-import uk.ac.kent.displayGraph.*;
+import uk.ac.kent.displayGraph.Graph;
+import uk.ac.kent.displayGraph.GraphPanel;
 
 
 /**

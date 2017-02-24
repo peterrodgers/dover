@@ -1,6 +1,6 @@
 package uk.ac.kent.displayGraph.views;
 
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
 
 import uk.ac.kent.displayGraph.GraphPanel;
 

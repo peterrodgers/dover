@@ -1,7 +1,7 @@
 package uk.ac.kent.displayGraph.experiments;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Point;
+import java.awt.event.KeyEvent;
 
 import uk.ac.kent.displayGraph.Graph;
 import uk.ac.kent.displayGraph.GraphPanel;

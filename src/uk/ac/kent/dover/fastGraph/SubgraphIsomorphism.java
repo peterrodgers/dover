@@ -15,6 +15,8 @@ public abstract class SubgraphIsomorphism {
 
 	/**
 	 * Saves the given subgraph into the relevant folder with the key of count
+	 * 
+	 * @param target The target graph
 	 * @param sub The FastGraph to save
 	 * @param count The number of this FastGraph
 	 * @param mainDir The parent directory to save to
@@ -46,6 +48,7 @@ public abstract class SubgraphIsomorphism {
 	/**
 	 * Exports the results to a HTML file
 	 * 
+	 * @param target The target graph
 	 * @param mainDir The parent directory
 	 * @param count The number of results
 	 * @param type The type of subgraph isomorphism

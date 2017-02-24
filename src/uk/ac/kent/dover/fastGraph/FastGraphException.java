@@ -39,7 +39,7 @@ public class FastGraphException extends Exception {
 	/**
 	 * Creates Exception with a message
 	 * 
-	 * @param causeT he cause of the error
+	 * @param cause The cause of the error
 	 */
 	public FastGraphException(Throwable cause) {
 		super(cause);

@@ -1,8 +1,8 @@
 package uk.ac.kent.displayGraph.utilities;
 
-import uk.ac.kent.displayGraph.*;
+import java.awt.event.KeyEvent;
 
-import java.awt.event.*;
+import uk.ac.kent.displayGraph.Graph;
 
 
 public class GraphUtilityConnectivity extends GraphUtility {

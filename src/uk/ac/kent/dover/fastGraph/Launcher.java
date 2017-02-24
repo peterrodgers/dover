@@ -1,15 +1,15 @@
 package uk.ac.kent.dover.fastGraph;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import uk.ac.kent.dover.fastGraph.Gui.LauncherGUI;
 import uk.ac.kent.dover.fastGraph.Gui.MotifTask;
 import uk.ac.kent.dover.fastGraph.comparators.EdgeComparator;
 import uk.ac.kent.dover.fastGraph.comparators.NodeComparator;
 import uk.ac.kent.dover.fastGraph.comparators.SimpleEdgeLabelComparator;
 import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 /**
  * Main class from which all the other functionality is called.
@@ -159,6 +159,8 @@ public class Launcher {
 	 * 
 	 * @param targetGraph The graph to search in
 	 * @param patternGraph The subgraph to find
+	 * @param patternNodes The number of nodes in the enumerated subgraphs
+	 * @param subgraphsPerNode The number of subgraphs to generate per node
 	 * @throws FileNotFoundException If the output file cannot be saved
 	 */
 	public void approximateSubgraphs(FastGraph targetGraph, FastGraph patternGraph,
@@ -176,7 +178,7 @@ public class Launcher {
 	 * @param edges Number of edges in the graph
 	 * @param directed If the graph is directed
 	 * @param simple If the graph is simple
-	 * @throws Exception 
+	 * @throws Exception If the graph cannot be saved (or created). Could be IO
 	 */
 	public void generateRandomGraph(File saveLocation, int nodes, int edges, boolean directed, boolean simple) throws Exception {
 		String directory = saveLocation.getPath();

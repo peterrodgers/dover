@@ -1,14 +1,26 @@
 package uk.ac.kent.displayGraph.dialogs;
 
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.util.ArrayList;
+import java.util.Vector;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import uk.ac.kent.displayGraph.Edge;
 import uk.ac.kent.displayGraph.EdgeType;
 import uk.ac.kent.displayGraph.GraphSelection;
-
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
 
 
 /**

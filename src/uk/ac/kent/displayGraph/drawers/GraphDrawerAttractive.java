@@ -1,10 +1,11 @@
 package uk.ac.kent.displayGraph.drawers;
 
-import java.util.*;
-import java.awt.geom.*;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Date;
 
-import uk.ac.kent.displayGraph.*;
+import uk.ac.kent.displayGraph.Node;
 
 /**
  * Attractive forces only version of Eades spring embedder.

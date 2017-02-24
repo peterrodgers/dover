@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import uk.ac.kent.dover.fastGraph.FastGraph;
 
@@ -41,7 +40,7 @@ public class ClearGraphActionListener implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		targetChooser.setSelectedFile(null);
 		targetGraph = null;
-		fileLabel.setText(launcherGUI.DEFAULT_FILE_MESSAGE);
+		fileLabel.setText(LauncherGUI.DEFAULT_FILE_MESSAGE);
 		fileLabel.setFont(new Font(fileLabel.getFont().getFontName(), Font.ITALIC, fileLabel.getFont().getSize()));
 	}
 

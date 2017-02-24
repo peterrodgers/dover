@@ -1,10 +1,15 @@
 package uk.ac.kent.displayGraph.test;
 
-import uk.ac.kent.displayGraph.*;
+import java.awt.Point;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.geom.*;
+import uk.ac.kent.displayGraph.Edge;
+import uk.ac.kent.displayGraph.EdgeType;
+import uk.ac.kent.displayGraph.Graph;
+import uk.ac.kent.displayGraph.Node;
+import uk.ac.kent.displayGraph.NodeType;
 
 
 public class Test {

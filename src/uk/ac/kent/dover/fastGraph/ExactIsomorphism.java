@@ -1,9 +1,11 @@
 package uk.ac.kent.dover.fastGraph;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 
-import uk.ac.kent.displayGraph.*;
+import uk.ac.kent.displayGraph.Graph;
 
 /**
  * Testing the structural similarity of two FastGraphs
@@ -58,8 +60,9 @@ public class ExactIsomorphism {
 	
 	
 	/**
-	 * @param args
-	 * @throws IOException 
+	 * Fortesting during development
+	 * @param args Default params
+	 * @throws IOException If the graphs cannot be loaded
 	 */
 	public static void main(String[] args) throws IOException {
 
@@ -191,7 +194,7 @@ g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i,true,false);
 	 * Create an ExactIsomorphism before running isomorphic. This makes multiple tests against
 	 * one graph to be more efficient as data for that graph does not need to be recreated.
 	 * 
-	 * @param one graph to be tested.
+	 * @param fastGraph one graph to be tested.
 	 *
 	 */
 	public ExactIsomorphism(FastGraph fastGraph) {
@@ -260,6 +263,7 @@ g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i,true,false);
 	 * gives the neighbours of nodes in g, without duplicates and without self sourcing.
 	 * 
 	 * @param g the graph
+	 * @param maxDegree The maximum degree of the nodes
 	 * @return the neighbours for each node in the graph
 	 */
 	public static ArrayList<HashSet<Integer>> findNeighbours(FastGraph g, int maxDegree) {

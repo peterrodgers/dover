@@ -1,16 +1,26 @@
 package uk.ac.kent.displayGraph.experiments;
 
-import java.util.*;
-import java.io.*;
-import java.text.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.filechooser.*;
+import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
-import uk.ac.kent.displayGraph.*;
-import uk.ac.kent.displayGraph.drawers.*;
-import uk.ac.kent.displayGraph.utilities.*;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileSystemView;
+
+import uk.ac.kent.displayGraph.Graph;
+import uk.ac.kent.displayGraph.drawers.GraphDrawerEdgeLength;
+import uk.ac.kent.displayGraph.utilities.GraphUtilityDistanceStats;
 
 /**
  *

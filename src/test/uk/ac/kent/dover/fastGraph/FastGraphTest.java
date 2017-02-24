@@ -1,18 +1,31 @@
 package test.uk.ac.kent.dover.fastGraph;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
-import java.nio.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.io.*;
 
-import uk.ac.kent.displayGraph.*;
-import uk.ac.kent.dover.fastGraph.*;
+import org.junit.Assert;
+import org.junit.Test;
 
-import org.junit.*;
+import uk.ac.kent.displayGraph.Edge;
+import uk.ac.kent.displayGraph.EdgeType;
+import uk.ac.kent.displayGraph.Graph;
+import uk.ac.kent.displayGraph.Node;
+import uk.ac.kent.displayGraph.NodeType;
+import uk.ac.kent.dover.fastGraph.Connected;
+import uk.ac.kent.dover.fastGraph.EdgeStructure;
+import uk.ac.kent.dover.fastGraph.FastGraph;
+import uk.ac.kent.dover.fastGraph.FastGraphEdgeType;
+import uk.ac.kent.dover.fastGraph.Launcher;
+import uk.ac.kent.dover.fastGraph.NodeStructure;
 
 
 /**

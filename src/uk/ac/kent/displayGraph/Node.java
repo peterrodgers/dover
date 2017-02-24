@@ -1,9 +1,13 @@
 package uk.ac.kent.displayGraph;
 
-import java.util.*;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Point;
+import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import javax.swing.JPanel;
 
 /**
  * A node in a graph. This implements a simple labeled node for a graph.

@@ -1,7 +1,6 @@
 package uk.ac.kent.displayGraph.comparators;
 
-import java.util.*;
-
+import java.util.Comparator;
 
 import uk.ac.kent.displayGraph.Edge;
 import uk.ac.kent.displayGraph.EdgeType;

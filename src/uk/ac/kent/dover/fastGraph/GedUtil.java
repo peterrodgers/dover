@@ -133,8 +133,8 @@ public class GedUtil {
 	 *
 	 * Uses these GedevoNative.Network to calculate the GED score.
 	 *
-	 * @param g1
-	 * @param g2
+	 * @param g1Network FastGraph as a GedevoNative.Network
+	 * @param g2Network FastGraph as a GedevoNative.Network
     * @return The GED score as a float
     */
 	public static float getGedScore(GedevoNative.Network g1Network, GedevoNative.Network g2Network) {

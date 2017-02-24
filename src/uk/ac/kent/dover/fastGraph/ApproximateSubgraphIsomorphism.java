@@ -1,23 +1,15 @@
 package uk.ac.kent.dover.fastGraph;
 
-import java.awt.Point;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
 import uk.ac.kent.displayGraph.Edge;
 import uk.ac.kent.displayGraph.Graph;
 import uk.ac.kent.displayGraph.Node;
-import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
 import uk.ac.kent.dover.fastGraph.comparators.SimpleEdgeLabelComparator;
 import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
 
@@ -35,8 +27,8 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 	
 	/**
 	 * For informal testing when developing
-	 * @param args
-	 * @throws FileNotFoundException 
+	 * @param args Default arguments
+	 * @throws FileNotFoundException If the files cannot be loaded
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
 		Debugger.enabled = true;		

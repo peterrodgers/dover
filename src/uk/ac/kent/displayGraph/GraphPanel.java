@@ -1,20 +1,39 @@
 package uk.ac.kent.displayGraph;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import java.applet.Applet;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 
-import uk.ac.kent.displayGraph.dialogs.*;
-import uk.ac.kent.displayGraph.drawers.*;
-import uk.ac.kent.displayGraph.experiments.*;
-import uk.ac.kent.displayGraph.utilities.*;
-import uk.ac.kent.displayGraph.views.*;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.MouseInputListener;
 
-import java.util.*;
-import java.applet.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.font.*;
+import uk.ac.kent.displayGraph.dialogs.EditEdgeDialog;
+import uk.ac.kent.displayGraph.dialogs.EditNodeDialog;
+import uk.ac.kent.displayGraph.dialogs.ManageEdgeTypesDialog;
+import uk.ac.kent.displayGraph.dialogs.ManageNodeTypesDialog;
+import uk.ac.kent.displayGraph.dialogs.MoveGraphFrame;
+import uk.ac.kent.displayGraph.drawers.GraphDrawer;
+import uk.ac.kent.displayGraph.experiments.GraphExperiment;
+import uk.ac.kent.displayGraph.utilities.GraphUtility;
+import uk.ac.kent.displayGraph.views.GraphView;
 
 /**
  * A panel on which a graph is displayed.

@@ -2,10 +2,12 @@ package test.uk.ac.kent.dover.fastGraph;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.*;
-import uk.ac.kent.dover.fastGraph.*;
-import org.junit.*;
+import java.io.IOException;
+
+import org.junit.Test;
+
 import test.uk.ac.kent.dover.TestRunner;
+import uk.ac.kent.dover.fastGraph.FastGraph;
 
 /**
  * 

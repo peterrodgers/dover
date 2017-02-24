@@ -1,8 +1,10 @@
 package uk.ac.kent.displayGraph.display;
 
-import java.awt.*;
+import java.awt.Color;
 
-import uk.ac.kent.displayGraph.*;
+import uk.ac.kent.displayGraph.EdgeType;
+import uk.ac.kent.displayGraph.Graph;
+import uk.ac.kent.displayGraph.NodeType;
 
 
 /** Example of using Graph Panel */

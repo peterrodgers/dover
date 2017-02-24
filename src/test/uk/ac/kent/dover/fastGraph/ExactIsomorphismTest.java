@@ -1,13 +1,17 @@
 package test.uk.ac.kent.dover.fastGraph;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
 import org.junit.Test;
 
-import uk.ac.kent.displayGraph.*;
-import uk.ac.kent.dover.fastGraph.*;
+import uk.ac.kent.displayGraph.Edge;
+import uk.ac.kent.displayGraph.Graph;
+import uk.ac.kent.displayGraph.Node;
+import uk.ac.kent.dover.fastGraph.ExactIsomorphism;
+import uk.ac.kent.dover.fastGraph.FastGraph;
 
 public class ExactIsomorphismTest {
 

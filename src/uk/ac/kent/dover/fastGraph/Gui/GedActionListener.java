@@ -1,14 +1,16 @@
 package uk.ac.kent.dover.fastGraph.Gui;
 
-import uk.ac.kent.dover.fastGraph.FastGraph;
-import uk.ac.kent.dover.fastGraph.GedUtil;
-import uk.ac.kent.dover.fastGraph.Launcher;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+
+import javax.swing.JLabel;
+import javax.swing.JTextArea;
+
+import uk.ac.kent.dover.fastGraph.FastGraph;
+import uk.ac.kent.dover.fastGraph.GedUtil;
+import uk.ac.kent.dover.fastGraph.Launcher;
 
 /**
  * Runs when the user chooses to find the Graph Edit Distance

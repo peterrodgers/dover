@@ -58,7 +58,7 @@ public class Debugger {
 	/**
 	 * Outputs the time difference between this call and the last resetTime() call with a message
 	 * 
-	 * @param Object o The object to to be printed
+	 * @param o The object to to be printed
 	 */
 	public static void outputTime(Object o) {
 		log(o.toString() + " " + (System.currentTimeMillis()-time)/1000.0+" seconds");
@@ -76,7 +76,7 @@ public class Debugger {
 	/**
 	 * Outputs the time difference between this call and the last createTime() call for the given time with a message
 	 * 
-	 * @param Object o The object to to be printed
+	 * @param o The object to to be printed
  	 * @param time A given timing variable
 	 */
 	public static void outputTime(Object o, long time) {

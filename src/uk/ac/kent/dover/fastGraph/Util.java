@@ -3,7 +3,17 @@ package uk.ac.kent.dover.fastGraph;
 import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -131,7 +141,7 @@ public class Util {
 	 * Checks if a String is a positive integer.
 	 * 
 	 * @param input The String to be converted
-	 * @throws NumberFormatException If the input is not an integer, or < 0.
+	 * @throws NumberFormatException If the input is not an integer, or $lt; 0.
 	 * @return The positive integer
 	 */
 	public static int checkForPositiveInteger(String input) throws NumberFormatException {
@@ -146,6 +156,7 @@ public class Util {
 	/**
 	 * Converts a LinkedList of any given object into an array of that object
 	 * 
+	 * @param <T> The type of objects in the list
 	 * @param list The list to be converted
 	 * @param array The array to be populated with the new objects
 	 */
@@ -228,7 +239,7 @@ public class Util {
 	}
 	
 	/**
-	 * Converts a HashSet<Integer> to int[]
+	 * Converts a HashSet of Integer to int[]
 	 * 
 	 * @param set The set to be converted
 	 * @return The newly converted array
@@ -238,7 +249,7 @@ public class Util {
 	}
 	
 	/**
-	 * Converts a HashSet<Integer> to a given int[]
+	 * Converts a HashSet of Integer to a given int[]
 	 * 
 	 * @param set The set to be converted
 	 * @param array The newly converted array
@@ -251,6 +262,7 @@ public class Util {
 	 * Converts an int[] to a HashSet of Integer using streams
 	 * 
 	 * @param array The array to convert
+ 	 * @param set The set to store the results in
 	 */
 	public static void convertArray(int[] array, HashSet<Integer> set) {
 		set.addAll(IntStream.of(array).boxed().collect(Collectors.toList()));
@@ -272,8 +284,10 @@ public class Util {
 	}
 	
 	/**
-	 * Gets a specific numbered item from the HashSet given
+	 * Gets a specific numbered item from the HashSet given.<br>
+	 * There is no guarantee this may pick the same entry if run multiple times.
 	 * 
+	 * @param <T> The type of object in the set
 	 * @param set The Set to look through
 	 * @param number The item nmber to return
 	 * @return The item
@@ -291,8 +305,9 @@ public class Util {
 	
 	/**
 	 * Returns a sublist.<br>
-	 * A copy of List.sublist() except the end is checked and shortend if too long
+	 * A copy of List.sublist() except the end is checked and shortened if too long
 	 * 
+	 * @param <T> The type of object in the list
 	 * @param list The list to have a sublist of
 	 * @param start The start index
 	 * @param end The end index
@@ -344,6 +359,7 @@ public class Util {
 	/**
 	 * Returns the standard deviation of an array
 	 * 
+	 * @param <T> The type of object in the array. Must be a Number.
 	 * @param array The array itself
 	 * @param mean The mean of the array
 	 * @return The standard deviation
@@ -361,8 +377,9 @@ public class Util {
 	}
 	
 	/**
-	 * Picks a random sublist of a list
+	 * Picks a random sublist of a list. Will not pick duplicates
 	 * 
+	 * @param <T> The type of object in the list
 	 * @param r The Random generator
 	 * @param number The number of items to choose
 	 * @param target The items to choose from
@@ -392,7 +409,7 @@ public class Util {
 	}
 	
 	/**
-	 * Returns the current date as yyyyMMddHHmm
+	 * Returns the current date as yyyyMMdd_HHmm
 	 * @return the current date
 	 */
 	public static String dateAsString() {
@@ -424,6 +441,8 @@ public class Util {
 
 	/**
 	 * Picks a random item from a list
+	 * 
+	 * @param <T> The type of object in the list
 	 * @param r Random number generator
 	 * @param list The list to pick from
 	 * @return The random item

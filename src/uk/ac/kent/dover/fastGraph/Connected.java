@@ -1,8 +1,6 @@
 package uk.ac.kent.dover.fastGraph;
 
-import java.util.*;
-
-import uk.ac.kent.dover.fastGraph.*;
+import java.util.LinkedList;
 
 public class Connected {
 	
@@ -22,6 +20,8 @@ public class Connected {
 	/** Breadth first search through the graph.
 	 * Note direct access to connectionBuf is a 3x speed up over accessing getNodeConnectingNodes(currentNode).
 	 * Using arrays for nodeFlagBuf is a minor speed up on ByteBuffer
+	 * 
+	 * @param g The FastGraph to test
 	 * 
 	 * @return true if the graph is connected, false otherwise. Empty graphs are connected.
 	 */

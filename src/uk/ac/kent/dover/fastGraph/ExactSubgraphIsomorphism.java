@@ -1,17 +1,21 @@
 package uk.ac.kent.dover.fastGraph;
 
-import java.awt.Point;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 
-import uk.ac.kent.displayGraph.Edge;
-import uk.ac.kent.displayGraph.Graph;
-import uk.ac.kent.displayGraph.Node;
-import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
-import uk.ac.kent.dover.fastGraph.comparators.*;
+import uk.ac.kent.dover.fastGraph.comparators.AlwaysTrueEdgeComparator;
+import uk.ac.kent.dover.fastGraph.comparators.AlwaysTrueNodeComparator;
+import uk.ac.kent.dover.fastGraph.comparators.EdgeComparator;
+import uk.ac.kent.dover.fastGraph.comparators.NodeComparator;
+import uk.ac.kent.dover.fastGraph.comparators.SimpleEdgeLabelComparator;
+import uk.ac.kent.dover.fastGraph.comparators.TimeEdgeComparator;
 
 /**
  * Testing the structural similarity of two FastGraphs. Assumes a single edge between each node.
@@ -43,8 +47,9 @@ public class ExactSubgraphIsomorphism extends SubgraphIsomorphism{
 
 	
 	/**
-	 * @param args
-	 * @throws IOException 
+	 * For informal testing during development
+	 * @param args Default arguments
+	 * @throws IOException IO error
 	 */
 	public static void main(String[] args) throws IOException {
 
@@ -490,7 +495,7 @@ Debugger.log();
 
 	/**
 	 * Output the results of this subgraph finder
-	 * @throws FileNotFoundException 
+	 * @throws FileNotFoundException If the output file cannot be created
 	 */
 	public void outputResults() throws FileNotFoundException {
 		File mainDir = new File(

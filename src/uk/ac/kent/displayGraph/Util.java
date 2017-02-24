@@ -1,7 +1,10 @@
 package uk.ac.kent.displayGraph;
 
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Point;
+import java.awt.Polygon;
+import java.awt.geom.Line2D;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
 
 /**
  * Utility Methods for the Graph package.

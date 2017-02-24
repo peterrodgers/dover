@@ -1,18 +1,19 @@
 package test.uk.ac.kent.dover.fastGraph;
 
-import org.cytoscape.gedevo.GedevoNativeUtil;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import uk.ac.kent.dover.fastGraph.EnumerateSubgraphNeighbourhood;
-import uk.ac.kent.dover.fastGraph.FastGraph;
-import uk.ac.kent.dover.fastGraph.GedUtil;
-import uk.ac.kent.dover.fastGraph.KMedoids;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.cytoscape.gedevo.GedevoNativeUtil;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import uk.ac.kent.dover.fastGraph.EnumerateSubgraphNeighbourhood;
+import uk.ac.kent.dover.fastGraph.FastGraph;
+import uk.ac.kent.dover.fastGraph.GedUtil;
+import uk.ac.kent.dover.fastGraph.KMedoids;
 
 /**
  * Created by dw3 on 13/02/2017.

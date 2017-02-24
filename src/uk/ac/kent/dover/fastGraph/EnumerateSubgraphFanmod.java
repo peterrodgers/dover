@@ -1,7 +1,6 @@
 package uk.ac.kent.dover.fastGraph;
 
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Random;
 
 /**

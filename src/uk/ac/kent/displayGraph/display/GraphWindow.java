@@ -1,16 +1,48 @@
 package uk.ac.kent.displayGraph.display;
 
-import javax.imageio.*;
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import uk.ac.kent.displayGraph.*;
-import uk.ac.kent.displayGraph.drawers.*;
-import uk.ac.kent.displayGraph.experiments.*;
-import uk.ac.kent.displayGraph.utilities.*;
-import uk.ac.kent.displayGraph.views.*;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+
+import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
+
+import uk.ac.kent.displayGraph.ExportSVG;
+import uk.ac.kent.displayGraph.Graph;
+import uk.ac.kent.displayGraph.GraphPanel;
+import uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder;
+import uk.ac.kent.displayGraph.drawers.GraphDrawer;
+import uk.ac.kent.displayGraph.drawers.GraphDrawerBarycenter;
+import uk.ac.kent.displayGraph.drawers.GraphDrawerEdgeLength;
+import uk.ac.kent.displayGraph.drawers.GraphDrawerHierarchical;
+import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
+import uk.ac.kent.displayGraph.experiments.GraphExperiment;
+import uk.ac.kent.displayGraph.utilities.GraphUtility;
+import uk.ac.kent.displayGraph.utilities.GraphUtilityConnectivity;
+import uk.ac.kent.displayGraph.utilities.GraphUtilityCountOcclusion;
+import uk.ac.kent.displayGraph.utilities.GraphUtilityCreateRandomEulerGraph;
+import uk.ac.kent.displayGraph.utilities.GraphUtilityCreateRandomGraph;
+import uk.ac.kent.displayGraph.utilities.GraphUtilityDistanceStats;
+import uk.ac.kent.displayGraph.utilities.GraphUtilityEdgeLabelRandomizer;
+import uk.ac.kent.displayGraph.utilities.GraphUtilityOccludeGraph;
+import uk.ac.kent.displayGraph.utilities.GraphUtilityRandomizer;
+import uk.ac.kent.displayGraph.utilities.GraphUtilityRemoveDummyNodes;
+import uk.ac.kent.displayGraph.utilities.GraphUtilityReverseEdgeWeights;
+import uk.ac.kent.displayGraph.utilities.GraphUtilitySnapToGrid;
+import uk.ac.kent.displayGraph.views.GraphView;
+import uk.ac.kent.displayGraph.views.GraphViewSeparateEdges;
+import uk.ac.kent.displayGraph.views.GraphViewShowNodeLabel;
+import uk.ac.kent.displayGraph.views.GraphViewToggleEdgeLabelsAndDirection;
 
 
 /** Graph layout window using GraphPanel */

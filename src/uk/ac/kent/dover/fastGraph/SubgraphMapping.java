@@ -41,6 +41,7 @@ public class SubgraphMapping {
 
 	
 	/**
+	 * @param patternGraphIndex The mapping to return
 	 * @return a single node mapping
 	 */
 	public int getSingleNodeMapping(int patternGraphIndex) {
@@ -49,6 +50,7 @@ public class SubgraphMapping {
 
 	
 	/**
+     * @param patternGraphIndex The mapping to return
 	 * @return a single edge mapping
 	 */
 	public int getSingleEdgeMapping(int patternGraphIndex) {

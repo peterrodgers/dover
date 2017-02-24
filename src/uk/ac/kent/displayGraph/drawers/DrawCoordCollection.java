@@ -1,10 +1,11 @@
 package uk.ac.kent.displayGraph.drawers;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Point;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Iterator;
 
-import uk.ac.kent.displayGraph.*;
+import uk.ac.kent.displayGraph.Node;
 
 /**
  * A collection of centre buffered nodes.

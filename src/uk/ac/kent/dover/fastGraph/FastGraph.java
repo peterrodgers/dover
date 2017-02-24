@@ -1,20 +1,40 @@
 package uk.ac.kent.dover.fastGraph;
 
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import uk.ac.kent.displayGraph.*;
-import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
-
-import static org.junit.Assert.assertEquals;
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Point;
 import java.awt.event.KeyEvent;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import uk.ac.kent.displayGraph.ColorBrewer;
+import uk.ac.kent.displayGraph.Edge;
+import uk.ac.kent.displayGraph.EdgeType;
+import uk.ac.kent.displayGraph.Graph;
+import uk.ac.kent.displayGraph.Node;
+import uk.ac.kent.displayGraph.NodeType;
+import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
 
 
 /**
@@ -24,12 +44,12 @@ import java.util.List;
  * <p>
  * The design is scalable, has fast access, and allows quick file save and load of the ByteBuffers.
  * However, poor dynamic performance.
- * <p>
+ * </p><p>
  * Storage:
  * node and edge indexes are integers and must start at 0 and end and size-1. Indexes are not stored,
  * they are assumed, so node info with nodeIndex n can be found starting in nodeBuf at offset n*nodeByteSize,
  * similarly edge with edgeIndex e starts in edgeBuf at e*edgeByteSize.
- * <p>
+ * </p>
  * <ul>
  * <li>nodeBuf stores offset of label start in nodeLabelBuf and size (in chars) of labels.</li>
  * <li>nodeBuf stores in and out offset and in and out number (degree) of connecting nodes and edges start
@@ -112,8 +132,9 @@ public class FastGraph {
 
 	
 	/**
+	 * For informal testing during development
 	 * @param args not used
-	 * @throws Exception 
+	 * @throws Exception Any error
 	 */
 	public static void main(String[] args) throws Exception {
 		GedUtil.initNativeCode();
@@ -960,7 +981,6 @@ String name = "soc-pokec-relationships.txt-reduced";
 	 * 
 	 * @param ret this is populated with the connecting edges found
 	 * @param nodeIndex the node
-	 * @return all connecting edges via parameter array. 
 	 */
 	public void getNodeConnectingEdges(int[] ret, int nodeIndex) {
 		
@@ -1004,7 +1024,6 @@ String name = "soc-pokec-relationships.txt-reduced";
 	 * 
 	 * @param ret this is populated with the connecting nodes found
 	 * @param nodeIndex the node
-	 * @return all node neighbours. 
 	 */
 	public void getNodeConnectingNodes(int[] ret, int nodeIndex) {
 		
@@ -1052,7 +1071,6 @@ String name = "soc-pokec-relationships.txt-reduced";
 	 * 
 	 * @param ret this is populated with the connecting edges found
 	 * @param nodeIndex the node
-	 * @return all connecting edges that enter the node via the parameter array. 
 	 */
 	public void getNodeConnectingInEdges(int[] ret, int nodeIndex) {
 		
@@ -1097,9 +1115,8 @@ String name = "soc-pokec-relationships.txt-reduced";
 	 * create array with size of either getNodeInDegree(nodeIndex) or maxDegree(). array elements beyond nodeDegree(nodeIndex)-1 are undefined.
 	 * Will throw an exception if ret is not large enough.
 	 * 
-	 * @param ret this is populated with the connecting nodes found
+	 * @param ret this is populated with all node neighbours that are on the end of edges that enter the node via the parameter array.
 	 * @param nodeIndex the node
- 	 * @return all node neighbours that are on the end of edges that enter the node via the parameter array.
 	 */
 	public void getNodeConnectingInNodes(int[] ret, int nodeIndex) {
 		
@@ -1142,9 +1159,8 @@ String name = "soc-pokec-relationships.txt-reduced";
 	 * create array with size of either getNodeOutDegree(nodeIndex) or maxDegree(). array elements beyond nodeDegree(nodeIndex)-1 are undefined.
 	 * Will throw an exception if ret is not large enough.
 	 * 
-	 * @param ret this is populated with the connecting edges found
+	 * @param ret this is populated with all edges that leave the node via the argument array.
 	 * @param nodeIndex the node
-	 * @return all edges that leave the node via the argument array. 
 	 */
 	public void getNodeConnectingOutEdges(int[] ret, int nodeIndex) {
 		
@@ -1190,9 +1206,8 @@ String name = "soc-pokec-relationships.txt-reduced";
 	 * create array with size of either getNodeOutDegree(nodeIndex) or maxDegree(). array elements beyond nodeDegree(nodeIndex)-1 are undefined.
 	 * Will throw an exception if ret is not large enough.
 	 * 
-	 * @param ret this is populated with the connecting nodes found
+	 * @param ret this is populated with all node neighbours that are on the end of edges that leave the passed node via the parameter array. 
 	 * @param nodeIndex the node
-  	 * @return all node neighbours that are on the end of edges that leave the passed node via the parameter array. 
 	 */
 	public void getNodeConnectingOutNodes(int[] ret, int nodeIndex) {
 		
@@ -1305,7 +1320,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 	
 	/**
 	 * @param nodeIndex the node
-	 * @return the node age
+	 * @param age The new age of the node
 	 */
 	public void setNodeAge(int nodeIndex, byte age) {
 		nodeBuf.put(NODE_AGE_OFFSET+nodeIndex*NODE_BYTE_SIZE, age);
@@ -1333,7 +1348,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 	
 	/**
 	 * @param edgeIndex the edge
-	 * @return the edge age
+	 * @param age the new edge age
 	 */
 	public void setEdgeAge(int edgeIndex, byte age) {
 		edgeBuf.put(EDGE_AGE_OFFSET+edgeIndex*EDGE_BYTE_SIZE, age);
@@ -1383,10 +1398,10 @@ String name = "soc-pokec-relationships.txt-reduced";
 	}
 	
 	/**
-	 * Change all the edge labels in the graph. Creates a new edgeLabelBuf, changes the label pointers in edgeBuf
+	 * Change all the edge labels in the graph. Creates a new edgeLabelBuf, changes the label pointers in edgeBuf.<br>
+	 * Will throw an OutofMemoryError is label length is too long
 	 * 
 	 * @param labels Must contain the same number of labels as there are edges in the graph
-	 * @throws OutofMemoryError
 	 */
 	public void setAllEdgeLabels(String[] labels)  {
 		
@@ -1548,7 +1563,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 	 * @param numberOfEdges the number of edges in the graph
 	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
 	 * @return the created FastGraph
-	 * @throws Exception 
+	 * @throws Exception If the file cannot be saved, or other FastGraph Exception
 	 */
 	public static FastGraph randomGraphFactory(int numberOfNodes, int numberOfEdges, boolean direct) throws Exception {
 		FastGraph graph = randomGraphFactory(numberOfNodes, numberOfEdges, -1, false, direct);
@@ -1563,7 +1578,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 	 * @param seed random number seed, -1 for current time
 	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
 	 * @return the created FastGraph
-	 * @throws Exception 
+	 * @throws Exception If the file cannot be saved, or other FastGraph Exception
 	 */
 	public static FastGraph randomGraphFactory(int numberOfNodes, int numberOfEdges, long seed, boolean direct) throws Exception {
 		FastGraph graph = randomGraphFactory(numberOfNodes, numberOfEdges, seed, false, direct);
@@ -1572,14 +1587,15 @@ String name = "soc-pokec-relationships.txt-reduced";
 	
 	
 	/**
-	 * Generate a random graph of the desired size. Self sourcing edges and parallel edges may exist.
+	 * Generate a random graph of the desired size. Self sourcing edges and parallel edges may exist, if simple is false
 	 * 
 	 * @param numberOfNodes the number of nodes in the graph
 	 * @param numberOfEdges the number of edges in the graph
 	 * @param seed random number seed, -1 for current time
+	 * @param simple If the new graph is a simple graph.
 	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
 	 * @return the created FastGraph
-	 * @throws Exception
+	 * @throws Exception If the file cannot be saved, or other FastGraph Exception
 	 */
 	public static FastGraph randomGraphFactory(int numberOfNodes, int numberOfEdges, long seed, boolean simple, boolean direct) throws Exception {
 		FastGraph g = new FastGraph(numberOfNodes,numberOfEdges,direct);
@@ -1597,7 +1613,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 	 * @param fileBaseName the name of the files, to which extensions are added
 	 * @return the created FastGraph
 	 * @throws IOException If the buffers cannot be loaded
-	 * @See loadBuffers
+	 * @see loadBuffers
 	 */
 	public static FastGraph loadBuffersGraphFactory(String directory, String fileBaseName) throws IOException {
 		FastGraph g = loadBuffers(directory,fileBaseName);
@@ -1857,7 +1873,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 	 * @param dir the directory for the file, if null then a directory called data/ under the current working directory
 	 * @param fileName the file name for the file
 	 * @param direct if true the ByteBuffers are direct, if false they are allocated on the heap
-	 * 
+	 * @return The new FastGraph
 	 * @throws Exception Throws if the adjacency list cannot be built correctly. Might be an IO error
 	 */
 	public static FastGraph adjacencyListGraphFactory(int nodeCount, int edgeCount, String dir, String fileName, boolean direct) throws Exception {
@@ -2082,12 +2098,12 @@ if(edgeIndex%1000000==0 ) {
 	 * Creates a graph from two files: baseFileName.nodes and baseFileName.edges.
 	 * Files are structured as line *"\n" separated) lists of items. Each element
 	 * in an item is tab ("\t") separated. Hence no tabs in file names are allowed.
-	 * <br/>
+	 * <br>
 	 * Nodes are lists of <code>index	label	weight	type	age</code>
 	 * <br>
 	 * where index must start at 0 and end at nodeCount-1, label is a string, weight is
 	 * integer valued, type is byte valued and age is byte valued.
-	 * <br/> 
+	 * <br> 
 	 * Edges are lists of <code>index	node1Index	node2Index	label	weight	type	age</code>
 	 * <br>
 	 * where index must start at 0 and end at edgeCount-1, node1Index is a node index,
@@ -2101,7 +2117,7 @@ if(edgeIndex%1000000==0 ) {
 	 * @param dir the directory for the file, if null then a directory called data/ under the current working directory
 	 * @param baseFileName the base of the file name for the file, two files called baseFileName.nodes and baseFileName.edges are expected
 	 * @param direct if true the ByteBuffers are direct, if false they are allocated on the heap
-     *
+     * @return The new FastGraph
 	 * @throws Exception Throws if the graph cannot be built correctly. Might be an IO error
 	 */
 	public static FastGraph nodeListEdgeListGraphFactory(int nodeCount, int edgeCount, String dir, String baseFileName, boolean direct) throws Exception {
@@ -4041,9 +4057,9 @@ System.out.println("DDD "+es);
 	 * of this FastGraph. Does not include time edge. Assumes all other edges connect
 	 * only with nodes of the same generation.
 	 * 
-	 * @param generation the generation of nodes and edges which will form the new FastGraph
+	 * @param inGeneration the generation of nodes and edges which will form the new FastGraph
 	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
-	 * @return
+	 * @return The new FastGraph
 	 */
 	public FastGraph findGenerationSubGraph(byte inGeneration, boolean direct) {
 		
