@@ -253,9 +253,29 @@ g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i,true,false);
 		sb.append(Integer.toString(fastGraph.getNumberOfEdges()));
 		sb.append(Arrays.toString(degreeBuckets1));
 		sb.append(Arrays.toString(eigenvalues1));
-
+		sb.append(generateTimeString());
 		return sb.toString();
 
+	}
+	
+	/**
+	 * Generates a count of the nodes at each age.<br>
+	 * Uses relative ages, so if a graph had 1 node of age 4, 2 of age 5 and 3 of age 6, would be represented as [1,2,3]
+	 * @return The age string
+	 */
+	protected String generateTimeString() {
+		int maxAge = fastGraph.findMaximumNodeAge();
+		int minAge = fastGraph.findMinimumNodeAge();
+		//Debugger.log("minAge: " + minAge + " maxAge: " + maxAge);
+		StringBuffer sb = new StringBuffer();
+		sb.append("[");
+		for(int i = minAge; i < maxAge; i++) {
+			sb.append(fastGraph.countNodesOfAge(i));
+			sb.append(",");
+		}
+		sb.append(fastGraph.countNodesOfAge(maxAge));
+		sb.append("]");
+		return sb.toString();
 	}
 
 
@@ -271,7 +291,7 @@ g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i,true,false);
 		ArrayList<HashSet<Integer>> ret = new ArrayList<HashSet<Integer>>(g.getNumberOfNodes());
 		for(int n = 0; n < g.getNumberOfNodes(); n++) {
 			HashSet<Integer> neighbours = new HashSet<Integer>(maxDegree);
-			int[] connections = g.getNodeConnectingNodes(n);
+			int[] connections = g.getNodeConnectingNodesOfSameAge(n);
 			for(int i = 0; i < connections.length; i++) {
 				Integer connectingNode = connections[i];
 				if(n == connectingNode) {
@@ -488,7 +508,7 @@ startTime = -1;
 	
 
 	/**
-	 * Check to see if the matched neighbours of n1 are neigbours of n2.
+	 * Check to see if the matched neighbours of n1 are neighbours of n2.
 	 * Checks number of connecting edges, assumes checks on number of neighbours for each node has been performed.
 	 * 
 	 * @param n1 node in fastGraph

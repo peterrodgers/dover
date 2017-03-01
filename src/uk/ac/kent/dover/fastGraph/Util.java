@@ -175,6 +175,16 @@ public class Util {
 	}
 	
 	/**
+	 * Converts a ArrayList of Integer to an int[] using streams
+	 * 
+	 * @param list The ArrayList to convert
+	 * @return The newly created array
+	 */
+	public static int[] convertArrayList(ArrayList<Integer> list) {
+		return list.stream().mapToInt(i->i).toArray();
+	}
+	
+	/**
 	 * Converts a LinkedList of Integer to a given int[] using streams
 	 * 
 	 * @param list The linked list to convert

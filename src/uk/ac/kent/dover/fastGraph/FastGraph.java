@@ -35,6 +35,7 @@ import uk.ac.kent.displayGraph.Graph;
 import uk.ac.kent.displayGraph.Node;
 import uk.ac.kent.displayGraph.NodeType;
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
+import uk.ac.kent.dover.fastGraph.Gui.MotifTaskDummy;
 
 
 /**
@@ -221,16 +222,60 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		Debugger.outputTime("saveBuffers test time ");
 		time = Debugger.createTime();
 */
-//String name = "simple-random-n-4-e-4";
+//String name = "simple-random-n-100-e-500-time";
 //String name = "simple-random-n-10-e-20";
-//String name = "as-skitter.txt";
-String name = "soc-pokec-relationships.txt-reduced";
+String name = "simple-random-n-4-e-4-time";
+//String name = "soc-pokec-relationships.txt-reduced";
 //String name = "Wiki-Vote.txt";
 
 		//String name = g1.getName();
 		//FastGraph g2 = g1;
 		try {
 			FastGraph g1 = loadBuffersGraphFactory(null,name);
+			/*
+			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g1);
+			HashSet<FastGraph> subs = esn.enumerateSubgraphs(6, 10, 100);
+			
+			for(FastGraph sub : subs) {
+				for(int i = 0; i < sub.getNumberOfEdges(); i++) {
+					if(sub.getEdgeType(i) == FastGraphEdgeType.TIME.getValue()) {
+						if(sub.getNodeAge(sub.getEdgeNode1(i)) == sub.getNodeAge(sub.getEdgeNode2(i))) {
+							//time must connect different ages
+							Debugger.log("### Broken!");
+							for(int j = 0; j < sub.getNumberOfNodes(); j++) {
+								Debugger.log("node: id: "+ j + " " + sub.getNodeLabel(j) + " age:" + sub.getNodeAge(j));
+							}
+							for(int j = 0; j < sub.getNumberOfEdges(); j++) {
+								Debugger.log("edge: id: "+ j + " " + sub.getEdgeLabel(j) + " type:" + sub.getEdgeType(j));
+							}
+							
+						}
+						
+					}
+				}
+				
+			}
+			Debugger.log("Test complete");
+			*/
+			//ExactIsomorphism ei = new ExactIsomorphism(g1);
+			//Debugger.log("nodes: " + g1.getNumberOfNodes());
+			//System.out.println(ei.generateTimeString());
+			
+		//	for(int i = 0 ; i < g1.getNumberOfNodes(); i++) {
+		//		Debugger.log(i + " " + g1.getNodeLabel(i) +" " + Arrays.toString(g1.getNodeConnectingNodes(i, true)));
+		//	}
+		//	g1.displayFastGraph();
+			
+			
+			
+			//ExactMotifFinder emf = new ExactMotifFinder(g1, new MotifTaskDummy(), true);
+			//emf.findAllMotifs(10,6,6);
+			//Debugger.log("###### REAL SET #####");
+			//emf.findAllMotifs(0,6,6);
+			//emf.compareMotifDatas(6,6);
+			
+			
+			/*
 			name+="-time-00";
 			for(int i = 0; i < 12; i++) {
 				if(i != 0) {
@@ -244,7 +289,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 				Debugger.outputTime("Created time slice "+i, time);
 				g1 = null; //gc
 				g2 = null; //gc
-			}
+			}*/
 			/*
 			 * CLEANING
 			 */ /*
@@ -1000,8 +1045,29 @@ String name = "soc-pokec-relationships.txt-reduced";
 	 * @param nodeIndex the node
 	 * @return all node neighbours. 
 	 */
-	public int[] getNodeConnectingNodes(int nodeIndex) {
+	public int[] getNodeConnectingNodesOfSameAge(int nodeIndex) {
+		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeIndex*NODE_BYTE_SIZE); // in offset is the first one
+		int degree = getNodeDegree(nodeIndex);
+		ArrayList<Integer> ret = new ArrayList<Integer>(degree);
+		int age = this.getNodeAge(nodeIndex);
 		
+		for(int i = 0; i < degree; i++) {
+			// don't need the edge, so step over edge/node pairs and the ege
+			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_NODE_OFFSET;
+			int node = connectionBuf.getInt(nodeOffset);
+			if(age == this.getNodeAge(i)) {
+				ret.add(node);
+			}
+		}
+		
+		return Util.convertArrayList(ret);
+	}
+	
+	/**
+	 * @param nodeIndex the node
+	 * @return all node neighbours. 
+	 */
+	public int[] getNodeConnectingNodes(int nodeIndex) {
 		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeIndex*NODE_BYTE_SIZE); // in offset is the first one
 		int degree = getNodeDegree(nodeIndex);
 		int[] ret = new int[degree];
@@ -1786,7 +1852,7 @@ String name = "soc-pokec-relationships.txt-reduced";
 	 * @param fileBaseName the name of the files, to which extensions are added
 	 */
 	public void saveBuffers(String directory, String fileBaseName) {
-		
+		//Debugger.log("saving to: " + directory);
 		String directoryAndBaseName = "";
 		if(directory != null) {
 			if(directory.charAt(directory.length()-1)== File.separatorChar) {
@@ -3872,6 +3938,21 @@ Debugger.outputTime("time for rewiring");
 			}
 		}
 		return ret;
+	}
+	
+	/**
+	 * Counts the number of nodes at the given age
+	 * @param age The given age
+	 * @return The number of nodes at this age
+	 */
+	public int countNodesOfAge(int age) {
+		int ret = 0;
+		for(int i = 0; i < this.getNumberOfNodes(); i++) {
+			if(this.getNodeAge(i) == age) {
+				ret++;
+			}
+		}
+		return ret;		
 	}
 	
 	/**

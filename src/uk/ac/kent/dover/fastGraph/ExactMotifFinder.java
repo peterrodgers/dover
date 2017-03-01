@@ -179,12 +179,12 @@ public class ExactMotifFinder {
 					
 					mt.publish((int) ((((double) i)/rewiresNeeded)*100), "From rewire " + (i+1) + " of " + rewiresNeeded, false);	
 					//find motifs
-					findMotifsInGraph(isoLists, hashBuckets, size, graph);
+					findMotifsInGraph(isoLists, hashBuckets, size, graph, referenceSet);
 				}
 
 				mt.publish((int) (step*((minSize-size)+1))+2, "Saving motifs sized " + size, true);
 			} else {
-				findMotifsInGraph(isoLists, hashBuckets, size, g);
+				findMotifsInGraph(isoLists, hashBuckets, size, g, referenceSet);
 			}
 			
 			//export results for this size
@@ -204,12 +204,13 @@ public class ExactMotifFinder {
 	 * @param hashBuckets The hashbuckets to store results in
 	 * @param size The size of motif to find
 	 * @param graph The graph to find motifs in
+	 * @param referenceSet If the graph is the referenceSet
 	 * @throws IOException If the graph cannot be loaded
 	 */
 	private void findMotifsInGraph(HashMap<String,IsoHolder> isoLists, HashMap<String,LinkedList<IsoHolder>> hashBuckets, 
-			int size, FastGraph graph) throws IOException {
+			int size, FastGraph graph, boolean referenceSet) throws IOException {
 	
-		ExactMotifFinder emf = new ExactMotifFinder(graph,saveAll);
+		ExactMotifFinder emf = new ExactMotifFinder(graph,saveAll && !referenceSet);
 		Debugger.log("    finding motifs");
 		emf.findMotifs(size, 0, hashBuckets);
 		HashMap<String,IsoHolder> newIsoLists = emf.extractGraphLists(hashBuckets);
@@ -451,12 +452,13 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 							found = true;
 							
 							if(saveAll) {
+								//Debugger.log("saving all");
 								subgraph.setName(hashString);
-								subgraph.saveBuffers("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-"+
-										sameHashList.size()+File.separatorChar+isoList.getNumber(),
-										hashString+"-"+sameHashList.size()
-								);
-								exportSVG(isoList.getKey(), subgraph, isoList.getNumber(), true);
+								File saveFolder = new File("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-"+
+										sameHashList.size()+File.separatorChar+isoList.getNumber());
+								saveFolder.mkdirs();
+								subgraph.saveBuffers(saveFolder.getAbsolutePath(),hashString+"-"+sameHashList.size());
+								exportSVG(saveFolder.getAbsolutePath(), subgraph, 0, true);
 							}
 							
 							break;
@@ -484,8 +486,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 					newHashList.add(newIsoList);
 				}
 
-				//TODO force GC
-				ei = null;
+				ei = null; //GC
 				//System.gc();
 			}
 			
@@ -519,10 +520,11 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		se.layout();
 		File saveLocation = null;
 		if (saveAll) {
-			saveLocation = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+g.getName()+File.separatorChar+key+File.separatorChar+count+File.separatorChar+"motif.svg");
+			saveLocation = new File(key+File.separatorChar+"motif.svg");
 		} else {
 			saveLocation = new File(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+g.getName()+File.separatorChar+key+"-"+count+File.separatorChar+"motif.svg");
 		}
+		//Debugger.log("exporting SVG to: " + saveLocation.getAbsolutePath() + " (count: " + count + ")");
 		uk.ac.kent.displayGraph.ExportSVG exSVG = new uk.ac.kent.displayGraph.ExportSVG(dg);
 		exSVG.saveGraph(saveLocation);
 		
