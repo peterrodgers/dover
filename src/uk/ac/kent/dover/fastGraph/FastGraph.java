@@ -144,7 +144,17 @@ public class FastGraph {
 		
 		Debugger.enabled = true;
 		
-//		FastGraph g1 = randomGraphFactory(5,6,1,false,false);
+		FastGraph g1 = randomGraphFactory(5,6,1001,true,false);
+		g1 = g1.randomTimeSeriesFactory(0.2, 0.2, 2, 2, false, false);
+		g1 = g1.randomTimeSeriesFactory(0.2, 0.2, 2, 2, false, false);
+		
+		g1.displayFastGraph();
+		
+		FastGraph g2 = g1.generateRewiredBehaviourGraphWithRandomGenerations(10,1,0.2, 0.2, 2, 2, false, false);
+		
+		g2.displayFastGraph();
+
+		
 //		FastGraph g1 = randomGraphFactory(1000000,10000000,1,false,false);
 /*		
 		Collection<Integer> deleteNodes = new ArrayList<Integer>();
@@ -224,14 +234,14 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 */
 //String name = "simple-random-n-100-e-500-time";
 //String name = "simple-random-n-10-e-20";
-String name = "simple-random-n-4-e-4-time";
+//String name = "simple-random-n-4-e-4-time";
 //String name = "soc-pokec-relationships.txt-reduced";
 //String name = "Wiki-Vote.txt";
 
 		//String name = g1.getName();
 		//FastGraph g2 = g1;
 		try {
-			FastGraph g1 = loadBuffersGraphFactory(null,name);
+//			FastGraph g1 = loadBuffersGraphFactory(null,name);
 			/*
 			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g1);
 			HashSet<FastGraph> subs = esn.enumerateSubgraphs(6, 10, 100);
@@ -4120,7 +4130,6 @@ Debugger.outputTime("time for rewiring");
 			int node2 = es.getNode2();
 			es.setNode1(node1);
 			es.setNode2(node2);
-System.out.println("DDD "+es);
 		}
 		
 		allEdges.addAll(timeEdges);
@@ -4130,6 +4139,44 @@ System.out.println("DDD "+es);
 		FastGraph g = structureFactory(getName()+"-"+newGeneration,newGeneration,allNodes,allEdges,direct);
 		
 		return g;
+	}
+	
+
+	/**
+	 * 
+	 * Create a graph. Rewire genreation (age) 0 then apply random changes to later
+	 * generations to create a graph with the same number of generations as this graph.
+	 * 
+	 * @param iterations the number of times to rewire generation 0, more means better chance of a truly random graph
+	 * @param seed random number generator seed for rewiring
+	 * @param deleteNodeProbability The probability a node will be removed
+	 * @param deleteEdgeProbability The probability an edge will be removed. Note edges will be removed if orphaned
+	 * @param nodesToAdd The number of nodes to add
+	 * @param edgesToAdd The number of edges to add
+	 * @param sensibleLabels If the new nodes and edges will have realistic labels. Increases the time and memory usage
+	 * @param direct set to false if on heap, true if off heap
+	 * @return The new graph based on this generation 0, rewired with the added timeslices
+	 * @throws IOException 
+	 */
+	public FastGraph generateRewiredBehaviourGraphWithRandomGenerations(int iterations, long seed,double deleteNodeProbability, double deleteEdgeProbability, int nodesToAdd, int edgesToAdd, 
+			boolean sensibleLabels, boolean direct) throws IOException {
+		
+		FastGraph generation0Graph = findGenerationSubGraph((byte)0,direct);
+		
+		FastGraph nextGenerationGraph = generation0Graph.generateRandomRewiredGraph(iterations, seed);
+		
+		byte maxGeneration = findMaximumNodeAge();
+		
+		byte generation = 0;
+		while(generation < maxGeneration) {
+			
+			nextGenerationGraph = nextGenerationGraph.randomTimeSeriesFactory(deleteNodeProbability, deleteEdgeProbability, nodesToAdd, edgesToAdd, sensibleLabels, direct);
+			generation++;
+		}
+	
+		nextGenerationGraph.setName(this.name+"-rewire-"+iterations);
+
+		return nextGenerationGraph;
 	}
 	
 	
@@ -4323,11 +4370,12 @@ System.out.println("DDD "+es);
 	 * @param nodesToAdd The number of nodes to add
 	 * @param edgesToAdd The number of edges to add
 	 * @param sensibleLabels If the new nodes and edges will have realistic labels. Increases the time and memory usage
+	 * @param direct set to false if on heap, true if off heap
 	 * @return The new graph with the added timeslice
 	 * @throws IOException If the names file cannot be loaded
 	 */
 	public FastGraph randomTimeSeriesFactory(double deleteNodeProbability, double deleteEdgeProbability, int nodesToAdd, int edgesToAdd, 
-			boolean sensibleLabels) throws IOException {
+			boolean sensibleLabels, boolean direct) throws IOException {
 		
 		byte oldGeneration = getGeneration();
 		byte newGeneration = (byte)(oldGeneration+1);
@@ -4398,7 +4446,7 @@ System.out.println("DDD "+es);
 		}
 		
 Debugger.resetTime();		
-		FastGraph g2 = this.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
+		FastGraph g2 = this.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, direct);
 Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfNodes()+" edges "+g2.getNumberOfEdges());		
 		
 		return g2;
