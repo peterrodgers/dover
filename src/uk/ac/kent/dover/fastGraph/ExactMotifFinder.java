@@ -295,8 +295,9 @@ public class ExactMotifFinder {
 	/**
 	 * Builds a list of rewired graphs, each one built from the previous and saved to disk
 	 * @param numOfRewires The number of rewires to perform
+	 * @throws IOException 
 	 */
-	public void buildRewires(int numOfRewires) {
+	public void buildRewires(int numOfRewires) throws IOException {
 		String graphName = g.getName();
 		FastGraph last = g;
 		for(int i = 0; i < numOfRewires; i++) {
@@ -311,7 +312,14 @@ public class ExactMotifFinder {
 			mt.publish(rewirePercentage, "Rewiring "+(i+1)+" out of "+numOfRewires+" times",false);	
 			Debugger.log("    rewiring for the "+i+" time");
 			
-			FastGraph newG = last.generateRandomRewiredGraph(1,1);
+			
+			//int iterations, long seed,double deleteNodeProbability, double deleteEdgeProbability, int nodesToAdd, int edgesToAdd, 
+			//boolean sensibleLabels, boolean direct
+			//FastGraph newG = last.generateRandomRewiredGraph(1,1);
+			FastGraph newG = last.generateRewiredBehaviourGraphWithRandomGenerations(
+					1, last.getNodeBuf().getLong(0), 0.1, 0.1, last.getNumberOfNodes()/10, last.getNumberOfEdges()/10, 
+					true, false);
+			
 			newG.setName(graphName);
 			mt.publish(rewirePercentage, "Saving Rewire "+(i+1),false);	
 			newG.saveBuffers("motifs"+File.separatorChar+graphName+File.separatorChar+"-rewire-"+i, "-rewire-"+i);

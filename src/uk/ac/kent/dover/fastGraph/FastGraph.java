@@ -144,7 +144,7 @@ public class FastGraph {
 		long time;
 		
 		Debugger.enabled = true;
-		
+	/*	
 		FastGraph g1 = randomGraphFactory(5,6,1001,true,false);
 		g1 = g1.randomTimeSeriesFactory(0.2, 0.2, 2, 2, false, false);
 		g1 = g1.randomTimeSeriesFactory(0.2, 0.2, 2, 2, false, false);
@@ -154,7 +154,7 @@ public class FastGraph {
 		FastGraph g2 = g1.generateRewiredBehaviourGraphWithRandomGenerations(10,1,0.2, 0.2, 2, 2, false, false);
 		
 		g2.displayFastGraph();
-
+*/
 		
 //		FastGraph g1 = randomGraphFactory(1000000,10000000,1,false,false);
 /*		
@@ -235,14 +235,14 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 */
 //String name = "simple-random-n-100-e-500-time";
 //String name = "simple-random-n-10-e-20";
-//String name = "simple-random-n-4-e-4-time";
+String name = "simple-random-n-4-e-4-time";
 //String name = "soc-pokec-relationships.txt-reduced";
 //String name = "Wiki-Vote.txt";
 
 		//String name = g1.getName();
 		//FastGraph g2 = g1;
 		try {
-//			FastGraph g1 = loadBuffersGraphFactory(null,name);
+			FastGraph g1 = loadBuffersGraphFactory(null,name);
 			/*
 			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g1);
 			HashSet<FastGraph> subs = esn.enumerateSubgraphs(6, 10, 100);
@@ -279,11 +279,11 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 			
 			
 			
-			//ExactMotifFinder emf = new ExactMotifFinder(g1, new MotifTaskDummy(), true);
-			//emf.findAllMotifs(10,6,6);
-			//Debugger.log("###### REAL SET #####");
-			//emf.findAllMotifs(0,6,6);
-			//emf.compareMotifDatas(6,6);
+			ExactMotifFinder emf = new ExactMotifFinder(g1, new MotifTaskDummy(), true);
+			emf.findAllMotifs(10,6,6);
+			Debugger.log("###### REAL SET #####");
+			emf.findAllMotifs(0,6,6);
+			emf.compareMotifDatas(6,6);
 			
 			
 			/*
@@ -4146,7 +4146,7 @@ Debugger.outputTime("time for rewiring");
 
 	/**
 	 * 
-	 * Create a graph. Rewire genreation (age) 0 then apply random changes to later
+	 * Create a graph. Rewire generation (age) 0 then apply random changes to later
 	 * generations to create a graph with the same number of generations as this graph.
 	 * 
 	 * @param iterations the number of times to rewire generation 0, more means better chance of a truly random graph
@@ -4158,7 +4158,7 @@ Debugger.outputTime("time for rewiring");
 	 * @param sensibleLabels If the new nodes and edges will have realistic labels. Increases the time and memory usage
 	 * @param direct set to false if on heap, true if off heap
 	 * @return The new graph based on this generation 0, rewired with the added timeslices
-	 * @throws IOException 
+	 * @throws IOException If the graph cannot be saved
 	 */
 	public FastGraph generateRewiredBehaviourGraphWithRandomGenerations(int iterations, long seed,double deleteNodeProbability, double deleteEdgeProbability, int nodesToAdd, int edgesToAdd, 
 			boolean sensibleLabels, boolean direct) throws IOException {
