@@ -24,6 +24,7 @@ import uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder;
 import uk.ac.kent.displayGraph.drawers.GraphDrawer;
 import uk.ac.kent.displayGraph.drawers.GraphDrawerBarycenter;
 import uk.ac.kent.displayGraph.drawers.GraphDrawerEdgeLength;
+import uk.ac.kent.displayGraph.drawers.GraphDrawerGravitySpringEmbedder;
 import uk.ac.kent.displayGraph.drawers.GraphDrawerHierarchical;
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
 import uk.ac.kent.displayGraph.experiments.GraphExperiment;
@@ -138,6 +139,9 @@ public class GraphWindow extends JFrame implements ActionListener {
 /*		GraphDrawerEdgeLength gdel = new GraphDrawerEdgeLength(KeyEvent.VK_E,"Spring Embedder - edge length version",KeyEvent.VK_E,true,true);
   		gp.addGraphDrawer(gdel);
 */
+		
+		gp.addGraphDrawer(new GraphDrawerGravitySpringEmbedder(KeyEvent.VK_G,"Spring Embedder with gravity - no randomization",KeyEvent.VK_G,false));
+
 // metric spring embedder
 		gp.addGraphDrawer(new GraphDrawerEdgeLength(KeyEvent.VK_M,"Metric Spring Embedder",KeyEvent.VK_M,false,true));
 

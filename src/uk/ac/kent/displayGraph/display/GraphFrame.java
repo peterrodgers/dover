@@ -20,6 +20,7 @@ import javax.swing.KeyStroke;
 import uk.ac.kent.displayGraph.Graph;
 import uk.ac.kent.displayGraph.GraphPanel;
 import uk.ac.kent.displayGraph.drawers.GraphDrawer;
+import uk.ac.kent.displayGraph.drawers.GraphDrawerGravitySpringEmbedder;
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
 import uk.ac.kent.displayGraph.experiments.GraphExperiment;
 import uk.ac.kent.displayGraph.utilities.GraphUtility;
@@ -90,6 +91,7 @@ public class GraphFrame extends JFrame implements ActionListener {
 
 	private void initLayout() {
 		gp.addGraphDrawer(new GraphDrawerSpringEmbedder(KeyEvent.VK_S,"Spring Embedder - no randomization",KeyEvent.VK_S,false));
+		gp.addGraphDrawer(new GraphDrawerGravitySpringEmbedder(KeyEvent.VK_G,"Spring Embedder with gravity- no randomization",KeyEvent.VK_G,false));
 	}
 
 	private void initMenu() {	
