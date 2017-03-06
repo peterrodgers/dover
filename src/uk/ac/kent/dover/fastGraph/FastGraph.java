@@ -234,8 +234,8 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		time = Debugger.createTime();
 */
 //String name = "simple-random-n-100-e-500-time";
-//String name = "simple-random-n-10-e-20";
-String name = "simple-random-n-4-e-4-time";
+String name = "simple-random-n-10-e-20-time";
+//String name = "simple-random-n-4-e-4-time";
 //String name = "soc-pokec-relationships.txt-reduced";
 //String name = "Wiki-Vote.txt";
 
@@ -277,14 +277,21 @@ String name = "simple-random-n-4-e-4-time";
 		//	}
 		//	g1.displayFastGraph();
 			
-			
+			/*
+			FastGraph g2 = g1.randomTimeSeriesFactory(0.1, 0.01, g1.getNumberOfNodes()/10, g1.getNumberOfEdges()/100, true, true);
+			g2.setName(g1.getName()+"-time");
+			g2.saveBuffers(null, g2.getName());
+			Debugger.outputTime("Created time slice ", time);
+			g1 = null; //gc
+			g2 = null; //gc
+			*/
 			
 			ExactMotifFinder emf = new ExactMotifFinder(g1, new MotifTaskDummy(), true);
 			emf.findAllMotifs(10,6,6);
 			Debugger.log("###### REAL SET #####");
 			emf.findAllMotifs(0,6,6);
 			emf.compareMotifDatas(6,6);
-			
+		
 			
 			/*
 			name+="-time-00";
@@ -1066,7 +1073,7 @@ String name = "simple-random-n-4-e-4-time";
 			// don't need the edge, so step over edge/node pairs and the ege
 			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_NODE_OFFSET;
 			int node = connectionBuf.getInt(nodeOffset);
-			if(age == this.getNodeAge(i)) {
+			if(age == this.getNodeAge(node)) {
 				ret.add(node);
 			}
 		}

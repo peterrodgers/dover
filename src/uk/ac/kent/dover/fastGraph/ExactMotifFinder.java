@@ -323,7 +323,9 @@ public class ExactMotifFinder {
 			newG.setName(graphName);
 			mt.publish(rewirePercentage, "Saving Rewire "+(i+1),false);	
 			newG.saveBuffers("motifs"+File.separatorChar+graphName+File.separatorChar+"-rewire-"+i, "-rewire-"+i);
-
+			exportSVG(Launcher.startingWorkingDirectory+File.separatorChar+"motifs"+File.separatorChar+graphName+File.separatorChar+"-rewire-"+i, newG, 0, true);
+			
+			
 			last = newG;
 		}
 	}	
