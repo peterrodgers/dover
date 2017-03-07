@@ -1,0 +1,4 @@
+targetNodes,targetEdges,targetName,patternNodes,patternEdges,patternName,numOfResults,time
+20,45,simple-random-n-10-e-20-time,4,-1,motif,1068,9457
+20,45,simple-random-n-10-e-20-time,5,-1,motif,1014,15601
+20,45,simple-random-n-10-e-20-time,6,-1,motif,943,385

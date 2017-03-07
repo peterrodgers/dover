@@ -39,6 +39,7 @@ public class ExactMotifFinder {
 	private EnumerateSubgraphRandom enumeratorRandom;
 	private HashSet<FastGraph> subgraphs; // subgraphs found by the enumerator
 	private boolean saveAll = false;
+	private int numOfResults = 0;
 	
 	/**
 	 * Main method to help with development
@@ -568,6 +569,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		double totalSize = 0.0;
 		for(MotifResultHolder mrh : motifResults) {
 			totalSize += mrh.getRealPercentage();
+			numOfResults += mrh.getNumber();
 		}
 		double mean = totalSize/motifResults.size();
 		
@@ -585,7 +587,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		motifResults.sort(Comparator.comparing(MotifResultHolder::generateSignificance).thenComparing(MotifResultHolder::getRealPercentage).reversed());
 		
 		Debugger.log("length of motifResults" + motifResults.size());
-		
+				
 		mt.publish(83, "Exporting Results", 0, "");
 		buildHomePage(minSize,maxSize);
 		int sample = 1000;
@@ -625,16 +627,19 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		    	String[] lineArr = line.split("\t");
 		    	String key = lineArr[0];
 		    	double percentage = Double.parseDouble(lineArr[2]);
+		    	int number = Integer.parseInt(lineArr[1]);
 		    	
 		    	//store result
 		    	if(results.containsKey(key)) {
 		    		MotifResultHolder result = results.get(key);
 		    		result.setRealPercentage(percentage);
+		    		result.appendNumber(number);
 		    	} else {
 		    		MotifResultHolder result = new MotifResultHolder();
 			    	result.setKey(key);
 			    	result.setReferencePercentage(percentage);
 			    	results.put(key,result);
+			    	result.appendNumber(number);
 		    	}		    	
 		    }
 		}
@@ -800,6 +805,13 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	}
 	
 	/**
+	 * @return the numOfResults
+	 */
+	public int getNumOfResults() {
+		return numOfResults;
+	}
+
+	/**
 	 * Inner class to hold details of motifs ready for output
 	 * @author Rob Baker
 	 *
@@ -808,6 +820,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		private String key; //the key
 		private double referencePercentage, realPercentage; //the relevant percentages
 		private double zScore;
+		private int number = 0;
 
 		/**
 		 * @return the key
@@ -874,12 +887,36 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 			return getRealPercentage() - getReferencePercentage();
 		}
 
+		/**
+		 * Gets the z score
+		 * @return the z score
+		 */
 		public double getzScore() {
 			return zScore;
 		}
 
+		/**
+		 * Sets the z score
+		 * @param zScore the new score
+		 */
 		public void setzScore(double zScore) {
 			this.zScore = zScore;
+		}
+		
+		/**
+		 * Gets the total number
+		 * @return the total number
+		 */
+		public int getNumber() {
+			return number;
+		}
+		
+		/**
+		 * adds the number onto the number already there
+		 * @param num Adds to total
+		 */
+		public void appendNumber(int num) {
+			number+= num;
 		}
 		
 	}
