@@ -234,7 +234,7 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		time = Debugger.createTime();
 */
 //String name = "simple-random-n-100-e-500-time";
-String name = "simple-random-n-10-e-20-time";
+String name = "simple-random-n-100-e-500";
 //String name = "simple-random-n-4-e-4-time";
 //String name = "soc-pokec-relationships.txt-reduced";
 //String name = "Wiki-Vote.txt";
@@ -243,6 +243,28 @@ String name = "simple-random-n-10-e-20-time";
 		//FastGraph g2 = g1;
 		try {
 			FastGraph g1 = loadBuffersGraphFactory(null,name);
+			
+			time = Debugger.createTime();
+			
+			KMedoids km = new KMedoids(g1, 10, 2);
+			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g1);
+			HashSet<FastGraph> subs = esn.enumerateSubgraphs(8, 1, 10);
+			System.out.println("subs: " + subs.size());
+			
+			ArrayList<FastGraph> subgraphs = new ArrayList<FastGraph>(subs);
+			ArrayList<ArrayList<FastGraph>> clusters = km.cluster(subgraphs);
+			System.out.println(clusters);
+			for(ArrayList<FastGraph> cluster : clusters) {
+				System.out.println("Cluster size: " + cluster.size());
+			}
+			Debugger.outputTime("Before saving", time);
+			km.saveClusters(clusters);
+			
+			Debugger.outputTime("Total time", time);
+			System.out.println("Ged scores: " + km.numberOfGedCalcs);
+			System.out.println("Gedtime (s): " + (km.gedTime/1000.0));
+			
+			
 			/*
 			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g1);
 			HashSet<FastGraph> subs = esn.enumerateSubgraphs(6, 10, 100);
@@ -285,13 +307,13 @@ String name = "simple-random-n-10-e-20-time";
 			g1 = null; //gc
 			g2 = null; //gc
 			*/
-			
+	/*		
 			ExactMotifFinder emf = new ExactMotifFinder(g1, new MotifTaskDummy(), true);
 			emf.findAllMotifs(10,6,6);
 			Debugger.log("###### REAL SET #####");
 			emf.findAllMotifs(0,6,6);
 			emf.compareMotifDatas(6,6);
-		
+		*/
 			
 			/*
 			name+="-time-00";
@@ -357,21 +379,7 @@ String name = "simple-random-n-10-e-20-time";
 			emf.compareMotifDatas(4,6);
 	*/
 /*
-			KMedoids km = new KMedoids(g2, 5, 2);
-			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g2);
-			HashSet<FastGraph> subs = esn.enumerateSubgraphs(4, 1, 10);
-			System.out.println("subs: " + subs.size());
-			
-			ArrayList<FastGraph> subgraphs = new ArrayList<FastGraph>(subs);
-			ArrayList<ArrayList<FastGraph>> clusters = km.cluster(subgraphs);
-			System.out.println(clusters);
-			for(ArrayList<FastGraph> cluster : clusters) {
-				System.out.println("Cluster size: " + cluster.size());
-			}
-			km.saveClusters(clusters);
-			
-			System.out.println("Ged scores: " + km.numberOfGedCalcs);
-			System.out.println("Gedtime (s): " + (km.gedTime/1000.0));
+
 */
 			//emf.findAndExportAllMotifs(10, 4, 4, 0, true);
 			//emf.findAndExportAllMotifs(0, 4, 4, 0, false);
@@ -4500,6 +4508,32 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 			}
 		}
 		return ret;
+	}
+	
+	/**
+	 * Finds the the degrees of each node.
+	 * 
+	 * @return an array containing the degrees
+	 */
+	public int[] findDegrees() {
+		int[] degrees = new int[this.getNumberOfNodes()];
+		for(int i = 0; i < this.getNumberOfNodes(); i++) {
+			degrees[i] = this.getNodeDegree(i);
+		}
+		
+		return degrees;
+	}
+	
+	/**
+	 * populate buckets index with the number of nodes that have degree index
+	 * 
+	 * @param buckets big enough to hold all degrees, should be at least maxDegree+1
+	 * @param degrees from findDegrees
+	 */
+	public void findDegreeBuckets(int[] buckets, int[] degrees) {
+		for(int i = 0; i < degrees.length; i++) {
+			buckets[degrees[i]]++;
+		}
 	}
 		
 }

@@ -214,31 +214,15 @@ g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i,true,false);
 		matches1 = new int[fastGraph.getNumberOfNodes()];
 		matches2 = new int[fastGraph.getNumberOfNodes()];
 		
-		degrees1 = findDegrees(fastGraph);
+		degrees1 = fastGraph.findDegrees();
 		
 		maxDegree1 = fastGraph.maximumDegree();
 
 		degreeBuckets1 = new int[maxDegree1+1];
-		findDegreeBuckets(degreeBuckets1,degrees1);
+		fastGraph.findDegreeBuckets(degreeBuckets1,degrees1);
 		
 		neighbours1 = findNeighbours(fastGraph,maxDegree1);
 	}
-	
-	
-	
-
-	/**
-	 * populate buckets index with the number of nodes that have degree index
-	 * 
-	 * @param buckets big enough to hold all degrees, should be at least maxDegree+1
-	 * @param degrees from findDegrees
-	 */
-	public static void findDegreeBuckets(int[] buckets, int[] degrees) {
-		for(int i = 0; i < degrees.length; i++) {
-			buckets[degrees[i]]++;
-		}
-	}
-
 
 	/**
 	 * Generate a string that can be used to put graph in buckets before final brute force comparison.
@@ -308,20 +292,7 @@ g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i,true,false);
 
 
 
-	/**
-	 * Finds the the degrees of each node.
-	 * 
-	 * @param g the graph with the nodes
-	 * @return an array containing the degrees
-	 */
-	public static int[] findDegrees(FastGraph g) {
-		int[] degrees = new int[g.getNumberOfNodes()];
-		for(int i = 0; i < g.getNumberOfNodes(); i++) {
-			degrees[i] = g.getNodeDegree(i);
-		}
-		
-		return degrees;
-	}
+
 
 private long startTime = -1;
 
@@ -374,13 +345,13 @@ startTime = -1;
 			return false;
 		}
 		
-		degrees2 = findDegrees(g);
+		degrees2 = g.findDegrees();
 		
 		maxDegree2 = g.maximumDegree();
 
 		// check the number of nodes at each degree
 		degreeBuckets2 = new int[maxDegree2+1];
-		findDegreeBuckets(degreeBuckets2,degrees2);
+		g.findDegreeBuckets(degreeBuckets2,degrees2);
 		if(!Arrays.equals(degreeBuckets1, degreeBuckets2)) {
 //System.out.println("Not isomorphic: different quantities of nodes with the same degree");
 failOnDegreeComparison++;

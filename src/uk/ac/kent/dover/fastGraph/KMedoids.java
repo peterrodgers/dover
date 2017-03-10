@@ -223,10 +223,50 @@ public class KMedoids {
 //		return (g1.getNumberOfNodes() + g1.getNumberOfEdges()) - (g2.getNumberOfNodes() + g2.getNumberOfEdges()); //placeholder
 		numberOfGedCalcs++;
 		long time = Debugger.createTime();
-		double result = GedUtil.getGedScore(map.get(g1), map.get(g2));
+
+		//double result = GedUtil.getGedScore(map.get(g1), map.get(g2));
+		double result = findDifferenceInDegreeProfiles(g1,g2);
+		
 		long diff = Debugger.createTime() - time;
 		gedTime += diff;
 		return result;
+	}
+	
+	/**
+	 * Finds the difference in degree profile between two graphs
+	 * @param g1 The first graph
+	 * @param g2 The second graph
+	 * @return The difference (double to maintain consistency with other methods)
+	 */
+	private double findDifferenceInDegreeProfiles(FastGraph g1, FastGraph g2) {
+		int[] buckets1 = populateDegreeBuckets(g1);
+		int[] buckets2 = populateDegreeBuckets(g2);
+
+		double total = 0;
+		for(int i = 0; i < Math.max(buckets1.length, buckets2.length); i++) {
+			if(i >= buckets1.length) {
+				total += buckets2[i];
+			} else if(i >= buckets2.length) {
+				total += buckets1[i];
+			} else {
+				total += Math.abs(buckets1[i] - buckets2[i]);
+			}		
+		}		
+		return total;
+	}
+	
+	/**
+	 * Populates degree buckets with the profiles of each degree
+	 * 
+	 * @param g1 The graph to run on
+	 * @return The buckets
+	 */
+	private int[] populateDegreeBuckets(FastGraph g1) {
+		int maxDegree1 = g1.maximumDegree();
+		int[] degreeBuckets1 = new int[maxDegree1+1];
+		int[] degrees1 = g1.findDegrees();
+		g1.findDegreeBuckets(degreeBuckets1,degrees1);
+		return degreeBuckets1;
 	}
 
 	/**
