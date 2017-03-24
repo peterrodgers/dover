@@ -43,7 +43,7 @@ public class MotifTaskDummy extends MotifTask {
 	 */
 	public MotifTaskDummy(Launcher launcher, JProgressBar bigProgress, JProgressBar smallProgress, File graph,
 			int minSize, int maxSize, JProgressBar progressBar, JLabel status, JPanel panel, boolean saveAll) {
-		super(launcher, bigProgress, smallProgress, graph, minSize, maxSize, progressBar, status, panel, saveAll);
+		super(launcher, bigProgress, smallProgress, graph, minSize, maxSize, progressBar, status, panel, saveAll, null);
 	}
 	
 	/**
