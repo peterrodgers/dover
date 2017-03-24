@@ -29,7 +29,7 @@ public class MotifActionListener implements ActionListener {
 	private JPanel motifPanel;
 	private JLabel statusBar;
 	private JProgressBar bigProgress, smallProgress, progressBar;
-	private JFileChooser targetChooser;
+	private JFileChooser targetChooser, refChooser;
 	private JCheckBox saveAllBox;
 	
 	/**
@@ -45,10 +45,11 @@ public class MotifActionListener implements ActionListener {
 	 * @param statusBar The main window status bar
 	 * @param targetChooser The chooser for the user to select the target graph
 	 * @param saveAllBox If the user wishes to save every example of motif
+	 * @param refChooser The box for the user to select a reference graph. May be empty
 	 */
 	public MotifActionListener(Launcher launcher, LauncherGUI launcherGUI, JTextField minInput, JTextField maxInput, JPanel motifPanel, 
 			JProgressBar bigProgress, JProgressBar smallProgress, JProgressBar progressBar, JLabel statusBar, JFileChooser targetChooser, 
-			JCheckBox saveAllBox) {
+			JCheckBox saveAllBox, JFileChooser refChooser) {
 		this.launcher = launcher;
 		this.launcherGUI = launcherGUI;
 		this.minInput = minInput;
@@ -60,6 +61,7 @@ public class MotifActionListener implements ActionListener {
 		this.statusBar = statusBar;
 		this.targetChooser = targetChooser;
 		this.saveAllBox = saveAllBox;
+		this.refChooser = refChooser;
 	}
 	
 	@Override
@@ -76,7 +78,7 @@ public class MotifActionListener implements ActionListener {
 			if(graph != null) {
 				//create a Task that will run the motif code and provide updates
 				MotifTask task = new MotifTask(launcher, bigProgress, smallProgress, graph, minNumber, maxNumber, 
-						progressBar, statusBar, motifPanel, saveAllBox.isSelected());
+						progressBar, statusBar, motifPanel, saveAllBox.isSelected(), refChooser.getSelectedFile());
 				task.execute();
 			} else {
 				JOptionPane.showMessageDialog(motifPanel, "Please select a target graph", "No target graph selected", JOptionPane.ERROR_MESSAGE);

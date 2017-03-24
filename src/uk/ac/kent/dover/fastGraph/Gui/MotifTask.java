@@ -23,7 +23,7 @@ public class MotifTask extends SwingWorker<Void, Progress> {
 	
 	private JProgressBar bigProgress, smallProgress, progressBar;
 	private Launcher launcher;
-	private File graph;
+	private File graph, reference;
 	private int minSize, maxSize;
 	private JLabel status;
 	private Progress lastProgress;
@@ -43,9 +43,10 @@ public class MotifTask extends SwingWorker<Void, Progress> {
 	 * @param status The main window's status bar
 	 * @param motifPanel The panel to attach errors to
 	 * @param saveAll If the user wishes to save every motif example
+	 * @param reference The reference graph, if there is one
 	 */
 	public MotifTask(Launcher launcher, JProgressBar bigProgress, JProgressBar smallProgress, File graph, int minSize, int maxSize,
-			JProgressBar progressBar, JLabel status, JPanel motifPanel, boolean saveAll) {
+			JProgressBar progressBar, JLabel status, JPanel motifPanel, boolean saveAll, File reference) {
 		this.launcher = launcher;
 		this.bigProgress = bigProgress;
 		this.smallProgress = smallProgress;
@@ -56,6 +57,7 @@ public class MotifTask extends SwingWorker<Void, Progress> {
 		this.status = status;
 		this.motifPanel = motifPanel;
 		this.saveAll = saveAll;
+		this.reference = reference;
 	}
 	
 
@@ -122,7 +124,7 @@ public class MotifTask extends SwingWorker<Void, Progress> {
 		String name = graph.getName();
 		String path = graph.getParent();							
 		
-		launcher.findMotifs(this, path+File.separatorChar+name, name, minSize, maxSize, saveAll);
+		launcher.findMotifs(this, path+File.separatorChar+name, name, minSize, maxSize, saveAll, reference);
 		//launcher
 		
 		return null;

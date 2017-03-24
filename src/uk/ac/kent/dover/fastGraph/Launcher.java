@@ -96,9 +96,11 @@ public class Launcher {
 	 * @param minNum The minimum size of motifs
 	 * @param maxNum The maximum size of motifs
 	 * @param saveAll If every example is to be saved
+	 * @param reference The reference graph, if there is one
 	 * @throws IOException If the files cannot be loaded
 	 */
-	public void findMotifs(MotifTask mt, String directory, String fileBaseName, int minNum, int maxNum, boolean saveAll) throws IOException {
+	public void findMotifs(MotifTask mt, String directory, String fileBaseName, int minNum, int maxNum, 
+			boolean saveAll, File reference) throws IOException {
 		double sizeDiff = maxNum - minNum;	
 		double step = 100/(sizeDiff+4);
 		
@@ -108,6 +110,13 @@ public class Launcher {
 			
 		mt.setSmallIndeterminate(false);			
 		ExactMotifFinder emf = new ExactMotifFinder(g2, mt, saveAll);
+		
+		if(reference != null) {
+			String name = reference.getName();
+			String path = reference.getParent();
+			FastGraph g3 = FastGraph.loadBuffersGraphFactory(path+File.separatorChar+name, path);
+			emf.setReferenceGraph(g3);
+		}
 		
 		emf.setSaveAll(false); //never want to save all examples in the rewired graph
 		mt.publish((int) step, "Building Reference Set", 0, "");		

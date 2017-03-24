@@ -40,6 +40,7 @@ public class ExactMotifFinder {
 	private HashSet<FastGraph> subgraphs; // subgraphs found by the enumerator
 	private boolean saveAll = false;
 	private int numOfResults = 0;
+	private FastGraph referenceGraph = null;
 	
 	/**
 	 * Main method to help with development
@@ -153,7 +154,7 @@ public class ExactMotifFinder {
 		}		
 		
 		//rewire graph
-		if(referenceSet) {
+		if(referenceSet && referenceGraph==null) {
 			//reference set
 			buildRewires(rewiresNeeded);
 		}
@@ -173,16 +174,19 @@ public class ExactMotifFinder {
 			if(referenceSet) {
 				mt.publish((int) (step*((minSize-size)+1))+2, "Finding motifs sized " + size, true);
 
-				//for each rewired graph
-				for(int i = 0; i < rewiresNeeded; i++) {
-					FastGraph graph = FastGraph.loadBuffersGraphFactory("motifs"+File.separatorChar+graphName+File.separatorChar+"-rewire-"+i,
-							"-rewire-"+i);
-					
-					mt.publish((int) ((((double) i)/rewiresNeeded)*100), "From rewire " + (i+1) + " of " + rewiresNeeded, false);	
-					//find motifs
-					findMotifsInGraph(isoLists, hashBuckets, size, graph, referenceSet);
+				if(referenceGraph == null) {
+					//for each rewired graph
+					for(int i = 0; i < rewiresNeeded; i++) {
+						FastGraph graph = FastGraph.loadBuffersGraphFactory("motifs"+File.separatorChar+graphName+File.separatorChar+"-rewire-"+i,
+								"-rewire-"+i);
+						
+						mt.publish((int) ((((double) i)/rewiresNeeded)*100), "From rewire " + (i+1) + " of " + rewiresNeeded, false);	
+						//find motifs
+						findMotifsInGraph(isoLists, hashBuckets, size, graph, referenceSet);
+					}
+				} else {
+					findMotifsInGraph(isoLists, hashBuckets, size, referenceGraph, referenceSet);
 				}
-
 				mt.publish((int) (step*((minSize-size)+1))+2, "Saving motifs sized " + size, true);
 			} else {
 				findMotifsInGraph(isoLists, hashBuckets, size, g, referenceSet);
@@ -809,6 +813,20 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 */
 	public int getNumOfResults() {
 		return numOfResults;
+	}
+
+	/**
+	 * @return the referenceGraph
+	 */
+	public FastGraph getReferenceGraph() {
+		return referenceGraph;
+	}
+
+	/**
+	 * @param referenceGraph the referenceGraph to set
+	 */
+	public void setReferenceGraph(FastGraph referenceGraph) {
+		this.referenceGraph = referenceGraph;
 	}
 
 	/**

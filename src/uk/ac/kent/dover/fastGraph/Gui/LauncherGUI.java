@@ -358,6 +358,24 @@ public class LauncherGUI extends JFrame {
 		saveAllBox.addActionListener(new MessageActionListener(saveAllBox, motifPanel, "Save all motifs", 
 				"This may take some time to complete and potentially use a large amount of disk space", JOptionPane.WARNING_MESSAGE));
 		
+		JSeparator sep1 = new JSeparator(SwingConstants.HORIZONTAL);
+		
+		JLabel refLabel = new JLabel("Optional: Specify reference set", SwingConstants.CENTER);
+		refLabel.setToolTipText("If no reference set is chosen, then rewire target graph");
+		
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new java.io.File("."));
+		fileChooser.setDialogTitle("Select subgraph directory");
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	    
+		JButton openBtn = new JButton("Open File...");
+		
+		JLabel fileLabel = new JLabel("No file selected  ");
+		fileLabel.setFont(new Font(fileLabel.getFont().getFontName(), Font.ITALIC, fileLabel.getFont().getSize()));
+		
+		//The action for when the user chooses a file
+		openBtn.addActionListener(new LoadFileActionListener(status, fileLabel, fileChooser, motifPanel, openBtn));
+		
 		JButton motifBtn = new JButton("Find Motifs");
 		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
 		JProgressBar bigProgress = new JProgressBar(0, 100);
@@ -372,7 +390,7 @@ public class LauncherGUI extends JFrame {
 		//add an action when the user clicks this button
 		//in an external class, so needs lots(!) of parameters
 		motifBtn.addActionListener(new MotifActionListener(launcher, this, minInput, maxInput, motifPanel,
-				bigProgress, smallProgress, progressBar, status, targetChooser, saveAllBox));
+				bigProgress, smallProgress, progressBar, status, targetChooser, saveAllBox, fileChooser));
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(2,2,2,2);
@@ -407,39 +425,67 @@ public class LauncherGUI extends JFrame {
         c.gridx = 1;
         c.gridy = 2;
         motifPanel.add(maxInput, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridheight = 3;
-        c.gridx = 2;
-        c.gridy = 1;
-        motifPanel.add(motifBtn, c);
-
+        
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridwidth = 2;
         c.gridheight = 1;
         c.gridx = 0;
         c.gridy = 3;
         motifPanel.add(saveAllBox, c);
+
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridwidth = 1;
+        c.gridheight = 3;
+        c.gridx = 2;
+        c.gridy = 1;
+        motifPanel.add(motifBtn, c);
         
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridwidth = 3;
         c.gridheight = 1;
         c.gridx = 0;
         c.gridy = 4;
+        motifPanel.add(sep1, c);
+        
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridwidth = 3;
+        c.gridheight = 1;
+		c.gridx = 0;
+		c.gridy = 5;
+		motifPanel.add(refLabel, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 1;
+		c.gridx = 0;
+		c.gridy = 6;
+		motifPanel.add(openBtn, c);
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 1;
+		c.gridy = 6;
+		c.gridwidth = 2;
+		motifPanel.add(fileLabel, c);
+		
+        
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridwidth = 3;
+        c.gridheight = 1;
+        c.gridx = 0;
+        c.gridy = 7;
         motifPanel.add(sep, c);
 
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 3;
 		c.gridheight = 1;
 		c.gridx = 0;
-		c.gridy = 5;
+		c.gridy = 8;
 		motifPanel.add(bigProgress, c);	
 		
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 3;
 		c.gridheight = 1;
 		c.gridx = 0;
-		c.gridy = 6;
+		c.gridy = 9;
 		motifPanel.add(smallProgress, c);	
 		return motifPanel;
 	}
