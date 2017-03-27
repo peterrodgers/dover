@@ -3694,6 +3694,7 @@ Debugger.outputTime("time for rewiring");
 
 		// this removes an edge from remainingEdgeArray
 		// by replacing the edge with the last edge in the array, and reducing the elements in the array that will be searched next time by one
+		Debugger.log("remaining edge count "+remainingEdgeCount);
 		int startEdge = r.nextInt(remainingEdgeCount);
 		int startNode = getEdgeNode1(startEdge);
 		remainingEdgeArray[startEdge] = remainingEdgeArray[remainingEdgeCount-1];

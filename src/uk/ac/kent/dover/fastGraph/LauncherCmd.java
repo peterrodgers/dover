@@ -164,7 +164,7 @@ public class LauncherCmd {
 					String path = f.getParent();							
 					System.out.println("Finding motifs. This may take some time....");
 					try {
-						launcher.findMotifs(new MotifTaskDummy(), path+File.separatorChar+name, name, minSize, maxSize, saveAll);
+						launcher.findMotifs(new MotifTaskDummy(), path+File.separatorChar+name, name, minSize, maxSize, saveAll, null);
 					} catch (IOException e) {
 						throw new ParseException("Error occurred: "+e.getMessage());
 					}

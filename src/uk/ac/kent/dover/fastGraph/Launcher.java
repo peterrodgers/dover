@@ -44,6 +44,7 @@ public class Launcher {
 	 * @throws Exception Only used when testing direct access to FastGraph
 	 */
 	public Launcher(String[] args) throws Exception{
+		Debugger.enabled = true;
 		//System.out.println("Launched!");
 		//System.out.println(Arrays.toString(args));
 		//System.out.println(args.length);
