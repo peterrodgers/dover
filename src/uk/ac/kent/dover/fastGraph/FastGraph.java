@@ -4178,9 +4178,15 @@ Debugger.outputTime("time for rewiring");
 	 */
 	public FastGraph generateRewiredBehaviourGraphWithRandomGenerations(int iterations, long seed,double deleteNodeProbability, double deleteEdgeProbability, int nodesToAdd, int edgesToAdd, 
 			boolean sensibleLabels, boolean direct) throws IOException {
-		
+
+		//TODO A QUICK FIX FOR THE DEMO, UNDERLYING ISSUE OF -55 for edgeAge, when nodeAge is 0 needs looking at
+		for(int i = 0; i < getNumberOfEdges(); i++) {
+			if(getEdgeAge(i) < 0) {
+				setEdgeAge(i,(byte)0);
+			}
+		}
+
 		FastGraph generation0Graph = findGenerationSubGraph((byte)0,direct);
-		
 		FastGraph nextGenerationGraph = generation0Graph.generateRandomRewiredGraph(iterations, seed);
 		
 		byte maxGeneration = findMaximumNodeAge();
