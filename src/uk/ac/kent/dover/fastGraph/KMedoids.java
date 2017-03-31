@@ -60,8 +60,6 @@ public class KMedoids {
 	 * @throws FastGraphException If the random selection cannot be obtained (i.e. k is too big)
 	 */
 	public ArrayList<ArrayList<FastGraph>> cluster(ArrayList<FastGraph> subgraphs) throws FastGraphException {
-		System.out.println("subs: " + subgraphs.size());
-		System.out.println("numOfClusters: " + numberOfClusters);
 		
 		ArrayList<FastGraph> medoids = Util.randomSelection(r, numberOfClusters, subgraphs);	
 		ArrayList<ArrayList<FastGraph>> output = new ArrayList<ArrayList<FastGraph>>(numberOfClusters);

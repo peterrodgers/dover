@@ -53,22 +53,32 @@ public class LauncherCmd {
 		Options options = new Options();
 
 		// add convert options
-		options.addOption("c", "convert", true, "Convert an Adjacency Matrix to buffers. Requires e,d,n.");
-		options.addOption("n", "nodes", true, "Number of nodes in Adjacency Matrix to convert");
-		options.addOption("e", "edges", true, "Number of edges in Adjacency Matrix to convert");
-		options.addOption("d", "directed", true, "Adjacency Matrix to convert is a directed graph");
+		options.addOption("c", "convert", true, "Convert an Adjacency List to buffers. Requires e,d,n. (Convert)");
+		options.addOption("n", "nodes", true, "Number of nodes in Adjacency List to convert  (Convert)");
+		options.addOption("e", "edges", true, "Number of edges in Adjacency List to convert  (Convert)");
+		options.addOption("d", "directed", true, "Adjacency List to convert is a directed graph  (Convert)");
 		
-		//add motif options
-		options.addOption("m","motif", true, "Find motifs in this graph. Requires minSize and maxSize.");
-		options.addOption(Option.builder().longOpt("minsize").desc("The minimum size of motif to find").hasArg().build());
-		options.addOption(Option.builder().longOpt("maxsize").desc("The maximum size of motif to find").hasArg().build());
-		options.addOption(Option.builder().longOpt("saveall").desc("Saves every example of motifs. This may take some time.").build());
+		//add exact motif options
+		options.addOption("m","exactmotif", true, "Find exact motifs in this graph. Requires minSize and maxSize. (ExactMotif)");
+		options.addOption(Option.builder().longOpt("minsize").desc("The minimum size of motif to find  (ExactMotif, ApproxMotif)").hasArg().build());
+		options.addOption(Option.builder().longOpt("maxsize").desc("The maximum size of motif to find  (ExactMotif, ApproxMotif)").hasArg().build());
+		options.addOption(Option.builder().longOpt("saveall").desc("Saves every example of motifs. This may take some time.  (ExactMotif)").build());
+
+		//add approximate motif options
+		options.addOption("M","approxmotif", true, "Find approximate motifs in this graph. "
+				+ "Requires minSize, maxSize, clusters, iterations, subspernode and optionally attempts. (ApproxMotif)");
+		options.addOption(Option.builder().longOpt("clusters").desc("The number of clusters (ApproxMotif)").hasArg().build());
+		options.addOption(Option.builder().longOpt("iterations").desc("The number of iterations (ApproxMotif)").hasArg().build());
+		options.addOption(Option.builder().longOpt("subspernode").desc("The number of subgraphs per node (ApproxMotif)").hasArg().build());
+		options.addOption(Option.builder().longOpt("attempts").desc("The number of attempts to find a subgraph. Default is " 
+				+ String.valueOf(Launcher.DEFAULT_SUBGRAPH_ENUMERATION_ATTEMPTS) + " (ApproxMotif)").hasArg().build());
+		//minsize & maxSize
 		
 		// add help option
-		options.addOption("h", "help", false, "Prints this message");
+		options.addOption("h", "help", false, "Prints this message (Help)");
 		
 		// add t option
-		options.addOption("t", false, "Runs the FastGraph as it used to in the early stages of development");
+		options.addOption("t", false, "Runs the FastGraph as it used to in the early stages of development (Debug)");
 		
 		return options;
 	}
@@ -90,9 +100,13 @@ public class LauncherCmd {
 			if(cmd.hasOption("c")) { 
 				convert(cmd);
 				
-				//if the user is finding motifs
+				//if the user is finding exact motifs
 			} else if(cmd.hasOption("m")){
 				motif(cmd);	
+				
+				//if the user is finding approx motifs
+			} else if(cmd.hasOption("M")) {
+				approxMotif(cmd);
 				
 				//if the user is testing the command line
 			} else if(cmd.hasOption("t")) {
@@ -120,7 +134,7 @@ public class LauncherCmd {
 	}
 	
 	/**
-	 * Runs the motif finding code and checks that parameters are valid
+	 * Runs the exact motif finding code and checks that parameters are valid
 	 * @param cmd The CommandLine object that holds the user's input
 	 * @throws ParseException If there is an error with the user's input
 	 */
@@ -181,6 +195,102 @@ public class LauncherCmd {
 		} else {
 			throw new ParseException("Motif finding requires minSize, maxSize. See --help for details.");
 		}
+	}
+	
+	/**
+	 * Runs the approximate motif finding code and checks that parameters are valid
+	 * @param cmd The CommandLine object that holds the user's input
+	 * @throws ParseException If there is an error with the user's input
+	 */
+	private void approxMotif(CommandLine cmd) throws ParseException {
+		
+		Option minFound = null;
+		Option maxFound = null;
+		Option clustersFound = null;
+		Option iterationsFound = null;
+		Option subspernodeFound = null;
+		Option attemptsFound = null;
+		for(Option o : cmd.getOptions()) {
+			
+			switch(o.getLongOpt().toLowerCase()) {
+				case "minsize" :
+					minFound = o;
+					break;
+				case "maxsize" :
+					maxFound = o;
+					break;
+				case "clusters" :
+					clustersFound = o;
+					break;
+				case "iterations" :
+					iterationsFound = o;
+					break;
+				case "subspernode" :
+					subspernodeFound = o;
+					break;
+				case "attempts" :
+					attemptsFound = o;
+					break;			
+			}
+		}
+		
+		//if all of the following are NOT NULL (ignore attempts, as that is optional)
+		if(!Util.areAnyObjectsNull(minFound, maxFound, clustersFound, iterationsFound, subspernodeFound)) {
+			String mVal = cmd.getOptionValue("M");
+			String minSizeVal = minFound.getValues()[0];
+			String maxSizeVal = maxFound.getValues()[0];
+			String clustersVal = clustersFound.getValues()[0];
+			String iterationsVal = iterationsFound.getValues()[0];
+			String subspernodeVal = subspernodeFound.getValues()[0];
+			String attemptsVal = String.valueOf(Launcher.DEFAULT_SUBGRAPH_ENUMERATION_ATTEMPTS);
+			if(attemptsFound != null) { //only update the value if there was one
+				attemptsVal = attemptsFound.getValues()[0];
+			} 
+			
+			if(!Util.areAnyObjectsNull(mVal, minSizeVal, maxSizeVal, clustersVal, iterationsVal, subspernodeVal, attemptsVal)) {
+				//all parameters have options given
+				
+				//ensure the inputs are valid numbers
+				int minSize, maxSize, clusters, iterations, subsPerNode, attempts;
+				try {
+					minSize = Util.checkForPositiveInteger(minSizeVal);
+					maxSize = Util.checkForPositiveInteger(maxSizeVal);
+					clusters = Util.checkForPositiveInteger(clustersVal);
+					iterations = Util.checkForPositiveInteger(iterationsVal);
+					subsPerNode = Util.checkForPositiveInteger(subspernodeVal);
+					attempts = Util.checkForPositiveInteger(attemptsVal);
+				} catch (NumberFormatException e) {
+					throw new ParseException("The values for minSize & maxSize must be positive (or 0) integers");
+				}
+				
+				//ensure the file is valid and readable
+				File f = new File(mVal);
+				if(f.canRead()) {
+					String name = f.getName();
+					String path = f.getParent();							
+					System.out.println("Finding motifs. This may take some time....");
+					try {
+						FastGraph g = launcher.loadFromBuffers(path+File.separatorChar+name, name);
+
+						launcher.approximateMotifs(g, minSize, maxSize, clusters, iterations, subsPerNode, attempts);
+					} catch (IOException e) {
+						throw new ParseException("Error occurred: "+e.getMessage());
+					} catch (FastGraphException e) {
+						throw new ParseException("Error occurred: "+e.getMessage());
+					}
+					System.out.println("Motif finding Complete. Output has been exported");
+					
+				} else {
+					throw new ParseException("File does not exist, or is not readable");
+				}				
+				
+			} else {
+				throw new ParseException("Approximate Motif finding requires that minSize, maxSize, clusters, iterations, subspernode all have arguments. See --help for details.");
+			}
+		} else {
+			throw new ParseException("Approximate Motif finding requires minSize, maxSize, clusters, iterations, subspernode and optionally attempts. See --help for details.");
+		}
+		
 	}
 	
 	/**

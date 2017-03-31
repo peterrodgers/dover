@@ -16,6 +16,7 @@ import java.util.Random;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * A class to hold a number of useful methods
@@ -460,5 +461,17 @@ public class Util {
 	public static <T> T pickRandom(Random r, ArrayList<T> list) {
 		int i = r.nextInt(list.size());
 		return list.get(i);
+	}
+	
+	/**
+	 * Checks if any of the objects are null
+	 * @param objects The objects to check
+	 * @return If any are null
+	 */
+	public static boolean areAnyObjectsNull(Object... objects) {
+		if (Stream.of(objects).anyMatch(x -> x == null)) {
+			return true;
+		}
+		return false;
 	}
 }

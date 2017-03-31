@@ -533,7 +533,7 @@ public class LauncherGUI extends JFrame {
 		subgraphsPerNodeField.setToolTipText(subgraphsPerNodeTip);
 		
 		JLabel attemptsLabel = new JLabel("Attempts to find subgraph:");
-		JTextField attemptsField = new JTextField("20", 3);
+		JTextField attemptsField = new JTextField(String.valueOf(Launcher.DEFAULT_SUBGRAPH_ENUMERATION_ATTEMPTS), 3);
 		String attemptsToolTip = "The number of attempts to find a subgraph. 20 is fine unless large subgraphs are being searched for";
 		attemptsLabel.setToolTipText(attemptsToolTip);
 		attemptsField.setToolTipText(attemptsToolTip);

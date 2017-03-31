@@ -23,6 +23,7 @@ public class Launcher {
 	
 	public static final String startingWorkingDirectory = System.getProperty("user.dir");
 	public final String DATA_URL = "https://www.cs.kent.ac.uk/projects/dover/"; //the URL for extra data
+	public static final int DEFAULT_SUBGRAPH_ENUMERATION_ATTEMPTS = 20; //the default number of attempts when enumerating a subgraph
 	
 	/**
 	 * Main method
