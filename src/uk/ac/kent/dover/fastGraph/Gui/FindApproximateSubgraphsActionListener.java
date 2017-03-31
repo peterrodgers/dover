@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 
+import uk.ac.kent.dover.fastGraph.Debugger;
 import uk.ac.kent.dover.fastGraph.FastGraph;
 import uk.ac.kent.dover.fastGraph.Launcher;
 
@@ -111,8 +112,9 @@ public class FindApproximateSubgraphsActionListener implements ActionListener {
 						
 						//System.out.println("patternNodes " + patternNodes);
 						//System.out.println("subgraphsPerNode " + subgraphsPerNode);
-						
+						long time = Debugger.createTime();				    	
 						launcher.approximateSubgraphs(g, subgraph, patternNodes, subgraphsPerNode);
+						System.out.println("time for subgraph" + Debugger.getTimeSinceInSeconds(time) + " s" );
 				    	
 				    	//stop the Progress Bar
 				    	progressBar.setIndeterminate(false);

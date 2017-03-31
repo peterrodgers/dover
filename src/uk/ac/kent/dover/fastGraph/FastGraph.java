@@ -139,7 +139,6 @@ public class FastGraph {
 	 * @throws Exception Any error
 	 */
 	public static void main(String[] args) throws Exception {
-		GedUtil.initNativeCode();
 		
 		long time;
 		
@@ -233,22 +232,50 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		Debugger.outputTime("saveBuffers test time ");
 		time = Debugger.createTime();
 */
-//String name = "simple-random-n-100-e-500-time";
-String name = "simple-random-n-100-e-500";
+String name = "simple-random-n-1000-e-5000-time";
+//String name = "simple-random-n-100-e-500";
 //String name = "simple-random-n-4-e-4-time";
-//String name = "soc-pokec-relationships.txt-reduced";
+//String name = "soc-pokec-relationships.txt-reduced-time";
 //String name = "Wiki-Vote.txt";
 
 		//String name = g1.getName();
 		//FastGraph g2 = g1;
 		try {
 			FastGraph g1 = loadBuffersGraphFactory(null,name);
+
+			/*
+			Connected c = new Connected();
+			long time2 = Debugger.createTime();
+			c.connected(g1);
+			Debugger.outputTime("connected test",time2);
+			*/
+			//FastGraph g1 = loadBuffersGraphFactory(null,name);
+			/*HashMap<Byte, Integer> map = new HashMap<>();
 			
+			for(int i = 0; i < g1.getNumberOfEdges(); i++) {
+				if(map.containsKey(g1.getEdgeAge(i))) {
+					map.put(g1.getEdgeAge(i),map.get(g1.getEdgeAge(i))+1);
+				} else {
+					map.put(g1.getEdgeAge(i),1);
+				}
+				
+				//if(g1.getEdgeAge(i) < 0) {
+				//	g1.setEdgeAge(i, (byte) 0);
+				//}
+				//Debugger.log();
+			}
+			System.out.println(map);
+			//g1.saveBuffers(null, name);
+			*/
+			Debugger.log("Number of nodes: " + g1.getNumberOfNodes());
+			Debugger.log("Number of edges: " + g1.getNumberOfEdges());
 			time = Debugger.createTime();
 			
 			KMedoids km = new KMedoids(g1, 10, 2);
 			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g1);
-			HashSet<FastGraph> subs = esn.enumerateSubgraphs(8, 1, 10);
+			HashSet<FastGraph> subs = esn.enumerateSubgraphs(4, 5, 10);
+			System.out.println("subs: " + subs.size());
+			subs.addAll(esn.enumerateSubgraphs(5, 5, 10));
 			System.out.println("subs: " + subs.size());
 			
 			ArrayList<FastGraph> subgraphs = new ArrayList<FastGraph>(subs);
@@ -263,8 +290,7 @@ String name = "simple-random-n-100-e-500";
 			Debugger.outputTime("Total time", time);
 			System.out.println("Ged scores: " + km.numberOfGedCalcs);
 			System.out.println("Gedtime (s): " + (km.gedTime/1000.0));
-			
-			
+						
 			/*
 			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g1);
 			HashSet<FastGraph> subs = esn.enumerateSubgraphs(6, 10, 100);
@@ -333,15 +359,7 @@ String name = "simple-random-n-100-e-500";
 			/*
 			 * CLEANING
 			 */ /*
-			FastGraph g1 = loadBuffersGraphFactory(null,name);
 			
-			for(int i = 0; i < g1.getNumberOfNodes(); i++) {
-				if(g1.getNodeAge(i) < 0) {
-					g1.setNodeAge(i, (byte) 0);
-				}
-				//Debugger.log();
-			}
-			g1.saveBuffers(null, name);
 			*/
 			//FastGraph g2 = g1.randomTimeSeriesFactory(0.2, 0.05, 1000, 300, true);
 			//g2.saveBuffers(null, name+"-time");
@@ -3694,6 +3712,7 @@ Debugger.outputTime("time for rewiring");
 
 		// this removes an edge from remainingEdgeArray
 		// by replacing the edge with the last edge in the array, and reducing the elements in the array that will be searched next time by one
+		Debugger.log("number of edges "+getNumberOfEdges());
 		Debugger.log("remaining edge count "+remainingEdgeCount);
 		int startEdge = r.nextInt(remainingEdgeCount);
 		int startNode = getEdgeNode1(startEdge);

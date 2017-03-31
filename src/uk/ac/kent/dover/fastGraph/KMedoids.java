@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-import org.cytoscape.gedevo.GedevoNative;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -35,8 +34,6 @@ public class KMedoids {
 	private int maxIterations;
 	
 	private FastGraph targetGraph;
-	
-	private HashMap<FastGraph, GedevoNative.Network> map = new HashMap<>();
 	
 	public int numberOfGedCalcs = 0;
 	public long gedTime = 0;
@@ -69,9 +66,6 @@ public class KMedoids {
 		ArrayList<FastGraph> medoids = Util.randomSelection(r, numberOfClusters, subgraphs);	
 		ArrayList<ArrayList<FastGraph>> output = new ArrayList<ArrayList<FastGraph>>(numberOfClusters);
 		
-		for(FastGraph sub : subgraphs) {
-			map.put(sub, GedUtil.fastGraphToNetwork(sub, sub.getName()));
-		}
 		Debugger.log("Map created. Not included in time");
 		boolean changed = true;
 		int count = 0;

@@ -10,7 +10,6 @@ import test.uk.ac.kent.dover.fastGraph.ExactIsomorphismTest;
 import test.uk.ac.kent.dover.fastGraph.ExactMotifFinderTest;
 import test.uk.ac.kent.dover.fastGraph.ExactSubgraphIsomorphismTest;
 import test.uk.ac.kent.dover.fastGraph.FastGraphTest;
-import test.uk.ac.kent.dover.fastGraph.GedTest;
 import test.uk.ac.kent.dover.fastGraph.InducedSubgraphTest;
 import test.uk.ac.kent.dover.fastGraph.RandomTimeSliceTest;
 
@@ -55,12 +54,6 @@ public class TestRunner {
 		System.out.println(result.wasSuccessful());
 
 		result = JUnitCore.runClasses(ApproximateSubgraphIsomorphismTest.class);
-		for (Failure failure : result.getFailures()) {
-			System.out.println(failure.toString());
-		}
-		System.out.println(result.wasSuccessful());
-
-		result = JUnitCore.runClasses(GedTest.class);
 		for (Failure failure : result.getFailures()) {
 			System.out.println(failure.toString());
 		}

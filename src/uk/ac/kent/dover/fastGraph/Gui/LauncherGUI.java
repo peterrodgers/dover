@@ -147,10 +147,6 @@ public class LauncherGUI extends JFrame {
 		tabbedPane.addTab("Others", otherPanel);
 		tabbedPane.setMnemonicAt(5, KeyEvent.VK_6);
 
-		JPanel gedPanel = buildGedTab(progressBar, statusBar, targetChooser);
-		tabbedPane.addTab("GED", gedPanel);
-		tabbedPane.setMnemonicAt(6, KeyEvent.VK_7);
-
 		blackline = BorderFactory.createLineBorder(Color.black);
 		titled = BorderFactory.createTitledBorder(blackline, "Task");
 		titled.setTitleJustification(TitledBorder.LEFT);
@@ -856,100 +852,6 @@ public class LauncherGUI extends JFrame {
 		statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		statusPanel.add(statusLabel);
 		return statusPanel;
-	}
-	
-	/**
-	 * Builds the Panel used to house the GUI elements for the Graph Edit Distance Tab
-	 *
-	 * @param graphList   The JList element used to select which is the target graph
-	 * @param progressBar The JProgressBar to update when loading a graph
-	 * @param targetChooser The chooser for the target graph
-	 * @return the GED tab
-	 */
-	private JPanel buildGedTab(JProgressBar progressBar, JPanel statusBar, JFileChooser targetChooser) {
-
-		JPanel gedPanel = new JPanel(new GridBagLayout());
-
-		// Set the layout
-		GridBagConstraints c = new GridBagConstraints();
-
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.insets = new Insets(2, 2, 2, 2);
-
-		JLabel graphOneLabel = new JLabel("Graph one:");
-
-		c.gridx = 0;
-		c.gridy = 0;
-		gedPanel.add(graphOneLabel, c);
-
-		JLabel graphTwoLabel = new JLabel("Graph two:");
-
-		c.gridx = 1;
-		c.gridy = 0;
-		gedPanel.add(graphTwoLabel, c);
-
-		JTextField graphOneTextField = new JTextField();
-		graphOneTextField.setEditable(false);
-
-		c.gridx = 0;
-		c.gridy = 1;
-		gedPanel.add(graphOneTextField, c);
-
-		JTextField graphTwoTextField = new JTextField();
-		graphTwoTextField.setEditable(false);
-
-		c.gridx = 1;
-		c.gridy = 1;
-		gedPanel.add(graphTwoTextField, c);
-
-		JButton selectGraphOne = new JButton("Set selected graph as graph one");
-
-		c.gridx = 0;
-		c.gridy = 2;
-		gedPanel.add(selectGraphOne, c);
-
-		JButton selectGraphTwo = new JButton("Set selected graph as graph two");
-
-		c.gridx = 1;
-		c.gridy = 2;
-		gedPanel.add(selectGraphTwo, c);
-
-		JButton getGedBtn = new JButton("Get GED of selected graphs");
-
-		c.gridx = 0;
-		c.gridy = 3;
-		c.gridwidth = 2;
-		gedPanel.add(getGedBtn, c);
-		// Layout finished
-
-		JLabel scoreLabel = new JLabel("GED score:");
-
-		c.gridx=0;
-		c.gridy=4;
-		c.gridwidth=1;
-		gedPanel.add(scoreLabel, c);
-
-		JTextArea gedScore = new JTextArea("");
-
-		c.gridx=1;
-		c.gridy=4;
-		c.gridwidth=1;
-		gedPanel.add(gedScore, c);
-
-		JLabel gedLastComputed = new JLabel("");
-
-		c.gridx=0;
-		c.gridy=5;
-		c.gridwidth=2;
-		gedPanel.add(gedLastComputed, c);
-
-		// Set behaviour
-		selectGraphOne.addActionListener(new GraphSelectedActionListener(ged1, targetChooser, graphOneTextField, this, 1));
-		selectGraphTwo.addActionListener(new GraphSelectedActionListener(ged2, targetChooser, graphTwoTextField, this, 2));
-
-		getGedBtn.addActionListener(new GedActionListener(launcher, this, gedScore, gedLastComputed));
-
-		return gedPanel;
 	}
 	
 	/**

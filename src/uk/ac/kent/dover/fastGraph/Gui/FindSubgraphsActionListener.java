@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
+import uk.ac.kent.dover.fastGraph.Debugger;
 import uk.ac.kent.dover.fastGraph.FastGraph;
 import uk.ac.kent.dover.fastGraph.Launcher;
 
@@ -103,9 +104,10 @@ public class FindSubgraphsActionListener implements ActionListener {
 
 						//System.out.println("Main graph nodes:" + g.getNumberOfNodes());
 						//System.out.println("Subgraph nodes:" + subgraph.getNumberOfNodes());
-						
+						long time = Debugger.createTime();
 						launcher.exactSubgraphs(g, subgraph);
-				    	
+				    	System.out.println("time for subgraph" + Debugger.getTimeSinceInSeconds(time) + " s" );
+						
 				    	//stop the Progress Bar
 				    	progressBar.setIndeterminate(false);
 				    	status.setText(LauncherGUI.DEFAULT_STATUS_MESSAGE);

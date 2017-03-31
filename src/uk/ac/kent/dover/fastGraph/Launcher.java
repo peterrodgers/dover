@@ -44,12 +44,11 @@ public class Launcher {
 	 * @throws Exception Only used when testing direct access to FastGraph
 	 */
 	public Launcher(String[] args) throws Exception{
-		Debugger.enabled = true;
+		Debugger.enabled = false;
 		//System.out.println("Launched!");
 		//System.out.println(Arrays.toString(args));
 		//System.out.println(args.length);
 
-		GedUtil.initNativeCode();
 		//if there are no arguments given, then load the GUI. Otherwise, load the command line interface
 		if (args.length == 0) {
 			new LauncherGUI(this);
@@ -102,6 +101,9 @@ public class Launcher {
 	 */
 	public void findMotifs(MotifTask mt, String directory, String fileBaseName, int minNum, int maxNum, 
 			boolean saveAll, File reference) throws IOException {
+		
+		long time = Debugger.createTime();
+		
 		double sizeDiff = maxNum - minNum;	
 		double step = 100/(sizeDiff+4);
 		
@@ -134,6 +136,7 @@ public class Launcher {
 		//emf.outputHashBuckets(referenceBuckets);
 		Debugger.outputTime("Time total motif detection");
 		mt.publish(100, "Complete", 0, "");
+		System.out.println("time for motif finding" + Debugger.getTimeSinceInSeconds(time) + " s" );
 	}
 	
 	/**
