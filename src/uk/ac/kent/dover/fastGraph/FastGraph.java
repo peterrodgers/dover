@@ -232,9 +232,9 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		Debugger.outputTime("saveBuffers test time ");
 		time = Debugger.createTime();
 */
-String name = "simple-random-n-1000-e-5000-time";
+//String name = "simple-random-n-1000-e-5000-time";
 //String name = "simple-random-n-100-e-500";
-//String name = "simple-random-n-4-e-4-time";
+String name = "soc-pokec-relationships.txt-reduced-time";
 //String name = "soc-pokec-relationships.txt-reduced-time";
 //String name = "Wiki-Vote.txt";
 
@@ -242,31 +242,15 @@ String name = "simple-random-n-1000-e-5000-time";
 		//FastGraph g2 = g1;
 		try {
 			FastGraph g1 = loadBuffersGraphFactory(null,name);
-
-			/*
-			Connected c = new Connected();
-			long time2 = Debugger.createTime();
-			c.connected(g1);
-			Debugger.outputTime("connected test",time2);
-			*/
-			//FastGraph g1 = loadBuffersGraphFactory(null,name);
-			/*HashMap<Byte, Integer> map = new HashMap<>();
-			
-			for(int i = 0; i < g1.getNumberOfEdges(); i++) {
-				if(map.containsKey(g1.getEdgeAge(i))) {
-					map.put(g1.getEdgeAge(i),map.get(g1.getEdgeAge(i))+1);
-				} else {
-					map.put(g1.getEdgeAge(i),1);
+			for(int i = 0; i < g1.getNumberOfEdges(); i++) {				
+				if(g1.getEdgeAge(i) < 0) {
+					g1.setEdgeAge(i, (byte) 0);
 				}
-				
-				//if(g1.getEdgeAge(i) < 0) {
-				//	g1.setEdgeAge(i, (byte) 0);
-				//}
-				//Debugger.log();
 			}
-			System.out.println(map);
-			//g1.saveBuffers(null, name);
-			*/
+			g1.setName(name);
+			g1.saveBuffers(null, name);
+			System.out.println("done");
+/*
 			Debugger.log("Number of nodes: " + g1.getNumberOfNodes());
 			Debugger.log("Number of edges: " + g1.getNumberOfEdges());
 			time = Debugger.createTime();
@@ -2090,7 +2074,7 @@ if(edgeIndex%1000000==0 ) {
 		int outLength = -22;
 		int weight = -55;
 		byte type = -77;
-		byte age = -99;
+		byte age = 0;
 		for(int i = 0; i < numberOfNodes; i++) {
 			nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE,inStart); // offset for inward connecting edges/nodes
 			nodeBuf.putInt(NODE_IN_DEGREE_OFFSET+i*NODE_BYTE_SIZE,inLength); // number of inward connecting edges/nodes
@@ -2126,7 +2110,7 @@ if(edgeIndex%1000000==0 ) {
 		int node2;
 		weight = -51;
 		type = -53;
-		age = -55;
+		age = 0;
 		for(int i = 0; i < numberOfEdges; i++) {
 			node1 = edgeNode1Map.get(i);
 			node2 = edgeNode2Map.get(i);
@@ -4197,13 +4181,6 @@ Debugger.outputTime("time for rewiring");
 	 */
 	public FastGraph generateRewiredBehaviourGraphWithRandomGenerations(int iterations, long seed,double deleteNodeProbability, double deleteEdgeProbability, int nodesToAdd, int edgesToAdd, 
 			boolean sensibleLabels, boolean direct) throws IOException {
-
-		//TODO A QUICK FIX FOR THE DEMO, UNDERLYING ISSUE OF -55 for edgeAge, when nodeAge is 0 needs looking at
-		for(int i = 0; i < getNumberOfEdges(); i++) {
-			if(getEdgeAge(i) < 0) {
-				setEdgeAge(i,(byte)0);
-			}
-		}
 
 		FastGraph generation0Graph = findGenerationSubGraph((byte)0,direct);
 		FastGraph nextGenerationGraph = generation0Graph.generateRandomRewiredGraph(iterations, seed);
