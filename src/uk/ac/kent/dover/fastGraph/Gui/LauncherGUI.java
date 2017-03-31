@@ -62,7 +62,6 @@ public class LauncherGUI extends JFrame {
 	private double screenHeight;
 	private int windowWidth, windowHeight;	
 	private double textHeight;
-	private File ged1, ged2;
 	private JFileChooser targetChooser;
 
 
@@ -124,7 +123,11 @@ public class LauncherGUI extends JFrame {
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP,JTabbedPane.SCROLL_TAB_LAYOUT);
 
 		JPanel motifPanel = buildMotifTab(progressBar, statusBar, targetChooser);
-		tabbedPane.addTab("Motif", motifPanel);
+		tabbedPane.addTab("Exact Motif", motifPanel);
+		tabbedPane.setMnemonicAt(0, KeyEvent.VK_0);
+		
+		JPanel approxMotifPanel = buildApproximateMotifTab(progressBar, statusBar, targetChooser);
+		tabbedPane.addTab("Approximate Motif", approxMotifPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
 		JPanel subgraphPanel = buildSubgraphTab(progressBar, statusBar, targetChooser);
@@ -486,7 +489,142 @@ public class LauncherGUI extends JFrame {
 		return motifPanel;
 	}
 	
+	/**
+	 * Builds the Panel used to house the GUI elements for the approximate Motif Tab
+	 * @param progressBar The main progress bar
+	 * @param statusBar The status bar to update
+	 * @param targetChooser The chooser for the target graph
+	 * @return The Motif Tab
+	 */
+	private JPanel buildApproximateMotifTab(JProgressBar progressBar, JPanel statusBar, JFileChooser targetChooser) {
+		JPanel motifPanel = new JPanel(new GridBagLayout());
+		JLabel status = (JLabel) statusBar.getComponent(0);
 
+		JLabel infoLabel = new JLabel("Find and export approximate motifs", SwingConstants.CENTER);
+				
+		JLabel minLabel = new JLabel("Min Size: ");
+		JTextField minInput = new JTextField(3);
+		String minToolTip = "The minimum size of motif to be found";
+		minLabel.setToolTipText(minToolTip);
+		minInput.setToolTipText(minToolTip);		
+		
+		JLabel maxLabel = new JLabel("Max Size: ");
+		JTextField maxInput = new JTextField(3);
+		String maxToolTip = "The maximum size of motif to be found";
+		maxLabel.setToolTipText(maxToolTip);
+		maxInput.setToolTipText(maxToolTip);
+		
+		JLabel clustersLabel = new JLabel("Clusters: ");
+		JTextField clustersInput = new JTextField(3);
+		String clustersToolTip = "The number of clusters";
+		clustersLabel.setToolTipText(clustersToolTip);
+		clustersInput.setToolTipText(clustersToolTip);
+		
+		JLabel iterationsLabel = new JLabel("Iterations: ");
+		JTextField iterationsInput = new JTextField(3);
+		String iterationsToolTip = "The number of iterations to run";
+		iterationsLabel.setToolTipText(iterationsToolTip);
+		iterationsInput.setToolTipText(iterationsToolTip);
+		
+		JLabel subgraphsPerNodeLabel = new JLabel("Number of Subgraphs per Node:");
+		JTextField subgraphsPerNodeField = new JTextField(3);
+		String subgraphsPerNodeTip = "The number of subgraphs generated for each node in the target graph";
+		subgraphsPerNodeLabel.setToolTipText(subgraphsPerNodeTip);
+		subgraphsPerNodeField.setToolTipText(subgraphsPerNodeTip);
+		
+		JLabel attemptsLabel = new JLabel("Attempts to find subgraph:");
+		JTextField attemptsField = new JTextField("20", 3);
+		String attemptsToolTip = "The number of attempts to find a subgraph. 20 is fine unless large subgraphs are being searched for";
+		attemptsLabel.setToolTipText(attemptsToolTip);
+		attemptsField.setToolTipText(attemptsToolTip);
+		
+		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
+		
+		JButton findBtn = new JButton("Find motifs");
+		findBtn.addActionListener(new FindApproximateMotifActionListener(launcher, this, minInput, maxInput, clustersInput, iterationsInput, 
+				subgraphsPerNodeField, attemptsField, motifPanel, progressBar, status, targetChooser));
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(2,2,2,2);
+		c.fill = GridBagConstraints.HORIZONTAL;
+
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 2;
+		motifPanel.add(infoLabel, c);
+		
+		c.gridx = 0;
+		c.gridy = 1;
+		c.gridwidth = 1;
+		motifPanel.add(minLabel, c);
+		
+		c.gridx = 1;
+		c.gridy = 1;
+		c.gridwidth = 1;
+		motifPanel.add(minInput, c);
+		
+		c.gridx = 0;
+		c.gridy = 2;
+		c.gridwidth = 1;
+		motifPanel.add(maxLabel, c);
+		
+		c.gridx = 1;
+		c.gridy = 2;
+		c.gridwidth = 1;
+		motifPanel.add(maxInput, c);
+		
+		c.gridx = 0;
+		c.gridy = 3;
+		c.gridwidth = 1;
+		motifPanel.add(clustersLabel, c);
+		
+		c.gridx = 1;
+		c.gridy = 3;
+		c.gridwidth = 1;
+		motifPanel.add(clustersInput, c);
+		
+		c.gridx = 0;
+		c.gridy = 4;
+		c.gridwidth = 1;
+		motifPanel.add(iterationsLabel, c);
+		
+		c.gridx = 1;
+		c.gridy = 4;
+		c.gridwidth = 1;
+		motifPanel.add(iterationsInput, c);
+		
+		c.gridx = 0;
+		c.gridy = 5;
+		c.gridwidth = 1;
+		motifPanel.add(subgraphsPerNodeLabel, c);
+		
+		c.gridx = 1;
+		c.gridy = 5;
+		c.gridwidth = 1;
+		motifPanel.add(subgraphsPerNodeField, c);
+		
+		c.gridx = 0;
+		c.gridy = 6;
+		c.gridwidth = 1;
+		motifPanel.add(attemptsLabel, c);
+		
+		c.gridx = 1;
+		c.gridy = 6;
+		c.gridwidth = 1;
+		motifPanel.add(attemptsField, c);
+		
+		c.gridx = 0;
+		c.gridy = 7;
+		c.gridwidth = 2;
+		motifPanel.add(sep, c);
+		
+		c.gridx = 0;
+		c.gridy = 8;
+		c.gridwidth = 2;
+		motifPanel.add(findBtn, c);		
+		
+		return motifPanel;
+	}
 
 	/**
 	 * Builds the Panel used to house the GUI elements for the Pattern Tab
@@ -1021,37 +1159,5 @@ public class LauncherGUI extends JFrame {
 	 */
 	public Launcher getLauncher() {
 		return launcher;
-	}
-
-	/**
-	 * Gets the first graph for GED comparison
-	 * @return the first graph for GED comparison
-	 */
-	public File getGed1() {
-		return ged1;
-	}
-
-	/**
-	 * Gets the second graph for GED comparison
-	 * @return the second graph for GED comparison
-	 */
-	public File getGed2() {
-		return ged2;
-	}
-
-	/**
-	 * Gets the first graph for GED comparison
-	 * @param ged1 the ged1 to set
-	 */
-	public void setGed1(File ged1) {
-		this.ged1 = ged1;
-	}
-
-	/**
-	 * Gets the second graph for GED comparison
-	 * @param ged2 the ged2 to set
-	 */
-	public void setGed2(File ged2) {
-		this.ged2 = ged2;
 	}
 }

@@ -3,6 +3,8 @@ package uk.ac.kent.dover.fastGraph;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 import uk.ac.kent.dover.fastGraph.Gui.LauncherGUI;
 import uk.ac.kent.dover.fastGraph.Gui.MotifTask;
@@ -201,5 +203,34 @@ public class Launcher {
 		r.setName(name);
 		r.saveBuffers(directory, name);
 		r = null; //GC
+	}
+	
+	/**
+	 * Finds motifs using the approximate method
+	 * 
+	 * @param targetGraph The graph to find motifs in
+	 * @param minSize The minimum size of motifs
+	 * @param maxSize The maximum size of motifs
+	 * @param numOfClusters The number of clusters
+	 * @param iterations The number of kMedoids iterations
+	 * @param subgraphsPerNode The number of generated subgraphs per node
+	 * @param attemptsToFindSubgraph The number of attempts to find a subgraph
+	 * @throws FastGraphException If there is a problem in the kMedoids code
+	 * @throws FileNotFoundException If the output file cannot be saved
+	 */
+	public void approximateMotifs(FastGraph targetGraph, int minSize, int maxSize, int numOfClusters, int iterations, 
+			int subgraphsPerNode, int attemptsToFindSubgraph) throws FastGraphException, FileNotFoundException {
+		
+		KMedoids km = new KMedoids(targetGraph, numOfClusters, iterations);
+		EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(targetGraph);
+		HashSet<FastGraph> subs = new HashSet<FastGraph>();
+		for(int i = minSize; i <= maxSize; i++) {
+			subs.addAll(esn.enumerateSubgraphs(i, subgraphsPerNode, attemptsToFindSubgraph));
+		}
+		
+		ArrayList<FastGraph> subgraphs = new ArrayList<FastGraph>(subs);
+		ArrayList<ArrayList<FastGraph>> clusters = km.cluster(subgraphs);
+
+		km.saveClusters(clusters);		
 	}
 }

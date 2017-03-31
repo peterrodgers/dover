@@ -233,8 +233,8 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		time = Debugger.createTime();
 */
 //String name = "simple-random-n-1000-e-5000-time";
-//String name = "simple-random-n-100-e-500";
-String name = "soc-pokec-relationships.txt-reduced-time";
+String name = "simple-random-n-10-e-20-time";
+//String name = "soc-pokec-relationships.txt-reduced-time";
 //String name = "soc-pokec-relationships.txt-reduced-time";
 //String name = "Wiki-Vote.txt";
 
@@ -242,7 +242,7 @@ String name = "soc-pokec-relationships.txt-reduced-time";
 		//FastGraph g2 = g1;
 		try {
 			FastGraph g1 = loadBuffersGraphFactory(null,name);
-			for(int i = 0; i < g1.getNumberOfEdges(); i++) {				
+/*			for(int i = 0; i < g1.getNumberOfEdges(); i++) {				
 				if(g1.getEdgeAge(i) < 0) {
 					g1.setEdgeAge(i, (byte) 0);
 				}
@@ -250,30 +250,9 @@ String name = "soc-pokec-relationships.txt-reduced-time";
 			g1.setName(name);
 			g1.saveBuffers(null, name);
 			System.out.println("done");
-/*
-			Debugger.log("Number of nodes: " + g1.getNumberOfNodes());
-			Debugger.log("Number of edges: " + g1.getNumberOfEdges());
-			time = Debugger.createTime();
-			
-			KMedoids km = new KMedoids(g1, 10, 2);
-			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g1);
-			HashSet<FastGraph> subs = esn.enumerateSubgraphs(4, 5, 10);
-			System.out.println("subs: " + subs.size());
-			subs.addAll(esn.enumerateSubgraphs(5, 5, 10));
-			System.out.println("subs: " + subs.size());
-			
-			ArrayList<FastGraph> subgraphs = new ArrayList<FastGraph>(subs);
-			ArrayList<ArrayList<FastGraph>> clusters = km.cluster(subgraphs);
-			System.out.println(clusters);
-			for(ArrayList<FastGraph> cluster : clusters) {
-				System.out.println("Cluster size: " + cluster.size());
-			}
-			Debugger.outputTime("Before saving", time);
-			km.saveClusters(clusters);
-			
-			Debugger.outputTime("Total time", time);
-			System.out.println("Ged scores: " + km.numberOfGedCalcs);
-			System.out.println("Gedtime (s): " + (km.gedTime/1000.0));
+*/
+			//Launcher l = new Launcher(new String[0]);
+			//l.approximateMotifs(g1, 4, 5, 10, 2, 5, 10);
 						
 			/*
 			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g1);
@@ -494,6 +473,7 @@ String name = "soc-pokec-relationships.txt-reduced-time";
 //
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 
  		
