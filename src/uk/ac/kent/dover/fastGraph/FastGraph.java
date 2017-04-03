@@ -3899,9 +3899,9 @@ Debugger.outputTime("time for rewiring");
 	
 	/**
 	 * Do any of the nodes have a label?
-	 * @return if any nodes have a label
+	 * @return if any node has a label
 	 */
-	public boolean isAnyNodesLabelled() {
+	public boolean isAnyNodeLabelled() {
 		for(int i = 0; i < this.getNumberOfNodes(); i++) {
 			if(!this.getNodeLabel(i).equals("")) {
 				return true;
@@ -3912,9 +3912,9 @@ Debugger.outputTime("time for rewiring");
 	
 	/**
 	 * Do any of the Edges have a label?
-	 * @return if any Edges have a label
+	 * @return if any Edge has a label
 	 */
-	public boolean isAnyEdgesLabelled() {
+	public boolean isAnyEdgeLabelled() {
 		for(int i = 0; i < this.getNumberOfEdges(); i++) {
 			if(!this.getEdgeLabel(i).equals("")) {
 				return true;

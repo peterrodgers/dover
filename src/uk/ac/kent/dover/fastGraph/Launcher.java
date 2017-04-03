@@ -12,6 +12,7 @@ import uk.ac.kent.dover.fastGraph.comparators.EdgeComparator;
 import uk.ac.kent.dover.fastGraph.comparators.NodeComparator;
 import uk.ac.kent.dover.fastGraph.comparators.SimpleEdgeLabelComparator;
 import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
+import uk.ac.kent.dover.fastGraph.comparators.TimeEdgeComparator;
 
 /**
  * Main class from which all the other functionality is called.
@@ -152,13 +153,13 @@ public class Launcher {
 	public void exactSubgraphs(FastGraph targetGraph, FastGraph patternGraph) throws FileNotFoundException {
 		
 		NodeComparator nc = null;
-		if(patternGraph.isAnyNodesLabelled()) {
-			System.out.println("node labelled");
+		if(patternGraph.isAnyNodeLabelled()) {
+			//System.out.println("node labelled");
 			nc = new SimpleNodeLabelComparator(targetGraph, patternGraph);
 		}
-		EdgeComparator ec = null;
-		if(patternGraph.isAnyEdgesLabelled()) {
-			System.out.println("edge labelled");
+		EdgeComparator ec = new TimeEdgeComparator(targetGraph, patternGraph);
+		if(patternGraph.isAnyEdgeLabelled()) {
+			//System.out.println("edge labelled");
 			ec = new SimpleEdgeLabelComparator(targetGraph, patternGraph);
 		}
 
