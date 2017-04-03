@@ -54,7 +54,7 @@ public class LauncherCmd {
 
 		// add convert options
 		options.addOption("c", "convert", true, "Convert an Adjacency List to buffers. Requires e,d,n. (Convert)");
-		options.addOption("n", "nodes", true, "Number of nodes in Adjacency List to convert  (Convert)");
+		options.addOption("n", "nodes", true, "Number of nodes. Either in Adjacency List to convert, or in enumerated subgraphs for approximate sunbgrpah isomorphism  (ApproxSubgraph, Convert)");
 		options.addOption("e", "edges", true, "Number of edges in Adjacency List to convert  (Convert)");
 		options.addOption("d", "directed", true, "Adjacency List to convert is a directed graph  (Convert)");
 		
@@ -69,14 +69,18 @@ public class LauncherCmd {
 				+ "Requires minSize, maxSize, clusters, iterations, subspernode and optionally attempts. (ApproxMotif)");
 		options.addOption(Option.builder().longOpt("clusters").desc("The number of clusters (ApproxMotif)").hasArg().build());
 		options.addOption(Option.builder().longOpt("iterations").desc("The number of iterations (ApproxMotif)").hasArg().build());
-		options.addOption(Option.builder().longOpt("subspernode").desc("The number of subgraphs per node (ApproxMotif)").hasArg().build());
+		options.addOption(Option.builder().longOpt("subspernode").desc("The number of subgraphs per node (ApproxMotif, ApproxSubgraph)").hasArg().build());
 		options.addOption(Option.builder().longOpt("attempts").desc("The number of attempts to find a subgraph. Default is " 
 				+ String.valueOf(Launcher.DEFAULT_SUBGRAPH_ENUMERATION_ATTEMPTS) + " (ApproxMotif)").hasArg().build());
 		//and minsize & maxSize
 		
 		//add the exact subgraph options
 		options.addOption("s","exactsubgraph", true, "Find exact subgraphs in this graph. Requires t or targetgraph. (ExactSubgraph)");
-		options.addOption("p","patterngraph", true, "Specifies the pattern graph to use (ExactSubgraph)");
+		options.addOption("p","patterngraph", true, "Specifies the pattern graph to use (ExactSubgraph, ApproxSubgraph)");
+		
+		//add approx subgraph options
+		options.addOption("S","approxsubgraph", true, "Find approx subgraphs in this graph. Requires t or targetgraph, n or nodes, subspernode and p or patterngraph. (ApproxSubgraph)");
+		//and n, subspernode, and patterngraph
 		
 		// add help option
 		options.addOption("h", "help", false, "Prints this message (Help)");
@@ -116,6 +120,10 @@ public class LauncherCmd {
 			} else if(cmd.hasOption("s")) {
 				exactSubgraph(cmd);
 				
+				//if the user is finding exact subgraphs
+			} else if(cmd.hasOption("S")) {
+				approxSubgraph(cmd);
+				
 				//if the user is testing the command line
 				//TODO remove this before deployment
 			} else if(cmd.hasOption("q")) {
@@ -140,6 +148,80 @@ public class LauncherCmd {
 			System.err.println(e.getMessage());
 			System.exit(1);
 		}
+	}
+	
+	/**
+	 * Runs the approx subgraph finding code and checks that parameters are valid
+	 * @param cmd The CommandLine object that holds the user's input
+	 * @throws ParseException If there is an error with the user's input
+	 */
+	private void approxSubgraph(CommandLine cmd) throws ParseException {
+		if (cmd.hasOption("p") && cmd.hasOption("n")) {
+			Option subsPerNodeFound = null;
+			for(Option o : cmd.getOptions()) {
+				if (o.getLongOpt().toLowerCase().equals("subspernode")) {
+					subsPerNodeFound = o;
+				}
+			}
+			
+			if(subsPerNodeFound != null) {
+				String sVal = cmd.getOptionValue("S");
+				String pVal = cmd.getOptionValue("p");
+				String nVal = cmd.getOptionValue("n");
+				String subsPerNodeVal = subsPerNodeFound.getValues()[0];
+				
+				if(!Util.areAnyObjectsNull(sVal, pVal, nVal, subsPerNodeVal)) {
+					//ensure the node and edge inputs are valid
+					int subsPerNode, nodes;
+					try {
+						subsPerNode = Util.checkForPositiveInteger(subsPerNodeVal);
+						nodes = Util.checkForPositiveInteger(nVal);
+					} catch (NumberFormatException e) {
+						throw new ParseException("The values for n & subspernode must be positive (or 0) integers");
+					}
+					
+					//ensure the file is valid and readable
+					File target = new File(sVal);
+					File pattern = new File(pVal);
+					if(target.canRead()) { //ensure this file can be read
+						
+						if (pattern.canRead()) { //ensure this file can be read
+							
+							String targetName = target.getName();
+							String targetPath = target.getParent();	
+							String patternName = pattern.getName();
+							String patternPath = pattern.getParent();	
+							System.out.println("Finding subgraphs. This may take some time....");
+							try {
+								FastGraph targetGraph = launcher.loadFromBuffers(targetPath+File.separatorChar+targetName, targetName);
+								FastGraph patternGraph = launcher.loadFromBuffers(patternPath+File.separatorChar+patternName, patternName);
+								
+								launcher.approximateSubgraphs(targetGraph, patternGraph, nodes, subsPerNode);
+								
+							} catch (IOException e) {
+								throw new ParseException("Error occurred: "+e.getMessage());
+							}
+							System.out.println("Finding subgraphs Complete. Output has been exported");
+							
+							
+						} else {
+							throw new ParseException("Pattern File does not exist, or is not readable");
+						}					
+						
+					} else {
+						throw new ParseException("Target File does not exist, or is not readable");
+					}
+					
+				} else {
+					throw new ParseException("Approximate subgraph isomorphism requires that n, p, s, t, subspernode all have arguments. See --help for details.");
+				}				
+			} else {
+				throw new ParseException("Approximate subgraph isomorphism requires t or targetgraph, n or nodes, subspernode and p or patterngraph. See --help for details.");
+			}			
+		} else {
+			throw new ParseException("Approximate subgraph isomorphism requires t or targetgraph, n or nodes, subspernode and p or patterngraph. See --help for details.");
+		}
+
 	}
 	
 	/**
