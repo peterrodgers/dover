@@ -72,13 +72,17 @@ public class LauncherCmd {
 		options.addOption(Option.builder().longOpt("subspernode").desc("The number of subgraphs per node (ApproxMotif)").hasArg().build());
 		options.addOption(Option.builder().longOpt("attempts").desc("The number of attempts to find a subgraph. Default is " 
 				+ String.valueOf(Launcher.DEFAULT_SUBGRAPH_ENUMERATION_ATTEMPTS) + " (ApproxMotif)").hasArg().build());
-		//minsize & maxSize
+		//and minsize & maxSize
+		
+		//add the exact subgraph options
+		options.addOption("s","exactsubgraph", true, "Find exact subgraphs in this graph. Requires t or targetgraph. (ExactSubgraph)");
+		options.addOption("p","patterngraph", true, "Specifies the pattern graph to use (ExactSubgraph)");
 		
 		// add help option
 		options.addOption("h", "help", false, "Prints this message (Help)");
 		
 		// add t option
-		options.addOption("t", false, "Runs the FastGraph as it used to in the early stages of development (Debug)");
+		options.addOption("q", false, "Runs the FastGraph as it used to in the early stages of development (Debug)");
 		
 		return options;
 	}
@@ -108,8 +112,13 @@ public class LauncherCmd {
 			} else if(cmd.hasOption("M")) {
 				approxMotif(cmd);
 				
+				//if the user is finding exact subgraphs
+			} else if(cmd.hasOption("s")) {
+				exactSubgraph(cmd);
+				
 				//if the user is testing the command line
-			} else if(cmd.hasOption("t")) {
+				//TODO remove this before deployment
+			} else if(cmd.hasOption("q")) {
 				FastGraph.main(args);
 			   /* try {
 			    	NamePicker np = new NamePicker();
@@ -131,6 +140,63 @@ public class LauncherCmd {
 			System.err.println(e.getMessage());
 			System.exit(1);
 		}
+	}
+	
+	/**
+	 * Runs the exact subgraph finding code and checks that parameters are valid
+	 * @param cmd The CommandLine object that holds the user's input
+	 * @throws ParseException If there is an error with the user's input
+	 */
+	private void exactSubgraph(CommandLine cmd) throws ParseException {
+		
+		if(cmd.hasOption("p")) {
+			String pVal = cmd.getOptionValue("p");
+			String sVal = cmd.getOptionValue("s");
+			
+			//if both p and s have arguments
+			if(!Util.areAnyObjectsNull(pVal, sVal)) {
+				
+				//ensure the file is valid and readable
+				File target = new File(sVal);
+				File pattern = new File(pVal);
+				if(target.canRead()) { //ensure this file can be read
+					
+					if (pattern.canRead()) { //ensure this file can be read
+						
+						String targetName = target.getName();
+						String targetPath = target.getParent();	
+						String patternName = pattern.getName();
+						String patternPath = pattern.getParent();	
+						System.out.println("Finding subgraphs. This may take some time....");
+						try {
+							FastGraph targetGraph = launcher.loadFromBuffers(targetPath+File.separatorChar+targetName, targetName);
+							FastGraph patternGraph = launcher.loadFromBuffers(patternPath+File.separatorChar+patternName, patternName);
+							
+							launcher.exactSubgraphs(targetGraph, patternGraph);
+							
+						} catch (IOException e) {
+							throw new ParseException("Error occurred: "+e.getMessage());
+						}
+						System.out.println("Finding subgraphs Complete. Output has been exported");
+						
+						
+					} else {
+						throw new ParseException("Pattern File does not exist, or is not readable");
+					}					
+					
+				} else {
+					throw new ParseException("Target File does not exist, or is not readable");
+				}
+				
+				
+			} else {
+				throw new ParseException("Exact subgraph isomorphism requires that t and s (or targetgraph and exactsubgraph) both have arguments. See --help for details.");
+			}
+			
+		} else {
+			throw new ParseException("Exact subgraph isomorphism requires t or targetgraph. See --help for details.");
+		}
+		
 	}
 	
 	/**

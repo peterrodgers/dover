@@ -154,20 +154,17 @@ public class Launcher {
 		
 		NodeComparator nc = null;
 		if(patternGraph.isAnyNodeLabelled()) {
-			//System.out.println("node labelled");
 			nc = new SimpleNodeLabelComparator(targetGraph, patternGraph);
 		}
 		EdgeComparator ec = new TimeEdgeComparator(targetGraph, patternGraph);
 		if(patternGraph.isAnyEdgeLabelled()) {
-			//System.out.println("edge labelled");
 			ec = new SimpleEdgeLabelComparator(targetGraph, patternGraph);
 		}
 
 		ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(targetGraph, patternGraph, nc, ec);
 		boolean result = esi.subgraphIsomorphismFinder();
 		esi.outputResults();
-		//System.out.println("result:" + result);
-		//System.out.println(esi.getFoundMappings());
+
 		esi = null; //GC
 	}
 	
