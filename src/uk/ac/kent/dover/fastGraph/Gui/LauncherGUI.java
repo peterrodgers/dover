@@ -120,8 +120,7 @@ public class LauncherGUI extends JFrame {
 		statusArea.add(statusBar, BorderLayout.SOUTH);
 
 		// Builds the Tabbed area
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP,JTabbedPane.SCROLL_TAB_LAYOUT);
-
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT,JTabbedPane.SCROLL_TAB_LAYOUT);
 		JPanel motifPanel = buildMotifTab(progressBar, statusBar, targetChooser);
 		tabbedPane.addTab("Exact Motif", motifPanel);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_0);
@@ -145,10 +144,6 @@ public class LauncherGUI extends JFrame {
 		JPanel randomGraphPanel = buildRandomGraphTab(progressBar, statusBar);
 		tabbedPane.addTab("Random Graph", randomGraphPanel);
 		tabbedPane.setMnemonicAt(4, KeyEvent.VK_5);
-
-		JPanel otherPanel = buildOtherTab(progressBar, statusBar, targetChooser);
-		tabbedPane.addTab("Others", otherPanel);
-		tabbedPane.setMnemonicAt(5, KeyEvent.VK_6);
 
 		blackline = BorderFactory.createLineBorder(Color.black);
 		titled = BorderFactory.createTitledBorder(blackline, "Task");
@@ -954,28 +949,6 @@ public class LauncherGUI extends JFrame {
 		convertPanel.add(convertBtn, c);
 
 		return convertPanel;
-	}
-
-	/**
-	 * Builds the Panel used to house the GUI elements for the Pattern Tab
-	 *
-	 * @param graphList The JList element used to select which is the target graph
-	 * @param progressBar The JProgressBar to update when loading a graph
-	 * @param targetChooser The chooser for the target graph
-	 * @return the Other tab
-	 */
-	private JPanel buildOtherTab(JProgressBar progressBar, JPanel statusBar, JFileChooser targetChooser) {
-		JPanel otherPanel = new JPanel(new BorderLayout());
-		JLabel status = (JLabel) statusBar.getComponent(0);
-
-		JButton selectedBtn = new JButton("Node Count");
-		otherPanel.add(selectedBtn, BorderLayout.WEST);
-
-		//The action for when the use selected the
-		selectedBtn.addActionListener(new OtherActionListener(targetChooser, progressBar, status, launcher, otherPanel));
-
-		otherPanel.add(new JLabel("more text"), BorderLayout.EAST);
-		return otherPanel;
 	}
 
 	/**
