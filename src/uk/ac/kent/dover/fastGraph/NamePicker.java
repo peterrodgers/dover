@@ -74,11 +74,9 @@ public class NamePicker {
 		double rNum = Math.random() * SURNAME_TOTAL_PROB;
 		for(Name name : surnames) {
 			if (rNum < name.getProb()) {
-				//System.out.println("surname: " + name.getName() + " " + rNum);
 				return name.getName();
 			}
 		}
-		//System.out.println("No surname:");
 		return null;
 	}
 	
@@ -93,22 +91,18 @@ public class NamePicker {
 			double rNum = Math.random() * MALE_FORENAME_TOTAL_PROB;
 			for(Name name : maleForenames) {
 				if (rNum < name.getProb()) {
-					//System.out.println("maleForename: " + name.getName() + " " + rNum);
 					return name.getName();
 				}
 			}
-			//System.out.println("No maleForename:");
 			return null;
 			//else, a woman
 		} else {
 			double rNum = Math.random() * FEMALE_FORENAME_TOTAL_PROB;
 			for(Name name : femaleForenames) {
 				if (rNum < name.getProb()) {
-					//System.out.println("femaleForename: " + name.getName() + " " + rNum);
 					return name.getName();
 				}
 			}
-			//System.out.println("No femaleForename:");
 			return null;
 		}
 		

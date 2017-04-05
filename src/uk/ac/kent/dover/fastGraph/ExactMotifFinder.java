@@ -43,15 +43,6 @@ public class ExactMotifFinder {
 	private FastGraph referenceGraph = null;
 	
 	/**
-	 * Main method to help with development
-	 * @param args Arguments for development
-	 * @throws Exception Catches any argument. For development
-	 */
-	public static void main(String[] args) throws Exception {
-		FastGraph.main(args);	
-	}
-	
-	/**
 	 * Trivial contructor
 	 * @param g the FastGraph to find motifs in
 	 * @param saveAll If every example is to be saved
@@ -131,7 +122,6 @@ public class ExactMotifFinder {
 	 * @throws IOException If the output data cannot be written
 	 */
 	public void findAllMotifs(int rewiresNeeded, int minSize, int maxSize) throws IOException {
-		System.out.println("Saving all? "+saveAll);
 		
 		double sizeDiff = maxSize - minSize;	
 		double step = 100/(sizeDiff+4);
@@ -196,10 +186,7 @@ public class ExactMotifFinder {
 			exportMotifData(isoLists, referenceSet, size, graphName, output, hashBuckets);
 			
 		}
-		
-		//TODO delete rewired graphs
-
-		
+				
 	}
 	
 	/**
@@ -300,7 +287,7 @@ public class ExactMotifFinder {
 	/**
 	 * Builds a list of rewired graphs, each one built from the previous and saved to disk
 	 * @param numOfRewires The number of rewires to perform
-	 * @throws IOException 
+	 * @throws IOException If the rewired graph cannot be saved
 	 */
 	public void buildRewires(int numOfRewires) throws IOException  {
 		String graphName = g.getName();

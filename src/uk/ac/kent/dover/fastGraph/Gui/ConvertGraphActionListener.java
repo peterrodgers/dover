@@ -77,12 +77,6 @@ public class ConvertGraphActionListener implements ActionListener{
 			String name = graphFile.getName();
 			String path = fileChooser.getCurrentDirectory().toString();
 			
-			System.out.println(fileChooser.getSelectedFile());
-			System.out.println("path: " + fileChooser.getCurrentDirectory());
-			System.out.println("node: " + nodeNumber);
-			System.out.println("edge: " + edgeNumber);
-			System.out.println("directed: " + directedGraph);
-			
 			//set the Progress Bar to move
 			progressBar.setIndeterminate(true);
 			status.setText("Converting...");

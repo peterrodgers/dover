@@ -45,7 +45,6 @@ public class InducedSubgraph {
 		//don't do this in a constructor, as the node buffer might not have been built or populated yet
 		//Random r = g.getRandomGen();
 		if (r == null) {
-			//System.out.println("resetting random");
 			long seed = g.getNodeBuf().getLong(1); //used to ensure the random is the same for each graph
 			r = new Random(seed);
 			//g.setRandomGen(r);

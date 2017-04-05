@@ -106,8 +106,7 @@ public class MotifTask extends SwingWorker<Void, Progress> {
 			bigProgress.setString(p.getMainTaskText());
 			smallProgress.setValue(p.getChildTaskNum());
 			smallProgress.setString(p.getChildTaskText());
-			//System.out.println("main task: " + p.getMainTaskNum() + p.getMainTaskText() + " child:" + p.getChildTaskNum() + p.getChildTaskText());
-
+			
 		}
 	}
 	

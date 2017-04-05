@@ -2845,14 +2845,6 @@ public class FastGraphTest {
 		addEdges.add(es1);
 
 		FastGraph g4 = g3.addNewTimeSlice(deleteNodes, deleteEdges, addNodes, addEdges, false);
-		
-for(int i = 0; i< g4.getNumberOfNodes(); i++) {
-	System.out.println(i+" "+g4.getNodeLabel(i)+" "+g4.getNodeAge(i));
-}
-
-for(int i = 0; i< g4.getNumberOfEdges(); i++) {
-	System.out.println(i+" "+g4.getEdgeLabel(i)+" "+g4.getEdgeAge(i));
-}
 
 		FastGraph ga = g4.findGenerationSubGraph((byte)0, true);
 		
@@ -2924,12 +2916,6 @@ for(int i = 0; i< g4.getNumberOfEdges(); i++) {
 
 	}
 
-	
-	//TODO Add tests here
-
-	
-	
-	
 	String get0Node0Edge() {
 		String json = "{\n";
 		json += "\"name\": \"empty\",\n";

@@ -60,8 +60,6 @@ public class FindSubgraphsActionListener implements ActionListener {
 	public void actionPerformed(ActionEvent arg0) {
 		File graph = targetChooser.getSelectedFile();
 		if (graph != null) {
-			System.out.println(graph);
-			
 			File file = fileChooser.getSelectedFile();
 			
 			//check that the subgraph has been selected
@@ -100,13 +98,8 @@ public class FindSubgraphsActionListener implements ActionListener {
 						
 						status.setText("Finding subgraphs");
 
-						//System.out.println("Finding subgraphs!");
-
-						//System.out.println("Main graph nodes:" + g.getNumberOfNodes());
-						//System.out.println("Subgraph nodes:" + subgraph.getNumberOfNodes());
 						long time = Debugger.createTime();
 						launcher.exactSubgraphs(g, subgraph);
-				    	System.out.println("time for subgraph" + Debugger.getTimeSinceInSeconds(time) + " s" );
 						
 				    	//stop the Progress Bar
 				    	progressBar.setIndeterminate(false);

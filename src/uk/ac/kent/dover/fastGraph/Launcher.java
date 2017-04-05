@@ -37,7 +37,7 @@ public class Launcher {
 	 * @throws Exception Only used when testing direct access to FastGraph
 	 */
 	public static void main(String[] args) throws Exception{
-		Debugger.enabled = true;
+		Debugger.enabled = false;
 		new Launcher(args);
 	}
 	
@@ -49,17 +49,12 @@ public class Launcher {
 	 */
 	public Launcher(String[] args) throws Exception{
 		Debugger.enabled = false;
-		//System.out.println("Launched!");
-		//System.out.println(Arrays.toString(args));
-		//System.out.println(args.length);
 
 		//if there are no arguments given, then load the GUI. Otherwise, load the command line interface
 		if (args.length == 0) {
 			new LauncherGUI(this);
-			//FastGraph.main(args); //will replace this with loading GUI instead
 		} else {
 			new LauncherCmd(this, args);
-			//FastGraph.main(args); //will replace this with some actual handling of arguments
 		}
 	}
 	
@@ -140,7 +135,6 @@ public class Launcher {
 		//emf.outputHashBuckets(referenceBuckets);
 		Debugger.outputTime("Time total motif detection");
 		mt.publish(100, "Complete", 0, "");
-		System.out.println("time for motif finding" + Debugger.getTimeSinceInSeconds(time) + " s" );
 	}
 	
 	/**

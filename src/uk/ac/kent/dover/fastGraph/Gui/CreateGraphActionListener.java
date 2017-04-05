@@ -96,7 +96,6 @@ public class CreateGraphActionListener implements ActionListener{
 			String directory = file.getPath();
 			String name = file.getName();
 			FastGraph g = launcherGui.getLauncher().loadFromBuffers(directory, name);
-			System.out.println("num nodes" + g.getNumberOfNodes());
 			uk.ac.kent.displayGraph.Graph dg = g.generateDisplayGraph();
 			dg.randomizeNodePoints(new Point(20,20),300,300);
 			return dg;

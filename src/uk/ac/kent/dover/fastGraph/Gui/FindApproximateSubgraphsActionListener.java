@@ -66,9 +66,7 @@ public class FindApproximateSubgraphsActionListener implements ActionListener {
 	 */
 	public void actionPerformed(ActionEvent arg0) {
 		File graph = targetChooser.getSelectedFile();
-		if (graph != null) {
-			System.out.println(graph);
-			
+		if (graph != null) {			
 			File file = fileChooser.getSelectedFile();
 			
 			//check that the subgraph has been selected
@@ -110,11 +108,8 @@ public class FindApproximateSubgraphsActionListener implements ActionListener {
 						int patternNodes = launcherGui.checkForPositiveInteger(patternNodesField.getText(),subgraphPanel);
 						int subgraphsPerNode = launcherGui.checkForPositiveInteger(subgraphsPerNodeField.getText(),subgraphPanel);
 						
-						//System.out.println("patternNodes " + patternNodes);
-						//System.out.println("subgraphsPerNode " + subgraphsPerNode);
 						long time = Debugger.createTime();				    	
 						launcher.approximateSubgraphs(g, subgraph, patternNodes, subgraphsPerNode);
-						System.out.println("time for subgraph" + Debugger.getTimeSinceInSeconds(time) + " s" );
 				    	
 				    	//stop the Progress Bar
 				    	progressBar.setIndeterminate(false);

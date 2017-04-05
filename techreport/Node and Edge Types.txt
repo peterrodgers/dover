@@ -18,3 +18,4 @@ Edges:
 11	Neighbour
 12	Business Partner
 13	Doctor
+127	Time

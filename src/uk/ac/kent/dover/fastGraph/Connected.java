@@ -62,9 +62,7 @@ public class Connected {
 		boolean allVisited = true;
 		if(nodeCount < numberOfNodes) {
 			allVisited = false;
-		}
-//System.out.println("edges tested "+edgeCount);		
-//System.out.println("nodes tested "+nodeCount);		
+		}	
 		return allVisited;
 	}
 

@@ -27,8 +27,8 @@ public class Profiler {
 	
 	/**
 	 * Change this to determine what to profile
-	 * @param args
-	 * @throws IOException
+	 * @param args Unused
+	 * @throws IOException If the graph cannot be loaded
 	 */
 	public static void main(String[] args) throws IOException {
 		Debugger.enabled = false; //will mute all output except that below
@@ -126,7 +126,7 @@ public class Profiler {
 	 * 
 	 * @param minSize Min size of motifs
 	 * @param maxSize Max size of motifs
-	 * @throws IOException 
+	 * @throws IOException If the graph cannot be loaded
 	 */
 	public void profileExactMotifMultiple(int minSize, int maxSize) throws IOException {
 		for(int i = minSize; i <= maxSize; i++) {
@@ -139,7 +139,7 @@ public class Profiler {
 	 * Profiles the exact motif finder for a given size
 	 * 
 	 * @param size The size of motif to test
-	 * @throws IOException
+	 * @throws IOException If the graph cannot be loaded
 	 */
 	public void profileExactMotif(int size) throws IOException {		
 		long time = Debugger.createTime();

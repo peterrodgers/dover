@@ -124,18 +124,6 @@ public class LauncherCmd {
 			} else if(cmd.hasOption("S")) {
 				approxSubgraph(cmd);
 				
-				//if the user is testing the command line
-				//TODO remove this before deployment
-			} else if(cmd.hasOption("q")) {
-				FastGraph.main(args);
-			   /* try {
-			    	NamePicker np = new NamePicker();
-			    	System.out.println(Arrays.toString(np.getNames(10)));
-			    } catch (Exception e) {
-			    	System.err.println(e.getMessage());
-			    	e.printStackTrace();
-			    }*/
-				
 			    //if the user wants some help
 			} else if (cmd.hasOption("h")) {
 				// automatically generate the help statement
