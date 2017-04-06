@@ -62,6 +62,85 @@ public class ExactIsomorphism {
 	private static int failOnBruteForce = 0;
 	private static int succeed = 0;
 	
+	
+	public static void main(String[] args) throws IOException {
+
+		Debugger.enabled = true;
+		
+/*		
+		double densityA = 0.05;
+		for(int nCount = 100; nCount <= 160; nCount=nCount+20) {
+			int eCount = (int)(densityA*nCount*(nCount-1));
+			System.out.println("nodes\t"+nCount+"\tedges\t"+eCount);
+			FastGraph gA = null;
+			resetProfiling();
+			for(int count = 0; count < 10; count++) {
+				try {
+					gA = FastGraph.randomGraphFactory(nCount,eCount,System.currentTimeMillis(),true,false);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				FastGraph gB = generateRandomIsomorphicGraph(gA,System.currentTimeMillis(),false);
+				long startEqualTime = System.currentTimeMillis();
+				ExactIsomorphism eiA = new ExactIsomorphism(gA);
+				boolean resA = eiA.isomorphic(gB);
+				long totalEqualTime = System.currentTimeMillis()-startEqualTime;
+				System.out.println("time\t"+totalEqualTime/1000.0);
+			}
+			ExactIsomorphism.reportTimes();
+			ExactIsomorphism.reportFailRatios();
+		}
+		
+*/		
+		int comparisons = 10000;
+//		int numNodes = 8;
+//		int numEdges = 16;
+		for(int densityValue = 1; densityValue < 4; densityValue++) {
+			double density = 0.1;
+			if(densityValue == 1) {
+				density = 0.2;
+			}
+			if(densityValue == 2) {
+				density = 0.3;
+			}
+			if(densityValue == 3) {
+				density = 0.4;
+			}
+			for(int numNodes = 4; numNodes <= 10; numNodes++) {
+				int numEdges = (int)(density*numNodes*(numNodes-1));
+				System.out.println("density\t"+density+"\tnumNodes\t"+numNodes+"\tnumEdges\t"+numEdges);
+				try {
+					resetProfiling();
+					long startTime = System.currentTimeMillis();
+					for(int i = 1; i <= comparisons; i++) {
+						FastGraph g1;
+						g1 = FastGraph.randomGraphFactory(numNodes,numEdges,i+System.currentTimeMillis(),true,false);
+						ExactIsomorphism ei = new ExactIsomorphism(g1);
+						FastGraph g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i+comparisons*2+System.currentTimeMillis(),true,false);
+						if(Connected.connected(g1) && Connected.connected(g2)) {
+							boolean res = ei.isomorphic(g2);
+						}
+					}
+					long totalTime = System.currentTimeMillis()-startTime; 
+					
+					ExactIsomorphism.reportTimes();
+					ExactIsomorphism.reportFailRatios();
+					System.out.println("Full isomorphism time "+totalTime/1000.0+" seconds, "+totalTime/(comparisons*1000.0)+" seconds per test");
+							
+		
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		
+		
+	}
+	
+
+	
 	/**
 	 * Call this after getting true from a call to isomorphism().
 	 * 
