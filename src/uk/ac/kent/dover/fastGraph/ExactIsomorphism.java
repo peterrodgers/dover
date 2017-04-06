@@ -66,7 +66,7 @@ public class ExactIsomorphism {
 
 		Debugger.enabled = true;
 		
-		
+/*		
 		double densityA = 0.05;
 		for(int nCount = 100; nCount <= 160; nCount=nCount+20) {
 			int eCount = (int)(densityA*nCount*(nCount-1));
@@ -91,7 +91,7 @@ public class ExactIsomorphism {
 			ExactIsomorphism.reportFailRatios();
 		}
 		
-		
+*/		
 		int comparisons = 10000;
 //		int numNodes = 8;
 //		int numEdges = 16;
