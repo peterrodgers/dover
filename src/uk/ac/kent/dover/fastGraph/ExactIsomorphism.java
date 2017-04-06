@@ -601,11 +601,12 @@ bruteForceStartTime = -1;
 	}
 
 	/**
-	 * Generates a random isomorphic graph
+	 * Generates a random graph isomorphic to the input one. Used for testing isomorphism as
+	 * testing two isomorphic graphs guarantees that the brute force part of the algorithm is used.
 	 * @param inGraph The starting graph
 	 * @param seed The random seed
-	 * @param direct If the graph is to be directed
-	 * @return The new ranodm graph
+	 * @param direct If the graph is to be on heap (false) or off heap (tre)
+	 * @return The new graph, isomorphic to the old one but with swapped node ids.
 	 */
 	public static FastGraph generateRandomIsomorphicGraph(FastGraph inGraph, long seed, boolean direct) {
 		ArrayList<NodeStructure> allNodes = new ArrayList<NodeStructure>();
