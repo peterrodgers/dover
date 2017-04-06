@@ -2,11 +2,9 @@ package uk.ac.kent.dover.fastGraph;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -14,8 +12,6 @@ import uk.ac.kent.dover.fastGraph.comparators.AlwaysTrueEdgeComparator;
 import uk.ac.kent.dover.fastGraph.comparators.AlwaysTrueNodeComparator;
 import uk.ac.kent.dover.fastGraph.comparators.EdgeComparator;
 import uk.ac.kent.dover.fastGraph.comparators.NodeComparator;
-import uk.ac.kent.dover.fastGraph.comparators.SimpleEdgeLabelComparator;
-import uk.ac.kent.dover.fastGraph.comparators.TimeEdgeComparator;
 
 /**
  * Testing the structural similarity of two FastGraphs. Assumes a single edge between each node.
@@ -79,18 +75,6 @@ public class ExactSubgraphIsomorphism extends SubgraphIsomorphism {
 		resultPossible = findPossibleNodeMappings();
 		
 		foundMappings = new LinkedList<SubgraphMapping>();
-/*		
-int pattern = 0;
-for(int[] matches : possibleNodeMappings) {
-
-	String labels = "";
-	for(int i = 0; i < matches.length; i++) {
-		labels += targetGraph.getNodeLabel(matches[i])+" ";
-	}
-	Debugger.log("pattern node id "+pattern+" label "+patternGraph.getNodeLabel(pattern)+" possible match with target node ids "+Arrays.toString(matches)+" labels "+labels);
-	pattern++;
-}
-*/
 		
 	}
 	
@@ -151,17 +135,7 @@ for(int[] matches : possibleNodeMappings) {
 				targetToPatternNodeMatches[currentTargetNode] = currentPatternNode;
 				patternToTargetNodeMatches[currentPatternNode] = currentTargetNode;
 				possibleMatchIndexProgress[currentPatternNode] = currentTargetIndex;
-/*				
-Debugger.log("found a match between pattern node "+currentPatternNode+" and target node "+currentTargetNode);
-for(int q = 0; q < patternToTargetNodeMatches.length; q++) {
-	Debugger.log("patternToTargetNodeMatches["+q+"] "+patternToTargetNodeMatches[q]);
-}
-Debugger.log("------------------");
-for(int q = 0; q < targetToPatternNodeMatches.length; q++) {
-	Debugger.log("targetToPatternNodeMatches["+q+"] "+targetToPatternNodeMatches[q]);
-}
-Debugger.log();
-*/
+
 				if(currentPatternIndex == numberOfPatternNodes-1) { // success, found full mapping!
 					mappingFound = true;
 					findEdgeMappings(patternToTargetEdgeMatches);
@@ -223,11 +197,6 @@ Debugger.log();
 		return mappingFound;
 		
 	}
-
-	
-
-
-
 
 	/**
 	 * Check to see if the matched neighbours of patternNode are neigbours of targetNode.

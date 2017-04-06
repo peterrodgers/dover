@@ -1,9 +1,9 @@
 # A comment
 
-0	node label 1	23	12	3
+0	node label 1	23	12	0
 
 # comment2
-1	node label 2	33	32	34
+1	node label 2	33	32	0
 
 # comment3
 

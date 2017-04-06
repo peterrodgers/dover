@@ -3573,7 +3573,7 @@ Debugger.outputTime("time for rewiring");
 	 * @return the largest node age in the graph
 	 */
 	public byte findMaximumNodeAge() {
-		byte ret = Byte.MIN_VALUE;
+		byte ret = 0;
 		for(int i = 0; i < this.getNumberOfNodes(); i++) {
 			if(this.getNodeAge(i) > ret) {
 				ret = this.getNodeAge(i);
