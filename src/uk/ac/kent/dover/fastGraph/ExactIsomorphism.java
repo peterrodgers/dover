@@ -62,6 +62,7 @@ public class ExactIsomorphism {
 	private static int failOnBruteForce = 0;
 	private static int succeed = 0;
 	
+	
 	public static void main(String[] args) throws IOException {
 
 		Debugger.enabled = true;
@@ -138,7 +139,7 @@ public class ExactIsomorphism {
 		
 	}
 	
-	
+
 	
 	/**
 	 * Call this after getting true from a call to isomorphism().
@@ -249,11 +250,6 @@ public class ExactIsomorphism {
 		}
 		return ret;
 	}
-
-
-
-
-
 
 	/**
 	 * Equality of graphs. Returns a mapping if this graph is equal
@@ -604,10 +600,13 @@ bruteForceStartTime = -1;
 		return ret;
 	}
 
-	
-	
-
-
+	/**
+	 * Generates a random isomorphic graph
+	 * @param inGraph The starting graph
+	 * @param seed The random seed
+	 * @param direct If the graph is to be directed
+	 * @return The new ranodm graph
+	 */
 	public static FastGraph generateRandomIsomorphicGraph(FastGraph inGraph, long seed, boolean direct) {
 		ArrayList<NodeStructure> allNodes = new ArrayList<NodeStructure>();
 		ArrayList<EdgeStructure> allEdges = new ArrayList<EdgeStructure>();
