@@ -68,7 +68,7 @@ public class ExactIsomorphism {
 		
 		
 		double densityA = 0.05;
-		for(int nCount = 100; nCount <= 200; nCount=nCount+20) {
+		for(int nCount = 100; nCount <= 160; nCount=nCount+20) {
 			int eCount = (int)(densityA*nCount*(nCount-1));
 			System.out.println("nodes\t"+nCount+"\tedges\t"+eCount);
 			FastGraph gA = null;
