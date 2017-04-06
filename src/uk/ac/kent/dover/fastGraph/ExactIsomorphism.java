@@ -3,7 +3,9 @@ package uk.ac.kent.dover.fastGraph;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
 
 import uk.ac.kent.displayGraph.Graph;
 
@@ -46,8 +48,11 @@ public class ExactIsomorphism {
 	private static int numberOfEigenvalueTests = 0;
 	
 	private static long timeForIsomorphismTests = 0;
+	private static long timeForBruteForceTests = 0;
 	private static long timeForOldIsomorphismTests = 0;
 	private static long timeForEigenvalueTests = 0;
+	private static long isomorphismStartTime = -1;
+	private static long bruteForceStartTime = -1;
 	
 	private static int failOnNodeCount = 0;
 	private static int failOnEdgeCount = 0;
@@ -56,6 +61,83 @@ public class ExactIsomorphism {
 	private static int failOnNodeMatches = 0;
 	private static int failOnBruteForce = 0;
 	private static int succeed = 0;
+	
+	public static void main(String[] args) throws IOException {
+
+		Debugger.enabled = true;
+		
+		
+		double densityA = 0.05;
+		for(int nCount = 100; nCount <= 200; nCount=nCount+20) {
+			int eCount = (int)(densityA*nCount*(nCount-1));
+			System.out.println("nodes\t"+nCount+"\tedges\t"+eCount);
+			FastGraph gA = null;
+			resetProfiling();
+			for(int count = 0; count < 10; count++) {
+				try {
+					gA = FastGraph.randomGraphFactory(nCount,eCount,System.currentTimeMillis(),true,false);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				FastGraph gB = generateRandomIsomorphicGraph(gA,System.currentTimeMillis(),false);
+				long startEqualTime = System.currentTimeMillis();
+				ExactIsomorphism eiA = new ExactIsomorphism(gA);
+				boolean resA = eiA.isomorphic(gB);
+				long totalEqualTime = System.currentTimeMillis()-startEqualTime;
+				System.out.println("time\t"+totalEqualTime/1000.0);
+			}
+			ExactIsomorphism.reportTimes();
+			ExactIsomorphism.reportFailRatios();
+		}
+		
+		
+		int comparisons = 10000;
+//		int numNodes = 8;
+//		int numEdges = 16;
+		for(int densityValue = 1; densityValue < 4; densityValue++) {
+			double density = 0.1;
+			if(densityValue == 1) {
+				density = 0.2;
+			}
+			if(densityValue == 2) {
+				density = 0.3;
+			}
+			if(densityValue == 3) {
+				density = 0.4;
+			}
+			for(int numNodes = 4; numNodes <= 10; numNodes++) {
+				int numEdges = (int)(density*numNodes*(numNodes-1));
+				System.out.println("density\t"+density+"\tnumNodes\t"+numNodes+"\tnumEdges\t"+numEdges);
+				try {
+					resetProfiling();
+					long startTime = System.currentTimeMillis();
+					for(int i = 1; i <= comparisons; i++) {
+						FastGraph g1;
+						g1 = FastGraph.randomGraphFactory(numNodes,numEdges,i+System.currentTimeMillis(),true,false);
+						ExactIsomorphism ei = new ExactIsomorphism(g1);
+						FastGraph g2 = FastGraph.randomGraphFactory(numNodes,numEdges,i+comparisons*2+System.currentTimeMillis(),true,false);
+						if(Connected.connected(g1) && Connected.connected(g2)) {
+							boolean res = ei.isomorphic(g2);
+						}
+					}
+					long totalTime = System.currentTimeMillis()-startTime; 
+					
+					ExactIsomorphism.reportTimes();
+					ExactIsomorphism.reportFailRatios();
+					System.out.println("Full isomorphism time "+totalTime/1000.0+" seconds, "+totalTime/(comparisons*1000.0)+" seconds per test");
+							
+		
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		
+		
+	}
+	
 	
 	
 	/**
@@ -172,18 +254,17 @@ public class ExactIsomorphism {
 
 
 
-private long startTime = -1;
 
 	/**
 	 * Equality of graphs. Returns a mapping if this graph is equal
-	 * to the given graph.
+	 * to the given graph. Graphs must be connected.
 	 *
 	 * @param g the graph to compare
 	 * @return true if there is an equality with the given graph, null if is not.
 	 */
 	public boolean isomorphic(FastGraph g) {
 numberOfIsomorphismTests++;
-startTime = System.currentTimeMillis();
+isomorphismStartTime = System.currentTimeMillis();
 
 		FastGraph g1 = fastGraph;
 		FastGraph g2 = g;
@@ -202,24 +283,35 @@ startTime = System.currentTimeMillis();
 		if(numberOfNodes1 == 0 && numberOfNodes2 == 0) {
 //System.out.println("Isomorphic: empty graphs");
 succeed++;
-timeForIsomorphismTests += System.currentTimeMillis()-startTime;
-startTime = -1;		
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
 			return true;
+		}
+
+		if(!Connected.connected(g1) && Connected.connected(g2)) {
+			return false;
+		}
+		if(Connected.connected(g1) && !Connected.connected(g2)) {
+			return false;
+		}
+		if(!Connected.connected(g1)) {
+			System.out.println("Graphs must be connected");
+			return false;
 		}
 				
 		if(numberOfNodes1 != numberOfNodes2) {
 //System.out.println("Not isomorphic: different number of edges");
 failOnNodeCount++;
-timeForIsomorphismTests += System.currentTimeMillis()-startTime;
-startTime = -1;		
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
 			return false;
 		}
 				
 		if(numberOfEdges1 != numberOfEdges2) {
 //System.out.println("Not isomorphic: different number of nodes");
 failOnEdgeCount++;
-timeForIsomorphismTests += System.currentTimeMillis()-startTime;
-startTime = -1;		
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
 			return false;
 		}
 		
@@ -233,8 +325,8 @@ startTime = -1;
 		if(!Arrays.equals(degreeBuckets1, degreeBuckets2)) {
 //System.out.println("Not isomorphic: different quantities of nodes with the same degree");
 failOnDegreeComparison++;
-timeForIsomorphismTests += System.currentTimeMillis()-startTime;
-startTime = -1;		
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
 			return false;
 		}
 
@@ -249,13 +341,13 @@ startTime = -1;
 		if(!compareEigenValues(eigenvalues2)) {
 //System.out.println("Not isomorphic: eigenvalues are different");
 failOnEigenvalues++;
-timeForIsomorphismTests += System.currentTimeMillis()-startTime;
-startTime = -1;		
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
 			return false;
 		}
 		
-if(startTime == -1) {
-	startTime = System.currentTimeMillis();
+if(isomorphismStartTime == -1) {
+	isomorphismStartTime = System.currentTimeMillis();
 }
 		
 		neighbours2 = findNeighbours(g,maxDegree2);
@@ -278,14 +370,15 @@ if(startTime == -1) {
 			if(i == 0) {
 //System.out.println("Not isomorphic: no possible match for a node");
 failOnNodeMatches++;
-timeForIsomorphismTests += System.currentTimeMillis()-startTime;
-startTime = -1;		
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
 				return false;
 			}
 			numberOfMatches[n1] = i;
 //System.out.println("node "+n1+" number of matches "+numberOfMatches[n1]+" possibleMatches "+Arrays.toString(possibleMatches[n1]));
 		}
 
+		bruteForceStartTime = System.currentTimeMillis();
 		
 		int[] matchesIndex = new int[numberOfNodes1]; // current indexes for the search
 		Arrays.fill(matchesIndex,-1);
@@ -296,6 +389,7 @@ startTime = -1;
 		int currentNode = 0;
 		matchesIndex[currentNode] = 0;
 		while(currentNode < numberOfNodes1) {
+
 //System.out.println("current progress "+Arrays.toString(matchesIndex));
 
 			if(matchesIndex[currentNode] == numberOfMatches[currentNode]) { // backtrack here to previous node if all nodes have been tried
@@ -310,8 +404,10 @@ startTime = -1;
 				if(currentNode == -1) {
 //System.out.println("Not isomorphic: brute force");
 failOnBruteForce++;
-timeForIsomorphismTests += System.currentTimeMillis()-startTime;
-startTime = -1;		
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+timeForBruteForceTests += System.currentTimeMillis()-bruteForceStartTime;
+bruteForceStartTime = -1;		
 					return false;
 				}
 				if(matches1[currentNode] != -1) { // reset the previous match
@@ -332,8 +428,10 @@ startTime = -1;
 				if(currentNode == numberOfNodes1) {
 //System.out.println("Isomorphic");
 succeed++;
-timeForIsomorphismTests += System.currentTimeMillis()-startTime;
-startTime = -1;		
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+timeForBruteForceTests += System.currentTimeMillis()-bruteForceStartTime;
+bruteForceStartTime = -1;		
 					return true;
 				}
 				matchesIndex[currentNode] = 0;
@@ -347,13 +445,14 @@ startTime = -1;
 // Never gets to here
 System.out.println("Isomorphic - Should never get to here");
 succeed++;
-timeForIsomorphismTests += System.currentTimeMillis()-startTime;
-startTime = -1;		
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+timeForBruteForceTests += System.currentTimeMillis()-bruteForceStartTime;
+bruteForceStartTime = -1;		
 		return true;
 		
 	}
 
-	
 	
 
 	/**
@@ -507,6 +606,63 @@ startTime = -1;
 
 	
 	
+
+
+	public static FastGraph generateRandomIsomorphicGraph(FastGraph inGraph, long seed, boolean direct) {
+		ArrayList<NodeStructure> allNodes = new ArrayList<NodeStructure>();
+		ArrayList<EdgeStructure> allEdges = new ArrayList<EdgeStructure>();
+		
+		Random r = new Random(seed);
+		
+		ArrayList<Integer> remainingNodes = new ArrayList<Integer>(inGraph.getNumberOfNodes());
+		for(int i = 0; i < inGraph.getNumberOfNodes(); i++) {
+			remainingNodes.add(i);
+		}
+
+		HashMap<Integer,Integer> inToNewNodeMapping = new HashMap<Integer,Integer>(inGraph.getNumberOfNodes()*3);
+		int index = 0;
+		while(!remainingNodes.isEmpty()) {
+			int nodeIndex = r.nextInt(remainingNodes.size());
+			int node = remainingNodes.get(nodeIndex);
+			remainingNodes.remove(nodeIndex);
+			String label = inGraph.getNodeLabel(node);
+			int weight = inGraph.getNodeWeight(node);
+			byte type = inGraph.getNodeType(node);
+			byte age = inGraph.getNodeAge(node);
+			NodeStructure ns = new NodeStructure(index,label,weight,type,age);
+			allNodes.add(ns);
+			inToNewNodeMapping.put(node, index);
+			index++;
+		}
+		
+
+		ArrayList<Integer> remainingEdges = new ArrayList<Integer>(inGraph.getNumberOfEdges());
+		for(int i = 0; i < inGraph.getNumberOfEdges(); i++) {
+			remainingEdges.add(i);
+		}
+
+		index = 0;
+		while(!remainingEdges.isEmpty()) {
+			int edgeIndex = r.nextInt(remainingEdges.size());
+			int edge = remainingEdges.get(edgeIndex);
+			remainingEdges.remove(edgeIndex);
+			String label = inGraph.getEdgeLabel(edge);
+			int weight = inGraph.getEdgeWeight(edge);
+			byte type = inGraph.getEdgeType(edge);
+			byte age = inGraph.getEdgeAge(edge);
+			int oldNode1 = inGraph.getEdgeNode1(edge);
+			int oldNode2 = inGraph.getEdgeNode2(edge);
+			int node1 = inToNewNodeMapping.get(oldNode1);
+			int node2 = inToNewNodeMapping.get(oldNode2);
+			EdgeStructure es = new EdgeStructure(index,label,weight,type,age,node1,node2);
+			allEdges.add(es);
+			index++;
+		}
+		
+		FastGraph g = FastGraph.structureFactory(inGraph.getName()+"-isomorphic",(byte)0,allNodes,allEdges,direct);
+		
+		return g;
+	}
 	
 	
 
@@ -550,8 +706,30 @@ startTime = -1;
 
 	}
 
+
+	/**
+	 * sets all the profiling counts and timing to zero
+	 */
+	public static void resetProfiling() {
+		numberOfIsomorphismTests = 0;
+		numberOfOldIsomorphismTests = 0;
+		numberOfEigenvalueTests = 0;
+		
+		timeForIsomorphismTests = 0;
+		timeForBruteForceTests = 0;
+		timeForOldIsomorphismTests = 0;
+		timeForEigenvalueTests = 0;
+		isomorphismStartTime = -1;
+		bruteForceStartTime = -1;
+		
+		failOnNodeCount = 0;
+		failOnEdgeCount = 0;
+		failOnEigenvalues = 0;
+		failOnDegreeComparison = 0;
+		failOnNodeMatches = 0;
+		failOnBruteForce = 0;
+		succeed = 0;
 	
-
-
+	}
 
 }

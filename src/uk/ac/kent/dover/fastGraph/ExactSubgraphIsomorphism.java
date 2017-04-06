@@ -23,7 +23,7 @@ import uk.ac.kent.dover.fastGraph.comparators.TimeEdgeComparator;
  * @author Peter Rodgers
  *
  */
-public class ExactSubgraphIsomorphism extends SubgraphIsomorphism{
+public class ExactSubgraphIsomorphism extends SubgraphIsomorphism {
 
 	private FastGraph targetGraph;
 	private FastGraph patternGraph;
@@ -46,7 +46,7 @@ public class ExactSubgraphIsomorphism extends SubgraphIsomorphism{
 	private boolean resultPossible; // set to false if a pattern node has no possible mappings in the target graph
 
 	/**
-	 * Create an ExactSubgraphIsomorphism before running findMatches.
+	 * Create an ExactSubgraphIsomorphism before running getFoundMatches.
 	 * 
 	 * @param patternGraph the small subgraph to be found in the larger target
 	 * @param targetGraph the larger target graph in which to find the pattern

@@ -708,6 +708,33 @@ public class ExactIsomorphismTest {
 	}
 	
 
+	@Test
+	public void test015() {
+		FastGraph g1 = null;
+		try {
+			g1 = FastGraph.randomGraphFactory(50,150,999,true,false);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		FastGraph g2 = ExactIsomorphism.generateRandomIsomorphicGraph(g1,444,false);
+		ExactIsomorphism ei = new ExactIsomorphism(g1);
+		assertTrue(ei.isomorphic(g2));
+		
+	}
+
+	@Test
+	public void test016() {
+		FastGraph g1 = null;
+		try {
+			g1 = FastGraph.randomGraphFactory(100,300,1,true,false);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		FastGraph g2 = ExactIsomorphism.generateRandomIsomorphicGraph(g1,2,false);
+		ExactIsomorphism ei = new ExactIsomorphism(g1);
+		assertTrue(ei.isomorphic(g2));
+		
+	}
 	
 	
 	/*
