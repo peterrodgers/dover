@@ -2915,4 +2915,151 @@ public class FastGraphTest {
 		assertEquals(0,ga.getEdgeNode2(1));
 	
 	}
+	
+	
+	@Test
+	public void test158() {
+		LinkedList<EdgeStructure> addEdges;
+		LinkedList<NodeStructure> addNodes;
+		FastGraph g;
+		ArrayList<ArrayList<Integer>> ret;
+		NodeStructure ns0,ns1,ns2,ns3;
+		EdgeStructure es0,es1,es2,es3,es4,es5;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		addEdges = new LinkedList<EdgeStructure>();
+		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
+		ret = g.findParallelEdges();
+		assertEquals(0,ret.size());
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
+		ns1 = new NodeStructure(1,"ns1", 1, (byte)1, (byte)0);
+		ns2 = new NodeStructure(2,"ns2", 1, (byte)0, (byte)0);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addNodes.add(ns2);
+		addEdges = new LinkedList<EdgeStructure>();
+		es0 = new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 0, 1);
+		es1 = new EdgeStructure(1,"es1", 2, (byte)0, (byte)0, 0, 2);
+		es2 = new EdgeStructure(2,"es2", 2, (byte)0, (byte)0, 1, 2);
+		addEdges.add(es0);
+		addEdges.add(es1);
+		addEdges.add(es2);
+		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
+		ret = g.findParallelEdges();
+		assertEquals(0,ret.size());
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
+		ns1 = new NodeStructure(1,"ns1", 1, (byte)1, (byte)0);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addEdges = new LinkedList<EdgeStructure>();
+		es0 = new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 0, 1);
+		es1 = new EdgeStructure(1,"es1", 2, (byte)0, (byte)0, 0, 1);
+		addEdges.add(es0);
+		addEdges.add(es1);
+		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
+		ret = g.findParallelEdges();
+		assertEquals(1,ret.size());
+		assertEquals(2,ret.get(0).size());
+		assertEquals(0,(int)((ret.get(0)).get(0)));
+		assertEquals(1,(int)((ret.get(0)).get(1)));
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
+		ns1 = new NodeStructure(1,"ns1", 1, (byte)1, (byte)0);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addEdges = new LinkedList<EdgeStructure>();
+		es0 = new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 1, 0);
+		es1 = new EdgeStructure(1,"es1", 2, (byte)0, (byte)0, 0, 1);
+		addEdges.add(es0);
+		addEdges.add(es1);
+		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
+		ret = g.findParallelEdges();
+		assertEquals(1,ret.size());
+		assertEquals(2,ret.get(0).size());
+		assertEquals(0,(int)((ret.get(0)).get(0)));
+		assertEquals(1,(int)((ret.get(0)).get(1)));
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
+		ns1 = new NodeStructure(1,"ns1", 1, (byte)1, (byte)0);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addEdges = new LinkedList<EdgeStructure>();
+		es0 = new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 0, 1);
+		es1 = new EdgeStructure(1,"es1", 1, (byte)0, (byte)0, 0, 1);
+		es2 = new EdgeStructure(2,"es2", 1, (byte)0, (byte)0, 1, 0);
+		addEdges.add(es0);
+		addEdges.add(es1);
+		addEdges.add(es2);
+		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
+		ret = g.findParallelEdges();
+		assertEquals(1,ret.size());
+		assertEquals(3,ret.get(0).size());
+		assertEquals(0,(int)((ret.get(0)).get(0)));
+		assertEquals(1,(int)((ret.get(0)).get(1)));
+		assertEquals(2,(int)((ret.get(0)).get(2)));
+		
+
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
+		ns1 = new NodeStructure(1,"ns1", 1, (byte)1, (byte)0);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addNodes.add(ns2);
+		addEdges = new LinkedList<EdgeStructure>();
+		es0 = new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 1, 1);
+		es1 = new EdgeStructure(1,"es1", 2, (byte)0, (byte)0, 1, 1);
+		addEdges.add(es0);
+		addEdges.add(es1);
+		addEdges.add(es2);
+		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
+		ret = g.findParallelEdges();
+		assertEquals(1,ret.size());
+		assertEquals(2,ret.get(0).size());
+		assertEquals(0,(int)((ret.get(0)).get(0)));
+		assertEquals(1,(int)((ret.get(0)).get(1)));
+
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
+		ns1 = new NodeStructure(1,"ns1", 1, (byte)1, (byte)0);
+		ns2 = new NodeStructure(2,"ns2", 1, (byte)1, (byte)0);
+		ns3 = new NodeStructure(3,"ns3", 1, (byte)1, (byte)0);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addNodes.add(ns2);
+		addNodes.add(ns3);
+		addEdges = new LinkedList<EdgeStructure>();
+		es0 = new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 3, 0);
+		es1 = new EdgeStructure(1,"es1", 1, (byte)0, (byte)0, 0, 1);
+		es2 = new EdgeStructure(2,"es2", 1, (byte)0, (byte)0, 2, 3);
+		es3 = new EdgeStructure(3,"es3", 1, (byte)0, (byte)0, 0, 3);
+		es4 = new EdgeStructure(4,"es4", 1, (byte)0, (byte)0, 3, 0);
+		es5 = new EdgeStructure(5,"es5", 1, (byte)0, (byte)0, 1, 0);
+		addEdges.add(es0);
+		addEdges.add(es1);
+		addEdges.add(es2);
+		addEdges.add(es3);
+		addEdges.add(es4);
+		addEdges.add(es5);
+		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
+		ret = g.findParallelEdges();
+		assertEquals(2,ret.size());
+		assertEquals(3,ret.get(0).size());
+		assertEquals(0,(int)((ret.get(0)).get(0)));
+		assertEquals(3,(int)((ret.get(0)).get(1)));
+		assertEquals(4,(int)((ret.get(0)).get(2)));
+		assertEquals(2,ret.get(1).size());
+		assertEquals(1,(int)((ret.get(1)).get(0)));
+		assertEquals(5,(int)((ret.get(1)).get(1)));
+		
+
+		
+	}
+	
 }

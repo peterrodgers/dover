@@ -17,6 +17,7 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -2903,17 +2904,9 @@ if(node%100000 == 0) {
 			outEdgeList.add(e);
 		}
 		
-//for(int i = 0; i < g.numberOfNodes; i++) {
-//	Debugger.log("node "+i+" in "+nodeIn.get(i)+" out "+nodeOut.get(i));
-//}
-		
 		// Initialise the connection buffer, modifying the node buffer connection data
-		//time = Debugger.createTime();
 		int offset = 0;
 		for(int node = 0; node < g.getNumberOfNodes(); node++) {
-//if(node%100000 == 0) {
-//	Debugger.outputTime("B populated "+node+" nodes in connection buffer");
-//}
 			
 			// setting the in connection offset and length
 			ArrayList<Integer> inEdges = nodeIn.get(node);
@@ -2961,7 +2954,6 @@ if(node%100000 == 0) {
 				offset += CONNECTION_PAIR_SIZE;
 			}
 		}
-//Debugger.outputTime("C finished");
 		
 		return g;
 	}
@@ -4162,6 +4154,44 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		for(int i = 0; i < degrees.length; i++) {
 			buckets[degrees[i]]++;
 		}
+	}
+	
+
+	/**
+	 * Outputs a list where each element is a list of parallel edges
+	 * 
+	 * @return all the parallel edges grouped in lists
+	 */
+	public ArrayList<ArrayList<Integer>> findParallelEdges() {
+		
+		HashSet<Integer> foundEdges = new HashSet<Integer>(getNumberOfEdges()*3);
+		
+		ArrayList<ArrayList<Integer>> ret = new ArrayList<ArrayList<Integer>>();
+		
+		for(int e1 = 0; e1 < getNumberOfEdges()-1; e1++) {
+			ArrayList<Integer> duplicateList = new ArrayList<Integer>();
+			duplicateList.add(e1);
+			if(foundEdges.contains(e1)) {
+				continue;
+			}
+			for(int e2 = e1+1; e2 < getNumberOfEdges(); e2++) {
+				if(foundEdges.contains(e2)) {
+					continue;
+				}
+				if(getEdgeNode1(e1) == getEdgeNode1(e2) && getEdgeNode2(e1) == getEdgeNode2(e2)) {
+					duplicateList.add(e2);
+					foundEdges.add(e2);
+				} else if(getEdgeNode2(e1) == getEdgeNode1(e2) && getEdgeNode1(e1) == getEdgeNode2(e2)) {
+					duplicateList.add(e2);
+					foundEdges.add(e2);
+				}
+			}
+			if(duplicateList.size() > 1) {
+				ret.add(duplicateList);
+			}
+			
+		}
+		return ret;
 	}
 		
 }
