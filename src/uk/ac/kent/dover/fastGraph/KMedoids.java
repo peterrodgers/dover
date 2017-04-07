@@ -210,7 +210,7 @@ public class KMedoids {
 	 * @param g2 The second graph
 	 * @return The comparison score
 	 */
-	private double comparisonScore(FastGraph g1, FastGraph g2) {
+	public double comparisonScore(FastGraph g1, FastGraph g2) {
 //		return (g1.getNumberOfNodes() + g1.getNumberOfEdges()) - (g2.getNumberOfNodes() + g2.getNumberOfEdges()); //placeholder
 		numberOfGedCalcs++;
 		long time = Debugger.createTime();

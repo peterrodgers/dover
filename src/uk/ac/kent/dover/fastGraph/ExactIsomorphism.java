@@ -212,7 +212,7 @@ isomorphismStartTime = -1;
 			return false;
 		}
 		if(!Connected.connected(g1)) {
-			System.out.println("Graphs must be connected");
+			System.err.println("Graphs must be connected"); //Should really throw an exception
 			return false;
 		}
 				

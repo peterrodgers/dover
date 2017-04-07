@@ -36,6 +36,9 @@ import uk.ac.kent.displayGraph.Graph;
 import uk.ac.kent.displayGraph.Node;
 import uk.ac.kent.displayGraph.NodeType;
 import uk.ac.kent.displayGraph.drawers.GraphDrawerGravitySpringEmbedder;
+import uk.ac.kent.dover.fastGraph.Gui.MotifTaskDummy;
+import uk.ac.kent.dover.fastGraph.comparators.SimpleEdgeLabelComparator;
+import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
 
 
 /**
@@ -111,8 +114,6 @@ public class FastGraph {
 	private boolean direct; // true if off heap storage for byte buffers, false if on heap
 	
 	private byte generation = 0; // the oldest generation time slice
-	
-		
 
 	/**
 	 * No direct access to constructor, as a number of data structures need to be created when
