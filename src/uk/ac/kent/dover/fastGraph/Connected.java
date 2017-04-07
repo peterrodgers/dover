@@ -2,19 +2,21 @@ package uk.ac.kent.dover.fastGraph;
 
 import java.util.LinkedList;
 
+/**
+*
+* Class to test graph connectivity.
+*
+*/
 public class Connected {
-	
 	
 	/**
 	 *
-	 * Create a Connected before running connected.
+	 * Create a Connected before running {@link #connected(FastGraph) connected}.
 	 *
 	 */
 	public Connected() {
 
 	}
-	
-
 	
 	
 	/** Breadth first search through the graph.

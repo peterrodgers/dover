@@ -12,9 +12,11 @@ import uk.ac.kent.dover.fastGraph.comparators.AlwaysTrueEdgeComparator;
 import uk.ac.kent.dover.fastGraph.comparators.AlwaysTrueNodeComparator;
 import uk.ac.kent.dover.fastGraph.comparators.EdgeComparator;
 import uk.ac.kent.dover.fastGraph.comparators.NodeComparator;
+import uk.ac.kent.dover.fastGraph.comparators.SimpleEdgeLabelComparator;
+import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
 
 /**
- * Testing the structural similarity of two FastGraphs. Assumes a single edge between each node.
+ * Testing the containment of a FastGraph inside another FastGraph. Assumes a single edge between each node.
  * 
  * @author Peter Rodgers
  *
@@ -41,8 +43,94 @@ public class ExactSubgraphIsomorphism extends SubgraphIsomorphism {
 	
 	private boolean resultPossible; // set to false if a pattern node has no possible mappings in the target graph
 
+	
+	
+	public static void main(String [] args) throws Exception {
+
+		double patternDensity = 0.2;
+		double targetDensity = 0.12;
+		long i = 1000;
+		long j = 1000000;
+		for(int patternNodes = 8; patternNodes <= 14; patternNodes+=2) {
+			if(patternNodes >= 12) {
+				patternDensity = 0.16;
+			}
+			if(patternNodes >= 14) {
+				patternDensity = 0.15;
+			}
+			int patternEdges = (int)(patternDensity*(patternNodes*(patternNodes-1)));
+			for(int targetNodes = 30; targetNodes <= 40; targetNodes+=2) {
+				int targetEdges = (int)(targetDensity*(targetNodes*(targetNodes-1)));
+					i++;
+					FastGraph pattern = FastGraph.randomGraphFactory(patternNodes, patternEdges, i, true, false);
+					while(!Connected.connected(pattern)) {
+						i++;
+						pattern = FastGraph.randomGraphFactory(patternNodes, patternEdges, i, true, false);
+					}
+					j++;
+					FastGraph target = FastGraph.randomGraphFactory(targetNodes, targetEdges, j, true, false);
+					while(!Connected.connected(target)) {
+						j++;
+						target = FastGraph.randomGraphFactory(targetNodes, targetEdges, j, true, false);
+					}
+					ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(target,pattern,null,null);
+					long time = System.currentTimeMillis();
+					boolean result = esi.subgraphIsomorphismFinder();
+					double resultTime = (System.currentTimeMillis()-time)/1000.0;
+					LinkedList<SubgraphMapping> mapping = esi.getFoundMappings();
+
+					System.out.println(patternNodes+"\t"+patternEdges+"\t"+targetNodes+"\t"+targetEdges+"\t"+mapping.size()+"\t"+resultTime);
+
+			}
+		}
+
+		FastGraph targetB = FastGraph.loadBuffersGraphFactory(null, "soc-pokec-relationships.txt-reduced");
+		 		
+		LinkedList<NodeStructure> addNodes = new LinkedList<NodeStructure>();
+		NodeStructure ns0 = new NodeStructure(0,"Shelia Riley", 1, (byte)0, (byte)0);
+		NodeStructure ns1 = new NodeStructure(1,"Michael Flemming", 1, (byte)0, (byte)0);
+		NodeStructure ns2 = new NodeStructure(2,"", 1, (byte)0, (byte)0);
+		NodeStructure ns3 = new NodeStructure(3,"", 1, (byte)0, (byte)0);
+		NodeStructure ns4 = new NodeStructure(4,"", 1, (byte)0, (byte)0);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addNodes.add(ns2);
+		addNodes.add(ns3);
+		addNodes.add(ns4);
+		
+		// define the edges that will appear in the new graph
+		// the nodes must be defined first, as the last two params give the node indexes
+		LinkedList<EdgeStructure> addEdges = new LinkedList<EdgeStructure>();
+		EdgeStructure es0 = new EdgeStructure(0,"", 1, (byte)0, (byte)0, 0, 1);
+		EdgeStructure es1 = new EdgeStructure(1,"", 2, (byte)0, (byte)0, 0, 2);
+		EdgeStructure es2 = new EdgeStructure(2,"", 2, (byte)0, (byte)0, 1, 3);
+		EdgeStructure es3 = new EdgeStructure(3,"", 2, (byte)0, (byte)0, 2, 3);
+		EdgeStructure es4 = new EdgeStructure(4,"", 2, (byte)0, (byte)0, 2, 4);
+		addEdges.add(es0);
+		addEdges.add(es1);
+		addEdges.add(es2);
+		addEdges.add(es3);
+		addEdges.add(es4);
+		
+		// use a factory to create the new graph
+		FastGraph patternB = FastGraph.structureFactory("pattern",(byte)0,addNodes,addEdges,false);
+ 
+//patternB.displayFastGraph();		
+		SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(targetB, patternB);
+		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(targetB, patternB);
+		ExactSubgraphIsomorphism esiB = new ExactSubgraphIsomorphism(targetB,patternB,snlc,selc);
+		long timeB = System.currentTimeMillis();
+		boolean resultB = esiB.subgraphIsomorphismFinder();
+		double resultTimeB = (System.currentTimeMillis()-timeB)/1000.0;
+		LinkedList<SubgraphMapping> mappingB = esiB.getFoundMappings();
+		System.out.println("names");
+		System.out.println(patternB.getNumberOfNodes()+"\t"+patternB.getNumberOfEdges()+"\t"+targetB.getNumberOfNodes()+"\t"+targetB.getNumberOfEdges()+"\t"+mappingB.size()+"\t"+resultTimeB);
+	}
+	
+	
+	
 	/**
-	 * Create an ExactSubgraphIsomorphism before running getFoundMatches.
+	 * Create an ExactSubgraphIsomorphism before running {@link #getFoundMappings() getFoundMappings}.
 	 * 
 	 * @param patternGraph the small subgraph to be found in the larger target
 	 * @param targetGraph the larger target graph in which to find the pattern
@@ -80,7 +168,7 @@ public class ExactSubgraphIsomorphism extends SubgraphIsomorphism {
 	
 
 	/**
-	 * call this after subGraphIsomorphismFinder
+	 * Call this after subGraphIsomorphismFinder.
 	 * @return the found mappings from the pattern graph to the target graph
 	 */
 	public LinkedList<SubgraphMapping> getFoundMappings () {return foundMappings;}
