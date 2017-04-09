@@ -1,6 +1,6 @@
 # Dover 
 
-### Scalable Subgraph Isomorphism
+### Scalable Algorithms for Graph Mining in Java
 
 [Installation instructions](https://github.com/peterrodgers/dover/wiki/Installation)
 
