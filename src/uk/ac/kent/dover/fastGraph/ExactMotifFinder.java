@@ -69,14 +69,14 @@ public class ExactMotifFinder {
 	/**
 	 * Finds all motifs from the reference set. Will rewire a reference set if one has not been given.
 	 * 
-	 * @param rewiresNeeded The number of rewires needed. If 0, then main set.
+	 * @param rewires The number of rewires needed. If 0, then main set.
 	 * @param minSize The minimum size of motifs to be found
 	 * @param maxSize The maximum size of motifs to be found
 	 * @throws IOException If the output data cannot be written
 	 * @throws FastGraphException 
 	 */
-	public void findMotifsReferenceSet(int rewires, int minNum, int maxNum) throws IOException, FastGraphException {
-		findAllMotifs(rewires,minNum,maxNum);
+	public void findMotifsReferenceSet(int rewires, int minSize, int maxSize) throws IOException, FastGraphException {
+		findAllMotifs(rewires,minSize,maxSize);
 	}
 	
 	/**
@@ -87,8 +87,8 @@ public class ExactMotifFinder {
 	 * @throws IOException If the output data cannot be written
 	 * @throws FastGraphException 
 	 */
-	public void findMotifsRealSet(int minNum, int maxNum) throws IOException, FastGraphException {
-		findAllMotifs(0,minNum,maxNum);
+	public void findMotifsRealSet(int minSize, int maxSize) throws IOException, FastGraphException {
+		findAllMotifs(0,minSize,maxSize);
 	}
 	
 	/**
