@@ -273,8 +273,9 @@ public class LauncherCmd {
 	 * Runs the exact motif finding code and checks that parameters are valid
 	 * @param cmd The CommandLine object that holds the user's input
 	 * @throws ParseException If there is an error with the user's input
+	 * @throws FastGraphException 
 	 */
-	private void motif(CommandLine cmd) throws ParseException {
+	private void motif(CommandLine cmd) throws ParseException, FastGraphException {
 		Option minFound = null;
 		Option maxFound = null;
 		Option saveAllFound = null;

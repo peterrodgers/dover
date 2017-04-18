@@ -5,7 +5,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import test.uk.ac.kent.dover.TestRunner;
 import uk.ac.kent.displayGraph.Edge;
@@ -13,6 +15,7 @@ import uk.ac.kent.displayGraph.Graph;
 import uk.ac.kent.displayGraph.Node;
 import uk.ac.kent.dover.fastGraph.ExactIsomorphism;
 import uk.ac.kent.dover.fastGraph.FastGraph;
+import uk.ac.kent.dover.fastGraph.FastGraphException;
 
 public class ExactIsomorphismTest {
 
@@ -23,11 +26,6 @@ public class ExactIsomorphismTest {
 		FastGraph g1,g2;
 		ExactIsomorphism ei;
 
-		g1 = FastGraph.randomGraphFactory(10,20,1,false);
-		g2 = FastGraph.randomGraphFactory(10,20,2,false);
-		ei = new ExactIsomorphism(g1);
-		assertFalse(ei.isomorphic(g2));
-
 		g1 = FastGraph.randomGraphFactory(0,0,1,false);
 		g2 = FastGraph.randomGraphFactory(0,0,1,false);
 		ei = new ExactIsomorphism(g1);
@@ -37,12 +35,11 @@ public class ExactIsomorphismTest {
 		g2 = FastGraph.randomGraphFactory(1,0,1,false);
 		ei = new ExactIsomorphism(g1);
 		assertTrue(ei.isomorphic(g2));
-
 	}
 
 	
 	@Test
-	public void test002() {
+	public void test002() throws FastGraphException {
 		ExactIsomorphism ei;
 		FastGraph g2;
 		FastGraph g1;
@@ -113,26 +110,51 @@ public class ExactIsomorphismTest {
 
 	}
 
+	
+	@Rule
+	public ExpectedException thrown1 = ExpectedException.none();
 	@Test
 	public void test004() throws Exception {
+		FastGraph g1;
+		g1 = FastGraph.randomGraphFactory(10,20,1,false); // disconnected graph
+	    thrown1.expect(FastGraphException.class);
+		new ExactIsomorphism(g1);
+	}
+		
+	@Rule
+	public ExpectedException thrown2 = ExpectedException.none();
+	@Test
+	public void test005() throws Exception {
 		FastGraph g1,g2;
 		ExactIsomorphism ei;
-		g1 = FastGraph.randomGraphFactory(10,20,1,false);
+		g1 = FastGraph.randomGraphFactory(10,20,6,false); // connected graph
 		ei = new ExactIsomorphism(g1);
 		
-		g2 = FastGraph.randomGraphFactory(10,25,1,false);
+		g2 = FastGraph.randomGraphFactory(10,20,1,false); // disconnected graph
+	    thrown2.expect(FastGraphException.class);
+	    ei.isomorphic(g2);
+	}
+		
+	@Test
+	public void test006() throws Exception {
+		FastGraph g1,g2;
+		ExactIsomorphism ei;
+		g1 = FastGraph.randomGraphFactory(10,20,6,false);
+		ei = new ExactIsomorphism(g1);
+	    
+		g2 = FastGraph.randomGraphFactory(10,25,6,false);
 		assertFalse(ei.isomorphic(g2));
 
-		g2 = FastGraph.randomGraphFactory(12,20,1,false);
+		g2 = FastGraph.randomGraphFactory(12,20,6,false);
 		assertFalse(ei.isomorphic(g2));
 
 		g2 = FastGraph.randomGraphFactory(10,20,2,false);
 		assertFalse(ei.isomorphic(g2));
-
 	}
 
+	
 	@Test
-	public void test005() {
+	public void test007() throws FastGraphException {
 		// problem with randomly generated graph. ok with display graph algorithm, failed with fastgraph algorithm
 		/* g1
 		 * Nodes:[n0, n1, n2]
@@ -193,7 +215,7 @@ public class ExactIsomorphismTest {
 	
 
 	@Test
-	public void test006() {
+	public void test008() throws FastGraphException {
 		// problem with randomly generated graph. ok with display graph algorithm, failed with fastgraph algorithm
 		/* g1
 		 * Nodes:[n0, n1, n2]
@@ -249,7 +271,7 @@ public class ExactIsomorphismTest {
 	}
 	
 	@Test
-	public void test007() {
+	public void test009() throws FastGraphException {
 		// problem with displayGraph isomorphism test generated graph. failed with display graph algorithm, ok with fastgraph algorithm
 		/* g1
 		 * Nodes:[n0, n1, n2, n3]
@@ -309,7 +331,7 @@ public class ExactIsomorphismTest {
 
 	
 	@Test
-	public void test008() {
+	public void test010() throws FastGraphException {
 		
 		Graph dg1 = new Graph("dg1");
 		Node n0 = new Node("n0");
@@ -371,7 +393,7 @@ public class ExactIsomorphismTest {
 	
 	
 	@Test
-	public void test009() {
+	public void test011() throws FastGraphException {
 		
 		Graph dg1 = new Graph("dg1");
 		Node n0 = new Node("n0");
@@ -433,7 +455,7 @@ public class ExactIsomorphismTest {
 	}
 	
 	@Test
-	public void test011() {
+	public void test012() throws FastGraphException {
 		/*
 		 * g1
 		 * Nodes:[n0, n1, n2, n3, n4, n5]
@@ -477,7 +499,7 @@ public class ExactIsomorphismTest {
 	}
 	
 	@Test
-	public void test012() {
+	public void test013() throws FastGraphException {
 		/*
 		 * g1
 		 * Nodes:[n0, n1, n2, n3, n4, n5, n6]
@@ -521,7 +543,7 @@ public class ExactIsomorphismTest {
 	
 	
 	@Test
-	public void test013() {
+	public void test014() throws FastGraphException {
 		/*
 		 * g1
 		 * Nodes:[n0, n1, n2, n3, n4, n5, n6, n7]
@@ -574,7 +596,7 @@ public class ExactIsomorphismTest {
 	
 	
 	@Test
-	public void test014() {
+	public void test015() throws FastGraphException {
 		/*
 		 * g1
 		 * Nodes:[n0, n1, n2, n3, n4, n5, n6, n7]
@@ -629,7 +651,7 @@ public class ExactIsomorphismTest {
 	
 
 	@Test
-	public void test015() {
+	public void test016() throws FastGraphException {
 		FastGraph g1 = null;
 		try {
 			g1 = FastGraph.randomGraphFactory(50,150,999,true,false);
@@ -643,7 +665,7 @@ public class ExactIsomorphismTest {
 	}
 
 	@Test
-	public void test016() {
+	public void test017() throws FastGraphException {
 		FastGraph g1 = null;
 		try {
 			g1 = FastGraph.randomGraphFactory(100,300,1,true,false);

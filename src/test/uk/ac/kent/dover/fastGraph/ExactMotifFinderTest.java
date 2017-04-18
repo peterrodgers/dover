@@ -11,6 +11,7 @@ import test.uk.ac.kent.dover.TestRunner;
 import uk.ac.kent.dover.fastGraph.ExactMotifFinder;
 import uk.ac.kent.dover.fastGraph.ExactMotifFinder.MotifResultHolder;
 import uk.ac.kent.dover.fastGraph.FastGraph;
+import uk.ac.kent.dover.fastGraph.FastGraphException;
 import uk.ac.kent.dover.fastGraph.Gui.MotifTaskDummy;
 
 /**
@@ -21,7 +22,7 @@ import uk.ac.kent.dover.fastGraph.Gui.MotifTaskDummy;
 public class ExactMotifFinderTest {
 
 	@Test
-	public void test001() throws IOException {
+	public void test001() throws IOException, FastGraphException {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get4Node5Edge(),false);
 		ExactMotifFinder emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
 		emf.findAllMotifs(10,4,4);
@@ -34,7 +35,7 @@ public class ExactMotifFinderTest {
 	}
 	
 	@Test
-	public void test002() throws IOException {
+	public void test002() throws IOException, FastGraphException {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get5Node5Edge(),false);
 		ExactMotifFinder emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
 		emf.findAllMotifs(10,4,4);
@@ -47,7 +48,7 @@ public class ExactMotifFinderTest {
 	}
 	
 	@Test
-	public void test003() throws IOException {
+	public void test003() throws IOException, FastGraphException {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get4Node5Edge(),false);
 		g = g.randomTimeSeriesFactory(0.2, 0.2, 2, 2, false, false);
 		ExactMotifFinder emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
@@ -61,7 +62,7 @@ public class ExactMotifFinderTest {
 	}
 	
 	@Test
-	public void test004() throws IOException {
+	public void test004() throws IOException, FastGraphException {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get5Node5Edge(),false);
 		g = g.randomTimeSeriesFactory(0.2, 0.2, 2, 2, false, false);
 		ExactMotifFinder emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);

@@ -127,8 +127,9 @@ public class Profiler {
 	 * @param minSize Min size of motifs
 	 * @param maxSize Max size of motifs
 	 * @throws IOException If the graph cannot be loaded
+	 * @throws FastGraphException 
 	 */
-	public void profileExactMotifMultiple(int minSize, int maxSize) throws IOException {
+	public void profileExactMotifMultiple(int minSize, int maxSize) throws IOException, FastGraphException {
 		for(int i = minSize; i <= maxSize; i++) {
 			System.out.println("    # Profiling motif of size "+i);
 			profileExactMotif(i);
@@ -140,8 +141,9 @@ public class Profiler {
 	 * 
 	 * @param size The size of motif to test
 	 * @throws IOException If the graph cannot be loaded
+	 * @throws FastGraphException 
 	 */
-	public void profileExactMotif(int size) throws IOException {		
+	public void profileExactMotif(int size) throws IOException, FastGraphException {		
 		long time = Debugger.createTime();
 		ExactMotifFinder emf = new ExactMotifFinder(targetGraph, new MotifTaskDummy(), true);
 		emf.findAllMotifs(10,size,size); //reference

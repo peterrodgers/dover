@@ -74,15 +74,20 @@ public class ExactIsomorphism {
 	/**
 	 *
 	 * Create an ExactIsomorphism before running isomorphic. This makes multiple tests against
-	 * one graph to be more efficient as data for that graph does not need to be recreated.
+	 * one graph to be more efficient as data for that graph does not need to be recreated. The
+	 * graph must be connected.
 	 * 
 	 * @param fastGraph one graph to be tested.
+	 * @throws FastGraphException if the graph is not connected
 	 *
 	 */
-	public ExactIsomorphism(FastGraph fastGraph) {
+	public ExactIsomorphism(FastGraph fastGraph) throws FastGraphException {
 
 		this.fastGraph = fastGraph;
 
+		if(!Connected.connected(fastGraph)) {
+			throw new FastGraphException("Graphs must be connected to test for isomorphism.");
+		}
 		am1 = new AdjacencyMatrix(fastGraph);
 		if(fastGraph.getNumberOfNodes() == 0) {
 			matrix1 = new int[0][0];
@@ -178,8 +183,9 @@ public class ExactIsomorphism {
 	 *
 	 * @param g the graph to compare
 	 * @return true if there is an equality with the given graph, null if is not.
+	 * @throws FastGraphException if the graph is disconnected
 	 */
-	public boolean isomorphic(FastGraph g) {
+	public boolean isomorphic(FastGraph g) throws FastGraphException {
 numberOfIsomorphismTests++;
 isomorphismStartTime = System.currentTimeMillis();
 
@@ -205,15 +211,16 @@ isomorphismStartTime = -1;
 			return true;
 		}
 
-		if(!Connected.connected(g1) && Connected.connected(g2)) {
+// note that the following two tests are reasonable, but have been commented out as defined behaviour on disconnected graph is to throw exception
+/*		if(!Connected.connected(g1) && Connected.connected(g2)) {
 			return false;
 		}
 		if(Connected.connected(g1) && !Connected.connected(g2)) {
 			return false;
 		}
-		if(!Connected.connected(g1)) {
-			System.err.println("Graphs must be connected"); //Should really throw an exception
-			return false;
+*/
+		if(!Connected.connected(g2)) {
+			throw new FastGraphException("Graph must be connected to test for isomorphism.");
 		}
 				
 		if(numberOfNodes1 != numberOfNodes2) {
@@ -452,8 +459,9 @@ bruteForceStartTime = -1;
 	 * @param nodes the nodes in g2 that form the subgraph
 	 * @param edges the edges in g2 that form the subgraph
 	 * @return true if the g1 and the subgraph of g2 are isomorphic, false otherwise
+	 * @throws FastGraphException 
 	 */
-	public boolean isomorphic(FastGraph g, int[] nodes, int[] edges) {
+	public boolean isomorphic(FastGraph g, int[] nodes, int[] edges) throws FastGraphException {
 
 		FastGraph subGraph = g.generateGraphFromSubgraph(nodes,edges);
 		
@@ -487,8 +495,9 @@ bruteForceStartTime = -1;
 	 * @param g1 one FastGraph to be tested
 	 * @param g2 the other FastGraph to be tested
 	 * @return true if g1 and g2 are isomorphic, false otherwise
+	 * @throws FastGraphException 
 	 */
-	public static boolean isomorphic(FastGraph g1, FastGraph g2) {
+	public static boolean isomorphic(FastGraph g1, FastGraph g2) throws FastGraphException {
 		ExactIsomorphism ei = new ExactIsomorphism(g1);
 		boolean ret = ei.isomorphic(g2);
 		return ret;

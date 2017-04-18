@@ -120,8 +120,9 @@ public class ExactMotifFinder {
 	 * @param minSize The minimum size of motifs to be found
 	 * @param maxSize The maximum size of motifs to be found
 	 * @throws IOException If the output data cannot be written
+	 * @throws FastGraphException 
 	 */
-	public void findAllMotifs(int rewiresNeeded, int minSize, int maxSize) throws IOException {
+	public void findAllMotifs(int rewiresNeeded, int minSize, int maxSize) throws IOException, FastGraphException {
 		
 		double sizeDiff = maxSize - minSize;	
 		double step = 100/(sizeDiff+4);
@@ -198,9 +199,10 @@ public class ExactMotifFinder {
 	 * @param graph The graph to find motifs in
 	 * @param referenceSet If the graph is the referenceSet
 	 * @throws IOException If the graph cannot be loaded
+	 * @throws FastGraphException 
 	 */
 	private void findMotifsInGraph(HashMap<String,IsoHolder> isoLists, HashMap<String,LinkedList<IsoHolder>> hashBuckets, 
-			int size, FastGraph graph, boolean referenceSet) throws IOException {
+			int size, FastGraph graph, boolean referenceSet) throws IOException, FastGraphException {
 	
 		ExactMotifFinder emf = new ExactMotifFinder(graph,saveAll && !referenceSet);
 		Debugger.log("    finding motifs");
@@ -426,8 +428,9 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * @param q the fraction of nodes to sample.
 	 * @param hashBuckets The buckets to store the results in
 	 * @throws IOException If the output files cannot be written
+	 * @throws FastGraphException 
 	 */
-	public void findMotifs(int k, double q, HashMap<String,LinkedList<IsoHolder>> hashBuckets) throws IOException {
+	public void findMotifs(int k, double q, HashMap<String,LinkedList<IsoHolder>> hashBuckets) throws IOException, FastGraphException {
 		
 		//hashBuckets = new HashMap<String,LinkedList<LinkedList<FastGraph>>> (g.getNumberOfNodes());
 		Random r = new Random(g.getNodeBuf().getLong(0));

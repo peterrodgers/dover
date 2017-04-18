@@ -97,9 +97,10 @@ public class Launcher {
 	 * @param saveAll If every example is to be saved
 	 * @param reference The reference graph, if there is one
 	 * @throws IOException If the files cannot be loaded
+	 * @throws FastGraphException 
 	 */
 	public void findMotifs(MotifTask mt, String directory, String fileBaseName, int minNum, int maxNum, 
-			boolean saveAll, File reference) throws IOException {
+			boolean saveAll, File reference) throws IOException, FastGraphException {
 		
 		long time = Debugger.createTime();
 		
