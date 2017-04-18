@@ -29,6 +29,7 @@ import java.util.Random;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import test.uk.ac.kent.dover.TestRunner;
 import uk.ac.kent.displayGraph.ColorBrewer;
 import uk.ac.kent.displayGraph.Edge;
 import uk.ac.kent.displayGraph.EdgeType;
@@ -115,6 +116,30 @@ public class FastGraph {
 	
 	private byte generation = 0; // the oldest generation time slice
 
+	public static void main(String args[]) throws IOException, FastGraphException {
+		
+		//FastGraph g1 = FastGraph.loadBuffersGraphFactory(null, "simple-random-n-4-e-4-time");
+		FastGraph g1 = FastGraph.jsonStringGraphFactory(TestRunner.get4Node5Edge(),false);
+		int minSize = 3, maxSize = 3;
+		int numOfClusters = 2, iterations = 1;
+		int subsPerNode = 2, attempts = 20;
+		KMedoids km = new KMedoids(g1, numOfClusters, iterations);
+		EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g1);
+		HashSet<FastGraph> subs = new HashSet<FastGraph>();
+		for(int i = minSize; i <= maxSize; i++) {//build a list of potential subgraphs
+			subs.addAll(esn.enumerateSubgraphs(i, subsPerNode, attempts));
+		}
+		
+		ArrayList<FastGraph> subgraphs = new ArrayList<FastGraph>(subs);
+		ArrayList<ArrayList<FastGraph>> clusters = km.cluster(subgraphs);
+
+		km.saveClusters(clusters);
+
+		
+		
+	}
+	
+	
 	/**
 	 * No direct access to constructor, as a number of data structures need to be created when
 	 * graph nodes and edges are added.
@@ -4140,6 +4165,26 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		int[] degrees = new int[this.getNumberOfNodes()];
 		for(int i = 0; i < this.getNumberOfNodes(); i++) {
 			degrees[i] = this.getNodeDegree(i);
+		}
+		
+		return degrees;
+	}
+	
+	/**
+	 * Finds the the degrees of each node at a certain age.
+	 * 
+	 * @param age The age to consider
+	 * @param nodes The list of nodes
+	 * 
+	 * @return an array containing the degrees
+	 */
+	public int[] findDegreesOfAge(int age, ArrayList<Integer> nodes) {
+		int[] degrees = new int[nodes.size()];
+		for(int i = 0; i < nodes.size(); i++) {
+			if (this.getNodeAge(i) == age) {
+				int node = nodes.get(i);
+				degrees[i] = this.getNodeConnectingNodesOfSameAge(node).length;
+			}
 		}
 		
 		return degrees;

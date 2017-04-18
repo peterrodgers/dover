@@ -66,7 +66,9 @@ public class Profiler {
 		//approximate subgraph testing
 		System.out.println("### Profiling approximate subgraphs");
 		Profiler p = new Profiler(outputFile, targetGraph, patternGraph);
-		p.profileApproximateSubgraphIsomorhpism(4, 10); //TODO change this as needed
+		SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(targetGraph, patternGraph); //TODO change this as needed
+		SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(targetGraph, patternGraph); //TODO change this as needed
+		p.profileApproximateSubgraphIsomorhpism(4, 10, snlc, selc); //TODO change this as needed
 		p.saveResult();
 		System.out.println("### Profiling approximate subgraphs Complete");
 		
@@ -91,10 +93,11 @@ public class Profiler {
 	 * @param subgraphsPerNode The number of subgraphs generated per node
 	 * @throws FileNotFoundException If the files cannot be found
 	 */
-	public void profileApproximateSubgraphIsomorhpism(int nodesInEnumSubgraphs, int subgraphsPerNode) throws FileNotFoundException {
+	public void profileApproximateSubgraphIsomorhpism(int nodesInEnumSubgraphs, int subgraphsPerNode, 
+			NodeComparator nc, EdgeComparator ec) throws FileNotFoundException {
 		long time = Debugger.createTime();
 		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(targetGraph, 
-				patternGraph, nodesInEnumSubgraphs, subgraphsPerNode);
+				patternGraph, nodesInEnumSubgraphs, subgraphsPerNode, nc, ec);
 		int result = isi.subgraphIsomorphismFinder();
 		long timeResult = Debugger.createTime()-time;
 		
@@ -146,8 +149,8 @@ public class Profiler {
 	public void profileExactMotif(int size) throws IOException, FastGraphException {		
 		long time = Debugger.createTime();
 		ExactMotifFinder emf = new ExactMotifFinder(targetGraph, new MotifTaskDummy(), true);
-		emf.findAllMotifs(10,size,size); //reference
-		emf.findAllMotifs(0,size,size); //real
+		emf.findMotifsReferenceSet(10,size,size); //reference
+		emf.findMotifsRealSet(size,size); //real
 		emf.compareMotifDatas(size,size);
 		int totalSize = emf.getNumOfResults();
 		long timeResult = Debugger.createTime()-time;

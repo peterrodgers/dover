@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import org.jsoup.nodes.Document;
@@ -216,7 +217,7 @@ public class KMedoids {
 		long time = Debugger.createTime();
 
 		//double result = GedUtil.getGedScore(map.get(g1), map.get(g2));
-		double result = findDifferenceInDegreeProfiles(g1,g2);
+		double result = findDifferenceInAgeDegreeProfiles(g1,g2);
 		
 		long diff = Debugger.createTime() - time;
 		gedTime += diff;
@@ -224,14 +225,39 @@ public class KMedoids {
 	}
 	
 	/**
-	 * Finds the difference in degree profile between two graphs
+	 * Finds the difference in degree profiles for each timeslice
 	 * @param g1 The first graph
 	 * @param g2 The second graph
+	 * @return The comparison score (double to maintain consistency with other methods)
+	 */
+	private double findDifferenceInAgeDegreeProfiles(FastGraph g1, FastGraph g2) {
+		int minAgeG1 = g1.findMinimumNodeAge();
+		int minAgeG2 = g2.findMinimumNodeAge();
+		int maxAgeG1 = g1.findMaximumNodeAge();
+		int maxAgeG2 = g2.findMaximumNodeAge();
+		
+		int minAge = Math.min(minAgeG1, minAgeG2);
+		int maxAge = Math.max(maxAgeG1, maxAgeG2);
+
+		double result = 0;
+		for(int i = 0; i <= maxAge-minAge; i++) {
+			//find the degree buckets for this age, do the comparison and store the result only
+
+			int[] buckets1 = populateDegreeBuckets(g1, i);
+			int[] buckets2 = populateDegreeBuckets(g2, i);
+			
+			result += findDifferenceInDegreeProfiles(buckets1, buckets2);
+		}		
+		return result;		
+	}
+	
+	/**
+	 * Finds the difference in degree profile between two graphs
+	 * @param buckets1 The first set of buckets
+	 * @param buckets2 The second set of buckets
 	 * @return The difference (double to maintain consistency with other methods)
 	 */
-	private double findDifferenceInDegreeProfiles(FastGraph g1, FastGraph g2) {
-		int[] buckets1 = populateDegreeBuckets(g1);
-		int[] buckets2 = populateDegreeBuckets(g2);
+	private double findDifferenceInDegreeProfiles(int[] buckets1, int[] buckets2) {
 
 		double total = 0;
 		for(int i = 0; i < Math.max(buckets1.length, buckets2.length); i++) {
@@ -244,6 +270,7 @@ public class KMedoids {
 			}		
 		}		
 		return total;
+
 	}
 	
 	/**
@@ -252,10 +279,10 @@ public class KMedoids {
 	 * @param g1 The graph to run on
 	 * @return The buckets
 	 */
-	private int[] populateDegreeBuckets(FastGraph g1) {
+	private int[] populateDegreeBuckets(FastGraph g1, int age) {
 		int maxDegree1 = g1.maximumDegree();
 		int[] degreeBuckets1 = new int[maxDegree1+1];
-		int[] degrees1 = g1.findDegrees();
+		int[] degrees1 = g1.findDegreesOfAge(age, g1.findAllNodesOfAge(age));
 		g1.findDegreeBuckets(degreeBuckets1,degrees1);
 		return degreeBuckets1;
 	}

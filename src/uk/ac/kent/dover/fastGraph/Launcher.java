@@ -123,11 +123,11 @@ public class Launcher {
 		
 		emf.setSaveAll(false); //never want to save all examples in the rewired graph
 		mt.publish((int) step, "Building Reference Set", 0, "");		
-		emf.findAllMotifs(10,minNum,maxNum);
+		emf.findMotifsReferenceSet(10,minNum,maxNum);
 		
 		emf.setSaveAll(saveAll);
 		mt.publish((int) (100-(2*step)), "Building Main Set", 0, "");
-		emf.findAllMotifs(0,minNum,maxNum);
+		emf.findMotifsRealSet(minNum,maxNum);
 		
 		mt.publish((int) (100-step), "Comparing Motif Sets", 0, "");
 		emf.compareMotifDatas(minNum,maxNum);
@@ -174,8 +174,18 @@ public class Launcher {
 	 */
 	public void approximateSubgraphs(FastGraph targetGraph, FastGraph patternGraph,
 			int patternNodes, int subgraphsPerNode) throws FileNotFoundException {
-
-		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(targetGraph, patternGraph, patternNodes, subgraphsPerNode);
+		
+		NodeComparator nc = null;
+		if(patternGraph.isAnyNodeLabelled()) {
+			nc = new SimpleNodeLabelComparator(targetGraph, patternGraph);
+		}
+		EdgeComparator ec = new TimeEdgeComparator(targetGraph, patternGraph);
+		if(patternGraph.isAnyEdgeLabelled()) {
+			ec = new SimpleEdgeLabelComparator(targetGraph, patternGraph);
+		}
+		
+		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(targetGraph, patternGraph,
+				patternNodes, subgraphsPerNode, nc, ec);
 		isi.subgraphIsomorphismFinder();
 		isi = null; //GC
 	}

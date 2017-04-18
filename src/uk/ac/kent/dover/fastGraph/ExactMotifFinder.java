@@ -66,10 +66,43 @@ public class ExactMotifFinder {
 		enumeratorRandom = new EnumerateSubgraphRandom(g);
 	}
 	
+	/**
+	 * Finds all motifs from the reference set. Will rewire a reference set if one has not been given.
+	 * 
+	 * @param rewiresNeeded The number of rewires needed. If 0, then main set.
+	 * @param minSize The minimum size of motifs to be found
+	 * @param maxSize The maximum size of motifs to be found
+	 * @throws IOException If the output data cannot be written
+	 * @throws FastGraphException 
+	 */
+	public void findMotifsReferenceSet(int rewires, int minNum, int maxNum) throws IOException, FastGraphException {
+		findAllMotifs(rewires,minNum,maxNum);
+	}
+	
+	/**
+	 * Finds all motifs from the real set.
+	 * 
+	 * @param minSize The minimum size of motifs to be found
+	 * @param maxSize The maximum size of motifs to be found
+	 * @throws IOException If the output data cannot be written
+	 * @throws FastGraphException 
+	 */
+	public void findMotifsRealSet(int minNum, int maxNum) throws IOException, FastGraphException {
+		findAllMotifs(0,minNum,maxNum);
+	}
+	
+	/**
+	 * If the saveAll option is specified
+	 * @return saveAll
+	 */
 	public boolean isSaveAll() {
 		return saveAll;
 	}
 
+	/**
+	 * Sets if the saveAll option is specified
+	 * @param saveAll to save all motifs?
+	 */
 	public void setSaveAll(boolean saveAll) {
 		this.saveAll = saveAll;
 	}
@@ -122,7 +155,7 @@ public class ExactMotifFinder {
 	 * @throws IOException If the output data cannot be written
 	 * @throws FastGraphException 
 	 */
-	public void findAllMotifs(int rewiresNeeded, int minSize, int maxSize) throws IOException, FastGraphException {
+	private void findAllMotifs(int rewiresNeeded, int minSize, int maxSize) throws IOException, FastGraphException {
 		
 		double sizeDiff = maxSize - minSize;	
 		double step = 100/(sizeDiff+4);

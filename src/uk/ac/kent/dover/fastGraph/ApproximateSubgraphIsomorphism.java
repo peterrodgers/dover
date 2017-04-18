@@ -10,6 +10,8 @@ import java.util.Random;
 import uk.ac.kent.displayGraph.Edge;
 import uk.ac.kent.displayGraph.Graph;
 import uk.ac.kent.displayGraph.Node;
+import uk.ac.kent.dover.fastGraph.comparators.EdgeComparator;
+import uk.ac.kent.dover.fastGraph.comparators.NodeComparator;
 import uk.ac.kent.dover.fastGraph.comparators.SimpleEdgeLabelComparator;
 import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
 
@@ -24,6 +26,8 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 	private FastGraph target, pattern;
 	private int patternNodes, subgraphsPerNode;
 	private HashMap<String,Integer> uniqueSubgraphs = new HashMap<String,Integer>();
+	private EdgeComparator ec;
+	private NodeComparator nc;
 	
 	/**
 	 * Trivial constructor. Assumes a subgraphsPerNode of 5.
@@ -32,8 +36,9 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 	 * @param pattern The pattern graph
 	 * @param patternNodes The number of nodes in the enumerated subgraphs
 	 */
-	public ApproximateSubgraphIsomorphism(FastGraph target, FastGraph pattern, int patternNodes) {
-		this(target, pattern, patternNodes, 5);
+	public ApproximateSubgraphIsomorphism(FastGraph target, FastGraph pattern, int patternNodes, 
+			NodeComparator nc, EdgeComparator ec) {
+		this(target, pattern, patternNodes, 5, nc, ec);
 	}
 	
 	/**
@@ -44,11 +49,14 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 	 * @param patternNodes The number of nodes in the enumerated subgraphs
 	 * @param subgraphsPerNode The number of subgraphs to generate per node.
 	 */
-	public ApproximateSubgraphIsomorphism(FastGraph target, FastGraph pattern, int patternNodes, int subgraphsPerNode) {
+	public ApproximateSubgraphIsomorphism(FastGraph target, FastGraph pattern, int patternNodes, int subgraphsPerNode, 
+			NodeComparator nc, EdgeComparator ec) {
 		this.target = target;
 		this.pattern = pattern;
 		this.patternNodes = patternNodes;
 		this.subgraphsPerNode = subgraphsPerNode;
+		this.nc = nc;
+		this.ec = ec;
 	}
 	
 	/**
@@ -115,9 +123,7 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 		for(FastGraph sub : subs) {
 			
 			//check isomorphism
-			SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(sub, pattern);
-			SimpleEdgeLabelComparator selc = new SimpleEdgeLabelComparator(sub, pattern);
-			ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(sub,pattern,snlc,selc);
+			ExactSubgraphIsomorphism esi = new ExactSubgraphIsomorphism(sub,pattern,nc,ec);
 			boolean result = esi.subgraphIsomorphismFinder();
 
 			if(result) {
