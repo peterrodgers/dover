@@ -26,7 +26,7 @@ public class ApproximateSubgraphIsomorphismTest {
 		
 		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(target, pattern, 4, 1, nc, ec);
 		int count = isi.subgraphIsomorphismFinder();
-		assertEquals(count,2);
+		assertEquals(20,count);
 	}
 	
 	@Test
@@ -40,7 +40,7 @@ public class ApproximateSubgraphIsomorphismTest {
 		
 		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(target, pattern, 5, 1, nc, ec);
 		int count = isi.subgraphIsomorphismFinder();
-		assertEquals(count,0);
+		assertEquals(60,count);
 	}
 	
 }

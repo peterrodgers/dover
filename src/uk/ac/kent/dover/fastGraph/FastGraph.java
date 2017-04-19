@@ -115,30 +115,6 @@ public class FastGraph {
 	private boolean direct; // true if off heap storage for byte buffers, false if on heap
 	
 	private byte generation = 0; // the oldest generation time slice
-
-	public static void main(String args[]) throws IOException, FastGraphException {
-		
-		//FastGraph g1 = FastGraph.loadBuffersGraphFactory(null, "simple-random-n-4-e-4-time");
-		FastGraph g1 = FastGraph.jsonStringGraphFactory(TestRunner.get4Node5Edge(),false);
-		int minSize = 3, maxSize = 3;
-		int numOfClusters = 2, iterations = 1;
-		int subsPerNode = 2, attempts = 20;
-		KMedoids km = new KMedoids(g1, numOfClusters, iterations);
-		EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g1);
-		HashSet<FastGraph> subs = new HashSet<FastGraph>();
-		for(int i = minSize; i <= maxSize; i++) {//build a list of potential subgraphs
-			subs.addAll(esn.enumerateSubgraphs(i, subsPerNode, attempts));
-		}
-		
-		ArrayList<FastGraph> subgraphs = new ArrayList<FastGraph>(subs);
-		ArrayList<ArrayList<FastGraph>> clusters = km.cluster(subgraphs);
-
-		km.saveClusters(clusters);
-
-		
-		
-	}
-	
 	
 	/**
 	 * No direct access to constructor, as a number of data structures need to be created when
@@ -2209,7 +2185,10 @@ if(edgeIndex%1000000==0 ) {
 		BufferedReader br = new BufferedReader(isr);
 		line = br.readLine();
 		splitLine = line.split(INFO_SPLIT_STRING);
-		String name = splitLine[1];
+		String name = "graph";
+		if(splitLine.length != 1) {
+			name = splitLine[1];
+		}
 		line = br.readLine();
 		splitLine = line.split(INFO_SPLIT_STRING);
 		int inNodeTotal = Integer.parseInt(splitLine[1]);

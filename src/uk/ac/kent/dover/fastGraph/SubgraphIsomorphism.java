@@ -23,6 +23,7 @@ public abstract class SubgraphIsomorphism {
 	 */
 	protected void saveSubgraph(FastGraph target, FastGraph sub, int count, File mainDir) {
 		//save graph
+		sub.setName(target.getName());
 		File dir = new File(mainDir.getAbsolutePath()+File.separatorChar+count);
 		dir.mkdir();
 		sub.saveBuffers(mainDir.getAbsolutePath()+File.separatorChar+count, target.getName());
