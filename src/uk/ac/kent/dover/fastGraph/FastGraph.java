@@ -1522,6 +1522,9 @@ public class FastGraph {
 		if(fileBaseName.length() == 0) {
 			throw new IOException("empty fileBaseName");
 		}
+		if(name == null) { // this should not normally be needed, it prevents an empty name being saved in the .info file 
+			name = fileBaseName;
+		}
 		if(name.length() == 0) { // this should not normally be needed, it prevents an empty name being saved in the .info file 
 			name = fileBaseName;
 		}

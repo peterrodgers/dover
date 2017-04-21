@@ -3080,6 +3080,7 @@ public class FastGraphTest {
 	    g1.saveBuffers(null,null);
 	}
 
+	
 	@Rule
 	public ExpectedException thrown2 = ExpectedException.none();
 	@Test
@@ -3088,6 +3089,20 @@ public class FastGraphTest {
 		g1 = FastGraph.randomGraphFactory(10,20,6,false);
 	    thrown2.expect(IOException.class);
 	    g1.saveBuffers(null,"");
+	}
+	
+
+	@Test
+	public void test161() throws Exception {
+		FastGraph g1,g2;
+		g1 = FastGraph.randomGraphFactory(10,20,6,false);
+		g1.setName("");
+		assertEquals("",g1.getName());
+	    g1.saveBuffers(null,"testName");
+	    g2 = FastGraph.loadBuffersGraphFactory(null,"testName");
+		assertEquals("testName",g1.getName());
+		assertEquals("testName",g2.getName());
+	    
 	}
 
 }
