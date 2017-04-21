@@ -1514,8 +1514,17 @@ public class FastGraph {
 	 * @param directory where the files are to be stored, or if null fileBaseName under data under the current working directory
 	 * @param fileBaseName the name of the files, to which extensions are added
 	 */
-	public void saveBuffers(String directory, String fileBaseName) {
-		//Debugger.log("saving to: " + directory);
+	public void saveBuffers(String directory, String fileBaseName) throws IOException {
+		
+		if(fileBaseName == null) {
+			throw new IOException("null fileBaseName");
+		}
+		if(fileBaseName.length() == 0) {
+			throw new IOException("empty fileBaseName");
+		}
+		if(name.length() == 0) { // this should not normally be needed, it prevents an empty name being saved in the .info file 
+			name = fileBaseName;
+		}
 		String directoryAndBaseName = "";
 		if(directory != null) {
 			if(directory.charAt(directory.length()-1)== File.separatorChar) {
@@ -1571,21 +1580,16 @@ public class FastGraph {
 	 * @param buf buffer to be written
 	 * @throws Exception if file save fails
 	 */
-	private void writeBuf(String fileName, ByteBuffer buf) throws Exception {
+	private void writeBuf(String fileName, ByteBuffer buf) throws IOException {
 		
-		try {
-			buf.rewind();
-			File file = new File(fileName);
-			FileOutputStream fos = new FileOutputStream(file, false);
-			FileChannel wChannel = fos.getChannel();
-			wChannel.write(buf);
-			fos.flush();
-			wChannel.close();
-			fos.close();
-		} catch(Exception e) {
-			Debugger.log("ERROR executing writeBuf("+fileName+","+buf+")");
-			e.printStackTrace();
-		}
+		buf.rewind();
+		File file = new File(fileName);
+		FileOutputStream fos = new FileOutputStream(file, false);
+		FileChannel wChannel = fos.getChannel();
+		wChannel.write(buf);
+		fos.flush();
+		wChannel.close();
+		fos.close();
 
 	}
 

@@ -25,10 +25,13 @@ public class ExactMotifFinderTest {
 	public void test001() throws IOException, FastGraphException {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get4Node5Edge(),false);
 		ExactMotifFinder emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
-		emf.findMotifsReferenceSet(10,4,4);
-
-		emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
-		emf.findMotifsRealSet(4,4);
+		try {
+			emf.findMotifsReferenceSet(10,4,4);
+			emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
+			emf.findMotifsRealSet(4,4);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		ArrayList<MotifResultHolder> results = emf.compareAndExportResults(4, 4, 4);
 		assertEquals(41.59, results.get(0).generateDifference(), 0.1);
@@ -38,10 +41,13 @@ public class ExactMotifFinderTest {
 	public void test002() throws IOException, FastGraphException {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get5Node5Edge(),false);
 		ExactMotifFinder emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
-		emf.findMotifsReferenceSet(10,4,4);
-
-		emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
-		emf.findMotifsRealSet(4,4);
+		try {
+			emf.findMotifsReferenceSet(10,4,4);
+			emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
+			emf.findMotifsRealSet(4,4);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		ArrayList<MotifResultHolder> results = emf.compareAndExportResults(4, 4, 4);
 		assertEquals(54.01, results.get(0).generateDifference(), 0.1);
@@ -52,10 +58,14 @@ public class ExactMotifFinderTest {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get4Node5Edge(),false);
 		g = g.randomTimeSeriesFactory(0.2, 0.2, 2, 2, false, false);
 		ExactMotifFinder emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
-		emf.findMotifsReferenceSet(10,4,4);
+		try {
+			emf.findMotifsReferenceSet(10,4,4);
+			emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
+			emf.findMotifsRealSet(4,4);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-		emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
-		emf.findMotifsRealSet(4,4);
 		
 		ArrayList<MotifResultHolder> results = emf.compareAndExportResults(4, 4, 4);
 		assertEquals(17.23, results.get(0).generateDifference(), 0.1);
@@ -66,10 +76,14 @@ public class ExactMotifFinderTest {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get5Node5Edge(),false);
 		g = g.randomTimeSeriesFactory(0.2, 0.2, 2, 2, false, false);
 		ExactMotifFinder emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
-		emf.findMotifsReferenceSet(10,4,4);
+		try {
+			emf.findMotifsReferenceSet(10,4,4);
+			emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
+			emf.findMotifsRealSet(4,4);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-		emf = new ExactMotifFinder(g, new MotifTaskDummy(), false);
-		emf.findMotifsRealSet(4,4);
 		
 		ArrayList<MotifResultHolder> results = emf.compareAndExportResults(4, 4, 4);
 		assertEquals(15.16, results.get(0).generateDifference(), 0.1);

@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -290,9 +291,9 @@ public class KMedoids {
 	/**
 	 * Save clusters to disk
 	 * @param clusters The clusters to save
-	 * @throws FileNotFoundException If the files cannot be saved
+	 * @throws IOException 
 	 */
-	public void saveClusters(ArrayList<ArrayList<FastGraph>> clusters) throws FileNotFoundException {
+	public void saveClusters(ArrayList<ArrayList<FastGraph>> clusters) throws IOException {
 		File mainDir = new File(
 				Launcher.startingWorkingDirectory+File.separatorChar+"kmedoids_results"+
 				File.separatorChar+targetGraph.getName()+"_"+Util.dateAsString()

@@ -143,9 +143,9 @@ public class Launcher {
 	 * 
 	 * @param targetGraph The graph to search in
 	 * @param patternGraph The subgraph to find
-	 * @throws FileNotFoundException If the output file cannot be saved
+	 * @throws IOException If the results cannot be saved
 	 */
-	public void exactSubgraphs(FastGraph targetGraph, FastGraph patternGraph) throws FileNotFoundException {
+	public void exactSubgraphs(FastGraph targetGraph, FastGraph patternGraph) throws IOException {
 		
 		NodeComparator nc = null;
 		if(patternGraph.isAnyNodeLabelled()) {
@@ -170,10 +170,10 @@ public class Launcher {
 	 * @param patternGraph The subgraph to find
 	 * @param patternNodes The number of nodes in the enumerated subgraphs
 	 * @param subgraphsPerNode The number of subgraphs to generate per node
-	 * @throws FileNotFoundException If the output file cannot be saved
+	 * @throws IOException If a subgraph cannot be saved
 	 */
 	public void approximateSubgraphs(FastGraph targetGraph, FastGraph patternGraph,
-			int patternNodes, int subgraphsPerNode) throws FileNotFoundException {
+			int patternNodes, int subgraphsPerNode) throws IOException {
 		
 		NodeComparator nc = null;
 		if(patternGraph.isAnyNodeLabelled()) {
@@ -220,10 +220,10 @@ public class Launcher {
 	 * @param subgraphsPerNode The number of generated subgraphs per node
 	 * @param attemptsToFindSubgraph The number of attempts to find a subgraph
 	 * @throws FastGraphException If there is a problem in the kMedoids code
-	 * @throws FileNotFoundException If the output file cannot be saved
+	 * @throws IOException If the clusters cannot be saved
 	 */
 	public void approximateMotifs(FastGraph targetGraph, int minSize, int maxSize, int numOfClusters, int iterations, 
-			int subgraphsPerNode, int attemptsToFindSubgraph) throws FastGraphException, FileNotFoundException {
+			int subgraphsPerNode, int attemptsToFindSubgraph) throws FastGraphException, IOException {
 		
 		KMedoids km = new KMedoids(targetGraph, numOfClusters, iterations);
 		EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(targetGraph);

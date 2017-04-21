@@ -13,7 +13,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import test.uk.ac.kent.dover.TestRunner;
 import uk.ac.kent.displayGraph.Edge;
@@ -23,8 +25,10 @@ import uk.ac.kent.displayGraph.Node;
 import uk.ac.kent.displayGraph.NodeType;
 import uk.ac.kent.dover.fastGraph.Connected;
 import uk.ac.kent.dover.fastGraph.EdgeStructure;
+import uk.ac.kent.dover.fastGraph.ExactIsomorphism;
 import uk.ac.kent.dover.fastGraph.FastGraph;
 import uk.ac.kent.dover.fastGraph.FastGraphEdgeType;
+import uk.ac.kent.dover.fastGraph.FastGraphException;
 import uk.ac.kent.dover.fastGraph.Launcher;
 import uk.ac.kent.dover.fastGraph.NodeStructure;
 
@@ -604,6 +608,7 @@ public class FastGraphTest {
 	public void test090() throws IOException {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get0Node0Edge(),false);
 		g.saveBuffers(null,"test");
+
 		FastGraph g2 = FastGraph.loadBuffersGraphFactory(null,"test");
 		assertEquals("empty",g2.getName());
 		assertEquals(0,g2.getNumberOfNodes());
@@ -613,7 +618,11 @@ public class FastGraphTest {
 	@Test
 	public void test091() throws IOException {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get4Node5Edge(),false);
-		g.saveBuffers(null,"test");
+		try {
+			g.saveBuffers(null,"test");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		FastGraph g2 = FastGraph.loadBuffersGraphFactory(null,"test");
 		assertEquals("four nodes, five edges",g2.getName());
 		assertEquals(4,g2.getNumberOfNodes());
@@ -3058,8 +3067,27 @@ public class FastGraphTest {
 		assertEquals(1,(int)((ret.get(1)).get(0)));
 		assertEquals(5,(int)((ret.get(1)).get(1)));
 		
-
-		
 	}
 	
+
+	@Rule
+	public ExpectedException thrown1 = ExpectedException.none();
+	@Test
+	public void test159() throws Exception {
+		FastGraph g1;
+		g1 = FastGraph.randomGraphFactory(10,20,6,false);
+	    thrown1.expect(IOException.class);
+	    g1.saveBuffers(null,null);
+	}
+
+	@Rule
+	public ExpectedException thrown2 = ExpectedException.none();
+	@Test
+	public void test160() throws Exception {
+		FastGraph g1;
+		g1 = FastGraph.randomGraphFactory(10,20,6,false);
+	    thrown2.expect(IOException.class);
+	    g1.saveBuffers(null,"");
+	}
+
 }

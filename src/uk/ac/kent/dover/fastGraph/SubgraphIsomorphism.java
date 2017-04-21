@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.jsoup.nodes.Document;
@@ -20,8 +21,9 @@ public abstract class SubgraphIsomorphism {
 	 * @param sub The FastGraph to save
 	 * @param count The number of this FastGraph
 	 * @param mainDir The parent directory to save to
+	 * @throws IOException If the buffers cannot be saved 
 	 */
-	protected void saveSubgraph(FastGraph target, FastGraph sub, int count, File mainDir) {
+	protected void saveSubgraph(FastGraph target, FastGraph sub, int count, File mainDir) throws IOException {
 		//save graph
 		sub.setName(target.getName());
 		File dir = new File(mainDir.getAbsolutePath()+File.separatorChar+count);

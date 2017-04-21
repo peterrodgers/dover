@@ -91,10 +91,10 @@ public class Profiler {
 	 * 
 	 * @param nodesInEnumSubgraphs The number of nodes in enumerated subgraphs
 	 * @param subgraphsPerNode The number of subgraphs generated per node
-	 * @throws FileNotFoundException If the files cannot be found
+	 * @throws IOException If subgraphs cannot be saved or the files cannot be found
 	 */
 	public void profileApproximateSubgraphIsomorhpism(int nodesInEnumSubgraphs, int subgraphsPerNode, 
-			NodeComparator nc, EdgeComparator ec) throws FileNotFoundException {
+			NodeComparator nc, EdgeComparator ec) throws IOException {
 		long time = Debugger.createTime();
 		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(targetGraph, 
 				patternGraph, nodesInEnumSubgraphs, subgraphsPerNode, nc, ec);

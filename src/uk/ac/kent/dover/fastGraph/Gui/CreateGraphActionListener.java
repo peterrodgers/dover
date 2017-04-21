@@ -144,7 +144,14 @@ public class CreateGraphActionListener implements ActionListener{
 		fileSaveItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
 		fileSaveItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				fileSaveAs();
+				try {
+					fileSaveAs();
+				} catch (IOException e) {
+					status.setText(LauncherGUI.DEFAULT_STATUS_MESSAGE);
+					JOptionPane.showMessageDialog(panel, "The buffer could not be saved. \n" + e.getMessage(), 
+							"Error: IOException", JOptionPane.ERROR_MESSAGE);
+					e.printStackTrace();
+				}
 			}
 		});
 		fileMenu.add(fileSaveItem);
@@ -168,8 +175,9 @@ public class CreateGraphActionListener implements ActionListener{
 
 	/**
 	 * Saves a display graph as a FastGraph buffers to disk. Also updates GUI displays
+	 * @throws IOException if the graph cannot be saved
 	 */
-	protected void fileSaveAs() {
+	protected void fileSaveAs() throws IOException {
 		JFileChooser chooser = null;
 		if (currentFile == null) {
 			chooser = new JFileChooser(new File("."));

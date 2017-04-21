@@ -2,6 +2,7 @@ package uk.ac.kent.dover.fastGraph;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -333,9 +334,9 @@ public class ExactSubgraphIsomorphism extends SubgraphIsomorphism {
 
 	/**
 	 * Output the results of this subgraph finder
-	 * @throws FileNotFoundException If the output file cannot be created
+	 * @throws IOException If the buffers cannot be saved
 	 */
-	public void outputResults() throws FileNotFoundException {
+	public void outputResults() throws IOException {
 		File mainDir = new File(
 				Launcher.startingWorkingDirectory+File.separatorChar+"subgraph_results"+
 				File.separatorChar+targetGraph.getName()+"_"+Util.dateAsString()

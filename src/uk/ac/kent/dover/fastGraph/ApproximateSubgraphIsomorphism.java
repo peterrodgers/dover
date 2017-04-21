@@ -2,6 +2,7 @@ package uk.ac.kent.dover.fastGraph;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -61,11 +62,10 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 	
 	/**
 	 * Performs the approximate subgraph isomorphism
-	 * @throws FileNotFoundException If the output file cannot be created
-	 * 
 	 * @return The number of subgraphs that match
+	 * @throws IOException If a subgraph cannot be saved
 	 */
-	public int subgraphIsomorphismFinder() throws FileNotFoundException {
+	public int subgraphIsomorphismFinder() throws IOException {
 		//don't want to generate potential subgraphs that are smaller than the pattern being searched for
 		if(patternNodes < pattern.getNumberOfNodes()) {
 			Debugger.log("error");
@@ -117,8 +117,9 @@ public class ApproximateSubgraphIsomorphism extends SubgraphIsomorphism {
 	 * @param count The number of subgraphs that match so far
 	 * @param mainDir The parent directory to save to
 	 * @return The number of subgraphs that match
+	 * @throws IOException If a subgraph cannot be saved
 	 */
-	private int testSubgraphs(HashSet<FastGraph> subs, int count, File mainDir) {
+	private int testSubgraphs(HashSet<FastGraph> subs, int count, File mainDir) throws IOException {
 		//for each generated subgraph
 		for(FastGraph sub : subs) {
 			
