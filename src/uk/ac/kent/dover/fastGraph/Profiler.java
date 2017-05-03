@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import uk.ac.kent.dover.fastGraph.Gui.MotifTaskDummy;
 import uk.ac.kent.dover.fastGraph.comparators.*;
@@ -34,7 +35,7 @@ public class Profiler {
 		Debugger.enabled = false; //will mute all output except that below
 		
 		//User customisable variables for testing
-		String outputFileName = "approxSubgraphTesting"; //TODO change this as needed
+		String outputFileName = "approxMotifTesting"; //TODO change this as needed
 		String targetGraphName = "simple-random-n-10-e-20-time"; //TODO change this as needed
 		String patternGraphName = "2-line-time-2"; //TODO change this as needed
 		
@@ -42,6 +43,14 @@ public class Profiler {
 		File outputFile = new File(Launcher.startingWorkingDirectory+File.separatorChar+"profiling"+File.separatorChar+outputFileName+".csv");
 		FastGraph targetGraph = FastGraph.loadBuffersGraphFactory(null,targetGraphName);
 		FastGraph patternGraph = FastGraph.loadBuffersGraphFactory(null,patternGraphName);
+		
+		//approx motif testing
+		System.out.println("### Profiling motifs");
+		Profiler p = new Profiler(outputFile, targetGraph, null);
+		int size = 4, numOfClusters = 4, iterations = 2, subsPerNode = 5, attempts = 20; //TODO change this as needed
+		p.profileApproximateMotif(size, numOfClusters, iterations, subsPerNode, attempts); 
+		p.saveResult();
+		System.out.println("### Profiling motifs Complete");
 		
 	/*	
 		//exact motif testing
@@ -63,6 +72,7 @@ public class Profiler {
 		System.out.println("### Profiling subgraphs Complete");
 	*/
 		
+	/*	
 		//approximate subgraph testing
 		System.out.println("### Profiling approximate subgraphs");
 		Profiler p = new Profiler(outputFile, targetGraph, patternGraph);
@@ -71,7 +81,9 @@ public class Profiler {
 		p.profileApproximateSubgraphIsomorhpism(4, 10, snlc, selc); //TODO change this as needed
 		p.saveResult();
 		System.out.println("### Profiling approximate subgraphs Complete");
-		
+	 */
+	
+	
 	}
 	
 	/**
@@ -158,6 +170,34 @@ public class Profiler {
 		ProfilerResult pr = new ProfilerResult(targetGraph.getNumberOfNodes(), targetGraph.getNumberOfEdges(), targetGraph.getName(),
 				size, -1, "motif", -1, -1, totalSize, timeResult);
 		results.add(pr);
+	}
+	
+	/**
+	 * Profiles the approx motif finder for a given size
+	 * 
+	 * @param size The size of motif to test
+	 * @param numOfClusters The number of clusters
+	 * @param iterations The number of iterations
+	 * @param subsPerNode The number of subs per node
+	 * @param attempts The number of attempts
+	 */
+	public void profileApproximateMotif(int size, int numOfClusters, int iterations, int subsPerNode, int attempts) {
+		long time = Debugger.createTime();
+		try{
+			KMedoids km = new KMedoids(targetGraph, numOfClusters, iterations);
+			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(targetGraph);
+			HashSet<FastGraph> subs = esn.enumerateSubgraphs(size, subsPerNode, attempts);
+			ArrayList<FastGraph> subgraphs = new ArrayList<FastGraph>(subs);
+			ArrayList<ArrayList<FastGraph>> clusters = km.cluster(subgraphs);
+			km.saveClusters(clusters);
+			
+			long timeResult = Debugger.createTime()-time;
+			ProfilerResult pr = new ProfilerResult(targetGraph.getNumberOfNodes(), targetGraph.getNumberOfEdges(), targetGraph.getName(),
+					size, -1, "approxmotif", -1, -1, subs.size(), timeResult);
+			results.add(pr);
+		} catch(Exception e) {
+			
+		}
 	}
 	
 	/**
