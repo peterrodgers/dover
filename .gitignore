@@ -12,3 +12,5 @@ desktop.ini
 *.log
 subgraph_results/*
 kmedoids_results/*
+profiling/*
+!profiling/*.csv
