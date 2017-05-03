@@ -1,5 +1,6 @@
 package uk.ac.kent.dover.fastGraph;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -49,7 +50,7 @@ public class ArgParser {
 		Path path = Paths.get(graph);
 		FastGraph fg = ap.convertGraph(path);
 		fg.displayFastGraph(); //TODO Optional
-		fg.saveBuffers("profiling", path.getFileName().toString());
+		fg.saveBuffers("profiling"+File.separatorChar+path.getFileName().toString(), path.getFileName().toString());
 	}	
 	
 	/**
