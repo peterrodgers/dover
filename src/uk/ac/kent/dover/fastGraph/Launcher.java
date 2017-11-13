@@ -13,6 +13,8 @@ import uk.ac.kent.dover.fastGraph.comparators.NodeComparator;
 import uk.ac.kent.dover.fastGraph.comparators.SimpleEdgeLabelComparator;
 import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
 import uk.ac.kent.dover.fastGraph.comparators.TimeEdgeComparator;
+import uk.ac.kent.dover.fastGraph.graphSimilarity.GraphSimilarity;
+import uk.ac.kent.dover.fastGraph.graphSimilarity.NodeDegreeDifference;
 
 /**
  * Main class from which all the other functionality is called.
@@ -224,8 +226,10 @@ public class Launcher {
 	 */
 	public void approximateMotifs(FastGraph targetGraph, int minSize, int maxSize, int numOfClusters, int iterations, 
 			int subgraphsPerNode, int attemptsToFindSubgraph) throws FastGraphException, IOException {
-		
-		KMedoids km = new KMedoids(targetGraph, numOfClusters, iterations);
+
+/* TODO needs a list of possible graph similarity measures in interface */
+		GraphSimilarity similarityMeasure = new NodeDegreeDifference(false);
+		KMedoids km = new KMedoids(targetGraph, numOfClusters, iterations, similarityMeasure);
 		EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(targetGraph);
 		HashSet<FastGraph> subs = new HashSet<FastGraph>();
 		for(int i = minSize; i <= maxSize; i++) {

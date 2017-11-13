@@ -4,14 +4,9 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
-import test.uk.ac.kent.dover.fastGraph.AdjacencyMatrixTest;
-import test.uk.ac.kent.dover.fastGraph.ApproximateSubgraphIsomorphismTest;
-import test.uk.ac.kent.dover.fastGraph.ExactIsomorphismTest;
-import test.uk.ac.kent.dover.fastGraph.ExactMotifFinderTest;
-import test.uk.ac.kent.dover.fastGraph.ExactSubgraphIsomorphismTest;
-import test.uk.ac.kent.dover.fastGraph.FastGraphTest;
-import test.uk.ac.kent.dover.fastGraph.InducedSubgraphTest;
-import test.uk.ac.kent.dover.fastGraph.RandomTimeSliceTest;
+import test.uk.ac.kent.dover.fastGraph.*;
+import test.uk.ac.kent.dover.fastGraph.graphSimilarity.*;
+
 
 public class TestRunner {
 	public static void main(String[] args) {
@@ -60,6 +55,12 @@ public class TestRunner {
 		System.out.println(result.wasSuccessful());
 		
 		result = JUnitCore.runClasses(RandomTimeSliceTest.class);
+		for (Failure failure : result.getFailures()) {
+			System.out.println(failure.toString());
+		}
+		System.out.println(result.wasSuccessful());
+		
+		result = JUnitCore.runClasses(NodeDegreeDifferenceTest.class);
 		for (Failure failure : result.getFailures()) {
 			System.out.println(failure.toString());
 		}

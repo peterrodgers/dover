@@ -13,6 +13,8 @@ import java.util.HashSet;
 
 import uk.ac.kent.dover.fastGraph.Gui.MotifTaskDummy;
 import uk.ac.kent.dover.fastGraph.comparators.*;
+import uk.ac.kent.dover.fastGraph.graphSimilarity.GraphSimilarity;
+import uk.ac.kent.dover.fastGraph.graphSimilarity.NodeDegreeDifference;
 
 /**
  * Profiles the existing methods
@@ -184,7 +186,8 @@ public class Profiler {
 	public void profileApproximateMotif(int size, int numOfClusters, int iterations, int subsPerNode, int attempts) {
 		long time = Debugger.createTime();
 		try{
-			KMedoids km = new KMedoids(targetGraph, numOfClusters, iterations);
+			GraphSimilarity similarityMeasure = new NodeDegreeDifference(false);
+			KMedoids km = new KMedoids(targetGraph, numOfClusters, iterations, similarityMeasure);
 			EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(targetGraph);
 			HashSet<FastGraph> subs = esn.enumerateSubgraphs(size, subsPerNode, attempts);
 			ArrayList<FastGraph> subgraphs = new ArrayList<FastGraph>(subs);

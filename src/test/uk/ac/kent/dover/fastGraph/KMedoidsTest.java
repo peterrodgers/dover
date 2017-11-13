@@ -13,6 +13,8 @@ import uk.ac.kent.dover.fastGraph.EnumerateSubgraphNeighbourhood;
 import uk.ac.kent.dover.fastGraph.FastGraph;
 import uk.ac.kent.dover.fastGraph.FastGraphException;
 import uk.ac.kent.dover.fastGraph.KMedoids;
+import uk.ac.kent.dover.fastGraph.graphSimilarity.GraphSimilarity;
+import uk.ac.kent.dover.fastGraph.graphSimilarity.NodeDegreeDifference;
 
 public class KMedoidsTest {
 
@@ -22,7 +24,8 @@ public class KMedoidsTest {
 		int minSize = 3, maxSize = 3;
 		int numOfClusters = 2, iterations = 1;
 		int subsPerNode = 1, attempts = 20;
-		KMedoids km = new KMedoids(g1, numOfClusters, iterations);
+		GraphSimilarity similarityMeasure = new NodeDegreeDifference(false);
+		KMedoids km = new KMedoids(g1, numOfClusters, iterations, similarityMeasure);
 		EnumerateSubgraphNeighbourhood esn = new EnumerateSubgraphNeighbourhood(g1);
 		HashSet<FastGraph> subs = new HashSet<FastGraph>();
 		for(int i = minSize; i <= maxSize; i++) {//build a list of potential subgraphs

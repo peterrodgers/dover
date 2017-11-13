@@ -4167,10 +4167,8 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 	public int[] findDegreesOfAge(int age, ArrayList<Integer> nodes) {
 		int[] degrees = new int[nodes.size()];
 		for(int i = 0; i < nodes.size(); i++) {
-			if (this.getNodeAge(i) == age) {
-				int node = nodes.get(i);
-				degrees[i] = this.getNodeConnectingNodesOfSameAge(node).length;
-			}
+			int node = nodes.get(i);
+			degrees[i] = this.getNodeConnectingNodesOfSameAge(node).length;
 		}
 		
 		return degrees;
