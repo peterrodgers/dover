@@ -16,41 +16,42 @@ public class NodeDegreeDifference extends GraphSimilarity {
 
 
 	public static void main(String [ ] args) {
-	
+
+		final int MILLION = 1000000;
+		int numberOfNodes = MILLION/5;
+		int numberOfEdges = MILLION*2;
 		double similarity;
-		NodeStructure ns0,ns1,ns2;
-		EdgeStructure es0,es1,es2;
-		LinkedList<NodeStructure> addNodes;
-		LinkedList<EdgeStructure> addEdges;
 		FastGraph g1,g2;
-		NodeDegreeDifference ndd;
+		NodeDegreeDifference ndd = new NodeDegreeDifference(true);
+		long time;
 		
-		
-		addNodes = new LinkedList<NodeStructure>();
-		ns0 = new NodeStructure(0,"ns01", 1, (byte)0, (byte)0);
-		ns1 = new NodeStructure(1,"ns11", 1, (byte)0, (byte)0);
-		addNodes.add(ns0);
-		addNodes.add(ns1);
-		addEdges = new LinkedList<EdgeStructure>();
-		es0 = new EdgeStructure(0,"es01", 1, (byte)0, (byte)0, 1, 0);
-		addEdges.add(es0);
-		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
-		
-		addNodes = new LinkedList<NodeStructure>();
-		ns0 = new NodeStructure(0,"ns02", 1, (byte)0, (byte)0);
-		ns1 = new NodeStructure(1,"ns12", 1, (byte)0, (byte)0);
-		addNodes.add(ns0);
-		addNodes.add(ns1);
-		addEdges = new LinkedList<EdgeStructure>();
-		g2 = FastGraph.structureFactory("g2",(byte)0,addNodes,addEdges,false);
-//for(int i = 0; i < g1.getNumberOfNodes(); i++) {
-//	System.out.println("node "+i+" age "+g1.getNodeAge(i));
-//}
-		
-		ndd = new NodeDegreeDifference(false);
+		while(true) {
+			try {
+				if(numberOfEdges < MILLION) {
+					System.out.println("nodes "+numberOfNodes+" edges "+numberOfEdges);
+				} else {
+					System.out.println("nodes "+numberOfNodes/(MILLION*1.0)+" million edges "+numberOfEdges/(MILLION*1.0)+" million");
+				}
+				time = System.currentTimeMillis();
+				g1 = FastGraph.randomGraphFactory(numberOfNodes, numberOfEdges, false);
+				System.out.println("Random g1 created time: "+(System.currentTimeMillis()-time)/1000.0+" seconds");
+				time = System.currentTimeMillis();
+				
+				g2 = FastGraph.randomGraphFactory(numberOfNodes, numberOfEdges, false);
+				System.out.println("Random g2 created time: "+(System.currentTimeMillis()-time)/1000.0+" seconds");
+				time = System.currentTimeMillis();
+				
+				similarity = ndd.similarity(g1, g2);
+				System.out.println("Similarity: "+similarity+" time: "+(System.currentTimeMillis()-time)/1000.0+" seconds\n");
+				time = System.currentTimeMillis();
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				System.exit(1);
+			}
+			numberOfNodes *= 2;
+			numberOfEdges *= 2;
+		}
 	
-		similarity = ndd.similarity(g1, g2);
-System.out.println(similarity);
 	}
 	
 	
@@ -137,8 +138,6 @@ System.out.println(similarity);
 		double total = 0;
 		for(int i = 0; i < Math.max(buckets1.length, buckets2.length); i++) {
 			
-//System.out.println("buckets1["+i+"] "+buckets1[i]);
-//System.out.println("buckets2["+i+"] "+buckets2[i]);
 			if(i >= buckets1.length) {
 				total += buckets2[i];
 			} else if(i >= buckets2.length) {
