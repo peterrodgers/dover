@@ -54,6 +54,10 @@ System.out.println(similarity);
 	}
 	
 	
+	public NodeDegreeDifference() {
+		super();
+	}
+	
 	public NodeDegreeDifference(boolean directed) {
 		super(directed);
 	}

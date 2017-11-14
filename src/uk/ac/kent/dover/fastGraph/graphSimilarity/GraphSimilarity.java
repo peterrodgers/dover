@@ -13,7 +13,19 @@ public abstract class GraphSimilarity {
 	
 	boolean directed;
 	
-	
+
+	/**
+	 * defaults to treating graph as undirected.
+	 */
+	public GraphSimilarity() {
+		super();
+		this.directed = false;
+	}
+
+	/** 
+	 * 
+	 * @param directed Treat graph as directed if true, otherwise treat graph as undirected.
+	 */
 	public GraphSimilarity(boolean directed) {
 		super();
 		this.directed = directed;

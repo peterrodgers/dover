@@ -33,11 +33,13 @@ public class NodeDegreeDifferenceTest {
 		g2 = FastGraph.structureFactory("g2",(byte)0,addNodes,addEdges,false);
 		
 		ndd = new NodeDegreeDifference(false);
-		
 		similarity = ndd.similarity(g1, g2);
-
+		assertEquals(0, similarity, 0.001);
+		similarity = ndd.similarity(g2, g1);
 		assertEquals(0, similarity, 0.001);
 
+		// new test
+		
 		addNodes = new LinkedList<NodeStructure>();
 		ns0 = new NodeStructure(0,"ns01", 1, (byte)1, (byte)0);
 		ns1 = new NodeStructure(1,"ns11", 1, (byte)1, (byte)0);
@@ -58,10 +60,13 @@ public class NodeDegreeDifferenceTest {
 		addEdges.add(es0);
 		g2 = FastGraph.structureFactory("g2",(byte)0,addNodes,addEdges,false);
 
+		ndd = new NodeDegreeDifference();
 		similarity = ndd.similarity(g1, g2);
+		assertEquals(0, similarity, 0.001);
+		similarity = ndd.similarity(g2, g1);
+		assertEquals(0, similarity, 0.001);
 
-		ndd = new NodeDegreeDifference(false);
-		
+		// new test
 		
 		addNodes = new LinkedList<NodeStructure>();
 		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
@@ -96,9 +101,11 @@ public class NodeDegreeDifferenceTest {
 		g2 = FastGraph.structureFactory("g2",(byte)0,addNodes,addEdges,false);
 		
 		similarity = ndd.similarity(g1, g2);
-
+		assertEquals(0, similarity, 0.001);
+		similarity = ndd.similarity(g2, g1);
 		assertEquals(0, similarity, 0.001);
 
+		// new test
 		
 		addNodes = new LinkedList<NodeStructure>();
 		ns0 = new NodeStructure(0,"ns0", 1, (byte)0, (byte)0);
@@ -128,8 +135,10 @@ public class NodeDegreeDifferenceTest {
 		addEdges.add(es1);
 		g2 = FastGraph.structureFactory("g2",(byte)0,addNodes,addEdges,false);
 		
+		ndd = new NodeDegreeDifference(false);
 		similarity = ndd.similarity(g1, g2);
-
+		assertEquals(0, similarity, 0.001);
+		similarity = ndd.similarity(g2, g1);
 		assertEquals(0, similarity, 0.001);
 
 		
@@ -172,6 +181,8 @@ public class NodeDegreeDifferenceTest {
 		similarity = ndd.similarity(g2, g1);
 		assertEquals(4.0, similarity, 0.001);
 
+		// new test
+
 		addNodes = new LinkedList<NodeStructure>();
 		ns0 = new NodeStructure(0,"ns01", 1, (byte)0, (byte)0);
 		ns1 = new NodeStructure(1,"ns11", 1, (byte)0, (byte)0);
@@ -198,6 +209,8 @@ public class NodeDegreeDifferenceTest {
 		similarity = ndd.similarity(g2, g1);
 		assertEquals(4.0, similarity, 0.001);
 
+		// new test
+
 		addNodes = new LinkedList<NodeStructure>();
 		addEdges = new LinkedList<EdgeStructure>();
 		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
@@ -211,13 +224,14 @@ public class NodeDegreeDifferenceTest {
 		es0 = new EdgeStructure(0,"es02", 1, (byte)0, (byte)0, 0, 0);
 		addEdges.add(es0);
 		g2 = FastGraph.structureFactory("g2",(byte)0,addNodes,addEdges,false);
-		ndd = new NodeDegreeDifference(false);
 		
+		ndd = new NodeDegreeDifference();
 		similarity = ndd.similarity(g1, g2);
 		assertEquals(2.0, similarity, 0.001);
 		similarity = ndd.similarity(g2, g1);
 		assertEquals(2.0, similarity, 0.001);
 
+		// new test
 		
 		addNodes = new LinkedList<NodeStructure>();
 		ns0 = new NodeStructure(0,"ns01", 1, (byte)0, (byte)0);
@@ -255,6 +269,7 @@ public class NodeDegreeDifferenceTest {
 		similarity = ndd.similarity(g2, g1);
 		assertEquals(4.0, similarity, 0.001);
 
+		// new test
 
 		addNodes = new LinkedList<NodeStructure>();
 		ns0 = new NodeStructure(0,"ns01", 1, (byte)0, (byte)1);
@@ -282,6 +297,7 @@ public class NodeDegreeDifferenceTest {
 		similarity = ndd.similarity(g2, g1);
 		assertEquals(4.0, similarity, 0.001);
 
+		// new test
 
 		addNodes = new LinkedList<NodeStructure>();
 		ns0 = new NodeStructure(0,"ns01", 1, (byte)0, (byte)1);
