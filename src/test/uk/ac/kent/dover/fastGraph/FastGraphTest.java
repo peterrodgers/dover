@@ -31,6 +31,7 @@ import uk.ac.kent.dover.fastGraph.FastGraphEdgeType;
 import uk.ac.kent.dover.fastGraph.FastGraphException;
 import uk.ac.kent.dover.fastGraph.Launcher;
 import uk.ac.kent.dover.fastGraph.NodeStructure;
+import uk.ac.kent.dover.fastGraph.graphSimilarity.NodeDegreeDifference;
 
 
 /**
@@ -3104,5 +3105,6 @@ public class FastGraphTest {
 		assertEquals("testName",g2.getName());
 	    
 	}
+
 
 }

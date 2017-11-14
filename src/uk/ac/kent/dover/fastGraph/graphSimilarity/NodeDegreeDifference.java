@@ -1,12 +1,8 @@
 package uk.ac.kent.dover.fastGraph.graphSimilarity;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.*;
 
-import uk.ac.kent.dover.fastGraph.EdgeStructure;
-import uk.ac.kent.dover.fastGraph.FastGraph;
-import uk.ac.kent.dover.fastGraph.NodeStructure;
+import uk.ac.kent.dover.fastGraph.*;
 
 /**
  * Simplistic graph difference measure that returns the sum of difference in degree profiles of nodes in the two graphs.
@@ -31,31 +27,21 @@ public class NodeDegreeDifference extends GraphSimilarity {
 		
 		
 		addNodes = new LinkedList<NodeStructure>();
-		ns0 = new NodeStructure(0,"ns0", 1, (byte)0, (byte)0);
-		ns1 = new NodeStructure(1,"ns1", 1, (byte)0, (byte)0);
-		ns2 = new NodeStructure(2,"ns2", 1, (byte)0, (byte)1);
+		ns0 = new NodeStructure(0,"ns01", 1, (byte)0, (byte)0);
+		ns1 = new NodeStructure(1,"ns11", 1, (byte)0, (byte)0);
 		addNodes.add(ns0);
 		addNodes.add(ns1);
-		addNodes.add(ns2);
 		addEdges = new LinkedList<EdgeStructure>();
-		es0 = new EdgeStructure(0,"es0", 1, (byte)0, (byte)1, 2, 2);
-		es1 = new EdgeStructure(1,"es1", 1, (byte)0, (byte)0, 1, 0);
+		es0 = new EdgeStructure(0,"es01", 1, (byte)0, (byte)0, 1, 0);
 		addEdges.add(es0);
-		addEdges.add(es1);
 		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
 		
 		addNodes = new LinkedList<NodeStructure>();
-		ns0 = new NodeStructure(0,"ns0", 1, (byte)0, (byte)1);
-		ns1 = new NodeStructure(1,"ns1", 1, (byte)0, (byte)0);
-		ns2 = new NodeStructure(2,"ns2", 1, (byte)0, (byte)0);
+		ns0 = new NodeStructure(0,"ns02", 1, (byte)0, (byte)0);
+		ns1 = new NodeStructure(1,"ns12", 1, (byte)0, (byte)0);
 		addNodes.add(ns0);
 		addNodes.add(ns1);
-		addNodes.add(ns2);
 		addEdges = new LinkedList<EdgeStructure>();
-		es0 = new EdgeStructure(0,"es0", 1, (byte)0, (byte)1, 0, 0);
-		es1 = new EdgeStructure(1,"es1", 1, (byte)0, (byte)0, 1, 2);
-		addEdges.add(es0);
-		addEdges.add(es1);
 		g2 = FastGraph.structureFactory("g2",(byte)0,addNodes,addEdges,false);
 //for(int i = 0; i < g1.getNumberOfNodes(); i++) {
 //	System.out.println("node "+i+" age "+g1.getNodeAge(i));
@@ -64,6 +50,7 @@ public class NodeDegreeDifference extends GraphSimilarity {
 		ndd = new NodeDegreeDifference(false);
 	
 		similarity = ndd.similarity(g1, g2);
+System.out.println(similarity);
 	}
 	
 	
@@ -85,11 +72,6 @@ public class NodeDegreeDifference extends GraphSimilarity {
 		return ret;
 	}
 
-	private double directedDegreeDifference(FastGraph g1, FastGraph g2) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
 	
 	private double undirectedDegreeDifference(FastGraph g1, FastGraph g2) {
 		int minAgeG1 = g1.findMinimumNodeAge();
@@ -104,9 +86,8 @@ public class NodeDegreeDifference extends GraphSimilarity {
 		for(int i = 0; i <= maxAge-minAge; i++) {
 			//find the degree buckets for this age, do the comparison and store the result only
 
-			int[] buckets1 = populateUndirectedDegreeBuckets(g1, i);
-			int[] buckets2 = populateUndirectedDegreeBuckets(g2, i);
-			
+			int[] buckets1 = g1.findDegreeProfileAtAge(i);
+			int[] buckets2 = g2.findDegreeProfileAtAge(i);
 			result += findDifferenceInDegreeProfiles(buckets1, buckets2);
 		}		
 		return result;		
@@ -114,6 +95,33 @@ public class NodeDegreeDifference extends GraphSimilarity {
 
 	
 	
+
+	private double directedDegreeDifference(FastGraph g1, FastGraph g2) {
+		int minAgeG1 = g1.findMinimumNodeAge();
+		int minAgeG2 = g2.findMinimumNodeAge();
+		int maxAgeG1 = g1.findMaximumNodeAge();
+		int maxAgeG2 = g2.findMaximumNodeAge();
+		
+		int minAge = Math.min(minAgeG1, minAgeG2);
+		int maxAge = Math.max(maxAgeG1, maxAgeG2);
+
+		double result = 0;
+		for(int i = 0; i <= maxAge-minAge; i++) {
+			//find the degree buckets for this age, do the comparison and store the result only
+
+			int[] inBuckets1 = g1.findInDegreeProfileAtAge(i);
+			int[] inBuckets2 = g2.findInDegreeProfileAtAge(i);
+			result += findDifferenceInDegreeProfiles(inBuckets1, inBuckets2);
+			
+			int[] outBuckets1 = g1.findOutDegreeProfileAtAge(i);
+			int[] outBuckets2 = g2.findOutDegreeProfileAtAge(i);
+			result += findDifferenceInDegreeProfiles(outBuckets1, outBuckets2);
+
+		}		
+		return result;		
+	}
+
+
 	/**
 	 * Finds the difference in degree profile between two graphs
 	 * @param buckets1 The first set of buckets
@@ -133,28 +141,11 @@ public class NodeDegreeDifference extends GraphSimilarity {
 				total += buckets1[i];
 			} else {
 				total += Math.abs(buckets1[i] - buckets2[i]);
-			}		
+			}
 		}		
 		return total;
 
 	}
 	
-	/**
-	 * Populates degree buckets with the profiles of each degree
-	 * 
-	 * @param g1 The graph to run on
-	 * @return The buckets
-	 */
-	private int[] populateUndirectedDegreeBuckets(FastGraph g, int age) {
-		int maxDegree = g.maximumDegree();
-		int[] degreeBuckets = new int[maxDegree+1];
-		ArrayList<Integer> nodesOfAge = g.findAllNodesOfAge(age);
-		int[] degrees = g.findDegreesOfAge(age, nodesOfAge);
-		
-		g.findDegreeBuckets(degreeBuckets,degrees);
-		return degreeBuckets;
-	}
-
-
 
 }

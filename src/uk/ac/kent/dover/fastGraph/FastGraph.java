@@ -715,7 +715,7 @@ public class FastGraph {
 		int age = this.getNodeAge(nodeIndex);
 		
 		for(int i = 0; i < degree; i++) {
-			// don't need the edge, so step over edge/node pairs and the ege
+			// don't need the edge, so step over edge/node pairs and the edge
 			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_NODE_OFFSET;
 			int node = connectionBuf.getInt(nodeOffset);
 			if(age == this.getNodeAge(node)) {
@@ -726,6 +726,8 @@ public class FastGraph {
 		return Util.convertArrayList(ret);
 	}
 	
+	
+
 	/**
 	 * @param nodeIndex the node
 	 * @return all node neighbours. 
@@ -4156,23 +4158,66 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		return degrees;
 	}
 	
+	
+
 	/**
-	 * Finds the the degrees of each node at a certain age.
+	 * Finds an array where the each array index gives the number of nodes at that age with the degree
 	 * 
 	 * @param age The age to consider
-	 * @param nodes The list of nodes
-	 * 
-	 * @return an array containing the degrees
+	 * @return the degree profile at the given age
 	 */
-	public int[] findDegreesOfAge(int age, ArrayList<Integer> nodes) {
-		int[] degrees = new int[nodes.size()];
-		for(int i = 0; i < nodes.size(); i++) {
-			int node = nodes.get(i);
-			degrees[i] = this.getNodeConnectingNodesOfSameAge(node).length;
+	public int[] findDegreeProfileAtAge(int age) {
+		int[] degrees = new int[maximumDegree()+1];
+		Arrays.fill(degrees, 0);
+		for(int i = 0; i < getNumberOfNodes(); i++) {
+			if(getNodeAge(i) == age) {
+				int degree = getNodeDegree(i);
+				degrees[degree]++;
+			}
 		}
-		
 		return degrees;
 	}
+	
+	
+	/**
+	 * Finds an array where the each array index gives the number of nodes at that age with the indegree. Indegree is
+	 * the number of edges entering the node
+	 * 
+	 * @param age The age to consider
+	 * @return the indegree profile at the given age
+	 */
+	public int[] findInDegreeProfileAtAge(int age) {
+		int[] degrees = new int[maximumInDegree()+1];
+		Arrays.fill(degrees, 0);
+		for(int i = 0; i < getNumberOfNodes(); i++) {
+			if(getNodeAge(i) == age) {
+				int degree = getNodeInDegree(i);
+				degrees[degree]++;
+			}
+		}
+		return degrees;
+	}
+	
+	
+	/**
+	 * Finds an array where the each array index gives the number of nodes at that age with the outdegree. Outdegree is
+	 * the number of edges leaving the node
+	 * 
+	 * @param age The age to consider
+	 * @return the outdegree profile at the given age
+	 */
+	public int[] findOutDegreeProfileAtAge(int age) {
+		int[] degrees = new int[maximumOutDegree()+1];
+		Arrays.fill(degrees, 0);
+		for(int i = 0; i < getNumberOfNodes(); i++) {
+			if(getNodeAge(i) == age) {
+				int degree = getNodeOutDegree(i);
+				degrees[degree]++;
+			}
+		}
+		return degrees;
+	}
+	
 	
 	/**
 	 * populate buckets index with the number of nodes that have degree index
