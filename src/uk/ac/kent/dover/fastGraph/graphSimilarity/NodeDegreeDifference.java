@@ -15,7 +15,7 @@ import uk.ac.kent.dover.fastGraph.*;
 public class NodeDegreeDifference extends GraphSimilarity {
 
 
-	public static void main(String [ ] args) {
+	public static void main(String [] args) {
 
 		final int MILLION = 1000000;
 		int numberOfNodes = MILLION/5;

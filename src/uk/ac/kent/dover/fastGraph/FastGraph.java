@@ -705,12 +705,63 @@ public class FastGraph {
 	
 
 	/**
+	 * All connecting nodes of same age.
+	 * 
 	 * @param nodeIndex the node
 	 * @return all node neighbours. 
 	 */
 	public int[] getNodeConnectingNodesOfSameAge(int nodeIndex) {
 		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeIndex*NODE_BYTE_SIZE); // in offset is the first one
 		int degree = getNodeDegree(nodeIndex);
+		ArrayList<Integer> ret = new ArrayList<Integer>(degree);
+		int age = this.getNodeAge(nodeIndex);
+		
+		for(int i = 0; i < degree; i++) {
+			// don't need the edge, so step over edge/node pairs and the edge
+			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_NODE_OFFSET;
+			int node = connectionBuf.getInt(nodeOffset);
+			if(age == this.getNodeAge(node)) {
+				ret.add(node);
+			}
+		}
+		
+		return Util.convertArrayList(ret);
+	}
+	
+	
+	/**
+	 * All connecting nodes of same age that are connected by edges pointing at the given parameter node.
+	 * 
+	 * @param nodeIndex the node
+	 * @return all node neighbours. 
+	 */
+	public int[] getNodeConnectingInNodesOfSameAge(int nodeIndex) {
+		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeIndex*NODE_BYTE_SIZE); // in offset is the first one
+		int degree = getNodeInDegree(nodeIndex);
+		ArrayList<Integer> ret = new ArrayList<Integer>(degree);
+		int age = this.getNodeAge(nodeIndex);
+		
+		for(int i = 0; i < degree; i++) {
+			// don't need the edge, so step over edge/node pairs and the edge
+			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_NODE_OFFSET;
+			int node = connectionBuf.getInt(nodeOffset);
+			if(age == this.getNodeAge(node)) {
+				ret.add(node);
+			}
+		}
+		
+		return Util.convertArrayList(ret);
+	}
+	
+	/**
+	 * All connecting nodes of same age that are connected by edges pointing away from the given parameter node.
+	 * 
+	 * @param nodeIndex the node
+	 * @return all node neighbours. 
+	 */
+	public int[] getNodeConnectingOutNodesOfSameAge(int nodeIndex) {
+		int connectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+nodeIndex*NODE_BYTE_SIZE); // in offset is the first one
+		int degree = getNodeOutDegree(nodeIndex);
 		ArrayList<Integer> ret = new ArrayList<Integer>(degree);
 		int age = this.getNodeAge(nodeIndex);
 		
@@ -4145,7 +4196,7 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 	}
 	
 	/**
-	 * Finds the the degrees of each node.
+	 * Finds the degrees of each node.
 	 * 
 	 * @return an array containing the degrees
 	 */
@@ -4153,6 +4204,37 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		int[] degrees = new int[this.getNumberOfNodes()];
 		for(int i = 0; i < this.getNumberOfNodes(); i++) {
 			degrees[i] = this.getNodeDegree(i);
+		}
+		
+		return degrees;
+	}
+	
+	/**
+	 * Finds the indegrees of each node. This is the number of nodes connecting
+	 * where the edge points at the node.
+	 * 
+	 * @return an array containing the indegrees
+	 */
+	public int[] findInDegrees() {
+		int[] degrees = new int[this.getNumberOfNodes()];
+		for(int i = 0; i < this.getNumberOfNodes(); i++) {
+			degrees[i] = this.getNodeInDegree(i);
+		}
+		
+		return degrees;
+	}
+	
+	
+	/**
+	 * Finds the outdegrees of each node. This is the number of nodes connecting
+	 * where the edge points away from the node.
+	 * 
+	 * @return an array containing the outdegrees
+	 */
+	public int[] findOutDegrees() {
+		int[] degrees = new int[this.getNumberOfNodes()];
+		for(int i = 0; i < this.getNumberOfNodes(); i++) {
+			degrees[i] = this.getNodeOutDegree(i);
 		}
 		
 		return degrees;

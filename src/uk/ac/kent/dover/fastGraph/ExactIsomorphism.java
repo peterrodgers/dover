@@ -1,11 +1,9 @@
 package uk.ac.kent.dover.fastGraph;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
+
+import static org.junit.Assert.assertTrue;
+
+import java.util.*;
 
 import uk.ac.kent.displayGraph.Graph;
 
@@ -20,28 +18,49 @@ public class ExactIsomorphism {
 	private int DECIMAL_PLACES = 6; // number of decimal places to round to
 	
 	private FastGraph fastGraph;
+	private boolean directed; // if true, treat the graph as directed, false undirected
 	private AdjacencyMatrix am1;
 	private AdjacencyMatrix am2;
 	private int[][] matrix1;
 	private int[][] matrix2;
 	private double[] eigenvalues1;
 	private double[] eigenvalues2;
-
 	
 	private int[] matches1;
 	private int[] matches2;
 
 	private int[] degrees1;
 	private int[] degrees2;
+	
+	private int[] inDegrees1;
+	private int[] inDegrees2;
+	private int[] outDegrees1;
+	private int[] outDegrees2;
+
 
 	private int[] degreeBuckets1; // how many of nodes each degree
 	private int[] degreeBuckets2; // how many of nodes each degree
 	
+	private int[] inDegreeBuckets1; // how many of nodes each degree
+	private int[] inDegreeBuckets2; // how many of nodes each degree
+	private int[] outDegreeBuckets1; // how many of nodes each degree
+	private int[] outDegreeBuckets2; // how many of nodes each degree
+	
 	private int maxDegree1;
 	private int maxDegree2;
 
+	private int maxInDegree1;
+	private int maxInDegree2;
+	private int maxOutDegree1;
+	private int maxOutDegree2;
+
 	private ArrayList<HashSet<Integer>> neighbours1;  // Non self-sourcing neighbour nodes for each node
 	private ArrayList<HashSet<Integer>> neighbours2;  // Non self-sourcing neighbour nodes for each node
+
+	private ArrayList<HashSet<Integer>> inNeighbours1;  // Non self-sourcing neighbour nodes for each node
+	private ArrayList<HashSet<Integer>> inNeighbours2;  // Non self-sourcing neighbour nodes for each node
+	private ArrayList<HashSet<Integer>> outNeighbours1;  // Non self-sourcing neighbour nodes for each node
+	private ArrayList<HashSet<Integer>> outNeighbours2;  // Non self-sourcing neighbour nodes for each node
 
 	private static int numberOfIsomorphismTests = 0;
 	private static int numberOfOldIsomorphismTests = 0;
@@ -62,20 +81,70 @@ public class ExactIsomorphism {
 	private static int failOnBruteForce = 0;
 	private static int succeed = 0;
 	
-	/**
-	 * Call this after getting true from a call to isomorphism().
-	 * 
-	 * @return the nodes matched from graph if the last call to isomorphism() returned true, undefined otherwise
-	 */
-	public int[] getLastMatch() {
-		return matches1;
+	public static void main(String [] args) {
+		FastGraph g1,g2;
+		ExactIsomorphism ei;
+		
+		try {
+
+			int nodes = 50;
+			int edges = 500;
+			long time;
+			while(true) {
+				g1 = FastGraph.randomGraphFactory(nodes, edges, false);
+				g2 = ExactIsomorphism.generateRandomIsomorphicGraph(g1, System.currentTimeMillis(), false);
+				time = System.currentTimeMillis();
+				if(!Connected.connected(g1)) {
+					continue;
+				}
+				if(ExactIsomorphism.isomorphic(g1, g2, false)) {
+					System.out.println("Ids changed undirected isomorphic nodes "+nodes+" edges "+edges+" time "+(System.currentTimeMillis()-time)/1000.0);
+				} else {
+					System.out.println("NOT ISOMORPHIC Ids changed undirected isomorphic nodes "+nodes+" edges "+edges+" time "+(System.currentTimeMillis()-time)/1000.0+" saving");
+					g1.saveBuffers(".", System.currentTimeMillis()+"A");
+					g2.saveBuffers(".", System.currentTimeMillis()+"A");
+				}
+				time = System.currentTimeMillis();
+				if(ExactIsomorphism.isomorphic(g1, g2, true)) {
+					System.out.println("Ids changed directed isomorphic nodes "+nodes+" edges "+edges+" time "+(System.currentTimeMillis()-time)/1000.0);
+				} else {
+					System.out.println("NOT ISOMORPHIC Ids changed directed isomorphic nodes "+nodes+" edges "+edges+" time "+(System.currentTimeMillis()-time)/1000.0+" saving");
+					g1.saveBuffers(".", System.currentTimeMillis()+"Q");
+					g2.saveBuffers(".", System.currentTimeMillis()+"R");
+				}
+				
+				g2 = FastGraph.randomGraphFactory(nodes, edges, false);
+				if(!Connected.connected(g2)) {
+					continue;
+				}
+				time = System.currentTimeMillis();
+				if(ExactIsomorphism.isomorphic(g1, g2, false)) {
+					System.out.println("Random undirected isomorphic nodes "+nodes+" edges "+edges+" time "+(System.currentTimeMillis()-time)/1000.0);
+				} else {
+					System.out.println("Random undirected not isomorphic nodes "+nodes+" edges "+edges+" time "+(System.currentTimeMillis()-time)/1000.0);
+				}
+				time = System.currentTimeMillis();
+				if(ExactIsomorphism.isomorphic(g1, g2, true)) {
+					System.out.println("Random directed isomorphic nodes "+nodes+" edges "+edges+" time "+(System.currentTimeMillis()-time)/1000.0);
+				} else {
+					System.out.println("Random directed not isomorphic nodes "+nodes+" edges "+edges+" time "+(System.currentTimeMillis()-time)/1000.0);
+				}
+				nodes *= 1.1;
+				edges *= 1.1;
+				System.out.println("NODES "+nodes+" EDGES "+edges);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
+	
 	
 	/**
 	 *
-	 * Create an ExactIsomorphism before running isomorphic. This makes multiple tests against
-	 * one graph to be more efficient as data for that graph does not need to be recreated. The
-	 * graph must be connected.
+	 * Create an ExactIsomorphism before running isomorphic for undirected graphs.
+	 * This makes multiple tests against one graph to be more efficient as data
+	 * for that graph does not need to be recreated. The graph must be connected.
 	 * 
 	 * @param fastGraph one graph to be tested.
 	 * @throws FastGraphException if the graph is not connected
@@ -84,6 +153,34 @@ public class ExactIsomorphism {
 	public ExactIsomorphism(FastGraph fastGraph) throws FastGraphException {
 
 		this.fastGraph = fastGraph;
+		this.directed = false;
+		init();
+	}
+
+	/**
+	 *
+	 * Create an ExactIsomorphism before running isomorphic.
+	 * This makes multiple tests against one graph to be more efficient as
+	 * data for that graph does not need to be recreated. The
+	 * graph must be connected.
+	 * 
+	 * @param fastGraph one graph to be tested.
+	 * @param directed true if the graphs should be treated as directed, false if they are undirected
+	 * @throws FastGraphException if the graph is not connected
+	 *
+	 */
+	public ExactIsomorphism(FastGraph fastGraph, boolean directed) throws FastGraphException {
+
+		this.fastGraph = fastGraph;
+		this.directed = directed;
+		init();
+	}
+	
+
+	/**
+	 * initialize the class
+	 */
+	private void init() throws FastGraphException {
 
 		if(!Connected.connected(fastGraph)) {
 			throw new FastGraphException("Graphs must be connected to test for isomorphism.");
@@ -100,16 +197,670 @@ public class ExactIsomorphism {
 		
 		matches1 = new int[fastGraph.getNumberOfNodes()];
 		matches2 = new int[fastGraph.getNumberOfNodes()];
-		
-		degrees1 = fastGraph.findDegrees();
-		
-		maxDegree1 = fastGraph.maximumDegree();
 
-		degreeBuckets1 = new int[maxDegree1+1];
-		fastGraph.findDegreeBuckets(degreeBuckets1,degrees1);
-		
-		neighbours1 = findNeighbours(fastGraph,maxDegree1);
+		if(!directed) {
+			degrees1 = fastGraph.findDegrees();
+			
+			maxDegree1 = fastGraph.maximumDegree();
+	
+			degreeBuckets1 = new int[maxDegree1+1];
+			fastGraph.findDegreeBuckets(degreeBuckets1,degrees1);
+			
+			neighbours1 = findNeighbours(fastGraph,maxDegree1);
+		} else {
+			inDegrees1 = fastGraph.findInDegrees();
+			outDegrees1 = fastGraph.findOutDegrees();
+			
+			maxInDegree1 = fastGraph.maximumInDegree();
+			maxOutDegree1 = fastGraph.maximumOutDegree();
+	
+			inDegreeBuckets1 = new int[maxInDegree1+1];
+			fastGraph.findDegreeBuckets(inDegreeBuckets1,inDegrees1);
+			outDegreeBuckets1 = new int[maxOutDegree1+1];
+			fastGraph.findDegreeBuckets(outDegreeBuckets1,outDegrees1);
+			
+			inNeighbours1 = findInNeighbours(fastGraph,maxInDegree1);
+			outNeighbours1 = findOutNeighbours(fastGraph,maxOutDegree1);
+		}
 	}
+	
+	/**
+	 * Call this after getting true from a call to isomorphism().
+	 * 
+	 * @return the nodes matched from the graph passed to the constructor to the graph
+	 * passed to {@link isomorphic}, if the last call to isomorphism() returned true, undefined otherwise
+	 */
+	public int[] getLastMatch() {
+		return matches1;
+	}
+
+	
+	/**
+	 * Equality of graphs. Returns a mapping if this graph is equal
+	 * to the given graph. Graphs must be connected. Resultant mapping on returning
+	 * true can be found with {@link getLastMapping}
+	 *
+	 * @param g the graph to compare
+	 * @return true if there is an equality with the given graph, null if is not.
+	 * @throws FastGraphException if the graph is disconnected
+	 */
+	public boolean isomorphic(FastGraph g) throws FastGraphException {
+		boolean ret = true;
+		if(directed) {
+			ret = directedIsomorphic(g);
+		} else {
+			ret = undirectedIsomorphic(g);
+		}
+		return ret;
+	}
+
+
+	
+	/**
+	 * Equality of undirected graphs. Returns a mapping if this graph is equal
+	 * to the given graph. Graphs must be connected.
+	 *
+	 * @param g the graph to compare
+	 * @return true if there is an equality with the given graph, null if is not.
+	 * @throws FastGraphException if the graph is disconnected
+	 */
+	public boolean undirectedIsomorphic(FastGraph g) throws FastGraphException {
+numberOfIsomorphismTests++;
+isomorphismStartTime = System.currentTimeMillis();
+
+		FastGraph g1 = fastGraph;
+		FastGraph g2 = g;
+		
+		int numberOfNodes1 = g1.getNumberOfNodes();
+		int numberOfNodes2 = g2.getNumberOfNodes();
+
+		int numberOfEdges1 = g1.getNumberOfEdges();
+		int numberOfEdges2 = g2.getNumberOfEdges();
+
+		// ensure that the same graph returns true
+		if(g1 == g2) {
+			return(true);
+		}
+		
+		if(numberOfNodes1 == 0 && numberOfNodes2 == 0) {
+//System.out.println("Isomorphic: empty graphs");
+succeed++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+			return true;
+		}
+
+// note that the following two tests are reasonable, but have been commented out as defined behaviour on disconnected graph is to throw exception
+/*		if(!Connected.connected(g1) && Connected.connected(g2)) {
+			return false;
+		}
+		if(Connected.connected(g1) && !Connected.connected(g2)) {
+			return false;
+		}
+*/
+		if(!Connected.connected(g2)) {
+			throw new FastGraphException("Graph must be connected to test for isomorphism.");
+		}
+				
+		if(numberOfNodes1 != numberOfNodes2) {
+//System.out.println("Not isomorphic: different number of nodes");
+failOnNodeCount++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+			return false;
+		}
+				
+		if(numberOfEdges1 != numberOfEdges2) {
+//System.out.println("Not isomorphic: different number of edges");
+failOnEdgeCount++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+			return false;
+		}
+		
+		degrees2 = g.findDegrees();
+		
+		maxDegree2 = g.maximumDegree();
+
+		// check the number of nodes at each degree
+		degreeBuckets2 = new int[maxDegree2+1];
+		g.findDegreeBuckets(degreeBuckets2,degrees2);
+		if(!Arrays.equals(degreeBuckets1, degreeBuckets2)) {
+//System.out.println("Not isomorphic: different quantities of nodes with the same degree");
+failOnDegreeComparison++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+			return false;
+		}
+
+		
+		
+		am2 = new AdjacencyMatrix(g);
+		matrix2 = am2.buildIntAdjacencyMatrix();
+		eigenvalues2 = am2.findEigenvalues(matrix2);
+		eigenvalues2 = Util.roundArray(eigenvalues2, DECIMAL_PLACES);
+//System.out.println(Arrays.toString(eigenvalues1));
+//System.out.println(Arrays.toString(eigenvalues2));
+		if(!compareEigenValues(eigenvalues2)) {
+//System.out.println("Not isomorphic: eigenvalues are different");
+failOnEigenvalues++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+			return false;
+		}
+		
+if(isomorphismStartTime == -1) {
+	isomorphismStartTime = System.currentTimeMillis();
+}
+		
+		neighbours2 = findNeighbours(g,maxDegree2);
+		
+		int[] numberOfMatches = new int[numberOfNodes1]; // gives the number of relevant elements in the second array of possibleMatches 
+		int[][] possibleMatches = new int[numberOfNodes1][numberOfNodes1]; // first element is the node, second is a list of potential matches
+		
+		for(int n1 = 0; n1 < numberOfNodes1; n1++) {
+			int i = 0;
+			for(int n2 = 0; n2 < numberOfNodes2; n2++) {
+				if(matrix1[n1][n1] != matrix2[n2][n2]) { // check that they have the same number of self sourcing edges
+					continue;
+				}
+				if(degrees1[n1] != degrees2[n2]) { // make sure the number of connecting edges is equal
+					continue;
+				}
+				possibleMatches[n1][i] = n2;
+				i++;
+			}
+			if(i == 0) {
+//System.out.println("Not isomorphic: no possible match for node "+n1+" from g1");
+failOnNodeMatches++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+				return false;
+			}
+			numberOfMatches[n1] = i;
+//System.out.println("node "+n1+" number of matches "+numberOfMatches[n1]+" possibleMatches "+Arrays.toString(possibleMatches[n1]));
+		}
+
+		bruteForceStartTime = System.currentTimeMillis();
+		
+		int[] matchesIndex = new int[numberOfNodes1]; // current indexes for the search
+		Arrays.fill(matchesIndex,-1);
+		Arrays.fill(matches1,-1);
+		Arrays.fill(matches2,-1);
+
+		// backtracking search here
+		int currentNode = 0;
+		matchesIndex[currentNode] = 0;
+		while(currentNode < numberOfNodes1) {
+
+//System.out.println("current progress "+Arrays.toString(matchesIndex));
+
+			if(matchesIndex[currentNode] == numberOfMatches[currentNode]) { // backtrack here to previous node if all nodes have been tried
+//System.out.println("Backtracking from node "+ currentNode+ " matched node "+matches1[currentNode]);
+				if(matches1[currentNode] != -1) {
+					matches2[matches1[currentNode]] = -1;
+				}
+				matches1[currentNode] = -1;
+				matchesIndex[currentNode] = -1;
+				matchesIndex[currentNode]= 0;
+				currentNode--;
+				if(currentNode == -1) {
+//System.out.println("Not isomorphic: brute force");
+failOnBruteForce++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+timeForBruteForceTests += System.currentTimeMillis()-bruteForceStartTime;
+bruteForceStartTime = -1;		
+					return false;
+				}
+				if(matches1[currentNode] != -1) { // reset the previous match
+					matches2[matches1[currentNode]] = -1;
+				}
+				matches1[currentNode] = -1; // reset the previous match
+				matchesIndex[currentNode]++; // increment to the next node of the previous
+				continue; // might have to happen multiple times
+			}
+
+			
+			int possibleMatch = possibleMatches[currentNode][matchesIndex[currentNode]];
+			if(isAnUndirectedMatch(currentNode,possibleMatch)) { // successful match, try the next node
+//System.out.println("SUCCESSFUL match node "+ currentNode+" with node "+possibleMatch);
+				matches1[currentNode] = possibleMatch;
+				matches2[possibleMatch] = currentNode;
+				currentNode++;
+				if(currentNode == numberOfNodes1) {
+//System.out.println("Isomorphic");
+succeed++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+timeForBruteForceTests += System.currentTimeMillis()-bruteForceStartTime;
+bruteForceStartTime = -1;		
+					return true;
+				}
+				matchesIndex[currentNode] = 0;
+			} else {
+//System.out.println("Not a successful match node "+ currentNode+" with node "+possibleMatch);
+				matchesIndex[currentNode]++; // fail so try the next node
+			}
+
+		}
+
+// Never gets to here
+System.out.println("Isomorphic - Should never get to here");
+succeed++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+timeForBruteForceTests += System.currentTimeMillis()-bruteForceStartTime;
+bruteForceStartTime = -1;		
+		return true;
+		
+	}
+	
+	
+	
+
+	/**
+	 * Check to see if the matched neighbours of n1 are neighbours of n2.
+	 * Checks number of connecting edges, assumes checks on number of neighbours for each node has been performed.
+	 * 
+	 * @param n1 node in fastGraph
+	 * @param n2 node in g
+	 * @return true if the neighbours match, false otherwise
+	 */
+	private boolean isAnUndirectedMatch(int n1, int n2) {
+		
+		
+//if(n1 == 2 && n2 == 1) {
+//System.out.println("AAA");
+//}
+		if(matches1[n1] != -1) {
+			return false;
+		}
+		if(matches2[n2] != -1) {
+			return false;
+		}
+		
+		HashSet<Integer> n1Neighbours = neighbours1.get(n1);
+		HashSet<Integer> n2Neighbours = neighbours2.get(n2);
+
+		int numberOfn1NeigboursMatched = 0;
+		for(int node : n1Neighbours) {
+			
+			
+			int matchNode = matches1[node];
+			if(matchNode == -1) { // no match, so nothing to do here
+				continue;
+			}
+			if(!n2Neighbours.contains(matchNode)) { // a neighbour of n1 has a matched node that is not a neigbour of n2
+				return false;
+			}
+			
+			/*
+			// removed edges Count check, never seems to be used
+			int edgeCount = matrix1[n1][node];
+			int matchedEdgeCount = matrix2[n2][matchNode];
+			if(edgeCount != matchedEdgeCount) { // different number of edge between the nodes and the matched nodes
+//System.out.println("edge counts differ");
+				return false;
+			}
+			*/
+			
+			numberOfn1NeigboursMatched++;
+		}
+
+		// now test it the other way - are all matched neighbours of n2 neighbours of n1
+		int numberOfn2NeigboursMatched = 0;
+		for(int node : n2Neighbours) {
+			int matchNode = matches2[node];
+			if(matchNode == -1) { // no match, so nothing to do here
+				continue;
+			}
+			if(!n1Neighbours.contains(matchNode)) { // a neighbour of n2 has a matched node that is not a neighbour of n1
+				return false;
+			}
+			numberOfn2NeigboursMatched++;
+		}
+		
+		// test the same number of matches
+		if(numberOfn1NeigboursMatched != numberOfn2NeigboursMatched) {
+			return false;
+		}
+
+
+		return true;
+	}
+	
+	
+
+	/**
+	 * Equality of directed graphs. Returns a mapping if this graph is equal
+	 * to the given graph. Graphs must be connected.
+	 *
+	 * @param g the graph to compare
+	 * @return true if there is an equality with the given graph, null if is not.
+	 * @throws FastGraphException if the graph is disconnected
+	 */
+	private boolean directedIsomorphic(FastGraph g) throws FastGraphException {
+numberOfIsomorphismTests++;
+isomorphismStartTime = System.currentTimeMillis();
+
+		FastGraph g1 = fastGraph;
+		FastGraph g2 = g;
+		
+		int numberOfNodes1 = g1.getNumberOfNodes();
+		int numberOfNodes2 = g2.getNumberOfNodes();
+
+		int numberOfEdges1 = g1.getNumberOfEdges();
+		int numberOfEdges2 = g2.getNumberOfEdges();
+
+		// ensure that the same graph returns true
+		if(g1 == g2) {
+			return(true);
+		}
+		
+		if(numberOfNodes1 == 0 && numberOfNodes2 == 0) {
+//System.out.println("Isomorphic: empty graphs");
+succeed++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+			return true;
+		}
+
+// note that the following two tests are reasonable, but have been commented out as defined behaviour on disconnected graph is to throw exception
+/*		if(!Connected.connected(g1) && Connected.connected(g2)) {
+			return false;
+		}
+		if(Connected.connected(g1) && !Connected.connected(g2)) {
+			return false;
+		}
+*/
+		if(!Connected.connected(g2)) {
+			throw new FastGraphException("Graph must be connected to test for isomorphism.");
+		}
+				
+		if(numberOfNodes1 != numberOfNodes2) {
+//System.out.println("Not isomorphic: different number of nodes");
+failOnNodeCount++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+			return false;
+		}
+				
+		if(numberOfEdges1 != numberOfEdges2) {
+//System.out.println("Not isomorphic: different number of edges");
+failOnEdgeCount++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+			return false;
+		}
+		
+		inDegrees2 = g.findInDegrees();
+		outDegrees2 = g.findOutDegrees();
+		
+		maxInDegree2 = g.maximumInDegree();
+		maxOutDegree2 = g.maximumOutDegree();
+
+		// check the number of nodes at each degree
+		inDegreeBuckets2 = new int[maxInDegree2+1];
+		g.findDegreeBuckets(inDegreeBuckets2,inDegrees2);
+		if(!Arrays.equals(inDegreeBuckets1, inDegreeBuckets2)) {
+//System.out.println("Not isomorphic: different quantities of nodes with the same indegree");
+failOnDegreeComparison++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+			return false;
+		}
+
+		outDegreeBuckets2 = new int[maxOutDegree2+1];
+		g.findDegreeBuckets(outDegreeBuckets2,outDegrees2);
+		if(!Arrays.equals(outDegreeBuckets1, outDegreeBuckets2)) {
+//System.out.println("Not isomorphic: different quantities of nodes with the same outdegree");
+failOnDegreeComparison++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+			return false;
+		}
+		
+		
+		am2 = new AdjacencyMatrix(g);
+		matrix2 = am2.buildIntAdjacencyMatrix();
+		eigenvalues2 = am2.findEigenvalues(matrix2);
+		eigenvalues2 = Util.roundArray(eigenvalues2, DECIMAL_PLACES);
+		if(!compareEigenValues(eigenvalues2)) {
+//System.out.println("Not isomorphic: eigenvalues are different");
+failOnEigenvalues++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+			return false;
+		}
+		
+if(isomorphismStartTime == -1) {
+	isomorphismStartTime = System.currentTimeMillis();
+}
+		
+		inNeighbours2 = findInNeighbours(g,maxInDegree2);
+		outNeighbours2 = findOutNeighbours(g,maxOutDegree2);
+		
+		int[] numberOfMatches = new int[numberOfNodes1]; // gives the number of relevant elements in the second array of possibleMatches 
+		int[][] possibleMatches = new int[numberOfNodes1][numberOfNodes1]; // first element is the node, second is a list of potential matches
+		
+		for(int n1 = 0; n1 < numberOfNodes1; n1++) {
+			int i = 0;
+			for(int n2 = 0; n2 < numberOfNodes2; n2++) {
+				if(matrix1[n1][n1] != matrix2[n2][n2]) { // check that they have the same number of self sourcing edges
+					continue;
+				}
+				if(inDegrees1[n1] != inDegrees2[n2]) { // make sure the number of connecting in edges is equal
+					continue;
+				}
+				if(outDegrees1[n1] != outDegrees2[n2]) { // make sure the number of connecting out edges is equal
+					continue;
+				}
+				possibleMatches[n1][i] = n2;
+				i++;
+			}
+			if(i == 0) {
+//System.out.println("Not isomorphic: no possible match for node "+n1+" from g1");
+failOnNodeMatches++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+				return false;
+			}
+			numberOfMatches[n1] = i;
+//System.out.println("node "+n1+" number of matches "+numberOfMatches[n1]+" possibleMatches "+Arrays.toString(possibleMatches[n1]));
+		}
+
+		bruteForceStartTime = System.currentTimeMillis();
+		
+		int[] matchesIndex = new int[numberOfNodes1]; // current indexes for the search
+		Arrays.fill(matchesIndex,-1);
+		Arrays.fill(matches1,-1);
+		Arrays.fill(matches2,-1);
+
+		// backtracking search here
+		int currentNode = 0;
+		matchesIndex[currentNode] = 0;
+		while(currentNode < numberOfNodes1) {
+
+//System.out.println("current progress "+Arrays.toString(matchesIndex));
+
+			if(matchesIndex[currentNode] == numberOfMatches[currentNode]) { // backtrack here to previous node if all nodes have been tried
+//System.out.println("Backtracking from node "+ currentNode+ " matched node "+matches1[currentNode]);
+				if(matches1[currentNode] != -1) {
+					matches2[matches1[currentNode]] = -1;
+				}
+				matches1[currentNode] = -1;
+				matchesIndex[currentNode] = -1;
+				matchesIndex[currentNode]= 0;
+				currentNode--;
+				if(currentNode == -1) {
+//System.out.println("Not isomorphic: brute force");
+failOnBruteForce++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+timeForBruteForceTests += System.currentTimeMillis()-bruteForceStartTime;
+bruteForceStartTime = -1;		
+					return false;
+				}
+				if(matches1[currentNode] != -1) { // reset the previous match
+					matches2[matches1[currentNode]] = -1;
+				}
+				matches1[currentNode] = -1; // reset the previous match
+				matchesIndex[currentNode]++; // increment to the next node of the previous
+				continue; // might have to happen multiple times
+			}
+
+			
+			int possibleMatch = possibleMatches[currentNode][matchesIndex[currentNode]];
+			if(isADirectedMatch(currentNode,possibleMatch)) { // successful match, try the next node
+//System.out.println("SUCCESSFUL match node "+ currentNode+" with node "+possibleMatch);
+				matches1[currentNode] = possibleMatch;
+				matches2[possibleMatch] = currentNode;
+				currentNode++;
+				if(currentNode == numberOfNodes1) {
+//System.out.println("Isomorphic");
+succeed++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+timeForBruteForceTests += System.currentTimeMillis()-bruteForceStartTime;
+bruteForceStartTime = -1;		
+					return true;
+				}
+				matchesIndex[currentNode] = 0;
+			} else {
+//System.out.println("Not a successful match node "+ currentNode+" with node "+possibleMatch);
+				matchesIndex[currentNode]++; // fail so try the next node
+			}
+
+		}
+
+// Never gets to here
+//System.out.println("Isomorphic - Should never get to here");
+succeed++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+timeForBruteForceTests += System.currentTimeMillis()-bruteForceStartTime;
+bruteForceStartTime = -1;		
+		return true;
+		
+	}
+
+	
+	/**
+	 * Check to see if the matched neighbours of n1 are neighbours of n2.
+	 * Checks number of connecting in and out edges, assumes checks on number of neighbours for each node has been performed.
+	 * 
+	 * @param n1 node in fastGraph
+	 * @param n2 node in g
+	 * @return true if the neighbours match, false otherwise
+	 */
+	private boolean isADirectedMatch(int n1, int n2) {
+
+		if(matches1[n1] != -1) {
+			return false;
+		}
+		if(matches2[n2] != -1) {
+			return false;
+		}
+		
+		// InNeighbours first
+		
+		HashSet<Integer> n1InNeighbours = inNeighbours1.get(n1);
+		HashSet<Integer> n2InNeighbours = inNeighbours2.get(n2);
+
+		int numberOfn1NeigboursMatched = 0;
+		for(int node : n1InNeighbours) {
+			
+			int matchNode = matches1[node];
+			if(matchNode == -1) { // no match, so nothing to do here
+				continue;
+			}
+			if(!n2InNeighbours.contains(matchNode)) { // a neighbour of n1 has a matched node that is not a neigbour of n2
+				return false;
+			}
+			
+			/*
+			// removed edges Count check, never seems to be used
+			int edgeCount = matrix1[n1][node];
+			int matchedEdgeCount = matrix2[n2][matchNode];
+			if(edgeCount != matchedEdgeCount) { // different number of edge between the nodes and the matched nodes
+//System.out.println("edge counts differ");
+				return false;
+			}
+			*/
+			
+			numberOfn1NeigboursMatched++;
+		}
+
+		// now test it the other way - are all matched neighbours of n2 neighbours of n1
+		int numberOfn2NeigboursMatched = 0;
+		for(int node : n2InNeighbours) {
+			int matchNode = matches2[node];
+			if(matchNode == -1) { // no match, so nothing to do here
+				continue;
+			}
+			if(!n1InNeighbours.contains(matchNode)) { // a neighbour of n2 has a matched node that is not a neighbour of n1
+				return false;
+			}
+			numberOfn2NeigboursMatched++;
+		}
+		
+		// test the same number of in node matches
+		if(numberOfn1NeigboursMatched != numberOfn2NeigboursMatched) {
+			return false;
+		}
+
+		// Now test OutNeighbours
+		
+		HashSet<Integer> n1OutNeighbours = outNeighbours1.get(n1);
+		HashSet<Integer> n2OutNeighbours = outNeighbours2.get(n2);
+
+		numberOfn1NeigboursMatched = 0;
+		for(int node : n1OutNeighbours) {
+			
+			int matchNode = matches1[node];
+			if(matchNode == -1) { // no match, so nothing to do here
+				continue;
+			}
+			if(!n2OutNeighbours.contains(matchNode)) { // a neighbour of n1 has a matched node that is not a neigbour of n2
+				return false;
+			}
+			
+			/*
+			// removed edges Count check, never seems to be used
+			int edgeCount = matrix1[n1][node];
+			int matchedEdgeCount = matrix2[n2][matchNode];
+			if(edgeCount != matchedEdgeCount) { // different number of edge between the nodes and the matched nodes
+//System.out.println("edge counts differ");
+				return false;
+			}
+			*/
+			
+			numberOfn1NeigboursMatched++;
+		}
+
+		// now test it the other way - are all matched neighbours of n2 neighbours of n1
+		numberOfn2NeigboursMatched = 0;
+		for(int node : n2OutNeighbours) {
+			int matchNode = matches2[node];
+			if(matchNode == -1) { // no match, so nothing to do here
+				continue;
+			}
+			if(!n1OutNeighbours.contains(matchNode)) { // a neighbour of n2 has a matched node that is not a neighbour of n1
+				return false;
+			}
+			numberOfn2NeigboursMatched++;
+		}
+		
+		// test the same number of out node matches
+		if(numberOfn1NeigboursMatched != numberOfn2NeigboursMatched) {
+			return false;
+		}
+
+		return true;
+	}
+
+
 
 	/**
 	 * Generate a string that can be used to put graph in buckets before final brute force comparison.
@@ -176,280 +927,63 @@ public class ExactIsomorphism {
 		}
 		return ret;
 	}
-
-	/**
-	 * Equality of graphs. Returns a mapping if this graph is equal
-	 * to the given graph. Graphs must be connected.
-	 *
-	 * @param g the graph to compare
-	 * @return true if there is an equality with the given graph, null if is not.
-	 * @throws FastGraphException if the graph is disconnected
-	 */
-	public boolean isomorphic(FastGraph g) throws FastGraphException {
-numberOfIsomorphismTests++;
-isomorphismStartTime = System.currentTimeMillis();
-
-		FastGraph g1 = fastGraph;
-		FastGraph g2 = g;
-		
-		int numberOfNodes1 = g1.getNumberOfNodes();
-		int numberOfNodes2 = g2.getNumberOfNodes();
-
-		int numberOfEdges1 = g1.getNumberOfEdges();
-		int numberOfEdges2 = g2.getNumberOfEdges();
-
-		// ensure that the same graph returns true
-		if(g1 == g2) {
-			return(true);
-		}
-		
-		if(numberOfNodes1 == 0 && numberOfNodes2 == 0) {
-//System.out.println("Isomorphic: empty graphs");
-succeed++;
-timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
-isomorphismStartTime = -1;		
-			return true;
-		}
-
-// note that the following two tests are reasonable, but have been commented out as defined behaviour on disconnected graph is to throw exception
-/*		if(!Connected.connected(g1) && Connected.connected(g2)) {
-			return false;
-		}
-		if(Connected.connected(g1) && !Connected.connected(g2)) {
-			return false;
-		}
-*/
-		if(!Connected.connected(g2)) {
-			throw new FastGraphException("Graph must be connected to test for isomorphism.");
-		}
-				
-		if(numberOfNodes1 != numberOfNodes2) {
-//System.out.println("Not isomorphic: different number of edges");
-failOnNodeCount++;
-timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
-isomorphismStartTime = -1;		
-			return false;
-		}
-				
-		if(numberOfEdges1 != numberOfEdges2) {
-//System.out.println("Not isomorphic: different number of nodes");
-failOnEdgeCount++;
-timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
-isomorphismStartTime = -1;		
-			return false;
-		}
-		
-		degrees2 = g.findDegrees();
-		
-		maxDegree2 = g.maximumDegree();
-
-		// check the number of nodes at each degree
-		degreeBuckets2 = new int[maxDegree2+1];
-		g.findDegreeBuckets(degreeBuckets2,degrees2);
-		if(!Arrays.equals(degreeBuckets1, degreeBuckets2)) {
-//System.out.println("Not isomorphic: different quantities of nodes with the same degree");
-failOnDegreeComparison++;
-timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
-isomorphismStartTime = -1;		
-			return false;
-		}
-
-		
-		
-		am2 = new AdjacencyMatrix(g);
-		matrix2 = am2.buildIntAdjacencyMatrix();
-		eigenvalues2 = am2.findEigenvalues(matrix2);
-		eigenvalues2 = Util.roundArray(eigenvalues2, DECIMAL_PLACES);
-//System.out.println(Arrays.toString(eigenvalues1));
-//System.out.println(Arrays.toString(eigenvalues2));
-		if(!compareEigenValues(eigenvalues2)) {
-//System.out.println("Not isomorphic: eigenvalues are different");
-failOnEigenvalues++;
-timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
-isomorphismStartTime = -1;		
-			return false;
-		}
-		
-if(isomorphismStartTime == -1) {
-	isomorphismStartTime = System.currentTimeMillis();
-}
-		
-		neighbours2 = findNeighbours(g,maxDegree2);
-		
-		int[] numberOfMatches = new int[numberOfNodes1]; // gives the number of relevant elements in the second array of possibleMatches 
-		int[][] possibleMatches = new int[numberOfNodes1][numberOfNodes1]; // first element is the node, second is a list of potential matches
-		
-		for(int n1 = 0; n1 < numberOfNodes1; n1++) {
-			int i = 0;
-			for(int n2 = 0; n2 < numberOfNodes2; n2++) {
-				if(matrix1[n1][n1] != matrix2[n2][n2]) { // check that they have the same number of self sourcing edges
-					continue;
-				}
-				if(degrees1[n1] != degrees2[n2]) { // make sure the number of connecting edges is equal
-					continue;
-				}
-				possibleMatches[n1][i] = n2;
-				i++;
-			}
-			if(i == 0) {
-//System.out.println("Not isomorphic: no possible match for a node");
-failOnNodeMatches++;
-timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
-isomorphismStartTime = -1;		
-				return false;
-			}
-			numberOfMatches[n1] = i;
-//System.out.println("node "+n1+" number of matches "+numberOfMatches[n1]+" possibleMatches "+Arrays.toString(possibleMatches[n1]));
-		}
-
-		bruteForceStartTime = System.currentTimeMillis();
-		
-		int[] matchesIndex = new int[numberOfNodes1]; // current indexes for the search
-		Arrays.fill(matchesIndex,-1);
-		Arrays.fill(matches1,-1);
-		Arrays.fill(matches2,-1);
-
-		// backtracking search here
-		int currentNode = 0;
-		matchesIndex[currentNode] = 0;
-		while(currentNode < numberOfNodes1) {
-
-//System.out.println("current progress "+Arrays.toString(matchesIndex));
-
-			if(matchesIndex[currentNode] == numberOfMatches[currentNode]) { // backtrack here to previous node if all nodes have been tried
-//System.out.println("Backtracking from node "+ currentNode+ " matched node "+matches1[currentNode]);
-				if(matches1[currentNode] != -1) {
-					matches2[matches1[currentNode]] = -1;
-				}
-				matches1[currentNode] = -1;
-				matchesIndex[currentNode] = -1;
-				matchesIndex[currentNode]= 0;
-				currentNode--;
-				if(currentNode == -1) {
-//System.out.println("Not isomorphic: brute force");
-failOnBruteForce++;
-timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
-isomorphismStartTime = -1;		
-timeForBruteForceTests += System.currentTimeMillis()-bruteForceStartTime;
-bruteForceStartTime = -1;		
-					return false;
-				}
-				if(matches1[currentNode] != -1) { // reset the previous match
-					matches2[matches1[currentNode]] = -1;
-				}
-				matches1[currentNode] = -1; // reset the previous match
-				matchesIndex[currentNode]++; // increment to the next node of the previous
-				continue; // might have to happen multiple times
-			}
-
-			
-			int possibleMatch = possibleMatches[currentNode][matchesIndex[currentNode]];
-			if(isAMatch(currentNode,possibleMatch)) { // successful match, try the next node
-//System.out.println("SUCCESSFUL match node "+ currentNode+" with node "+possibleMatch);
-				matches1[currentNode] = possibleMatch;
-				matches2[possibleMatch] = currentNode;
-				currentNode++;
-				if(currentNode == numberOfNodes1) {
-//System.out.println("Isomorphic");
-succeed++;
-timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
-isomorphismStartTime = -1;		
-timeForBruteForceTests += System.currentTimeMillis()-bruteForceStartTime;
-bruteForceStartTime = -1;		
-					return true;
-				}
-				matchesIndex[currentNode] = 0;
-			} else {
-//System.out.println("Not a successful match node "+ currentNode+" with node "+possibleMatch);
-				matchesIndex[currentNode]++; // fail so try the next node
-			}
-
-		}
-
-// Never gets to here
-System.out.println("Isomorphic - Should never get to here");
-succeed++;
-timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
-isomorphismStartTime = -1;		
-timeForBruteForceTests += System.currentTimeMillis()-bruteForceStartTime;
-bruteForceStartTime = -1;		
-		return true;
-		
-	}
-
 	
-
 	/**
-	 * Check to see if the matched neighbours of n1 are neighbours of n2.
-	 * Checks number of connecting edges, assumes checks on number of neighbours for each node has been performed.
+	 * gives the neighbours of nodes in g which are connected by edges pointing at the node,
+	 * without duplicates and without self sourcing.
 	 * 
-	 * @param n1 node in fastGraph
-	 * @param n2 node in g
-	 * @return true if the neighbours match, false otherwise
+	 * @param g the graph
+	 * @param maxDegree The maximum indegree of the nodes
+	 * @return the neighbours for each node in the graph
 	 */
-	private boolean isAMatch(int n1, int n2) {
+	public static ArrayList<HashSet<Integer>> findInNeighbours(FastGraph g, int maxDegree) {
 		
-		
-//if(n1 == 2 && n2 == 1) {
-//System.out.println("AAA");
-//}
-		if(matches1[n1] != -1) {
-			return false;
-		}
-		if(matches2[n2] != -1) {
-			return false;
-		}
-		
-		HashSet<Integer> n1Neighbours = neighbours1.get(n1);
-		HashSet<Integer> n2Neighbours = neighbours2.get(n2);
-
-		int numberOfn1NeigboursMatched = 0;
-		for(int node : n1Neighbours) {
-			
-			
-			int matchNode = matches1[node];
-			if(matchNode == -1) { // no match, so nothing to do here
-				continue;
+		ArrayList<HashSet<Integer>> ret = new ArrayList<HashSet<Integer>>(g.getNumberOfNodes());
+		for(int n = 0; n < g.getNumberOfNodes(); n++) {
+			HashSet<Integer> neighbours = new HashSet<Integer>(maxDegree);
+			int[] connections = g.getNodeConnectingInNodesOfSameAge(n);
+			for(int i = 0; i < connections.length; i++) {
+				Integer connectingNode = connections[i];
+				if(n == connectingNode) {
+					continue;
+				}
+				if(!neighbours.contains(connectingNode)) {
+					neighbours.add(connectingNode);
+				}
 			}
-			if(!n2Neighbours.contains(matchNode)) { // a neighbour of n1 has a matched node that is not a neigbour of n2
-				return false;
-			}
-			
-			/*
-			// removed edges Count check, never seems to be used
-			int edgeCount = matrix1[n1][node];
-			int matchedEdgeCount = matrix2[n2][matchNode];
-			if(edgeCount != matchedEdgeCount) { // different number of edge between the nodes and the matched nodes
-//System.out.println("edge counts differ");
-				return false;
-			}
-			*/
-			
-			numberOfn1NeigboursMatched++;
+			ret.add(neighbours);
 		}
-
-		// now test it the other way - are all matched neighbours of n2 neighbours of n1
-		int numberOfn2NeigboursMatched = 0;
-		for(int node : n2Neighbours) {
-			int matchNode = matches2[node];
-			if(matchNode == -1) { // no match, so nothing to do here
-				continue;
-			}
-			if(!n1Neighbours.contains(matchNode)) { // a neighbour of n2 has a matched node that is not a neighbour of n1
-				return false;
-			}
-			numberOfn2NeigboursMatched++;
-		}
-		
-		// test the same number of matches
-		if(numberOfn1NeigboursMatched != numberOfn2NeigboursMatched) {
-			return false;
-		}
-
-
-		return true;
+		return ret;
 	}
-
+	
+	
+	/**
+	 * gives the neighbours of nodes in g which are connected by edges pointing away from the node,
+	 * without duplicates and without self sourcing.
+	 * 
+	 * @param g the graph
+	 * @param maxDegree The maximum indegree of the nodes
+	 * @return the neighbours for each node in the graph
+	 */
+	public static ArrayList<HashSet<Integer>> findOutNeighbours(FastGraph g, int maxDegree) {
+		
+		ArrayList<HashSet<Integer>> ret = new ArrayList<HashSet<Integer>>(g.getNumberOfNodes());
+		for(int n = 0; n < g.getNumberOfNodes(); n++) {
+			HashSet<Integer> neighbours = new HashSet<Integer>(maxDegree);
+			int[] connections = g.getNodeConnectingOutNodesOfSameAge(n);
+			for(int i = 0; i < connections.length; i++) {
+				Integer connectingNode = connections[i];
+				if(n == connectingNode) {
+					continue;
+				}
+				if(!neighbours.contains(connectingNode)) {
+					neighbours.add(connectingNode);
+				}
+			}
+			ret.add(neighbours);
+		}
+		return ret;
+	}
 
 
 	/**
@@ -469,27 +1003,27 @@ bruteForceStartTime = -1;
 
 		return iso;
 	}
-
-
 		
-
-	/**
-	 * Check if the given graph has the same structure as the graph passed to the constructor.
-	 * 
-	 * @param g the FastGraph to be tested
-	 * @return true if the two graphs are isomorphic, false otherwise
-	 */
-	public boolean isomorphicOld(FastGraph g) {
-		
-		Graph displayGraph = fastGraph.generateDisplayGraph();
-		Graph dg = g.generateDisplayGraph();
-		boolean iso = displayGraph.isomorphic(dg);
-		return iso;
-	}
 
 
 	/**
 	 * Check if two graphs have the same structure. Use the constructor and non static method if
+	 * lots of comparisons are going to be made against the same graph.
+	 * 
+	 * @param g1 one FastGraph to be tested
+	 * @param g2 the other FastGraph to be tested
+	 * @param directed false if the graphs are treated as undirected, true if they are directed
+	 * @return true if g1 and g2 are isomorphic, false otherwise
+	 * @throws FastGraphException 
+	 */
+	public static boolean isomorphic(FastGraph g1, FastGraph g2, boolean directed) throws FastGraphException {
+		ExactIsomorphism ei = new ExactIsomorphism(g1,directed);
+		boolean ret = ei.isomorphic(g2);
+		return ret;
+	}
+	
+	/**
+	 * Check if two undirected graphs have the same structure. Use the constructor and non static method if
 	 * lots of comparisons are going to be made against the same graph.
 	 * 
 	 * @param g1 one FastGraph to be tested
@@ -503,6 +1037,22 @@ bruteForceStartTime = -1;
 		return ret;
 	}
 	
+
+	/**
+	 * Check if the given graph has the same structure as the graph passed to the constructor.
+	 * Only for undirected graphs.
+	 * 
+	 * @param g the FastGraph to be tested
+	 * @return true if the two graphs are isomorphic, false otherwise
+	 */
+	public boolean isomorphicOld(FastGraph g) {
+		
+		Graph displayGraph = fastGraph.generateDisplayGraph();
+		Graph dg = g.generateDisplayGraph();
+		boolean iso = displayGraph.isomorphic(dg);
+		return iso;
+	}
+
 
 	/**
 	 * Compare graphs by their eigenvalues

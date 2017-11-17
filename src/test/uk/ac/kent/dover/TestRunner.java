@@ -508,7 +508,7 @@ public class TestRunner {
 	public static String get5Node7EdgeA() {
 	
 		String json = "{\n";
-		json += "\"name\": \"four nodes, five edges\",\n";
+		json += "\"name\": \"five nodes, seven edges A\",\n";
 		json += "\"nodes\": [\n";
 		json += "{\n";
 		json += "\"nodeIndex\": \"0\",\n";
@@ -623,7 +623,7 @@ public class TestRunner {
 	public static String get5Node7EdgeB() {
 	
 		String json = "{\n";
-		json += "\"name\": \"four nodes, five edges\",\n";
+		json += "\"name\": \"five nodes, seven edges B\",\n";
 		json += "\"nodes\": [\n";
 		json += "{\n";
 		json += "\"nodeIndex\": \"0\",\n";
@@ -738,7 +738,7 @@ public class TestRunner {
 	public static String get5Node7EdgeC() {
 	
 		String json = "{\n";
-		json += "\"name\": \"four nodes, five edges\",\n";
+		json += "\"name\": \"five nodes, seven edges A\",\n";
 		json += "\"nodes\": [\n";
 		json += "{\n";
 		json += "\"nodeIndex\": \"0\",\n";

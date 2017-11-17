@@ -1,20 +1,13 @@
 package test.uk.ac.kent.dover.fastGraph;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.*;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 
 import test.uk.ac.kent.dover.TestRunner;
@@ -1560,46 +1553,46 @@ public class FastGraphTest {
 		g = FastGraph.jsonStringGraphFactory(TestRunner.get0Node0Edge(),false);
 		arr = g.degreeProfile();
 		int[] correct1 = new int[0];
-		Assert.assertArrayEquals(correct1,arr);
+		assertArrayEquals(correct1,arr);
 		arr = g.inDegreeProfile();
 		int[] correct1a = new int[0];
-		Assert.assertArrayEquals(correct1a,arr);
+		assertArrayEquals(correct1a,arr);
 		arr = g.outDegreeProfile();
 		int[] correct1b = new int[0];
-		Assert.assertArrayEquals(correct1b,arr);
+		assertArrayEquals(correct1b,arr);
 		
 		g = FastGraph.jsonStringGraphFactory(TestRunner.get1Node0Edge(),false);
 		arr = g.degreeProfile();
 		int[] correct2 = {1};
-		Assert.assertArrayEquals(correct2,arr);
+		assertArrayEquals(correct2,arr);
 		arr = g.inDegreeProfile();
 		int[] correct2a = {1};
-		Assert.assertArrayEquals(correct2a,arr);
+		assertArrayEquals(correct2a,arr);
 		arr = g.outDegreeProfile();
 		int[] correct2b = {1};
-		Assert.assertArrayEquals(correct2b,arr);
+		assertArrayEquals(correct2b,arr);
 		
 		g = FastGraph.jsonStringGraphFactory(TestRunner.get5Node5Edge(),false);
 		arr = g.degreeProfile();
 		int[] correct3 = {0,1,3,1};
-		Assert.assertArrayEquals(correct3,arr);
+		assertArrayEquals(correct3,arr);
 		arr = g.inDegreeProfile();
 		int[] correct3a = {1,3,1};
-		Assert.assertArrayEquals(correct3a,arr);
+		assertArrayEquals(correct3a,arr);
 		arr = g.outDegreeProfile();
 		int[] correct3b = {1,3,1};
-		Assert.assertArrayEquals(correct3b,arr);
+		assertArrayEquals(correct3b,arr);
 		
 		g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		arr = g.degreeProfile();
 		int[] correct4 = {0,1,0,1};
-		Assert.assertArrayEquals(correct4,arr);
+		assertArrayEquals(correct4,arr);
 		arr = g.inDegreeProfile();
 		int[] correct4a = {0,2};
-		Assert.assertArrayEquals(correct4a,arr);
+		assertArrayEquals(correct4a,arr);
 		arr = g.outDegreeProfile();
 		int[] correct4b = {1,0,1};
-		Assert.assertArrayEquals(correct4b,arr);
+		assertArrayEquals(correct4b,arr);
 		
 	}
 
@@ -1613,15 +1606,15 @@ public class FastGraphTest {
 		assertTrue((g.getEdgeNode1(1) != g1.getEdgeNode1(1)) || (g.getEdgeNode2(1) != g1.getEdgeNode2(1)));
 		assertTrue((g.getEdgeNode1(0) != g1.getEdgeNode1(0)) || (g.getEdgeNode1(1) != g1.getEdgeNode1(1)) || (g.getEdgeNode1(2) != g1.getEdgeNode1(2)) || (g.getEdgeNode1(3) != g1.getEdgeNode1(3)) || (g.getEdgeNode1(4) != g1.getEdgeNode1(4)));
 		assertTrue((g.getEdgeNode2(0) != g1.getEdgeNode2(0)) || (g.getEdgeNode2(1) != g1.getEdgeNode2(1)) || (g.getEdgeNode2(2) != g1.getEdgeNode2(2)) || (g.getEdgeNode2(3) != g1.getEdgeNode2(3)) || (g.getEdgeNode2(4) != g1.getEdgeNode2(4)));
-		Assert.assertArrayEquals(g.inDegreeProfile(),g1.inDegreeProfile());
-		Assert.assertArrayEquals(g.outDegreeProfile(),g1.outDegreeProfile());
+		assertArrayEquals(g.inDegreeProfile(),g1.inDegreeProfile());
+		assertArrayEquals(g.outDegreeProfile(),g1.outDegreeProfile());
 		
 		g = FastGraph.jsonStringGraphFactory(TestRunner.get4Node5Edge(),false);
 		g1 = g.generateRandomRewiredGraph(10,111);
 		assertTrue(g1.checkConsistency());
 		assertTrue((g.getEdgeNode1(1) != g1.getEdgeNode1(1)) || (g.getEdgeNode2(1) != g1.getEdgeNode2(1)));
-		Assert.assertArrayEquals(g.inDegreeProfile(),g1.inDegreeProfile());
-		Assert.assertArrayEquals(g.outDegreeProfile(),g1.outDegreeProfile());
+		assertArrayEquals(g.inDegreeProfile(),g1.inDegreeProfile());
+		assertArrayEquals(g.outDegreeProfile(),g1.outDegreeProfile());
 		
 	}
 	
@@ -3103,7 +3096,273 @@ public class FastGraphTest {
 	    g2 = FastGraph.loadBuffersGraphFactory(null,"testName");
 		assertEquals("testName",g1.getName());
 		assertEquals("testName",g2.getName());
-	    
+	}
+
+
+	@Test
+	public void test162() throws Exception {
+		FastGraph g1;
+		int[] intArray;
+		Graph dg1;
+		
+		dg1 = new Graph("dg1");
+		g1 = FastGraph.displayGraphFactory(dg1, false);
+
+		intArray = new int[0];
+		assertArrayEquals(intArray,g1.findDegrees());
+		intArray = new int[0];
+		assertArrayEquals(intArray,g1.findInDegrees());
+		intArray = new int[0];
+		assertArrayEquals(intArray,g1.findOutDegrees());
+		
+		dg1 = new Graph("dg1");
+		dg1.addAdjacencyEdge("n0", "n1");
+		dg1.addAdjacencyEdge("n0", "n2");
+		dg1.addAdjacencyEdge("n1", "n2");
+		g1 = FastGraph.displayGraphFactory(dg1, false);
+		
+		intArray = new int[3];
+		intArray[0] = 2;
+		intArray[1] = 2;
+		intArray[2] = 2;
+		assertArrayEquals(intArray,g1.findDegrees());
+		intArray = new int[3];
+		intArray[0] = 0;
+		intArray[1] = 1;
+		intArray[2] = 2;
+		assertArrayEquals(intArray,g1.findInDegrees());
+		intArray = new int[3];
+		intArray[0] = 2;
+		intArray[1] = 1;
+		intArray[2] = 0;
+		assertArrayEquals(intArray,g1.findOutDegrees());
+
+		dg1 = new Graph("dg1");
+		dg1.addAdjacencyEdge("n0", "n1");
+		dg1.addAdjacencyEdge("n0", "n2");
+		dg1.addAdjacencyEdge("n1", "n2");
+		dg1.addAdjacencyEdge("n2", "n2");
+		g1 = FastGraph.displayGraphFactory(dg1, false);
+		
+		intArray = new int[3];
+		intArray[0] = 2;
+		intArray[1] = 2;
+		intArray[2] = 4;
+		assertArrayEquals(intArray,g1.findDegrees());
+		intArray = new int[3];
+		intArray[0] = 0;
+		intArray[1] = 1;
+		intArray[2] = 3;
+		assertArrayEquals(intArray,g1.findInDegrees());
+		intArray = new int[3];
+		intArray[0] = 2;
+		intArray[1] = 1;
+		intArray[2] = 1;
+		assertArrayEquals(intArray,g1.findOutDegrees());
+
+	}
+	
+	
+	
+	@Test
+	public void test163() throws Exception {
+		FastGraph g1;
+		int[] intArray, ret;
+		Graph dg1;
+		
+		dg1 = new Graph("dg1");
+		dg1.addNode(new Node());
+		g1 = FastGraph.displayGraphFactory(dg1, false);
+		
+		intArray = new int[0];
+		ret = g1.getNodeConnectingNodesOfSameAge(0);
+		assertArrayEquals(intArray,ret);
+
+		intArray = new int[0];
+		ret = g1.getNodeConnectingInNodesOfSameAge(0);
+		assertArrayEquals(intArray,ret);
+
+		intArray = new int[0];
+		ret = g1.getNodeConnectingOutNodesOfSameAge(0);
+		assertArrayEquals(intArray,ret);
+
+		dg1 = new Graph("dg1");
+		dg1.addAdjacencyEdge("n0", "n1");
+		dg1.addAdjacencyEdge("n0", "n2");
+		dg1.addAdjacencyEdge("n1", "n2");
+		g1 = FastGraph.displayGraphFactory(dg1, false);
+		
+		intArray = new int[2];
+		intArray[0] = 1;
+		intArray[1] = 2;
+		ret = g1.getNodeConnectingNodesOfSameAge(0);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[2];
+		intArray[0] = 0;
+		intArray[1] = 2;
+		ret = g1.getNodeConnectingNodesOfSameAge(1);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[2];
+		intArray[0] = 0;
+		intArray[1] = 1;
+		ret = g1.getNodeConnectingNodesOfSameAge(2);
+		assertArrayEquals(intArray,ret);
+
+		intArray = new int[0];
+		ret = g1.getNodeConnectingInNodesOfSameAge(0);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[1];
+		intArray[0] = 0;
+		ret = g1.getNodeConnectingInNodesOfSameAge(1);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[2];
+		intArray[0] = 0;
+		intArray[1] = 1;
+		ret = g1.getNodeConnectingInNodesOfSameAge(2);
+		assertArrayEquals(intArray,ret);
+
+		intArray = new int[2];
+		intArray[0] = 1;
+		intArray[1] = 2;
+		ret = g1.getNodeConnectingOutNodesOfSameAge(0);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[1];
+		intArray[0] = 2;
+		ret = g1.getNodeConnectingOutNodesOfSameAge(1);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[0];
+		ret = g1.getNodeConnectingOutNodesOfSameAge(2);
+		assertArrayEquals(intArray,ret);
+
+		dg1 = new Graph("dg1");
+		dg1.addAdjacencyEdge("n0", "n1");
+		dg1.addAdjacencyEdge("n0", "n2");
+		dg1.addAdjacencyEdge("n1", "n2");
+		dg1.addAdjacencyEdge("n0", "n0");
+		g1 = FastGraph.displayGraphFactory(dg1, false);
+		
+		intArray = new int[4];
+		intArray[0] = 0;
+		intArray[1] = 1;
+		intArray[2] = 2;
+		intArray[3] = 0;
+		ret = g1.getNodeConnectingNodesOfSameAge(0);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[2];
+		intArray[0] = 0;
+		intArray[1] = 2;
+		ret = g1.getNodeConnectingNodesOfSameAge(1);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[2];
+		intArray[0] = 0;
+		intArray[1] = 1;
+		ret = g1.getNodeConnectingNodesOfSameAge(2);
+		assertArrayEquals(intArray,ret);
+
+		intArray = new int[1];
+		intArray[0] = 0;
+		ret = g1.getNodeConnectingInNodesOfSameAge(0);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[1];
+		intArray[0] = 0;
+		ret = g1.getNodeConnectingInNodesOfSameAge(1);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[2];
+		intArray[0] = 0;
+		intArray[1] = 1;
+		ret = g1.getNodeConnectingInNodesOfSameAge(2);
+		assertArrayEquals(intArray,ret);
+
+		intArray = new int[3];
+		intArray[0] = 1;
+		intArray[1] = 0;
+		intArray[1] = 2;
+		ret = g1.getNodeConnectingOutNodesOfSameAge(0);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[1];
+		intArray[0] = 2;
+		ret = g1.getNodeConnectingOutNodesOfSameAge(1);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[0];
+		ret = g1.getNodeConnectingOutNodesOfSameAge(2);
+		assertArrayEquals(intArray,ret);
+	}
+
+	
+	@Test
+	public void test164() throws Exception {
+		FastGraph g1;
+		int[] intArray, ret;
+		NodeStructure ns0,ns1,ns2,ns3;
+		EdgeStructure es0,es1,es2;
+		LinkedList<NodeStructure> addNodes;
+		LinkedList<EdgeStructure> addEdges;
+
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns01", 1, (byte)1, (byte)0);
+		ns1 = new NodeStructure(1,"ns11", 1, (byte)1, (byte)0);
+		ns2 = new NodeStructure(2,"ns21", 1, (byte)1, (byte)1);
+		ns3 = new NodeStructure(3,"ns31", 1, (byte)1, (byte)1);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addNodes.add(ns2);
+		addNodes.add(ns3);
+		addEdges = new LinkedList<EdgeStructure>();
+		es0 = new EdgeStructure(0,"es01", 1, (byte)0, (byte)1, 1, 0);
+		es1 = new EdgeStructure(1,"es11", 1, (byte)0, (byte)0, 2, 3);
+		es2 = new EdgeStructure(2,"es21CrossesAges", 1, (byte)0, (byte)0, 0, 2);
+		addEdges.add(es0);
+		addEdges.add(es1);
+		addEdges.add(es2);
+		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
+		
+		intArray = new int[1];
+		intArray[0] = 1;
+		ret = g1.getNodeConnectingNodesOfSameAge(0);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[1];
+		intArray[0] = 0;
+		ret = g1.getNodeConnectingNodesOfSameAge(1);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[1];
+		intArray[0] = 3;
+		ret = g1.getNodeConnectingNodesOfSameAge(2);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[1];
+		intArray[0] = 2;
+		ret = g1.getNodeConnectingNodesOfSameAge(3);
+		assertArrayEquals(intArray,ret);
+
+		intArray = new int[1];
+		intArray[0] = 1;
+		ret = g1.getNodeConnectingInNodesOfSameAge(0);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[0];
+		ret = g1.getNodeConnectingInNodesOfSameAge(1);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[0];
+		ret = g1.getNodeConnectingInNodesOfSameAge(2);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[1];
+		intArray[0] = 2;
+		ret = g1.getNodeConnectingInNodesOfSameAge(3);
+		assertArrayEquals(intArray,ret);
+
+		intArray = new int[0];
+		ret = g1.getNodeConnectingOutNodesOfSameAge(0);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[1];
+		intArray[0] = 0;
+		ret = g1.getNodeConnectingOutNodesOfSameAge(1);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[1];
+		intArray[0] = 3;
+		ret = g1.getNodeConnectingOutNodesOfSameAge(2);
+		assertArrayEquals(intArray,ret);
+		intArray = new int[0];
+		ret = g1.getNodeConnectingOutNodesOfSameAge(3);
+		assertArrayEquals(intArray,ret);
 	}
 
 

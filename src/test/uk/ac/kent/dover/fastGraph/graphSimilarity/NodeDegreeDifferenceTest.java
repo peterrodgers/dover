@@ -1,6 +1,6 @@
 package test.uk.ac.kent.dover.fastGraph.graphSimilarity;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.*;
