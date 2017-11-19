@@ -18,8 +18,8 @@ public class AdjacencyListCreator {
 	/**
 	 * Main method. Converts FG to ADJ list
 	 * 
-	 * @param args
-	 * @throws IOException
+	 * @param args Not used
+	 * @throws IOException If there is a problem with file access
 	 */
 	public static void main(String[] args) throws IOException {
 		//TODO change these as required

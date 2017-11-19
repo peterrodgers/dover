@@ -1,8 +1,7 @@
 package test.uk.ac.kent.dover;
 
-import org.junit.runner.JUnitCore;
-import org.junit.runner.Result;
-import org.junit.runner.notification.Failure;
+import org.junit.runner.*;
+import org.junit.runner.notification.*;
 
 import test.uk.ac.kent.dover.fastGraph.*;
 import test.uk.ac.kent.dover.fastGraph.graphSimilarity.*;

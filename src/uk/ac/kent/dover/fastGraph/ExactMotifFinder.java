@@ -2,20 +2,8 @@ package uk.ac.kent.dover.fastGraph;
 
 import java.awt.Point;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.io.*;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.jsoup.nodes.Document;
@@ -24,6 +12,12 @@ import org.jsoup.nodes.Element;
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
 import uk.ac.kent.dover.fastGraph.Gui.MotifTask;
 
+/**
+ * Find motifs, where the comparison between motifs is an exact isomorphism.
+ * 
+ * @author pjr
+ *
+ */
 public class ExactMotifFinder {
 	
 	/**
@@ -73,9 +67,8 @@ public class ExactMotifFinder {
 	 * @param minSize The minimum size of motifs to be found
 	 * @param maxSize The maximum size of motifs to be found
 	 * @throws IOException If the output data cannot be written
-	 * @throws FastGraphException 
 	 */
-	public void findMotifsReferenceSet(int rewires, int minSize, int maxSize) throws IOException, FastGraphException {
+	public void findMotifsReferenceSet(int rewires, int minSize, int maxSize) throws IOException {
 		findAllMotifs(rewires,minSize,maxSize);
 	}
 	
@@ -85,9 +78,8 @@ public class ExactMotifFinder {
 	 * @param minSize The minimum size of motifs to be found
 	 * @param maxSize The maximum size of motifs to be found
 	 * @throws IOException If the output data cannot be written
-	 * @throws FastGraphException 
 	 */
-	public void findMotifsRealSet(int minSize, int maxSize) throws IOException, FastGraphException {
+	public void findMotifsRealSet(int minSize, int maxSize) throws IOException {
 		findAllMotifs(0,minSize,maxSize);
 	}
 	
@@ -153,9 +145,8 @@ public class ExactMotifFinder {
 	 * @param minSize The minimum size of motifs to be found
 	 * @param maxSize The maximum size of motifs to be found
 	 * @throws IOException If the output data cannot be written
-	 * @throws FastGraphException 
 	 */
-	private void findAllMotifs(int rewiresNeeded, int minSize, int maxSize) throws IOException, FastGraphException {
+	private void findAllMotifs(int rewiresNeeded, int minSize, int maxSize) throws IOException {
 		
 		double sizeDiff = maxSize - minSize;	
 		double step = 100/(sizeDiff+4);
@@ -195,25 +186,29 @@ public class ExactMotifFinder {
 			HashMap<String,IsoHolder> isoLists = new HashMap<>();	
 			HashMap<String,LinkedList<IsoHolder>> hashBuckets = new HashMap<String,LinkedList<IsoHolder>>();
 			
-			if(referenceSet) {
-				mt.publish((int) (step*((minSize-size)+1))+2, "Finding motifs sized " + size, true);
-
-				if(referenceGraph == null) {
-					//for each rewired graph
-					for(int i = 0; i < rewiresNeeded; i++) {
-						FastGraph graph = FastGraph.loadBuffersGraphFactory("motifs"+File.separatorChar+graphName+File.separatorChar+"-rewire-"+i,
-								"-rewire-"+i);
-						
-						mt.publish((int) ((((double) i)/rewiresNeeded)*100), "From rewire " + (i+1) + " of " + rewiresNeeded, false);	
-						//find motifs
-						findMotifsInGraph(isoLists, hashBuckets, size, graph, referenceSet);
+			try {
+				if(referenceSet) {
+					mt.publish((int) (step*((minSize-size)+1))+2, "Finding motifs sized " + size, true);
+	
+					if(referenceGraph == null) {
+						//for each rewired graph
+						for(int i = 0; i < rewiresNeeded; i++) {
+							FastGraph graph = FastGraph.loadBuffersGraphFactory("motifs"+File.separatorChar+graphName+File.separatorChar+"-rewire-"+i,
+									"-rewire-"+i);
+							
+							mt.publish((int) ((((double) i)/rewiresNeeded)*100), "From rewire " + (i+1) + " of " + rewiresNeeded, false);	
+							//find motifs
+							findMotifsInGraph(isoLists, hashBuckets, size, graph, referenceSet);
+						}
+					} else {
+						findMotifsInGraph(isoLists, hashBuckets, size, referenceGraph, referenceSet);
 					}
+					mt.publish((int) (step*((minSize-size)+1))+2, "Saving motifs sized " + size, true);
 				} else {
-					findMotifsInGraph(isoLists, hashBuckets, size, referenceGraph, referenceSet);
+					findMotifsInGraph(isoLists, hashBuckets, size, g, referenceSet);
 				}
-				mt.publish((int) (step*((minSize-size)+1))+2, "Saving motifs sized " + size, true);
-			} else {
-				findMotifsInGraph(isoLists, hashBuckets, size, g, referenceSet);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 			
 			//export results for this size
@@ -232,10 +227,9 @@ public class ExactMotifFinder {
 	 * @param graph The graph to find motifs in
 	 * @param referenceSet If the graph is the referenceSet
 	 * @throws IOException If the graph cannot be loaded
-	 * @throws FastGraphException 
 	 */
 	private void findMotifsInGraph(HashMap<String,IsoHolder> isoLists, HashMap<String,LinkedList<IsoHolder>> hashBuckets, 
-			int size, FastGraph graph, boolean referenceSet) throws IOException, FastGraphException {
+			int size, FastGraph graph, boolean referenceSet) throws IOException {
 	
 		ExactMotifFinder emf = new ExactMotifFinder(graph,saveAll && !referenceSet);
 		Debugger.log("    finding motifs");
@@ -461,9 +455,8 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * @param q the fraction of nodes to sample.
 	 * @param hashBuckets The buckets to store the results in
 	 * @throws IOException If the output files cannot be written
-	 * @throws FastGraphException 
 	 */
-	public void findMotifs(int k, double q, HashMap<String,LinkedList<IsoHolder>> hashBuckets) throws IOException, FastGraphException {
+	public void findMotifs(int k, double q, HashMap<String,LinkedList<IsoHolder>> hashBuckets) throws IOException {
 		
 		//hashBuckets = new HashMap<String,LinkedList<LinkedList<FastGraph>>> (g.getNumberOfNodes());
 		Random r = new Random(g.getNodeBuf().getLong(0));
@@ -479,60 +472,65 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 			enumerator.enumerateSubgraphsFromNode(k, 5, 10, n, r, subgraphs);
 			
 			for(FastGraph subgraph : subgraphs) {
-				ExactIsomorphism ei = new ExactIsomorphism(subgraph);
-				String hashString = ei.generateStringForHash();
-	//Debugger.log("new subgraph, hash value "+hashString);			
-				if(hashBuckets.containsKey(hashString)) {
-					LinkedList<IsoHolder> sameHashList = hashBuckets.get(hashString); // all of the FastGraphs with the given hash value
-					boolean found = false;
-					for(IsoHolder isoList : sameHashList) { // now need to test all the same hash value buckets for isomorphism
-						// only need to test the first Graph in an isomorphic list!
-						FastGraph comparisonGraph = isoList.getGraph();
-
-						if(ei.isomorphic(comparisonGraph)) {
-							isoList.incrementNumber();
-							found = true;
-							
-							if(saveAll) {
-								//Debugger.log("saving all");
-								subgraph.setName(hashString);
-								File saveFolder = new File("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-"+
-										sameHashList.size()+File.separatorChar+isoList.getNumber());
-								saveFolder.mkdirs();
-								subgraph.saveBuffers(saveFolder.getAbsolutePath(),hashString+"-"+sameHashList.size());
-								exportSVG(saveFolder.getAbsolutePath(), subgraph, 0, true);
+				ExactIsomorphism ei = null;
+				try {
+					ei = new ExactIsomorphism(subgraph);
+					String hashString = ei.generateStringForHash();
+		//Debugger.log("new subgraph, hash value "+hashString);			
+					if(hashBuckets.containsKey(hashString)) {
+						LinkedList<IsoHolder> sameHashList = hashBuckets.get(hashString); // all of the FastGraphs with the given hash value
+						boolean found = false;
+						for(IsoHolder isoList : sameHashList) { // now need to test all the same hash value buckets for isomorphism
+							// only need to test the first Graph in an isomorphic list!
+							FastGraph comparisonGraph = isoList.getGraph();
+	
+							if(ei.isomorphic(comparisonGraph)) {
+								isoList.incrementNumber();
+								found = true;
+								
+								if(saveAll) {
+									//Debugger.log("saving all");
+									subgraph.setName(hashString);
+									File saveFolder = new File("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-"+
+											sameHashList.size()+File.separatorChar+isoList.getNumber());
+									saveFolder.mkdirs();
+									subgraph.saveBuffers(saveFolder.getAbsolutePath(),hashString+"-"+sameHashList.size());
+									exportSVG(saveFolder.getAbsolutePath(), subgraph, 0, true);
+								}
+								
+								break;
 							}
-							
-							break;
 						}
-					}
-					
-					if(!found) { // no isomorphic graphs found, so need to create a new list
-						IsoHolder newIsoList = new IsoHolder(hashString+"-"+(sameHashList.size()+1), 1);
+						
+						if(!found) { // no isomorphic graphs found, so need to create a new list
+							IsoHolder newIsoList = new IsoHolder(hashString+"-"+(sameHashList.size()+1), 1);
+							
+							subgraph.setName(hashString);
+							subgraph.saveBuffers("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-"+(sameHashList.size()+1), hashString+"-"+(sameHashList.size()+1));
+							
+							//newIsoList.setGraph(subgraph);
+							sameHashList.add(newIsoList);
+						}
+					} else {
+						LinkedList<IsoHolder> newHashList = new LinkedList<IsoHolder>();
+						hashBuckets.put(hashString, newHashList);
 						
 						subgraph.setName(hashString);
-						subgraph.saveBuffers("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-"+(sameHashList.size()+1), hashString+"-"+(sameHashList.size()+1));
+						subgraph.saveBuffers("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-1", hashString+"-1");
 						
-						//newIsoList.setGraph(subgraph);
-						sameHashList.add(newIsoList);
+						IsoHolder newIsoList = new IsoHolder(hashString+"-1", 1);
+						//newIsoList.add(subgraph);
+						newHashList.add(newIsoList);
 					}
-				} else {
-					LinkedList<IsoHolder> newHashList = new LinkedList<IsoHolder>();
-					hashBuckets.put(hashString, newHashList);
-					
-					subgraph.setName(hashString);
-					subgraph.saveBuffers("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-1", hashString+"-1");
-					
-					IsoHolder newIsoList = new IsoHolder(hashString+"-1", 1);
-					//newIsoList.add(subgraph);
-					newHashList.add(newIsoList);
+	
+					ei = null; //GC
+					//System.gc();
+				} catch (FastGraphException e) {
+					e.printStackTrace();
 				}
-
-				ei = null; //GC
-				//System.gc();
 			}
-			
 		}
+
 	
 	}
 	
@@ -545,7 +543,7 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 	 * @param graph The graph to be exported
 	 * @param count The isomorphic count
 	 * @param saveAll If this is for saving every motif found
-	 * @throws IOException 
+	 * @throws IOException If there is a problem saving the file
 	 */
 	private void exportSVG(String key, FastGraph graph, int count, boolean saveAll) throws IOException {
 		//int count = isoList.getNumber();
@@ -553,7 +551,6 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		dg.randomizeNodePoints(new Point(20,20),300,300);
 		dg.setLabel(key);
 		uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg, false);
-		uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
 		GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
 		se.setAnimateFlag(false);
 		se.setIterations(100);

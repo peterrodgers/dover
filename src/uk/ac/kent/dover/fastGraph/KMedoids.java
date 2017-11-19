@@ -2,13 +2,8 @@ package uk.ac.kent.dover.fastGraph;
 
 import java.awt.Point;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
+import java.io.*;
+import java.util.*;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -50,6 +45,7 @@ public class KMedoids {
 	 * @param targetGraph The target graph
 	 * @param numberOfClusters The number of clusters
 	 * @param maxIterations The maximum number of iterations
+	 * @param measure The similarity measure between two graphs
 	 */
 	public KMedoids(FastGraph targetGraph, int numberOfClusters, int maxIterations, GraphSimilarity measure) {
 		this.numberOfClusters = numberOfClusters;
@@ -235,7 +231,7 @@ public class KMedoids {
 	/**
 	 * Save clusters to disk
 	 * @param clusters The clusters to save
-	 * @throws IOException 
+	 * @throws IOException If there is a problem saving the file
 	 */
 	public void saveClusters(ArrayList<ArrayList<FastGraph>> clusters) throws IOException {
 		File mainDir = new File(

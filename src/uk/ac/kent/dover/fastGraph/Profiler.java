@@ -105,10 +105,12 @@ public class Profiler {
 	 * 
 	 * @param nodesInEnumSubgraphs The number of nodes in enumerated subgraphs
 	 * @param subgraphsPerNode The number of subgraphs generated per node
+	 * @param nc The node comparator to be used
+	 * @param ec The edge comparator to be used
 	 * @throws IOException If subgraphs cannot be saved or the files cannot be found
 	 */
 	public void profileApproximateSubgraphIsomorhpism(int nodesInEnumSubgraphs, int subgraphsPerNode, 
-			NodeComparator nc, EdgeComparator ec) throws IOException {
+		NodeComparator nc, EdgeComparator ec) throws IOException {
 		long time = Debugger.createTime();
 		ApproximateSubgraphIsomorphism isi = new ApproximateSubgraphIsomorphism(targetGraph, 
 				patternGraph, nodesInEnumSubgraphs, subgraphsPerNode, nc, ec);
@@ -144,9 +146,8 @@ public class Profiler {
 	 * @param minSize Min size of motifs
 	 * @param maxSize Max size of motifs
 	 * @throws IOException If the graph cannot be loaded
-	 * @throws FastGraphException 
 	 */
-	public void profileExactMotifMultiple(int minSize, int maxSize) throws IOException, FastGraphException {
+	public void profileExactMotifMultiple(int minSize, int maxSize) throws IOException {
 		for(int i = minSize; i <= maxSize; i++) {
 			System.out.println("    # Profiling motif of size "+i);
 			profileExactMotif(i);
@@ -158,9 +159,8 @@ public class Profiler {
 	 * 
 	 * @param size The size of motif to test
 	 * @throws IOException If the graph cannot be loaded
-	 * @throws FastGraphException 
 	 */
-	public void profileExactMotif(int size) throws IOException, FastGraphException {		
+	public void profileExactMotif(int size) throws IOException {		
 		long time = Debugger.createTime();
 		ExactMotifFinder emf = new ExactMotifFinder(targetGraph, new MotifTaskDummy(), true);
 		emf.findMotifsReferenceSet(10,size,size); //reference

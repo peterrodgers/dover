@@ -38,7 +38,7 @@ public class Launcher {
 	 * @param args The command line instructions given
 	 * @throws Exception Only used when testing direct access to FastGraph
 	 */
-	public static void main(String[] args) throws Exception{
+	public static void main(String[] args) throws Exception {
 		Debugger.enabled = false;
 		new Launcher(args);
 	}
@@ -99,10 +99,9 @@ public class Launcher {
 	 * @param saveAll If every example is to be saved
 	 * @param reference The reference graph, if there is one
 	 * @throws IOException If the files cannot be loaded
-	 * @throws FastGraphException 
 	 */
 	public void findMotifs(MotifTask mt, String directory, String fileBaseName, int minNum, int maxNum, 
-			boolean saveAll, File reference) throws IOException, FastGraphException {
+			boolean saveAll, File reference) throws IOException {
 		
 		long time = Debugger.createTime();
 		

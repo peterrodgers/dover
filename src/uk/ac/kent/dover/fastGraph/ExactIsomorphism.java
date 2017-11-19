@@ -1,8 +1,6 @@
 package uk.ac.kent.dover.fastGraph;
 
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.*;
 
 import uk.ac.kent.displayGraph.Graph;
@@ -97,14 +95,14 @@ public class ExactIsomorphism {
 				if(!Connected.connected(g1)) {
 					continue;
 				}
-				if(ExactIsomorphism.isomorphic(g1, g2, false)) {
+/*				if(ExactIsomorphism.isomorphic(g1, g2, false)) {
 					System.out.println("Ids changed undirected isomorphic nodes "+nodes+" edges "+edges+" time "+(System.currentTimeMillis()-time)/1000.0);
 				} else {
 					System.out.println("NOT ISOMORPHIC Ids changed undirected isomorphic nodes "+nodes+" edges "+edges+" time "+(System.currentTimeMillis()-time)/1000.0+" saving");
 					g1.saveBuffers(".", System.currentTimeMillis()+"A");
 					g2.saveBuffers(".", System.currentTimeMillis()+"A");
 				}
-				time = System.currentTimeMillis();
+*/				time = System.currentTimeMillis();
 				if(ExactIsomorphism.isomorphic(g1, g2, true)) {
 					System.out.println("Ids changed directed isomorphic nodes "+nodes+" edges "+edges+" time "+(System.currentTimeMillis()-time)/1000.0);
 				} else {
@@ -167,7 +165,6 @@ public class ExactIsomorphism {
 	 * @param fastGraph one graph to be tested.
 	 * @param directed true if the graphs should be treated as directed, false if they are undirected
 	 * @throws FastGraphException if the graph is not connected
-	 *
 	 */
 	public ExactIsomorphism(FastGraph fastGraph, boolean directed) throws FastGraphException {
 
@@ -238,7 +235,7 @@ public class ExactIsomorphism {
 	/**
 	 * Equality of graphs. Returns a mapping if this graph is equal
 	 * to the given graph. Graphs must be connected. Resultant mapping on returning
-	 * true can be found with {@link getLastMapping}
+	 * true can be found with {@link #getLastMatch()}
 	 *
 	 * @param g the graph to compare
 	 * @return true if there is an equality with the given graph, null if is not.
@@ -993,7 +990,7 @@ bruteForceStartTime = -1;
 	 * @param nodes the nodes in g2 that form the subgraph
 	 * @param edges the edges in g2 that form the subgraph
 	 * @return true if the g1 and the subgraph of g2 are isomorphic, false otherwise
-	 * @throws FastGraphException 
+	 * @throws FastGraphException if a graph is not connected
 	 */
 	public boolean isomorphic(FastGraph g, int[] nodes, int[] edges) throws FastGraphException {
 
@@ -1014,7 +1011,7 @@ bruteForceStartTime = -1;
 	 * @param g2 the other FastGraph to be tested
 	 * @param directed false if the graphs are treated as undirected, true if they are directed
 	 * @return true if g1 and g2 are isomorphic, false otherwise
-	 * @throws FastGraphException 
+	 * @throws FastGraphException if a graph is not connected
 	 */
 	public static boolean isomorphic(FastGraph g1, FastGraph g2, boolean directed) throws FastGraphException {
 		ExactIsomorphism ei = new ExactIsomorphism(g1,directed);
@@ -1029,7 +1026,7 @@ bruteForceStartTime = -1;
 	 * @param g1 one FastGraph to be tested
 	 * @param g2 the other FastGraph to be tested
 	 * @return true if g1 and g2 are isomorphic, false otherwise
-	 * @throws FastGraphException 
+	 * @throws FastGraphException if a graph is not connected
 	 */
 	public static boolean isomorphic(FastGraph g1, FastGraph g2) throws FastGraphException {
 		ExactIsomorphism ei = new ExactIsomorphism(g1);

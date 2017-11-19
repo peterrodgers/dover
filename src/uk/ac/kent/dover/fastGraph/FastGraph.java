@@ -1360,9 +1360,9 @@ public class FastGraph {
 	 * @param seed random number seed, -1 for current time
 	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
 	 * @return the created FastGraph
-	 * @throws Exception If the file cannot be saved, or other FastGraph Exception
+	 * @throws FastGraphException If the desired number of edges is more than a complete graph for when simple is true
 	 */
-	public static FastGraph randomGraphFactory(int numberOfNodes, int numberOfEdges, long seed, boolean direct) throws Exception {
+	public static FastGraph randomGraphFactory(int numberOfNodes, int numberOfEdges, long seed, boolean direct) throws FastGraphException {
 		FastGraph graph = randomGraphFactory(numberOfNodes, numberOfEdges, seed, false, direct);
 		return graph;
 	}
@@ -1377,9 +1377,9 @@ public class FastGraph {
 	 * @param simple If the new graph is a simple graph.
 	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
 	 * @return the created FastGraph
-	 * @throws Exception If the file cannot be saved, or other FastGraph Exception
+	 * @throws FastGraphException If the desired number of edges is more than a complete graph for when simple is true
 	 */
-	public static FastGraph randomGraphFactory(int numberOfNodes, int numberOfEdges, long seed, boolean simple, boolean direct) throws Exception {
+	public static FastGraph randomGraphFactory(int numberOfNodes, int numberOfEdges, long seed, boolean simple, boolean direct) throws FastGraphException {
 		FastGraph g = new FastGraph(numberOfNodes,numberOfEdges,direct);
 		g.setName("random-n-"+numberOfNodes+"-e-"+numberOfEdges);
 		g.populateRandomGraph(simple, seed);
@@ -1566,6 +1566,7 @@ public class FastGraph {
 	 * 
 	 * @param directory where the files are to be stored, or if null fileBaseName under data under the current working directory
 	 * @param fileBaseName the name of the files, to which extensions are added
+	 * @throws IOException If there is a problem with saving the buffers
 	 */
 	public void saveBuffers(String directory, String fileBaseName) throws IOException {
 		
@@ -2315,7 +2316,7 @@ if(edgeIndex%1000000==0 ) {
 	 * If the graph is simple, and there are too many edges for the nodes, an exception is thrown
 	 * 
 	 * @param seed the random number generator seed, -1 for current time
-	 * @param simple if true then no selfsourcing edges or parallel edges
+	 * @param simple if true then no self sourcing edges or parallel edges
 	 * @throws FastGraphException If the desired number of edges is more than a complete graph for when simple is true
 	 */
 	public void populateRandomGraph(boolean simple, long seed) throws FastGraphException {

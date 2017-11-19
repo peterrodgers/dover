@@ -1,14 +1,9 @@
 package uk.ac.kent.dover.fastGraph;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.ShortBuffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.io.*;
+import java.nio.*;
+import java.nio.file.*;
+import java.util.*;
 
 /**
  * Converter from ARG file formats to FastGraph. For profiling.
@@ -38,8 +33,8 @@ public class ArgParser {
 	/**
 	 * Main method. Change some values in here for converting the graphs.
 	 * 
-	 * @param args
-	 * @throws IOException
+	 * @param args The arguments
+	 * @throws IOException If there is a problem saving the buffers
 	 */
 	public static void main(String[] args) throws IOException {
 		

@@ -12,6 +12,12 @@ import org.jsoup.nodes.Element;
 
 import uk.ac.kent.displayGraph.drawers.GraphDrawerSpringEmbedder;
 
+/**
+ * Find one graph inside of another.
+ * 
+ * @author pjr
+ *
+ */
 public abstract class SubgraphIsomorphism {
 
 	/**
