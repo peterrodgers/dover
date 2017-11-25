@@ -9,12 +9,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import test.uk.ac.kent.dover.TestRunner;
-import uk.ac.kent.displayGraph.Edge;
-import uk.ac.kent.displayGraph.Graph;
-import uk.ac.kent.displayGraph.Node;
-import uk.ac.kent.dover.fastGraph.ExactIsomorphism;
-import uk.ac.kent.dover.fastGraph.FastGraph;
-import uk.ac.kent.dover.fastGraph.FastGraphException;
+import uk.ac.kent.displayGraph.*;
+import uk.ac.kent.dover.fastGraph.*;
+import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
 
 public class ExactIsomorphismTest {
 
@@ -1137,6 +1134,7 @@ public class ExactIsomorphismTest {
 		assertTrue(ei.isomorphic(g1));
 		ei = new ExactIsomorphism(g2,true);
 		assertFalse(ei.isomorphic(g1));
+		
 	}
 	
 	@Rule
@@ -1157,5 +1155,119 @@ public class ExactIsomorphismTest {
 
 	}
 		
+	@Test
+	public void test29() throws FastGraphException {
+
+		ExactIsomorphism ei;
+		SimpleNodeLabelComparator nodeComparator;
+		Graph dg1 = new Graph("dg1");
+		dg1.addAdjacencyEdge("n0", "n1");
+		dg1.addAdjacencyEdge("n1", "n2");
+		dg1.addAdjacencyEdge("n2", "n0");
+		
+		Graph dg2 = new Graph("dg2");
+		dg2.addAdjacencyEdge("n1", "n2");
+		dg2.addAdjacencyEdge("n2", "n0");
+		dg2.addAdjacencyEdge("n0", "n1");
+
+		FastGraph g1 = FastGraph.displayGraphFactory(dg1, false);
+		FastGraph g2 = FastGraph.displayGraphFactory(dg2, false);
+		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		
+		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		assertTrue(ei.isomorphic(g2));
+		
+		int[] mapping = {2,0,1};
+		assertTrue(Arrays.equals(mapping, ei.getLastMatch()));
+		
+		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		assertTrue(ei.isomorphic(g1));
+		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		assertTrue(ei.isomorphic(g1));
+
+	}
+
+	
+	@Test
+	public void test30() throws FastGraphException {
+	
+		ExactIsomorphism ei;
+		SimpleNodeLabelComparator nodeComparator;
+		Graph dg1 = new Graph("dg1");
+		dg1.addAdjacencyEdge("n0", "n1");
+		dg1.addAdjacencyEdge("n1", "n2");
+		dg1.addAdjacencyEdge("n2", "n0");
+		dg1.getNodes().get(0).setLabel("n2");
+		
+		Graph dg2 = new Graph("dg2");
+		dg2.addAdjacencyEdge("n1", "n2");
+		dg2.addAdjacencyEdge("n2", "n0");
+		dg2.addAdjacencyEdge("n0", "n1");
+	
+		FastGraph g1 = FastGraph.displayGraphFactory(dg1, false);
+		FastGraph g2 = FastGraph.displayGraphFactory(dg2, false);
+		
+		nodeComparator = null;
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		
+		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		assertTrue(ei.isomorphic(g1));
+		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		assertTrue(ei.isomorphic(g1));
+
+		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
+		assertFalse(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
+		assertFalse(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		
+		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		assertFalse(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		assertFalse(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		assertFalse(ei.isomorphic(g1));
+		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		assertFalse(ei.isomorphic(g1));
+
+	}
+	
+	@Test
+	public void test031() throws FastGraphException {
+		FastGraph g1 = null;
+		ExactIsomorphism ei;
+		try {
+			g1 = FastGraph.randomGraphFactory(50,150,876,true,false);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		FastGraph g2 = ExactIsomorphism.generateRandomIsomorphicGraph(g1,654,false);
+		
+		String l1 = g1.getNodeLabel(5);
+		String l2 = g2.getNodeLabel(5);
+		
+		assertNotEquals(l1,l2);
+		
+		SimpleNodeLabelComparator nodeComparator;
+		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
+		
+		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		assertTrue(ei.isomorphic(g1));
+		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		assertTrue(ei.isomorphic(g1));
+		
+	}
+
 
 }

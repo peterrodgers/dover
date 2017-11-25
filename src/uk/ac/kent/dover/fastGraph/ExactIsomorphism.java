@@ -1,8 +1,12 @@
 package uk.ac.kent.dover.fastGraph;
 
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.*;
 
+import uk.ac.kent.dover.fastGraph.comparators.*;
 import uk.ac.kent.displayGraph.Graph;
 
 /**
@@ -17,6 +21,7 @@ public class ExactIsomorphism {
 	
 	private FastGraph fastGraph;
 	private boolean directed; // if true, treat the graph as directed, false undirected
+	private NodeComparator nodeComparator; // if not null, use to test matching nodes
 	private AdjacencyMatrix am1;
 	private AdjacencyMatrix am2;
 	private int[][] matrix1;
@@ -80,6 +85,7 @@ public class ExactIsomorphism {
 	private static int succeed = 0;
 	
 	public static void main(String [] args) {
+		
 		FastGraph g1,g2;
 		ExactIsomorphism ei;
 		
@@ -141,6 +147,7 @@ public class ExactIsomorphism {
 	/**
 	 *
 	 * Create an ExactIsomorphism before running isomorphic for undirected graphs.
+	 * No node matching test is done.
 	 * This makes multiple tests against one graph to be more efficient as data
 	 * for that graph does not need to be recreated. The graph must be connected.
 	 * 
@@ -152,12 +159,14 @@ public class ExactIsomorphism {
 
 		this.fastGraph = fastGraph;
 		this.directed = false;
+		this.nodeComparator = null;
 		init();
 	}
 
 	/**
 	 *
 	 * Create an ExactIsomorphism before running isomorphic.
+	 * No node matching test is done.
 	 * This makes multiple tests against one graph to be more efficient as
 	 * data for that graph does not need to be recreated. The
 	 * graph must be connected.
@@ -170,6 +179,29 @@ public class ExactIsomorphism {
 
 		this.fastGraph = fastGraph;
 		this.directed = directed;
+		this.nodeComparator = null;
+		init();
+	}
+	
+	/**
+	 *
+	 * Create an ExactIsomorphism before running isomorphic.
+	 * Node matching test is done if a nodeComparator is passed, e.g. for comparing node labels.
+	 * This makes multiple tests against one graph to be more efficient as
+	 * data for that graph does not need to be recreated. The
+	 * graph must be connected.
+	 * 
+	 * @param fastGraph one graph to be tested.
+	 * @param directed true if the graphs should be treated as directed, false if they are undirected
+	 * @param nodeComparator if set, used to compare the node attributes for a match, if null, only the topology is tested, node attributes will not affect matching.
+	 * g1 in the node comparator should be the first parameter, g2 should be the graph to be tested for isomorphism
+	 * @throws FastGraphException if the graph is not connected
+	 */
+	public ExactIsomorphism(FastGraph fastGraph, boolean directed, NodeComparator nodeComparator) throws FastGraphException {
+
+		this.fastGraph = fastGraph;
+		this.directed = directed;
+		this.nodeComparator = nodeComparator;
 		init();
 	}
 	
@@ -298,7 +330,6 @@ isomorphismStartTime = -1;
 		if(!Connected.connected(g2)) {
 			throw new FastGraphException("Graph must be connected to test for isomorphism.");
 		}
-				
 		if(numberOfNodes1 != numberOfNodes2) {
 //System.out.println("Not isomorphic: different number of nodes");
 failOnNodeCount++;
@@ -363,6 +394,11 @@ if(isomorphismStartTime == -1) {
 				}
 				if(degrees1[n1] != degrees2[n2]) { // make sure the number of connecting edges is equal
 					continue;
+				}
+				if(nodeComparator != null) {
+					if(nodeComparator.compare(n1, n2) != 0) {
+						continue;
+					}
 				}
 				possibleMatches[n1][i] = n2;
 				i++;
@@ -479,10 +515,9 @@ bruteForceStartTime = -1;
 		
 		HashSet<Integer> n1Neighbours = neighbours1.get(n1);
 		HashSet<Integer> n2Neighbours = neighbours2.get(n2);
-
+		
 		int numberOfn1NeigboursMatched = 0;
 		for(int node : n1Neighbours) {
-			
 			
 			int matchNode = matches1[node];
 			if(matchNode == -1) { // no match, so nothing to do here
@@ -492,6 +527,12 @@ bruteForceStartTime = -1;
 				return false;
 			}
 			
+			if(nodeComparator != null) {
+				if(nodeComparator.compare(node, matchNode) != 0) { // the matched neighbours have different labels
+					return false;
+				}
+			}
+
 			/*
 			// removed edges Count check, never seems to be used
 			int edgeCount = matrix1[n1][node];
@@ -653,6 +694,11 @@ if(isomorphismStartTime == -1) {
 				if(outDegrees1[n1] != outDegrees2[n2]) { // make sure the number of connecting out edges is equal
 					continue;
 				}
+				if(nodeComparator != null) {
+					if(nodeComparator.compare(n1, n2) != 0) {
+						continue;
+					}
+				}
 				possibleMatches[n1][i] = n2;
 				i++;
 			}
@@ -776,6 +822,11 @@ bruteForceStartTime = -1;
 				return false;
 			}
 			
+			if(nodeComparator != null) {
+				if(nodeComparator.compare(node, matchNode) != 0) { // the matched neighbours have different labels
+					return false;
+				}
+			}
 			/*
 			// removed edges Count check, never seems to be used
 			int edgeCount = matrix1[n1][node];
@@ -823,6 +874,11 @@ bruteForceStartTime = -1;
 				return false;
 			}
 			
+			if(nodeComparator != null) {
+				if(nodeComparator.compare(node, matchNode) != 0) { // the matched neighbours have different labels
+					return false;
+				}
+			}
 			/*
 			// removed edges Count check, never seems to be used
 			int edgeCount = matrix1[n1][node];
@@ -1015,6 +1071,24 @@ bruteForceStartTime = -1;
 	 */
 	public static boolean isomorphic(FastGraph g1, FastGraph g2, boolean directed) throws FastGraphException {
 		ExactIsomorphism ei = new ExactIsomorphism(g1,directed);
+		boolean ret = ei.isomorphic(g2);
+		return ret;
+	}
+	
+	/**
+	 * Check if two graphs have the same structure. Use the constructor and non static method if
+	 * lots of comparisons are going to be made against the same graph.
+	 * 
+	 * @param g1 one FastGraph to be tested
+	 * @param g2 the other FastGraph to be tested
+	 * @param directed false if the graphs are treated as undirected, true if they are directed
+	 * @param nodeComparator if set, used to compare the node attributes for a match, if null, only the topology is tested, node attributes will not affect matching.
+	 * g1 and g2 in the node comparator should correspond to the first and second parameter, respectively.
+	 * @return true if g1 and g2 are isomorphic, false otherwise
+	 * @throws FastGraphException if a graph is not connected
+	 */
+	public static boolean isomorphic(FastGraph g1, FastGraph g2, boolean directed, NodeComparator nodeComparator) throws FastGraphException {
+		ExactIsomorphism ei = new ExactIsomorphism(g1,directed,nodeComparator);
 		boolean ret = ei.isomorphic(g2);
 		return ret;
 	}
