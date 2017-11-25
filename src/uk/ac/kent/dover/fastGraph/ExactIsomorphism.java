@@ -1,9 +1,6 @@
 package uk.ac.kent.dover.fastGraph;
 
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.*;
 
 import uk.ac.kent.dover.fastGraph.comparators.*;
@@ -85,6 +82,7 @@ public class ExactIsomorphism {
 	private static int succeed = 0;
 	
 	public static void main(String [] args) {
+		
 		
 		FastGraph g1,g2;
 		ExactIsomorphism ei;
