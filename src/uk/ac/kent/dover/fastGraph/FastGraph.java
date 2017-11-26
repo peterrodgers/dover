@@ -49,7 +49,8 @@ import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
  * <p>
  * The design is scalable, has fast access, and allows quick file save and load of the ByteBuffers.
  * However, poor dynamic performance.
- * </p><p>
+ * </p>
+ * <p>
  * Storage:
  * node and edge indexes are integers and must start at 0 and end and size-1. Indexes are not stored,
  * they are assumed, so node info with nodeIndex n can be found starting in nodeBuf at offset n*nodeByteSize,
@@ -116,6 +117,67 @@ public class FastGraph {
 	
 	private byte generation = 0; // the oldest generation time slice
 	
+	public static void main(String [] args) throws Exception {
+		
+		if(true) {
+			FastGraph g1 = FastGraph.randomGraphFactory(0, 0, false);
+			NodeStructure ns;
+			ns = new NodeStructure(-1,"abc", 1, (byte)2, (byte)3);
+			g1 = g1.generateGraphByAddingSingletonNode(ns);
+			System.out.println(g1.getNodeLabel(0));
+			System.out.println(g1.getNodeAge(0));
+			System.out.println("ZZZZ");
+		}
+/*
+		FastGraph g;
+		int[] deleteNodes = {0};
+		int[] deleteEdges = {};
+		int n;
+		long time;
+		int edges = 1000;
+		
+		g = FastGraph.randomGraphFactory(edges*10, edges, 4, false);
+		n = 0;
+		time = System.currentTimeMillis();
+		while(n < g.getNumberOfNodes()) {
+			while(g.getNodeDegree(n) != 0) {
+				n++;
+				if(n == g.getNumberOfNodes()) {
+					break;
+				}
+			}
+			if(n == g.getNumberOfNodes()) {
+				break;
+			}
+			g = g.generateGraphByDeletingSingletonNode(n);
+		}
+		System.out.println("Time for generateGraphByDeletingSingletonNode: "+(System.currentTimeMillis()-time)/1000.0);
+
+		
+		g = FastGraph.randomGraphFactory(edges*10, edges, 4, false);
+		n = 0;
+		time = System.currentTimeMillis();
+		while(n < g.getNumberOfNodes()) {
+			while(g.getNodeDegree(n) != 0) {
+				n++;
+				if(n == g.getNumberOfNodes()) {
+					break;
+				}
+			}
+			if(n == g.getNumberOfNodes()) {
+				break;
+			}
+			deleteNodes[0] = n;
+			g = g.generateGraphByDeletingItems(deleteNodes, deleteEdges, false);
+		}
+		System.out.println("Time for generateGraphByDeletingItems: "+(System.currentTimeMillis()-time)/1000.0);
+*/
+		
+	}
+	
+
+	
+
 	/**
 	 * No direct access to constructor, as a number of data structures need to be created when
 	 * graph nodes and edges are added.
@@ -131,6 +193,33 @@ public class FastGraph {
 		this.direct = direct;
 		
 		init();
+	}
+
+	
+	
+	
+	/**
+	 * Allocates space for the node, edge and connection ByteBuffers. The label ByteBuffers
+	 * are created later
+	 */
+	private void init() {
+
+		if(!direct) {
+			nodeBuf = ByteBuffer.allocate(numberOfNodes*NODE_BYTE_SIZE);
+			edgeBuf = ByteBuffer.allocate(numberOfEdges*EDGE_BYTE_SIZE);
+			connectionBuf = ByteBuffer.allocate(numberOfEdges*2*CONNECTION_PAIR_SIZE);
+			// nodeLabelBuf and edgeLabelBuf now created in Factories by setAllNodeLabels and setAllEdgeLabels
+		} else {
+			nodeBuf = ByteBuffer.allocateDirect(numberOfNodes*NODE_BYTE_SIZE);
+			edgeBuf = ByteBuffer.allocateDirect(numberOfEdges*EDGE_BYTE_SIZE);
+			connectionBuf = ByteBuffer.allocateDirect(numberOfEdges*2*CONNECTION_PAIR_SIZE);
+			// nodeLabelBuf and edgeLabelBuf now created in Factories by setAllNodeLabels and setAllEdgeLabels
+		}
+		
+		nodeBuf.clear();
+		edgeBuf.clear();
+		connectionBuf.clear();
+		
 	}
 
 	
@@ -588,7 +677,6 @@ public class FastGraph {
 		
 		int labelStart = nodeBuf.getInt(NODE_LABEL_START_OFFSET+nodeIndex*NODE_BYTE_SIZE);
 		int labelLength = nodeBuf.getShort(NODE_LABEL_LENGTH_OFFSET+nodeIndex*NODE_BYTE_SIZE);
-		
 		char[] label = new char[labelLength];
 		for(int i = 0; i < labelLength; i++) {
 			int offset = labelStart+i*2;
@@ -1267,31 +1355,6 @@ public class FastGraph {
 	}
 		
 
-	
-	
-	/**
-	 * Allocates space for the node, edge and connection ByteBuffers. The label ByteBuffers
-	 * are created later
-	 */
-	private void init() {
-
-		if(!direct) {
-			nodeBuf = ByteBuffer.allocate(numberOfNodes*NODE_BYTE_SIZE);
-			edgeBuf = ByteBuffer.allocate(numberOfEdges*EDGE_BYTE_SIZE);
-			connectionBuf = ByteBuffer.allocate(numberOfEdges*2*CONNECTION_PAIR_SIZE);
-			// nodeLabelBuf and edgeLabelBuf now created in Factories by setAllNodeLabels
-		} else {
-			nodeBuf = ByteBuffer.allocateDirect(numberOfNodes*NODE_BYTE_SIZE);
-			edgeBuf = ByteBuffer.allocateDirect(numberOfEdges*EDGE_BYTE_SIZE);
-			connectionBuf = ByteBuffer.allocateDirect(numberOfEdges*2*CONNECTION_PAIR_SIZE);
-			// nodeLabelBuf and edgeLabelBuf now created in Factories by setAllNodeLabels
-		}
-		
-		nodeBuf.clear();
-		edgeBuf.clear();
-		connectionBuf.clear();
-		
-	}
 
 
 	/**
@@ -3165,13 +3228,12 @@ if(node%100000 == 0) {
 		Graph g = new Graph(getName());
 		
 		int oldestAge = findMaximumNodeAge();
-		Color[] colors = new Color[oldestAge];
+		Color[] colors = new Color[oldestAge+1];
 		if(oldestAge >= 0 && oldestAge <= 11) {
 			colors = ColorBrewer.BuGn.getColorPalette(oldestAge+1);
 		} else {
 			Arrays.fill(colors, Color.WHITE); //fill with white
 		}
-		
 		for(int i = 0; i < numberOfNodes; i++) {
 			Node n = new Node();
 			n.setLabel(getNodeLabel(i));
@@ -4351,5 +4413,156 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		}
 		return ret;
 	}
+	
+
+	/**
+	 * 
+	 * Generates a new FastGraph with n removed, n must have degree 0.
+	 * This is a fast method to use when performance is crucial.
+	 * Leaves unused memory in the nodeLabelBuffer.
+	 * 
+	 * @param n the node to remove
+	 * @return if successful, the new fast graph or null if n is connected
+	 * @throws Exception Throws if the new FastGraph does not build correctly. Most likely out of memory error.
+	 */
+	public FastGraph generateGraphByDeletingSingletonNode(int n) {
+		if(this.getNodeDegree(n) != 0) {
+			return null;
+		}
+		
+		FastGraph g = new FastGraph(this.numberOfNodes-1,this.numberOfEdges,this.direct);
+		// nodeLabelBuf and edgeLabelBuf no longer allocated in init 
+		int nodeLabelBufSize = this.nodeLabelBuf.capacity();
+		int edgeLabelBufSize = this.edgeLabelBuf.capacity();
+		if(!direct) {
+			g.nodeLabelBuf = ByteBuffer.allocate(nodeLabelBufSize);
+			g.edgeLabelBuf = ByteBuffer.allocate(edgeLabelBufSize);
+		} else {
+			g.nodeLabelBuf = ByteBuffer.allocateDirect(nodeLabelBufSize);
+			g.edgeLabelBuf = ByteBuffer.allocateDirect(edgeLabelBufSize);
+		}
+
+		this.connectionBuf.rewind();
+		this.nodeLabelBuf.rewind();
+		this.edgeLabelBuf.rewind();
+
+		g.connectionBuf.put(this.connectionBuf);
+		// here we just leave the old label in the Buffer, it would be
+		// better for memory, but slower, to delete the label from this
+		// buffer and reassign all the offsets after the deleted node in the nodeBuf
+		g.nodeLabelBuf.put(this.nodeLabelBuf); 
+		g.edgeLabelBuf.put(this.edgeLabelBuf);
+
+		this.nodeBuf.rewind();
+		int uptoDeletedNodeEnd = (n)*NODE_BYTE_SIZE;
+		byte[] nodes1 = new byte[uptoDeletedNodeEnd];
+		this.nodeBuf.get(nodes1, 0, uptoDeletedNodeEnd);
+
+		// this because the offset in get seems to fail for the bulk get
+		// it is a way to move the position past the deleted node
+		byte[] throwAway = new byte[NODE_BYTE_SIZE];
+		this.nodeBuf.get(throwAway, 0, NODE_BYTE_SIZE);
+		
+		int afterDeletedNodeSize = (this.numberOfNodes-(n+1))*NODE_BYTE_SIZE;
+		byte[] nodes2 = new byte[afterDeletedNodeSize];
+		this.nodeBuf.get(nodes2, 0, afterDeletedNodeSize);
+		this.nodeBuf.rewind();
+		g.nodeBuf.put(nodes1);
+		g.nodeBuf.put(nodes2);
+		g.nodeBuf.rewind();
+
+		// recalculate connections to nodes that have moved id down by one
+		this.edgeBuf.rewind();
+		g.edgeBuf.put(this.edgeBuf);
+		for(int i = 0; i < g.getNumberOfEdges(); i+= 1) {
+			int n1 = g.edgeBuf.getInt(EDGE_NODE1_OFFSET+i*EDGE_BYTE_SIZE);
+			int n2 = g.edgeBuf.getInt(EDGE_NODE2_OFFSET+i*EDGE_BYTE_SIZE);
+			if(n1 > n) {
+				n1--;
+				g.edgeBuf.putInt(EDGE_NODE1_OFFSET+i*EDGE_BYTE_SIZE,n1);
+			}
+			if(n2 > n) {
+				n2--;
+				g.edgeBuf.putInt(EDGE_NODE2_OFFSET+i*EDGE_BYTE_SIZE,n2);
+			}
+		}
+		
+		g.name = this.name;
+		
+		return g;
+	}
+	
+	
+
+	/**
+	 * 
+	 * Generates a new FastGraph with ns added. Ignores the id of ns.
+	 * 
+	 * @param n the node to add
+	 * @return if successful, the new fast graph or null if n is connected
+	 * @throws Exception Throws if the new FastGraph does not build correctly. Most likely out of memory error.
+	 */
+	public FastGraph generateGraphByAddingSingletonNode(NodeStructure ns) {
+		
+		FastGraph g = new FastGraph(this.numberOfNodes+1,this.numberOfEdges,this.direct);
+		// nodeLabelBuf and edgeLabelBuf no longer allocated in init 
+		int nodeLabelBufSize = this.nodeLabelBuf.capacity()+(ns.getLabel().length()*2);
+		if(nodeLabelBufSize*2 > MAX_BYTE_BUFFER_SIZE) {
+			throw new OutOfMemoryError("Tried to create a nodeLabelBuf with too many chars");
+		}
+
+		int edgeLabelBufSize = this.edgeLabelBuf.capacity();
+		if(!direct) {
+			g.nodeLabelBuf = ByteBuffer.allocate(nodeLabelBufSize);
+			g.edgeLabelBuf = ByteBuffer.allocate(edgeLabelBufSize);
+		} else {
+			g.nodeLabelBuf = ByteBuffer.allocateDirect(nodeLabelBufSize);
+			g.edgeLabelBuf = ByteBuffer.allocateDirect(edgeLabelBufSize);
+		}
+
+		this.connectionBuf.rewind();
+		this.edgeLabelBuf.rewind();
+		this.edgeBuf.rewind();
+		g.connectionBuf.put(this.connectionBuf);
+		g.edgeLabelBuf.put(this.edgeLabelBuf);
+		g.edgeBuf.put(this.edgeBuf);
+		
+		this.nodeLabelBuf.rewind();
+		g.nodeLabelBuf.put(this.nodeLabelBuf);
+		
+		// place the new label
+		int labelStart = this.nodeLabelBuf.capacity();
+		String label = ns.getLabel();
+		char[] labelArray = label.toCharArray();
+		short labelLength = (short)(labelArray.length);
+	
+		g.nodeLabelBuf.rewind();
+		int labelOffset = labelStart;
+		for(int j = 0; j < labelArray.length; j++) {
+			char c = labelArray[j];
+			g.nodeLabelBuf.putChar(labelOffset,c);
+			labelOffset += 2;  // increment by 2 as it is a char (2 bytes)
+		}
+
+		// place the new node
+		this.nodeBuf.rewind();
+		g.nodeBuf.put(this.nodeBuf);
+		int nodeId = this.numberOfNodes; // the new node is at the end of node list
+		g.nodeBuf.putInt(NODE_LABEL_START_OFFSET+nodeId*NODE_BYTE_SIZE,labelStart); // label start
+		g.nodeBuf.putShort(NODE_LABEL_LENGTH_OFFSET+nodeId*NODE_BYTE_SIZE,labelLength); // label size
+		g.nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE,0); // offset for inward connecting edges/nodes
+		g.nodeBuf.putInt(NODE_IN_DEGREE_OFFSET+nodeId*NODE_BYTE_SIZE,0); // number of inward connecting edges/nodes
+		g.nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE,0); // offset for outward connecting edges/nodes
+		g.nodeBuf.putInt(NODE_OUT_DEGREE_OFFSET+nodeId*NODE_BYTE_SIZE,0); // number of outward connecting edges/nodes
+		g.nodeBuf.putInt(NODE_WEIGHT_OFFSET+nodeId*NODE_BYTE_SIZE,ns.getWeight()); // weight
+		g.nodeBuf.put(NODE_TYPE_OFFSET+nodeId*NODE_BYTE_SIZE,ns.getType()); // type
+		g.nodeBuf.put(NODE_AGE_OFFSET+nodeId*NODE_BYTE_SIZE,ns.getAge()); // age
+
+		g.name = this.name;
+		
+		return g;
+	}
+	
+	
 		
 }

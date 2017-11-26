@@ -80,9 +80,9 @@ public class ExactIsomorphism {
 	private static int failOnNodeMatches = 0;
 	private static int failOnBruteForce = 0;
 	private static int succeed = 0;
+
 	
 	public static void main(String [] args) {
-		
 		
 		FastGraph g1,g2;
 		ExactIsomorphism ei;
