@@ -47,7 +47,7 @@ public class ExactIsomorphismTest {
 
 	
 	@Test
-	public void test002() throws FastGraphException {
+	public void test002()  {
 		ExactIsomorphism ei;
 		FastGraph g2;
 		FastGraph g1;
@@ -141,18 +141,19 @@ public class ExactIsomorphismTest {
 	}
 
 	
-	@Rule
-	public ExpectedException thrown1 = ExpectedException.none();
 	@Test
 	public void test004() throws Exception {
-		FastGraph g1;
+		FastGraph g1,g2;
+		ExactIsomorphism ei;
 		g1 = FastGraph.randomGraphFactory(10,20,1,false); // disconnected graph
-	    thrown1.expect(FastGraphException.class);
-		new ExactIsomorphism(g1);
+		g2 = FastGraph.randomGraphFactory(10,20,2222,false); // disconnected graph
+		ei = new ExactIsomorphism(g1);
+		assertFalse(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g2);
+		assertFalse(ei.isomorphic(g1));
+		
 	}
 		
-	@Rule
-	public ExpectedException thrown2 = ExpectedException.none();
 	@Test
 	public void test005() throws Exception {
 		FastGraph g1,g2;
@@ -160,11 +161,9 @@ public class ExactIsomorphismTest {
 		g1 = FastGraph.randomGraphFactory(10,20,6,false); // connected graph
 		g2 = FastGraph.randomGraphFactory(10,20,1,false); // disconnected graph
 		ei = new ExactIsomorphism(g1,false);
-	    thrown2.expect(FastGraphException.class);
 	    ei.isomorphic(g2);
 	    
 		ei = new ExactIsomorphism(g1,true);
-	    thrown2.expect(FastGraphException.class);
 	    ei.isomorphic(g2);
 
 	}
@@ -207,7 +206,7 @@ public class ExactIsomorphismTest {
 
 	
 	@Test
-	public void test007() throws FastGraphException {
+	public void test007()  {
 		// problem with randomly generated graph. ok with display graph algorithm, failed with fastgraph algorithm
 		/* g1
 		 * Nodes:[n0, n1, n2]
@@ -268,7 +267,7 @@ public class ExactIsomorphismTest {
 	
 
 	@Test
-	public void test008() throws FastGraphException {
+	public void test008()  {
 		// problem with randomly generated graph. ok with display graph algorithm, failed with fastgraph algorithm
 		/* g1
 		 * Nodes:[n0, n1, n2]
@@ -325,7 +324,7 @@ public class ExactIsomorphismTest {
 	}
 	
 	@Test
-	public void test009() throws FastGraphException {
+	public void test009()  {
 		// problem with displayGraph isomorphism test generated graph. failed with display graph algorithm, ok with fastgraph algorithm
 		/* g1
 		 * Nodes:[n0, n1, n2, n3]
@@ -388,7 +387,7 @@ public class ExactIsomorphismTest {
 
 	
 	@Test
-	public void test010() throws FastGraphException {
+	public void test010()  {
 		
 		Graph dg1 = new Graph("dg1");
 		Node n0 = new Node("n0");
@@ -453,7 +452,7 @@ public class ExactIsomorphismTest {
 	
 	
 	@Test
-	public void test011() throws FastGraphException {
+	public void test011()  {
 		
 		Graph dg1 = new Graph("dg1");
 		Node n0 = new Node("n0");
@@ -517,7 +516,7 @@ public class ExactIsomorphismTest {
 	}
 	
 	@Test
-	public void test012() throws FastGraphException {
+	public void test012()  {
 		/*
 		 * g1
 		 * Nodes:[n0, n1, n2, n3, n4, n5]
@@ -563,7 +562,7 @@ public class ExactIsomorphismTest {
 	}
 	
 	@Test
-	public void test013() throws FastGraphException {
+	public void test013()  {
 		/*
 		 * g1
 		 * Nodes:[n0, n1, n2, n3, n4, n5, n6]
@@ -609,7 +608,7 @@ public class ExactIsomorphismTest {
 	
 	
 	@Test
-	public void test014() throws FastGraphException {
+	public void test014()  {
 		/*
 		 * g1
 		 * Nodes:[n0, n1, n2, n3, n4, n5, n6, n7]
@@ -666,7 +665,7 @@ public class ExactIsomorphismTest {
 	
 	
 	@Test
-	public void test015() throws FastGraphException {
+	public void test015()  {
 		/*
 		 * g1
 		 * Nodes:[n0, n1, n2, n3, n4, n5, n6, n7]
@@ -723,7 +722,7 @@ public class ExactIsomorphismTest {
 	
 
 	@Test
-	public void test016() throws FastGraphException {
+	public void test016()  {
 		FastGraph g1 = null;
 		ExactIsomorphism ei;
 		try {
@@ -750,7 +749,7 @@ public class ExactIsomorphismTest {
 	}
 
 	@Test
-	public void test017() throws FastGraphException {
+	public void test017()  {
 		FastGraph g1 = null;
 		ExactIsomorphism ei;
 		try {
@@ -771,7 +770,7 @@ public class ExactIsomorphismTest {
 	}
 	
 	@Test
-	public void test018() throws FastGraphException {
+	public void test018()  {
 		/*
 		 * g1
 		 * Nodes:[n0, n1, n2]
@@ -812,7 +811,7 @@ public class ExactIsomorphismTest {
 	}
 	
 	@Test
-	public void test019() throws FastGraphException {
+	public void test019()  {
 
 		ExactIsomorphism ei;
 		Graph dg1 = new Graph("dg1");
@@ -844,7 +843,7 @@ public class ExactIsomorphismTest {
 	}
 	
 	@Test
-	public void test020() throws FastGraphException {
+	public void test020()  {
 
 		ExactIsomorphism ei;
 		Graph dg1 = new Graph("dg1");
@@ -877,7 +876,7 @@ public class ExactIsomorphismTest {
 	
 	
 	@Test
-	public void test021() throws FastGraphException {
+	public void test021()  {
 
 		ExactIsomorphism ei;
 		Graph dg1 = new Graph("dg1");
@@ -913,7 +912,7 @@ public class ExactIsomorphismTest {
 	
 
 	@Test
-	public void test22() throws FastGraphException {
+	public void test22()  {
 
 		ExactIsomorphism ei;
 		Graph dg1 = new Graph("dg1");
@@ -951,7 +950,7 @@ public class ExactIsomorphismTest {
 	
 
 	@Test
-	public void test23() throws FastGraphException {
+	public void test23()  {
 
 		ExactIsomorphism ei;
 		Graph dg1 = new Graph("dg1");
@@ -984,7 +983,7 @@ public class ExactIsomorphismTest {
 	}
 	
 	@Test
-	public void test24() throws FastGraphException {
+	public void test24()  {
 
 		ExactIsomorphism ei;
 		Graph dg1 = new Graph("dg1");
@@ -1022,7 +1021,7 @@ public class ExactIsomorphismTest {
 	
 
 	@Test
-	public void test25() throws FastGraphException {
+	public void test25()  {
 
 		ExactIsomorphism ei;
 		Graph dg1 = new Graph("dg1");
@@ -1059,7 +1058,7 @@ public class ExactIsomorphismTest {
 	}
 	
 	@Test
-	public void test26() throws FastGraphException {
+	public void test26()  {
 
 		ExactIsomorphism ei;
 		Graph dg1 = new Graph("dg1");
@@ -1098,7 +1097,7 @@ public class ExactIsomorphismTest {
 	}
 	
 	@Test
-	public void test27() throws FastGraphException {
+	public void test27()  {
 
 		ExactIsomorphism ei;
 		Graph dg1 = new Graph("dg1");
@@ -1137,8 +1136,6 @@ public class ExactIsomorphismTest {
 		
 	}
 	
-	@Rule
-	public ExpectedException thrown3 = ExpectedException.none();
 	@Test
 	public void test028() throws Exception {
 		FastGraph g1,g2;
@@ -1146,17 +1143,15 @@ public class ExactIsomorphismTest {
 		g1 = FastGraph.randomGraphFactory(10,20,6,false); // connected graph
 		g2 = FastGraph.randomGraphFactory(10,20,1,false); // disconnected graph
 		ei = new ExactIsomorphism(g1,true);
-	    thrown3.expect(FastGraphException.class);
-	    ei.isomorphic(g2);
+		assertFalse(ei.isomorphic(g2));
 	    
-		ei = new ExactIsomorphism(g1,true);
-	    thrown3.expect(FastGraphException.class);
-	    ei.isomorphic(g2);
+		ei = new ExactIsomorphism(g2,true);
+		assertFalse(ei.isomorphic(g1));
 
 	}
 		
 	@Test
-	public void test29() throws FastGraphException {
+	public void test29()  {
 
 		ExactIsomorphism ei;
 		SimpleNodeLabelComparator nodeComparator;
@@ -1193,7 +1188,7 @@ public class ExactIsomorphismTest {
 
 	
 	@Test
-	public void test30() throws FastGraphException {
+	public void test30()  {
 	
 		ExactIsomorphism ei;
 		SimpleNodeLabelComparator nodeComparator;
@@ -1255,7 +1250,7 @@ public class ExactIsomorphismTest {
 	}
 	
 	@Test
-	public void test031() throws FastGraphException {
+	public void test031()  {
 		FastGraph g1 = null;
 		ExactIsomorphism ei;
 		try {
@@ -1286,7 +1281,7 @@ public class ExactIsomorphismTest {
 
 	
 	@Test
-	public void test033() throws FastGraphException {
+	public void test032()  {
 		
 		ExactIsomorphism ei;
 		SimpleNodeLabelComparator nodeComparator;
@@ -1365,7 +1360,7 @@ public class ExactIsomorphismTest {
 
 	
 	@Test
-	public void test032() throws FastGraphException {
+	public void test033()  {
 		
 		ExactIsomorphism ei;
 		SimpleNodeLabelComparator nodeComparator;
@@ -1439,7 +1434,465 @@ public class ExactIsomorphismTest {
 		assertTrue(ei.isomorphic(g2));
 		ei = new ExactIsomorphism(g2,false,null);
 		assertTrue(ei.isomorphic(g1));
-
-
 	}
+
+	
+	@Test
+	public void test034()  {
+		
+		ExactIsomorphism ei;
+		SimpleNodeLabelComparator nodeComparator;
+		
+		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
+		NodeStructure ns10 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns11 = new NodeStructure(1,"b", 0, (byte)0, (byte)0);
+		nodes1.add(ns10);
+		nodes1.add(ns11);
+		List<EdgeStructure> edges1 = new ArrayList<EdgeStructure>();
+		List<NodeStructure> nodes2 = new ArrayList<NodeStructure>();
+		NodeStructure ns20 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns21 = new NodeStructure(1,"b", 0, (byte)0, (byte)0);
+		nodes2.add(ns20);
+		nodes2.add(ns21);
+		List<EdgeStructure> edges2 = new ArrayList<EdgeStructure>();
+
+		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
+		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
+
+		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,true,nodeComparator));
+		
+		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		
+		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
+		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		assertTrue(ei.isomorphic(g2));
+		
+		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
+		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		assertTrue(ei.isomorphic(g1));
+		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		assertTrue(ei.isomorphic(g1));
+		
+		ei = new ExactIsomorphism(g1,true,null);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g2,true,null);
+		assertTrue(ei.isomorphic(g1));
+
+		ei = new ExactIsomorphism(g1,false,null);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g2,false,null);
+		assertTrue(ei.isomorphic(g1));
+	}
+	
+	
+	
+	@Test
+	public void test035()  {
+		
+		ExactIsomorphism ei;
+		SimpleNodeLabelComparator nodeComparator;
+		
+		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
+		NodeStructure ns10 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns11 = new NodeStructure(1,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns12 = new NodeStructure(2,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns13 = new NodeStructure(3,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns14 = new NodeStructure(4,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns15 = new NodeStructure(5,"a", 0, (byte)0, (byte)0);
+		nodes1.add(ns10);
+		nodes1.add(ns11);
+		nodes1.add(ns12);
+		nodes1.add(ns13);
+		nodes1.add(ns14);
+		nodes1.add(ns15);
+		List<EdgeStructure> edges1 = new ArrayList<EdgeStructure>();
+		EdgeStructure es10 = new EdgeStructure(0,"es10", 0, (byte)0, (byte)0, 0, 1);
+		EdgeStructure es11 = new EdgeStructure(1,"es11", 0, (byte)0, (byte)0, 1, 2);
+		EdgeStructure es12 = new EdgeStructure(2,"es12", 0, (byte)0, (byte)0, 2, 0);
+		EdgeStructure es13 = new EdgeStructure(3,"es13", 0, (byte)0, (byte)0, 3, 4);
+		EdgeStructure es14 = new EdgeStructure(4,"es14", 0, (byte)0, (byte)0, 4, 5);
+		EdgeStructure es15 = new EdgeStructure(5,"es15", 0, (byte)0, (byte)0, 5, 3);
+		edges1.add(es10);
+		edges1.add(es11);
+		edges1.add(es12);
+		edges1.add(es13);
+		edges1.add(es14);
+		edges1.add(es15);
+		List<NodeStructure> nodes2 = new ArrayList<NodeStructure>();
+		NodeStructure ns20 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns21 = new NodeStructure(1,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns22 = new NodeStructure(2,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns23 = new NodeStructure(3,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns24 = new NodeStructure(4,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns25 = new NodeStructure(5,"a", 0, (byte)0, (byte)0);
+		nodes2.add(ns20);
+		nodes2.add(ns21);
+		nodes2.add(ns22);
+		nodes2.add(ns23);
+		nodes2.add(ns24);
+		nodes2.add(ns25);
+		List<EdgeStructure> edges2 = new ArrayList<EdgeStructure>();
+		EdgeStructure es20 = new EdgeStructure(0,"es20", 0, (byte)0, (byte)0, 1, 0);
+		EdgeStructure es21 = new EdgeStructure(1,"es21", 0, (byte)0, (byte)0, 2, 1);
+		EdgeStructure es22 = new EdgeStructure(2,"es22", 0, (byte)0, (byte)0, 0, 2);
+		EdgeStructure es23 = new EdgeStructure(3,"es23", 0, (byte)0, (byte)0, 4, 3);
+		EdgeStructure es24 = new EdgeStructure(4,"es24", 0, (byte)0, (byte)0, 5, 4);
+		EdgeStructure es25 = new EdgeStructure(5,"es25", 0, (byte)0, (byte)0, 3, 5);
+		edges2.add(es20);
+		edges2.add(es21);
+		edges2.add(es22);
+		edges2.add(es23);
+		edges2.add(es24);
+		edges2.add(es25);
+
+		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
+		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
+
+		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,true,nodeComparator));
+		
+		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		
+		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
+		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		assertTrue(ei.isomorphic(g2));
+		
+		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
+		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		assertTrue(ei.isomorphic(g1));
+		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		assertTrue(ei.isomorphic(g1));
+		
+		ei = new ExactIsomorphism(g1,true,null);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g2,true,null);
+		assertTrue(ei.isomorphic(g1));
+
+		ei = new ExactIsomorphism(g1,false,null);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g2,false,null);
+		assertTrue(ei.isomorphic(g1));
+	}
+	
+	
+	@Test
+	public void test036()  {
+		
+		ExactIsomorphism ei;
+		SimpleNodeLabelComparator nodeComparator;
+		
+		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
+		NodeStructure ns10 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns11 = new NodeStructure(1,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns12 = new NodeStructure(2,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns13 = new NodeStructure(3,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns14 = new NodeStructure(4,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns15 = new NodeStructure(5,"b", 0, (byte)0, (byte)0);
+		NodeStructure ns16 = new NodeStructure(6,"b", 0, (byte)0, (byte)0);
+		NodeStructure ns17 = new NodeStructure(7,"a", 0, (byte)0, (byte)0);
+		nodes1.add(ns10);
+		nodes1.add(ns11);
+		nodes1.add(ns12);
+		nodes1.add(ns13);
+		nodes1.add(ns14);
+		nodes1.add(ns15);
+		nodes1.add(ns16);
+		nodes1.add(ns17);
+		List<EdgeStructure> edges1 = new ArrayList<EdgeStructure>();
+		EdgeStructure es10 = new EdgeStructure(0,"es10", 0, (byte)0, (byte)0, 1, 0);
+		EdgeStructure es11 = new EdgeStructure(1,"es11", 0, (byte)0, (byte)0, 1, 2);
+		EdgeStructure es12 = new EdgeStructure(2,"es12", 0, (byte)0, (byte)0, 2, 0);
+		EdgeStructure es13 = new EdgeStructure(3,"es13", 0, (byte)0, (byte)0, 3, 4);
+		EdgeStructure es14 = new EdgeStructure(4,"es14", 0, (byte)0, (byte)0, 4, 5);
+		EdgeStructure es15 = new EdgeStructure(5,"es15", 0, (byte)0, (byte)0, 5, 3);
+		edges1.add(es10);
+		edges1.add(es11);
+		edges1.add(es12);
+		edges1.add(es13);
+		edges1.add(es14);
+		edges1.add(es15);
+		List<NodeStructure> nodes2 = new ArrayList<NodeStructure>();
+		NodeStructure ns20 = new NodeStructure(0,"b", 0, (byte)0, (byte)0);
+		NodeStructure ns21 = new NodeStructure(1,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns22 = new NodeStructure(2,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns23 = new NodeStructure(3,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns24 = new NodeStructure(4,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns25 = new NodeStructure(5,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns26 = new NodeStructure(6,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns27 = new NodeStructure(7,"b", 0, (byte)0, (byte)0);
+		nodes2.add(ns20);
+		nodes2.add(ns21);
+		nodes2.add(ns22);
+		nodes2.add(ns23);
+		nodes2.add(ns24);
+		nodes2.add(ns25);
+		nodes2.add(ns26);
+		nodes2.add(ns27);
+		List<EdgeStructure> edges2 = new ArrayList<EdgeStructure>();
+		EdgeStructure es20 = new EdgeStructure(0,"es20", 0, (byte)0, (byte)0, 1, 0);
+		EdgeStructure es21 = new EdgeStructure(1,"es21", 0, (byte)0, (byte)0, 2, 1);
+		EdgeStructure es22 = new EdgeStructure(2,"es22", 0, (byte)0, (byte)0, 0, 2);
+		EdgeStructure es23 = new EdgeStructure(3,"es23", 0, (byte)0, (byte)0, 4, 3);
+		EdgeStructure es24 = new EdgeStructure(4,"es24", 0, (byte)0, (byte)0, 5, 4);
+		EdgeStructure es25 = new EdgeStructure(5,"es25", 0, (byte)0, (byte)0, 5, 3);
+		edges2.add(es20);
+		edges2.add(es21);
+		edges2.add(es22);
+		edges2.add(es23);
+		edges2.add(es24);
+		edges2.add(es25);
+
+		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
+		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
+
+		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,true,nodeComparator));
+		
+		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		
+		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
+		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		assertTrue(ei.isomorphic(g2));
+		
+		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
+		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		assertTrue(ei.isomorphic(g1));
+		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		assertTrue(ei.isomorphic(g1));
+		
+		ei = new ExactIsomorphism(g1,true,null);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g2,true,null);
+		assertTrue(ei.isomorphic(g1));
+
+		ei = new ExactIsomorphism(g1,false,null);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g2,false,null);
+		assertTrue(ei.isomorphic(g1));
+	}
+
+	
+	
+	@Test
+	public void test037()  {
+		
+		ExactIsomorphism ei;
+		SimpleNodeLabelComparator nodeComparator;
+		
+		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
+		NodeStructure ns10 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns11 = new NodeStructure(1,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns12 = new NodeStructure(2,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns13 = new NodeStructure(3,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns14 = new NodeStructure(4,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns15 = new NodeStructure(5,"b", 0, (byte)0, (byte)0);
+		nodes1.add(ns10);
+		nodes1.add(ns11);
+		nodes1.add(ns12);
+		nodes1.add(ns13);
+		nodes1.add(ns14);
+		nodes1.add(ns15);
+		List<EdgeStructure> edges1 = new ArrayList<EdgeStructure>();
+		EdgeStructure es10 = new EdgeStructure(0,"es10", 0, (byte)0, (byte)0, 1, 0);
+		EdgeStructure es11 = new EdgeStructure(1,"es11", 0, (byte)0, (byte)0, 1, 2);
+		EdgeStructure es12 = new EdgeStructure(2,"es12", 0, (byte)0, (byte)0, 2, 0);
+		EdgeStructure es13 = new EdgeStructure(3,"es13", 0, (byte)0, (byte)0, 3, 4);
+		EdgeStructure es14 = new EdgeStructure(4,"es14", 0, (byte)0, (byte)0, 4, 5);
+		EdgeStructure es15 = new EdgeStructure(5,"es15", 0, (byte)0, (byte)0, 5, 3);
+		edges1.add(es10);
+		edges1.add(es11);
+		edges1.add(es12);
+		edges1.add(es13);
+		edges1.add(es14);
+		edges1.add(es15);
+		List<NodeStructure> nodes2 = new ArrayList<NodeStructure>();
+		NodeStructure ns20 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns21 = new NodeStructure(1,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns22 = new NodeStructure(2,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns23 = new NodeStructure(3,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns24 = new NodeStructure(4,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns25 = new NodeStructure(5,"b", 0, (byte)0, (byte)0);
+		nodes2.add(ns20);
+		nodes2.add(ns21);
+		nodes2.add(ns22);
+		nodes2.add(ns23);
+		nodes2.add(ns24);
+		nodes2.add(ns25);
+		List<EdgeStructure> edges2 = new ArrayList<EdgeStructure>();
+		EdgeStructure es20 = new EdgeStructure(0,"es20", 0, (byte)0, (byte)0, 1, 0);
+		EdgeStructure es21 = new EdgeStructure(1,"es21", 0, (byte)0, (byte)0, 2, 1);
+		EdgeStructure es22 = new EdgeStructure(2,"es22", 0, (byte)0, (byte)0, 0, 2);
+		EdgeStructure es23 = new EdgeStructure(3,"es23", 0, (byte)0, (byte)0, 4, 3);
+		EdgeStructure es24 = new EdgeStructure(4,"es24", 0, (byte)0, (byte)0, 5, 4);
+		EdgeStructure es25 = new EdgeStructure(5,"es25", 0, (byte)0, (byte)0, 5, 3);
+		edges2.add(es20);
+		edges2.add(es21);
+		edges2.add(es22);
+		edges2.add(es23);
+		edges2.add(es24);
+		edges2.add(es25);
+
+		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
+		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
+
+		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
+		assertFalse(ExactIsomorphism.isomorphic(g1,g2,true,nodeComparator));
+		
+		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,false,nodeComparator));
+		assertFalse(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		
+		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
+		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		assertFalse(ei.isomorphic(g2));
+		
+		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
+		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		assertTrue(ei.isomorphic(g1));
+		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		assertFalse(ei.isomorphic(g1));
+		
+		ei = new ExactIsomorphism(g1,true,null);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g2,true,null);
+		assertTrue(ei.isomorphic(g1));
+
+		ei = new ExactIsomorphism(g1,false,null);
+		assertTrue(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g2,false,null);
+		assertTrue(ei.isomorphic(g1));
+	}
+	
+	
+	@Test
+	public void test038()  {
+		
+		ExactIsomorphism ei;
+		
+		Graph dg1 = new Graph("dg1");
+		dg1.addAdjacencyEdge("n0", "n1");
+		dg1.addAdjacencyEdge("n1", "n2");
+		dg1.addAdjacencyEdge("n2", "n3");
+		dg1.addAdjacencyEdge("n3", "n4");
+		dg1.addAdjacencyEdge("n4", "n5");
+		dg1.addAdjacencyEdge("n5", "n0");
+		dg1.addAdjacencyEdge("n0", "n2");
+		dg1.addAdjacencyEdge("n11", "n12");
+		dg1.addAdjacencyEdge("n12", "n13");
+		dg1.addAdjacencyEdge("n13", "n11");
+		
+		Graph dg2 = new Graph("dg2");
+		dg2.addAdjacencyEdge("n23", "n21");
+		dg2.addAdjacencyEdge("n22", "n23");
+		dg2.addAdjacencyEdge("n0", "n1");
+		dg2.addAdjacencyEdge("n2", "n3");
+		dg2.addAdjacencyEdge("n5", "n0");
+		dg2.addAdjacencyEdge("n21", "n22");
+		dg2.addAdjacencyEdge("n0", "n3");
+		dg2.addAdjacencyEdge("n3", "n4");
+		dg2.addAdjacencyEdge("n4", "n5");
+		dg2.addAdjacencyEdge("n1", "n2");
+
+		FastGraph g1 = FastGraph.displayGraphFactory(dg1, false);
+		FastGraph g2 = FastGraph.displayGraphFactory(dg2, false);
+
+		
+		ei = new ExactIsomorphism(g1,true,null);
+		assertFalse(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g2,true,null);
+		assertFalse(ei.isomorphic(g1));
+
+		ei = new ExactIsomorphism(g1,false,null);
+		assertFalse(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g2,false,null);
+		assertFalse(ei.isomorphic(g1));
+	}
+	
+
+	
+	@Test
+	public void test039()  {
+		
+		ExactIsomorphism ei;
+		SimpleNodeLabelComparator nodeComparator;
+		
+		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
+		NodeStructure ns10 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns11 = new NodeStructure(1,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns12 = new NodeStructure(2,"a", 0, (byte)0, (byte)0);
+		nodes1.add(ns10);
+		nodes1.add(ns11);
+		nodes1.add(ns12);
+		List<EdgeStructure> edges1 = new ArrayList<EdgeStructure>();
+		EdgeStructure es10 = new EdgeStructure(0,"es10", 0, (byte)0, (byte)0, 1, 0);
+		EdgeStructure es11 = new EdgeStructure(1,"es11", 0, (byte)0, (byte)0, 1, 2);
+		edges1.add(es10);
+		edges1.add(es11);
+		List<NodeStructure> nodes2 = new ArrayList<NodeStructure>();
+		NodeStructure ns20 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns21 = new NodeStructure(1,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns22 = new NodeStructure(2,"a", 0, (byte)0, (byte)0);
+		nodes2.add(ns20);
+		nodes2.add(ns21);
+		nodes2.add(ns22);
+		List<EdgeStructure> edges2 = new ArrayList<EdgeStructure>();
+		EdgeStructure es20 = new EdgeStructure(0,"es20", 0, (byte)0, (byte)0, 0, 1);
+		EdgeStructure es21 = new EdgeStructure(1,"es21", 0, (byte)0, (byte)0, 2, 2);
+		edges2.add(es20);
+		edges2.add(es21);
+
+		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
+		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
+
+		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
+		assertFalse(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
+		assertFalse(ExactIsomorphism.isomorphic(g1,g2,true,nodeComparator));
+		
+		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
+		assertFalse(ExactIsomorphism.isomorphic(g2,g1,false,nodeComparator));
+		assertFalse(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		
+		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
+		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		assertFalse(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		assertFalse(ei.isomorphic(g2));
+		
+		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
+		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		assertFalse(ei.isomorphic(g1));
+		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		assertFalse(ei.isomorphic(g1));
+		
+		ei = new ExactIsomorphism(g1,true,null);
+		assertFalse(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g2,true,null);
+		assertFalse(ei.isomorphic(g1));
+
+		ei = new ExactIsomorphism(g1,false,null);
+		assertFalse(ei.isomorphic(g2));
+		ei = new ExactIsomorphism(g2,false,null);
+		assertFalse(ei.isomorphic(g1));
+	}
+	
+	
 }

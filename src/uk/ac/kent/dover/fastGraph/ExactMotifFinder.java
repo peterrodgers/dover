@@ -473,61 +473,57 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 			
 			for(FastGraph subgraph : subgraphs) {
 				ExactIsomorphism ei = null;
-				try {
-					ei = new ExactIsomorphism(subgraph);
-					String hashString = ei.generateStringForHash();
-		//Debugger.log("new subgraph, hash value "+hashString);			
-					if(hashBuckets.containsKey(hashString)) {
-						LinkedList<IsoHolder> sameHashList = hashBuckets.get(hashString); // all of the FastGraphs with the given hash value
-						boolean found = false;
-						for(IsoHolder isoList : sameHashList) { // now need to test all the same hash value buckets for isomorphism
-							// only need to test the first Graph in an isomorphic list!
-							FastGraph comparisonGraph = isoList.getGraph();
-	
-							if(ei.isomorphic(comparisonGraph)) {
-								isoList.incrementNumber();
-								found = true;
-								
-								if(saveAll) {
-									//Debugger.log("saving all");
-									subgraph.setName(hashString);
-									File saveFolder = new File("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-"+
-											sameHashList.size()+File.separatorChar+isoList.getNumber());
-									saveFolder.mkdirs();
-									subgraph.saveBuffers(saveFolder.getAbsolutePath(),hashString+"-"+sameHashList.size());
-									exportSVG(saveFolder.getAbsolutePath(), subgraph, 0, true);
-								}
-								
-								break;
+				ei = new ExactIsomorphism(subgraph);
+				String hashString = ei.generateStringForHash();
+	//Debugger.log("new subgraph, hash value "+hashString);			
+				if(hashBuckets.containsKey(hashString)) {
+					LinkedList<IsoHolder> sameHashList = hashBuckets.get(hashString); // all of the FastGraphs with the given hash value
+					boolean found = false;
+					for(IsoHolder isoList : sameHashList) { // now need to test all the same hash value buckets for isomorphism
+						// only need to test the first Graph in an isomorphic list!
+						FastGraph comparisonGraph = isoList.getGraph();
+
+						if(ei.isomorphic(comparisonGraph)) {
+							isoList.incrementNumber();
+							found = true;
+							
+							if(saveAll) {
+								//Debugger.log("saving all");
+								subgraph.setName(hashString);
+								File saveFolder = new File("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-"+
+										sameHashList.size()+File.separatorChar+isoList.getNumber());
+								saveFolder.mkdirs();
+								subgraph.saveBuffers(saveFolder.getAbsolutePath(),hashString+"-"+sameHashList.size());
+								exportSVG(saveFolder.getAbsolutePath(), subgraph, 0, true);
 							}
-						}
-						
-						if(!found) { // no isomorphic graphs found, so need to create a new list
-							IsoHolder newIsoList = new IsoHolder(hashString+"-"+(sameHashList.size()+1), 1);
 							
-							subgraph.setName(hashString);
-							subgraph.saveBuffers("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-"+(sameHashList.size()+1), hashString+"-"+(sameHashList.size()+1));
-							
-							//newIsoList.setGraph(subgraph);
-							sameHashList.add(newIsoList);
+							break;
 						}
-					} else {
-						LinkedList<IsoHolder> newHashList = new LinkedList<IsoHolder>();
-						hashBuckets.put(hashString, newHashList);
+					}
+					
+					if(!found) { // no isomorphic graphs found, so need to create a new list
+						IsoHolder newIsoList = new IsoHolder(hashString+"-"+(sameHashList.size()+1), 1);
 						
 						subgraph.setName(hashString);
-						subgraph.saveBuffers("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-1", hashString+"-1");
+						subgraph.saveBuffers("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-"+(sameHashList.size()+1), hashString+"-"+(sameHashList.size()+1));
 						
-						IsoHolder newIsoList = new IsoHolder(hashString+"-1", 1);
-						//newIsoList.add(subgraph);
-						newHashList.add(newIsoList);
+						//newIsoList.setGraph(subgraph);
+						sameHashList.add(newIsoList);
 					}
-	
-					ei = null; //GC
-					//System.gc();
-				} catch (FastGraphException e) {
-					e.printStackTrace();
+				} else {
+					LinkedList<IsoHolder> newHashList = new LinkedList<IsoHolder>();
+					hashBuckets.put(hashString, newHashList);
+					
+					subgraph.setName(hashString);
+					subgraph.saveBuffers("motifs"+File.separatorChar+g.getName()+File.separatorChar+hashString+"-1", hashString+"-1");
+					
+					IsoHolder newIsoList = new IsoHolder(hashString+"-1", 1);
+					//newIsoList.add(subgraph);
+					newHashList.add(newIsoList);
 				}
+
+				ei = null; //GC
+				//System.gc();
 			}
 		}
 

@@ -96,9 +96,6 @@ public class ExactIsomorphism {
 				g1 = FastGraph.randomGraphFactory(nodes, edges, false);
 				g2 = ExactIsomorphism.generateRandomIsomorphicGraph(g1, System.currentTimeMillis(), false);
 				time = System.currentTimeMillis();
-				if(!Connected.connected(g1)) {
-					continue;
-				}
 /*				if(ExactIsomorphism.isomorphic(g1, g2, false)) {
 					System.out.println("Ids changed undirected isomorphic nodes "+nodes+" edges "+edges+" time "+(System.currentTimeMillis()-time)/1000.0);
 				} else {
@@ -116,9 +113,6 @@ public class ExactIsomorphism {
 				}
 				
 				g2 = FastGraph.randomGraphFactory(nodes, edges, false);
-				if(!Connected.connected(g2)) {
-					continue;
-				}
 				time = System.currentTimeMillis();
 				if(ExactIsomorphism.isomorphic(g1, g2, false)) {
 					System.out.println("Random undirected isomorphic nodes "+nodes+" edges "+edges+" time "+(System.currentTimeMillis()-time)/1000.0);
@@ -147,13 +141,12 @@ public class ExactIsomorphism {
 	 * Create an ExactIsomorphism before running isomorphic for undirected graphs.
 	 * No node matching test is done.
 	 * This makes multiple tests against one graph to be more efficient as data
-	 * for that graph does not need to be recreated. The graph must be connected.
+	 * for that graph does not need to be recreated.
 	 * 
 	 * @param fastGraph one graph to be tested.
-	 * @throws FastGraphException if the graph is not connected
 	 *
 	 */
-	public ExactIsomorphism(FastGraph fastGraph) throws FastGraphException {
+	public ExactIsomorphism(FastGraph fastGraph) {
 
 		this.fastGraph = fastGraph;
 		this.directed = false;
@@ -166,14 +159,12 @@ public class ExactIsomorphism {
 	 * Create an ExactIsomorphism before running isomorphic.
 	 * No node matching test is done.
 	 * This makes multiple tests against one graph to be more efficient as
-	 * data for that graph does not need to be recreated. The
-	 * graph must be connected.
+	 * data for that graph does not need to be recreated.
 	 * 
 	 * @param fastGraph one graph to be tested.
 	 * @param directed true if the graphs should be treated as directed, false if they are undirected
-	 * @throws FastGraphException if the graph is not connected
 	 */
-	public ExactIsomorphism(FastGraph fastGraph, boolean directed) throws FastGraphException {
+	public ExactIsomorphism(FastGraph fastGraph, boolean directed) {
 
 		this.fastGraph = fastGraph;
 		this.directed = directed;
@@ -186,16 +177,14 @@ public class ExactIsomorphism {
 	 * Create an ExactIsomorphism before running isomorphic.
 	 * Node matching test is done if a nodeComparator is passed, e.g. for comparing node labels.
 	 * This makes multiple tests against one graph to be more efficient as
-	 * data for that graph does not need to be recreated. The
-	 * graph must be connected.
+	 * data for that graph does not need to be recreated.
 	 * 
 	 * @param fastGraph one graph to be tested.
 	 * @param directed true if the graphs should be treated as directed, false if they are undirected
 	 * @param nodeComparator if set, used to compare the node attributes for a match, if null, only the topology is tested, node attributes will not affect matching.
 	 * g1 in the node comparator should be the first parameter, g2 should be the graph to be tested for isomorphism
-	 * @throws FastGraphException if the graph is not connected
 	 */
-	public ExactIsomorphism(FastGraph fastGraph, boolean directed, NodeComparator nodeComparator) throws FastGraphException {
+	public ExactIsomorphism(FastGraph fastGraph, boolean directed, NodeComparator nodeComparator) {
 
 		this.fastGraph = fastGraph;
 		this.directed = directed;
@@ -207,11 +196,8 @@ public class ExactIsomorphism {
 	/**
 	 * initialize the class
 	 */
-	private void init() throws FastGraphException {
+	private void init() {
 
-		if(!Connected.connected(fastGraph)) {
-			throw new FastGraphException("Graphs must be connected to test for isomorphism.");
-		}
 		am1 = new AdjacencyMatrix(fastGraph);
 		if(fastGraph.getNumberOfNodes() == 0) {
 			matrix1 = new int[0][0];
@@ -264,14 +250,13 @@ public class ExactIsomorphism {
 	
 	/**
 	 * Equality of graphs. Returns a mapping if this graph is equal
-	 * to the given graph. Graphs must be connected. Resultant mapping on returning
+	 * to the given graph. Resultant mapping on returning
 	 * true can be found with {@link #getLastMatch()}
 	 *
 	 * @param g the graph to compare
 	 * @return true if there is an equality with the given graph, null if is not.
-	 * @throws FastGraphException if the graph is disconnected
 	 */
-	public boolean isomorphic(FastGraph g) throws FastGraphException {
+	public boolean isomorphic(FastGraph g) {
 		boolean ret = true;
 		if(directed) {
 			ret = directedIsomorphic(g);
@@ -285,13 +270,12 @@ public class ExactIsomorphism {
 	
 	/**
 	 * Equality of undirected graphs. Returns a mapping if this graph is equal
-	 * to the given graph. Graphs must be connected.
+	 * to the given graph.
 	 *
 	 * @param g the graph to compare
 	 * @return true if there is an equality with the given graph, null if is not.
-	 * @throws FastGraphException if the graph is disconnected
 	 */
-	public boolean undirectedIsomorphic(FastGraph g) throws FastGraphException {
+	public boolean undirectedIsomorphic(FastGraph g) {
 numberOfIsomorphismTests++;
 isomorphismStartTime = System.currentTimeMillis();
 
@@ -317,17 +301,13 @@ isomorphismStartTime = -1;
 			return true;
 		}
 
-// note that the following two tests are reasonable, but have been commented out as defined behaviour on disconnected graph is to throw exception
-/*		if(!Connected.connected(g1) && Connected.connected(g2)) {
+		if(!Connected.connected(g1) && Connected.connected(g2)) {
 			return false;
 		}
 		if(Connected.connected(g1) && !Connected.connected(g2)) {
 			return false;
 		}
-*/
-		if(!Connected.connected(g2)) {
-			throw new FastGraphException("Graph must be connected to test for isomorphism.");
-		}
+
 		if(numberOfNodes1 != numberOfNodes2) {
 //System.out.println("Not isomorphic: different number of nodes");
 failOnNodeCount++;
@@ -570,13 +550,12 @@ bruteForceStartTime = -1;
 
 	/**
 	 * Equality of directed graphs. Returns a mapping if this graph is equal
-	 * to the given graph. Graphs must be connected.
+	 * to the given graph.
 	 *
 	 * @param g the graph to compare
 	 * @return true if there is an equality with the given graph, null if is not.
-	 * @throws FastGraphException if the graph is disconnected
 	 */
-	private boolean directedIsomorphic(FastGraph g) throws FastGraphException {
+	private boolean directedIsomorphic(FastGraph g) {
 numberOfIsomorphismTests++;
 isomorphismStartTime = System.currentTimeMillis();
 
@@ -602,18 +581,13 @@ isomorphismStartTime = -1;
 			return true;
 		}
 
-// note that the following two tests are reasonable, but have been commented out as defined behaviour on disconnected graph is to throw exception
-/*		if(!Connected.connected(g1) && Connected.connected(g2)) {
+		if(!Connected.connected(g1) && Connected.connected(g2)) {
 			return false;
 		}
 		if(Connected.connected(g1) && !Connected.connected(g2)) {
 			return false;
 		}
-*/
-		if(!Connected.connected(g2)) {
-			throw new FastGraphException("Graph must be connected to test for isomorphism.");
-		}
-				
+
 		if(numberOfNodes1 != numberOfNodes2) {
 //System.out.println("Not isomorphic: different number of nodes");
 failOnNodeCount++;
@@ -1044,9 +1018,8 @@ bruteForceStartTime = -1;
 	 * @param nodes the nodes in g2 that form the subgraph
 	 * @param edges the edges in g2 that form the subgraph
 	 * @return true if the g1 and the subgraph of g2 are isomorphic, false otherwise
-	 * @throws FastGraphException if a graph is not connected
 	 */
-	public boolean isomorphic(FastGraph g, int[] nodes, int[] edges) throws FastGraphException {
+	public boolean isomorphic(FastGraph g, int[] nodes, int[] edges) {
 
 		FastGraph subGraph = g.generateGraphFromSubgraph(nodes,edges);
 		
@@ -1065,9 +1038,8 @@ bruteForceStartTime = -1;
 	 * @param g2 the other FastGraph to be tested
 	 * @param directed false if the graphs are treated as undirected, true if they are directed
 	 * @return true if g1 and g2 are isomorphic, false otherwise
-	 * @throws FastGraphException if a graph is not connected
 	 */
-	public static boolean isomorphic(FastGraph g1, FastGraph g2, boolean directed) throws FastGraphException {
+	public static boolean isomorphic(FastGraph g1, FastGraph g2, boolean directed) {
 		ExactIsomorphism ei = new ExactIsomorphism(g1,directed);
 		boolean ret = ei.isomorphic(g2);
 		return ret;
@@ -1083,9 +1055,8 @@ bruteForceStartTime = -1;
 	 * @param nodeComparator if set, used to compare the node attributes for a match, if null, only the topology is tested, node attributes will not affect matching.
 	 * g1 and g2 in the node comparator should correspond to the first and second parameter, respectively.
 	 * @return true if g1 and g2 are isomorphic, false otherwise
-	 * @throws FastGraphException if a graph is not connected
 	 */
-	public static boolean isomorphic(FastGraph g1, FastGraph g2, boolean directed, NodeComparator nodeComparator) throws FastGraphException {
+	public static boolean isomorphic(FastGraph g1, FastGraph g2, boolean directed, NodeComparator nodeComparator) {
 		ExactIsomorphism ei = new ExactIsomorphism(g1,directed,nodeComparator);
 		boolean ret = ei.isomorphic(g2);
 		return ret;
@@ -1098,9 +1069,8 @@ bruteForceStartTime = -1;
 	 * @param g1 one FastGraph to be tested
 	 * @param g2 the other FastGraph to be tested
 	 * @return true if g1 and g2 are isomorphic, false otherwise
-	 * @throws FastGraphException if a graph is not connected
 	 */
-	public static boolean isomorphic(FastGraph g1, FastGraph g2) throws FastGraphException {
+	public static boolean isomorphic(FastGraph g1, FastGraph g2) {
 		ExactIsomorphism ei = new ExactIsomorphism(g1);
 		boolean ret = ei.isomorphic(g2);
 		return ret;
