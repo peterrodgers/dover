@@ -1488,6 +1488,9 @@ public class ExactIsomorphismTest {
 		assertTrue(ei.isomorphic(g2));
 		ei = new ExactIsomorphism(g2,false,null);
 		assertTrue(ei.isomorphic(g1));
+		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 	}
 	
 	
@@ -1583,6 +1586,9 @@ public class ExactIsomorphismTest {
 		assertTrue(ei.isomorphic(g2));
 		ei = new ExactIsomorphism(g2,false,null);
 		assertTrue(ei.isomorphic(g1));
+		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 	}
 	
 	
@@ -1685,6 +1691,9 @@ public class ExactIsomorphismTest {
 		assertTrue(ei.isomorphic(g2));
 		ei = new ExactIsomorphism(g2,false,null);
 		assertTrue(ei.isomorphic(g1));
+
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 	}
 
 	
@@ -1780,6 +1789,9 @@ public class ExactIsomorphismTest {
 		assertTrue(ei.isomorphic(g2));
 		ei = new ExactIsomorphism(g2,false,null);
 		assertTrue(ei.isomorphic(g1));
+		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 	}
 	
 	
@@ -1825,6 +1837,9 @@ public class ExactIsomorphismTest {
 		assertFalse(ei.isomorphic(g2));
 		ei = new ExactIsomorphism(g2,false,null);
 		assertFalse(ei.isomorphic(g1));
+		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 	}
 	
 
@@ -1892,6 +1907,10 @@ public class ExactIsomorphismTest {
 		assertFalse(ei.isomorphic(g2));
 		ei = new ExactIsomorphism(g2,false,null);
 		assertFalse(ei.isomorphic(g1));
+		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+
 	}
 	
 	

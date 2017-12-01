@@ -1,45 +1,20 @@
 package uk.ac.kent.dover.fastGraph;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import java.awt.Color;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json.*;
 
-import test.uk.ac.kent.dover.TestRunner;
-import uk.ac.kent.displayGraph.ColorBrewer;
-import uk.ac.kent.displayGraph.Edge;
-import uk.ac.kent.displayGraph.EdgeType;
-import uk.ac.kent.displayGraph.Graph;
-import uk.ac.kent.displayGraph.Node;
-import uk.ac.kent.displayGraph.NodeType;
+import uk.ac.kent.displayGraph.*;
 import uk.ac.kent.displayGraph.drawers.GraphDrawerGravitySpringEmbedder;
-import uk.ac.kent.dover.fastGraph.Gui.MotifTaskDummy;
-import uk.ac.kent.dover.fastGraph.comparators.SimpleEdgeLabelComparator;
-import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
 
 
 /**
@@ -119,65 +94,46 @@ public class FastGraph {
 	
 	public static void main(String [] args) throws Exception {
 		
-		if(true) {
-			FastGraph g1 = FastGraph.randomGraphFactory(0, 0, false);
-			NodeStructure ns;
-			ns = new NodeStructure(-1,"abc", 1, (byte)2, (byte)3);
-			g1 = g1.generateGraphByAddingSingletonNode(ns);
-			System.out.println(g1.getNodeLabel(0));
-			System.out.println(g1.getNodeAge(0));
-			System.out.println("ZZZZ");
-		}
-/*
-		FastGraph g;
-		int[] deleteNodes = {0};
-		int[] deleteEdges = {};
-		int n;
-		long time;
-		int edges = 1000;
+		System.out.println("XXXXX");
 		
-		g = FastGraph.randomGraphFactory(edges*10, edges, 4, false);
-		n = 0;
-		time = System.currentTimeMillis();
-		while(n < g.getNumberOfNodes()) {
-			while(g.getNodeDegree(n) != 0) {
-				n++;
-				if(n == g.getNumberOfNodes()) {
-					break;
-				}
-			}
-			if(n == g.getNumberOfNodes()) {
-				break;
-			}
-			g = g.generateGraphByDeletingSingletonNode(n);
-		}
-		System.out.println("Time for generateGraphByDeletingSingletonNode: "+(System.currentTimeMillis()-time)/1000.0);
+		Debugger.enabled = true;
+		
+		FastGraph g,g1;
+		LinkedList<NodeStructure> addNodes;
+		LinkedList<EdgeStructure> addEdges;
+		NodeStructure ns;
+		EdgeStructure es;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		addEdges = new LinkedList<EdgeStructure>();
+		g = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
+		
+		ns = new NodeStructure(-1,"nlkjh1", 1, (byte)1, (byte)0);
+addNodes.add(ns);
+		g = g.generateGraphByAddingNode(ns);
 
+		ns = new NodeStructure(-1,"yhtggtff1", 1, (byte)8, (byte)0);
+addNodes.add(ns);
+		g = g.generateGraphByAddingNode(ns);
 		
-		g = FastGraph.randomGraphFactory(edges*10, edges, 4, false);
-		n = 0;
-		time = System.currentTimeMillis();
-		while(n < g.getNumberOfNodes()) {
-			while(g.getNodeDegree(n) != 0) {
-				n++;
-				if(n == g.getNumberOfNodes()) {
-					break;
-				}
-			}
-			if(n == g.getNumberOfNodes()) {
-				break;
-			}
-			deleteNodes[0] = n;
-			g = g.generateGraphByDeletingItems(deleteNodes, deleteEdges, false);
-		}
-		System.out.println("Time for generateGraphByDeletingItems: "+(System.currentTimeMillis()-time)/1000.0);
-*/
+		es = new EdgeStructure(-1,"edge label 0", 12, (byte)0, (byte)1, 0, 1);
+addEdges.add(es);
+		g = g.generateGraphByAddingEdge(es);
 		
-	}
-	
+		ns = new NodeStructure(-1,"2", 1, (byte)8, (byte)0);
+addNodes.add(ns);
+		g = g.generateGraphByAddingNode(ns);
+		
+		es = new EdgeStructure(-1,"1", 9, (byte)0, (byte)1, 1, 2);
+addEdges.add(es);
+		g = g.generateGraphByAddingEdge(es);
+//		g.outputInternalData();
+//System.out.println(g.checkConsistency());
+g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
+g1.outputInternalData();
+	}	
 
 	
-
 	/**
 	 * No direct access to constructor, as a number of data structures need to be created when
 	 * graph nodes and edges are added.
@@ -760,10 +716,9 @@ public class FastGraph {
 		int[] ret = new int[degree];
 		
 		for(int i = 0; i < degree; i++) {
-			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
-			int node = connectionBuf.getInt(nodeOffset);
-			ret[i] = node;
+			int edgeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
+			int edge = connectionBuf.getInt(edgeOffset);
+			ret[i] = edge;
 		}
 		
 		return ret;
@@ -784,10 +739,9 @@ public class FastGraph {
 		int degree = getNodeDegree(nodeIndex);
 		
 		for(int i = 0; i < degree; i++) {
-			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
-			int node = connectionBuf.getInt(nodeOffset);
-			ret[i] = node;
+			int edgeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
+			int edge = connectionBuf.getInt(edgeOffset);
+			ret[i] = edge;
 		}
 	}
 	
@@ -919,14 +873,12 @@ public class FastGraph {
 		
 		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeIndex*NODE_BYTE_SIZE); // in offset is the first one
 		int degree = getNodeInDegree(nodeIndex);
-		
 		int[] ret = new int[degree];
 		
 		for(int i = 0; i < degree; i++) {
-			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
-			int node = connectionBuf.getInt(nodeOffset);
-			ret[i] = node;
+			int edgeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
+			int edge = connectionBuf.getInt(edgeOffset);
+			ret[i] = edge;
 		}
 		
 		return ret;
@@ -948,10 +900,9 @@ public class FastGraph {
 		int degree = getNodeInDegree(nodeIndex);
 		
 		for(int i = 0; i < degree; i++) {
-			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
-			int node = connectionBuf.getInt(nodeOffset);
-			ret[i] = node;
+			int edgeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
+			int edge = connectionBuf.getInt(edgeOffset);
+			ret[i] = edge;
 		}
 	}
 
@@ -1014,10 +965,9 @@ public class FastGraph {
 		int[] ret = new int[degree];
 		
 		for(int i = 0; i < degree; i++) {
-			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
-			int node = connectionBuf.getInt(nodeOffset);
-			ret[i] = node;
+			int edgeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
+			int edge = connectionBuf.getInt(edgeOffset);
+			ret[i] = edge;
 		}
 		
 		return ret;
@@ -1038,10 +988,9 @@ public class FastGraph {
 		int degree = getNodeOutDegree(nodeIndex);
 		
 		for(int i = 0; i < degree; i++) {
-			// don't need the edge, so step over edge/node pairs and the ege
-			int nodeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
-			int node = connectionBuf.getInt(nodeOffset);
-			ret[i] = node;
+			int edgeOffset = connectionOffset+(i*CONNECTION_PAIR_SIZE)+CONNECTION_EDGE_OFFSET;
+			int edge = connectionBuf.getInt(edgeOffset);
+			ret[i] = edge;
 		}
 	}
 
@@ -1693,6 +1642,124 @@ public class FastGraph {
 	}
 	
 
+	/**
+	 * Debugging info
+	 */
+	public void outputInternalData() {
+		
+		HashMap<String,Integer> outConnectionMap = new HashMap<String,Integer>();
+		HashMap<String,Integer> inConnectionMap = new HashMap<String,Integer>();
+		ArrayList<Integer> nodeLabelIndex = new ArrayList<Integer>();
+		ArrayList<Integer> nodeLabelNode = new ArrayList<Integer>();
+		ArrayList<Integer> edgeLabelIndex = new ArrayList<Integer>();
+		ArrayList<Integer> edgeLabelEdge = new ArrayList<Integer>();
+		
+		System.out.println("Graph name: "+getName());
+		for(int i = 0; i< numberOfNodes; i++) {
+			System.out.println("node "+i+" "+getNodeLabel(i));
+			System.out.println("  LABEL_START: "+nodeBuf.getInt(NODE_LABEL_START_OFFSET+i*NODE_BYTE_SIZE));
+			System.out.println("  LABEL_LENGTH: "+nodeBuf.getShort(NODE_LABEL_LENGTH_OFFSET+i*NODE_BYTE_SIZE));
+			System.out.println("  IN_CONNECTION_START: "+nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE));
+			System.out.println("  IN_DEGREE: "+nodeBuf.getInt(NODE_IN_DEGREE_OFFSET+i*NODE_BYTE_SIZE));
+			System.out.println("  OUT_CONNECTION_START: "+nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE));
+			System.out.println("  OUT_DEGREE: "+nodeBuf.getInt(NODE_OUT_DEGREE_OFFSET+i*NODE_BYTE_SIZE));
+			System.out.println("  WEIGHT: "+nodeBuf.getInt(NODE_WEIGHT_OFFSET+i*NODE_BYTE_SIZE));
+			System.out.println("  TYPE: "+nodeBuf.get(NODE_TYPE_OFFSET+i*NODE_BYTE_SIZE));
+			System.out.println("  AGE: "+nodeBuf.get(NODE_AGE_OFFSET+i*NODE_BYTE_SIZE));
+
+			outConnectionMap.put("node"+i+"out",nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE));
+			inConnectionMap.put("node"+i+"in",nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+i*NODE_BYTE_SIZE));
+			nodeLabelIndex.add(nodeBuf.getInt(NODE_LABEL_START_OFFSET+i*NODE_BYTE_SIZE));
+			nodeLabelNode.add(i);
+		}
+		
+		for(int i = 0; i< numberOfEdges; i++) {
+			System.out.println("edge "+i+" "+getEdgeLabel(i));
+			System.out.println("  NODE1: "+edgeBuf.getInt(EDGE_NODE1_OFFSET+i*EDGE_BYTE_SIZE));
+			System.out.println("  NODE2: "+edgeBuf.getInt(EDGE_NODE2_OFFSET+i*EDGE_BYTE_SIZE));
+			System.out.println("  LABEL_START: "+edgeBuf.getInt(EDGE_LABEL_START_OFFSET+i*EDGE_BYTE_SIZE));
+			System.out.println("  LABEL_LENGTH: "+edgeBuf.getShort(EDGE_LABEL_LENGTH_OFFSET+i*EDGE_BYTE_SIZE));
+			System.out.println("  WEIGHT: "+edgeBuf.getInt(EDGE_WEIGHT_OFFSET+i*EDGE_BYTE_SIZE));
+			System.out.println("  TYPE: "+edgeBuf.get(EDGE_TYPE_OFFSET+i*EDGE_BYTE_SIZE));
+			System.out.println("  AGE: "+edgeBuf.get(EDGE_AGE_OFFSET+i*EDGE_BYTE_SIZE));
+			
+			edgeLabelIndex.add(edgeBuf.getInt(EDGE_LABEL_START_OFFSET+i*EDGE_BYTE_SIZE));
+			edgeLabelEdge.add(i);
+		}
+		
+		nodeLabelBuf.rewind();
+		System.out.print("nodeLabelBuf: ");
+		for(int i = 0; i< nodeLabelBuf.capacity(); i+= 2) {
+			int index = nodeLabelIndex.indexOf(i);
+			while(index != -1) {
+				System.out.print("node"+nodeLabelNode.get(index)+" ");
+				nodeLabelIndex.set(index,-1);
+				index = nodeLabelIndex.indexOf(i);
+			}
+			System.out.print(nodeLabelBuf.getChar()+" ");
+		}
+		int index = nodeLabelIndex.indexOf(nodeLabelBuf.capacity());
+		while(index != -1) {
+			System.out.print("node"+nodeLabelNode.get(index)+" ");
+			nodeLabelIndex.set(index,-1);
+			index = nodeLabelIndex.indexOf(nodeLabelBuf.capacity());
+		}
+		
+		System.out.println();
+		
+		edgeLabelBuf.rewind();
+		System.out.print("edgeLabelBuf: ");
+		for(int i = 0; i< edgeLabelBuf.capacity(); i+= 2) {
+			index = edgeLabelIndex.indexOf(i);
+			while(index != -1) {
+				System.out.print("edge"+edgeLabelEdge.get(index)+" ");
+				edgeLabelIndex.set(index,-1);
+				index = edgeLabelIndex.indexOf(i);
+			}
+			System.out.print(edgeLabelBuf.getChar()+" ");
+		}
+		index = edgeLabelIndex.indexOf(edgeLabelBuf.capacity());
+		while(index != -1) {
+			System.out.print("edge"+edgeLabelEdge.get(index)+" ");
+			edgeLabelIndex.set(index,-1);
+			index = edgeLabelIndex.indexOf(edgeLabelBuf.capacity());
+		}
+		
+		System.out.println();
+		
+		connectionBuf.rewind();
+		System.out.print("connectionBuf: ");
+		for(int i = 0; i< connectionBuf.capacity(); i+= 4) {
+			for(String s : inConnectionMap.keySet()) {
+				if(inConnectionMap.get(s) == i) {
+					System.out.print(s+" ");
+				}
+			}
+			for(String s : outConnectionMap.keySet()) {
+				if(outConnectionMap.get(s) == i) {
+					System.out.print(s+" ");
+				}
+			}
+			System.out.print(connectionBuf.getInt()+" ");
+		}
+		for(String s : inConnectionMap.keySet()) {
+			if(inConnectionMap.get(s) == connectionBuf.capacity()) {
+				System.out.print(s+" ");
+			}
+		}
+		for(String s : outConnectionMap.keySet()) {
+			if(outConnectionMap.get(s) == connectionBuf.capacity()) {
+				System.out.print(s+" ");
+			}
+		}
+		System.out.println();
+		
+		System.out.println("consistent: "+checkConsistency());
+
+	}
+	
+
+	
 	/**
 	 * Save a ByteBuffer to a file.
 	 * 
@@ -3320,11 +3387,11 @@ if(node%100000 == 0) {
 				return false;
 			}
 			if(!Util.convertArray(getNodeConnectingOutEdges(node1)).contains(e)) {
-				Debugger.log("INCONSISTENT. Edge "+e+" has node1 "+node1+ " but it is not in the node out list");
+				Debugger.log("INCONSISTENT. Edge "+e+" has node1 "+node1+ " but edge "+e+" is not in the node's out edges list");
 				return false;
 			}
 			if(!Util.convertArray(getNodeConnectingInEdges(node2)).contains(e)) {
-				Debugger.log("INCONSISTENT. Edge "+e+" has node2 "+node2+ " but it is not in the node in list");
+				Debugger.log("INCONSISTENT. Edge "+e+" has node2 "+node2+ " but edge "+e+" is not in the node's in edges list");
 				return false;
 			}
 		}
@@ -3344,7 +3411,7 @@ if(node%100000 == 0) {
 				int otherEnd = oppositeEnd(connectingEdge, n);
 				int connectingNode = getNodeConnectingOutNodes(n)[i];
 				if(otherEnd != connectingNode) {
-					Debugger.log("INCONSISTENT. Node "+n+" has inconsitent edge and node in connecting out list");
+					Debugger.log("INCONSISTENT. Node "+n+" has inconsistent edge and node connecting out list");
 					return false;
 				}
 				if(n != oppositeEnd(connectingEdge, otherEnd)) {
@@ -3353,12 +3420,12 @@ if(node%100000 == 0) {
 				}
 			}
 				
-				for(int i = 0; i < getNodeConnectingInEdges(n).length; i++) {
+			for(int i = 0; i < getNodeConnectingInEdges(n).length; i++) {
 					int connectingEdge = getNodeConnectingInEdges(n)[i];
 					int otherEnd = oppositeEnd(connectingEdge, n);
 					int connectingNode = getNodeConnectingInNodes(n)[i];
 					if(otherEnd != connectingNode) {
-						Debugger.log("INCONSISTENT. Node "+n+" has inconsitent edge and node in connecting in list");
+						Debugger.log("INCONSISTENT. Node "+n+" has inconsistent edge and node in connecting in list");
 					return false;
 				}
 				if(n != oppositeEnd(connectingEdge, otherEnd)) {
@@ -3367,6 +3434,20 @@ if(node%100000 == 0) {
 				}
 
 			}
+			
+			// orientation and position of node connections
+			int inConnectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+n*NODE_BYTE_SIZE);
+			int outConnectionOffset = nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+n*NODE_BYTE_SIZE);
+			
+			if(inConnectionOffset > outConnectionOffset) {
+				Debugger.log("INCONSISTENT. node "+n+" inConnectionOffset must be less than or equal to outConnectionOffset");
+				return false;
+			}
+			if(outConnectionOffset != inConnectionOffset+getNodeInDegree(n)*8) {
+				Debugger.log("INCONSISTENT. node "+n+" outConnectionOffset must straight after inConnectionOffset");
+				return false;
+			}
+
 		}
 		
 		return true;
@@ -3374,7 +3455,7 @@ if(node%100000 == 0) {
 
 
 
-	
+
 	/**
 	 * This generates a new random graph based on the existing graph, but with rewired edges. The node degrees are maintained.
 	 * It performs multiple rewrites 
@@ -3908,6 +3989,7 @@ Debugger.outputTime("time for rewiring");
 	}
 	
 
+
 	/**
 	 * 
 	 * Create a graph. Rewire generation (age) 0 then apply random changes to later
@@ -4001,13 +4083,14 @@ Debugger.outputTime("time for rewiring");
 
 	/**
 	 * Given a collection of NodeStructure and EdgeStructure, create a new graph.
-	 * Edges node1 and node2 refer to the ids in the nodes list. The ids in both lists
-	 * must start at 0 and increase by 1 for each element.
+	 * Edges node1 and node2 refer to the ids in the nodes list. This method
+	 * does not use ids of elements in nodes and edges, instead assigns them
+	 * according to their position in the list, starting at 0.
 	 * 
 	 * @param inName the name of the new FastGraph
 	 * @param inGeneration the generation of the new FastGraph, put 0 if unsure
-	 * @param nodes the nodes to be in the new FastGraph. ids must start at 0 and end at nodes.size()-1
-	 * @param edges the edges to be in the new FastGraph. ids must start at 0 and end at edges.size()-1
+	 * @param nodes the nodes to be in the new FastGraph. ids are ignored
+	 * @param edges the edges to be in the new FastGraph. ids are ignored
 	 * @param direct if true then off heap ByteBuffers, if false then on heap ByteBuffers
 	 * @return the new FastGraph with the nodes and edges from the input
 	 */
@@ -4021,8 +4104,9 @@ Debugger.outputTime("time for rewiring");
 		String[] nodeLabels = new String[nodeCount];
 		String[] edgeLabels = new String[edgeCount];
 
+		int nodeId = 0;
 		for(NodeStructure ns : nodes) {
-			int nodeId = ns.getId();
+			ns.setId(nodeId);
 			g.nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE,-1); // offset for inward connecting edges/nodes
 			g.nodeBuf.putInt(NODE_IN_DEGREE_OFFSET+nodeId*NODE_BYTE_SIZE,-1); // number of inward connecting edges/nodes
 			g.nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+nodeId*NODE_BYTE_SIZE,-1); // offset for outward connecting edges/nodes
@@ -4033,6 +4117,7 @@ Debugger.outputTime("time for rewiring");
 
 			// save labels for later
 			nodeLabels[nodeId] = ns.getLabel();
+			nodeId++;
 		}
 
 		g.setAllNodeLabels(nodeLabels);
@@ -4050,9 +4135,10 @@ Debugger.outputTime("time for rewiring");
 		}
 		
 		ArrayList<Integer> inEdgeList;	
-		ArrayList<Integer> outEdgeList;	
+		ArrayList<Integer> outEdgeList;
+		int edgeId = 0;
 		for(EdgeStructure es : edges) {
-			int edgeId = es.getId();
+			es.setId(edgeId);
 			g.edgeBuf.putInt(EDGE_NODE1_OFFSET+edgeId*EDGE_BYTE_SIZE,es.getNode1()); // one end of edge
 			g.edgeBuf.putInt(EDGE_NODE2_OFFSET+edgeId*EDGE_BYTE_SIZE,es.getNode2()); // other end of edge
 			g.edgeBuf.putInt(EDGE_WEIGHT_OFFSET+edgeId*EDGE_BYTE_SIZE,es.getWeight()); // weight
@@ -4067,6 +4153,8 @@ Debugger.outputTime("time for rewiring");
 			inEdgeList.add(edgeId);
 			outEdgeList = nodeOut.get(es.getNode1());
 			outEdgeList.add(edgeId);
+			
+			edgeId++;
 			
 		}
 		
@@ -4437,9 +4525,13 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		if(!direct) {
 			g.nodeLabelBuf = ByteBuffer.allocate(nodeLabelBufSize);
 			g.edgeLabelBuf = ByteBuffer.allocate(edgeLabelBufSize);
+			// connectionBuf could be set to wrong size in init()
+			g.connectionBuf = ByteBuffer.allocate(this.connectionBuf.capacity());
 		} else {
 			g.nodeLabelBuf = ByteBuffer.allocateDirect(nodeLabelBufSize);
 			g.edgeLabelBuf = ByteBuffer.allocateDirect(edgeLabelBufSize);
+			// connectionBuf could be set to wrong size in init()
+			g.connectionBuf = ByteBuffer.allocate(this.connectionBuf.capacity());
 		}
 
 		this.connectionBuf.rewind();
@@ -4454,7 +4546,8 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		g.edgeLabelBuf.put(this.edgeLabelBuf);
 
 		this.nodeBuf.rewind();
-		int uptoDeletedNodeEnd = (n)*NODE_BYTE_SIZE;
+		// first bit of the nodeBuf remains the same
+		int uptoDeletedNodeEnd = n*NODE_BYTE_SIZE;
 		byte[] nodes1 = new byte[uptoDeletedNodeEnd];
 		this.nodeBuf.get(nodes1, 0, uptoDeletedNodeEnd);
 
@@ -4463,10 +4556,12 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		byte[] throwAway = new byte[NODE_BYTE_SIZE];
 		this.nodeBuf.get(throwAway, 0, NODE_BYTE_SIZE);
 		
+		// second bit of the nodeBuf moves down by one node
 		int afterDeletedNodeSize = (this.numberOfNodes-(n+1))*NODE_BYTE_SIZE;
 		byte[] nodes2 = new byte[afterDeletedNodeSize];
 		this.nodeBuf.get(nodes2, 0, afterDeletedNodeSize);
 		this.nodeBuf.rewind();
+		
 		g.nodeBuf.put(nodes1);
 		g.nodeBuf.put(nodes2);
 		g.nodeBuf.rewind();
@@ -4487,6 +4582,19 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 			}
 		}
 		
+		// recalculate node connections to nodes that have moved id down by one
+		g.connectionBuf.rewind();
+		int i = 4; // start on nodes, the second in the pair
+		while(i < g.connectionBuf.capacity()) {
+			int node = g.connectionBuf.getInt(i);
+			if(node > n) {
+				g.connectionBuf.putInt(i,node-1);
+			}
+			i += CONNECTION_PAIR_SIZE;
+		}
+
+
+		
 		g.name = this.name;
 		
 		return g;
@@ -4496,13 +4604,14 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 
 	/**
 	 * 
-	 * Generates a new FastGraph with ns added. Ignores the id of ns.
+	 * Generates a new FastGraph with ns added. Ignores the id of ns, the new node will have the
+	 * id of the number of nodes in the original graph.
 	 * 
-	 * @param n the node to add
-	 * @return if successful, the new fast graph or null if n is connected
+	 * @param ns the node to add
+	 * @return the new fast graph
 	 * @throws Exception Throws if the new FastGraph does not build correctly. Most likely out of memory error.
 	 */
-	public FastGraph generateGraphByAddingSingletonNode(NodeStructure ns) {
+	public FastGraph generateGraphByAddingNode(NodeStructure ns) {
 		
 		FastGraph g = new FastGraph(this.numberOfNodes+1,this.numberOfEdges,this.direct);
 		// nodeLabelBuf and edgeLabelBuf no longer allocated in init 
@@ -4515,19 +4624,27 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		if(!direct) {
 			g.nodeLabelBuf = ByteBuffer.allocate(nodeLabelBufSize);
 			g.edgeLabelBuf = ByteBuffer.allocate(edgeLabelBufSize);
+			// connectionBuf could be set to wrong size in init()
+			g.connectionBuf = ByteBuffer.allocate(this.connectionBuf.capacity());
 		} else {
 			g.nodeLabelBuf = ByteBuffer.allocateDirect(nodeLabelBufSize);
 			g.edgeLabelBuf = ByteBuffer.allocateDirect(edgeLabelBufSize);
+			// connectionBuf could be set to wrong size in init()
+			g.connectionBuf = ByteBuffer.allocateDirect(this.connectionBuf.capacity());
 		}
 
 		this.connectionBuf.rewind();
 		this.edgeLabelBuf.rewind();
 		this.edgeBuf.rewind();
+		g.connectionBuf.rewind();
+		g.edgeLabelBuf.rewind();
+		g.edgeBuf.rewind();
 		g.connectionBuf.put(this.connectionBuf);
 		g.edgeLabelBuf.put(this.edgeLabelBuf);
 		g.edgeBuf.put(this.edgeBuf);
 		
 		this.nodeLabelBuf.rewind();
+		g.nodeLabelBuf.rewind();
 		g.nodeLabelBuf.put(this.nodeLabelBuf);
 		
 		// place the new label
@@ -4563,6 +4680,395 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		return g;
 	}
 	
-	
+
+	/**
+	 * 
+	 * Generates a new FastGraph with e removed.
+	 * Leaves unused memory in the edgeLabelBuffer and connectionBuf.
+	 * 
+	 * @param e the node to remove
+	 * @return the new fast graph
+	 * @throws Exception Throws if the new FastGraph does not build correctly.
+	 */
+	public FastGraph generateGraphByDeletingEdge(int e) {
 		
+		FastGraph g = new FastGraph(this.numberOfNodes,this.numberOfEdges-1,this.direct);
+		// nodeLabelBuf and edgeLabelBuf no longer allocated in init 
+		int nodeLabelBufSize = this.nodeLabelBuf.capacity();
+		int edgeLabelBufSize = this.edgeLabelBuf.capacity();
+		if(!direct) {
+			g.nodeLabelBuf = ByteBuffer.allocate(nodeLabelBufSize);
+			g.edgeLabelBuf = ByteBuffer.allocate(edgeLabelBufSize);
+			// connectionBuf may be set to wrong size in init()
+			g.connectionBuf = ByteBuffer.allocate(this.connectionBuf.capacity());
+		} else {
+			g.nodeLabelBuf = ByteBuffer.allocateDirect(nodeLabelBufSize);
+			g.edgeLabelBuf = ByteBuffer.allocateDirect(edgeLabelBufSize);
+			// connectionBuf may be set to wrong size in init()
+			g.connectionBuf = ByteBuffer.allocateDirect(this.connectionBuf.capacity());
+		}
+
+		this.nodeBuf.rewind();
+		this.nodeLabelBuf.rewind();
+		this.edgeLabelBuf.rewind();
+
+		g.nodeBuf.put(this.nodeBuf);
+		g.nodeLabelBuf.put(this.nodeLabelBuf); 
+		// here we just leave the old label in the Buffer, it would be
+		// better for memory, but slower, to delete the label from this
+		// buffer and reassign all the offsets after the deleted node in the nodeBuf
+		g.edgeLabelBuf.put(this.edgeLabelBuf);
+		
+		this.edgeBuf.rewind();
+		// first bit of edgeBuf remains the same
+		int uptoDeletedEdgeEnd = e*EDGE_BYTE_SIZE;
+		byte[] edges1 = new byte[uptoDeletedEdgeEnd];
+		this.edgeBuf.get(edges1, 0, uptoDeletedEdgeEnd);
+
+		// this because the offset in get seems to fail for the bulk get
+		// it is a way to move the position past the deleted edge
+		byte[] throwAway = new byte[EDGE_BYTE_SIZE];
+		this.edgeBuf.get(throwAway, 0, EDGE_BYTE_SIZE);
+		
+		// second bit of edgeBuf moves down by one
+		int afterDeletedEdgeSize = (this.numberOfEdges-(e+1))*EDGE_BYTE_SIZE;
+		byte[] edges2 = new byte[afterDeletedEdgeSize];
+		this.edgeBuf.get(edges2, 0, afterDeletedEdgeSize);
+		this.edgeBuf.rewind();
+
+		g.edgeBuf.rewind();
+		g.edgeBuf.put(edges1);
+		g.edgeBuf.put(edges2);
+		g.edgeBuf.rewind();
+		
+		// change the connections of the nodes at either end of the edge
+		// this leaves space at the end of in and out edge connection lists
+		// could retrieve this space by moving all other lists, but a lot of
+		// node references would need to be changed
+
+		g.connectionBuf.rewind();
+		this.connectionBuf.rewind();
+		g.connectionBuf.put(this.connectionBuf);
+		
+		// out edges for node1
+		int n1 = this.getEdgeNode1(e);
+		int n2 = this.getEdgeNode2(e);
+
+		int outDegree1 = this.getNodeOutDegree(n1);
+		int outConnectionOffset1 = g.nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+n1*NODE_BYTE_SIZE);
+		boolean foundEdge = false;
+		for(int i = 0; i < outDegree1; i++) { // just outDegrees, as out is after in
+			int edge = g.connectionBuf.getInt(outConnectionOffset1+i*CONNECTION_PAIR_SIZE);
+			int node = g.connectionBuf.getInt(outConnectionOffset1+i*CONNECTION_PAIR_SIZE+4);
+			if(foundEdge) { // delete the edge and move all other connecting edges down by an edge
+				g.connectionBuf.putInt(outConnectionOffset1+(i-1)*CONNECTION_PAIR_SIZE,edge); // edge is first in pair
+				g.connectionBuf.putInt(outConnectionOffset1+(i-1)*CONNECTION_PAIR_SIZE+4,node); // node is second in pair
+			}
+			if(e == edge) {
+				foundEdge = true;
+			}
+		}
+		// change out degrees length only as in degree starts list
+		g.nodeBuf.putInt(n1*NODE_BYTE_SIZE+NODE_OUT_DEGREE_OFFSET,outDegree1-1);
+		
+		// in edges for node2
+		int inDegree2 = this.getNodeInDegree(n2);
+		int outDegree2 = this.getNodeOutDegree(n2);
+		int degree2 = inDegree2+outDegree2;
+		int inConnectionOffset2 = g.nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+n2*NODE_BYTE_SIZE);
+		int outConnectionOffset2 = g.nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+n2*NODE_BYTE_SIZE);
+		foundEdge = false;
+
+//this.outputInternalData();
+		for(int i = 0; i < degree2; i++) {
+			int edge = g.connectionBuf.getInt(inConnectionOffset2+i*CONNECTION_PAIR_SIZE);
+			int node = g.connectionBuf.getInt(inConnectionOffset2+i*CONNECTION_PAIR_SIZE+4);
+
+			if(foundEdge) { // delete the edge and move all other connecting edges down by an edge, this moves all out edge,node pairs
+				g.connectionBuf.putInt(inConnectionOffset2+(i-1)*CONNECTION_PAIR_SIZE,edge); // edge is first in pair
+				g.connectionBuf.putInt(inConnectionOffset2+(i-1)*CONNECTION_PAIR_SIZE+4,node); // node is second in pair
+			}
+			if(e == edge) {
+				foundEdge = true;
+			}
+		}
+
+		// change in degree
+		g.nodeBuf.putInt(n2*NODE_BYTE_SIZE+NODE_IN_DEGREE_OFFSET,inDegree2-1);
+		// length of in degree has changed so out degree start position has changed
+		g.nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+n2*NODE_BYTE_SIZE,outConnectionOffset2-CONNECTION_PAIR_SIZE);
+
+		// recalculate node connections to edges that have moved id down by one
+		this.connectionBuf.rewind();
+		g.connectionBuf.put(this.nodeBuf);
+		int i = 0;
+		while(i < g.connectionBuf.capacity()) {
+			int edge = g.connectionBuf.getInt(i);
+			if(edge > e) {
+				g.connectionBuf.putInt(i,edge-1);
+			}
+			i += CONNECTION_PAIR_SIZE;
+		}
+
+		
+		g.name = this.name;
+		
+		return g;
+	}
+	
+	
+	/**
+	 * 
+	 * Generates a new FastGraph with es added. Ignores the id of es, the new edge will have the
+	 * id of the number of edges in the original graph. Redundant space is added as the
+	 * connection list of the attached nodes is recreated and appended to the end of the connectionBuf.
+	 * 
+	 * @param es the edge to add
+	 * @return the new fast graph
+	 * @throws Exception Throws if the new FastGraph does not build correctly. Most likely out of memory error.
+	 */
+	public FastGraph generateGraphByAddingEdge(EdgeStructure es) throws Exception {
+//TODO		
+		if(es.getNode1() >= this.getNumberOfNodes()) {
+			throw new FastGraphException("node n1 is greater than the number of nodes");
+		}
+		if(es.getNode2() >= this.getNumberOfNodes()) {
+			throw new FastGraphException("node n2 is greater than the number of nodes");
+		}
+		
+		FastGraph g = new FastGraph(this.numberOfNodes,this.numberOfEdges+1,this.direct);
+		// nodeLabelBuf and edgeLabelBuf no longer allocated in init 
+		int edgeLabelBufSize = this.edgeLabelBuf.capacity()+(es.getLabel().length()*2);
+		if(edgeLabelBufSize*2 > MAX_BYTE_BUFFER_SIZE) {
+			throw new OutOfMemoryError("Tried to create an edgeLabelBuf with too many chars");
+		}
+
+		int n1 = es.getNode1(); // the source node
+		int n2 = es.getNode2(); // the target node
+		int nodeLabelBufSize = this.nodeLabelBuf.capacity();
+		int connectionBufSize = this.connectionBuf.capacity()+(this.getNodeDegree(n1)+1)*CONNECTION_PAIR_SIZE+(this.getNodeDegree(n2)+1)*CONNECTION_PAIR_SIZE;
+		if(!direct) {
+			g.nodeLabelBuf = ByteBuffer.allocate(nodeLabelBufSize);
+			g.edgeLabelBuf = ByteBuffer.allocate(edgeLabelBufSize);
+			// connectionBuf is set to wrong size in init(), it needs extra edges
+			g.connectionBuf = ByteBuffer.allocate(connectionBufSize);
+		} else {
+			g.nodeLabelBuf = ByteBuffer.allocateDirect(nodeLabelBufSize);
+			g.edgeLabelBuf = ByteBuffer.allocateDirect(edgeLabelBufSize);
+			// connectionBuf is set to wrong size in init(), it needs extra edges
+			g.connectionBuf = ByteBuffer.allocate(connectionBufSize);
+		}
+
+		this.nodeLabelBuf.rewind();
+		this.nodeBuf.rewind();
+		g.nodeLabelBuf.put(this.nodeLabelBuf);
+		g.nodeBuf.put(this.nodeBuf);
+		
+		this.edgeLabelBuf.rewind();
+		g.edgeLabelBuf.rewind();
+		g.edgeLabelBuf.put(this.edgeLabelBuf);
+		
+		// place the new label
+		int labelStart = this.edgeLabelBuf.capacity();
+		String label = es.getLabel();
+		char[] labelArray = label.toCharArray();
+		short labelLength = (short)(labelArray.length);
+	
+		g.edgeLabelBuf.rewind();
+		int labelOffset = labelStart;
+		for(int j = 0; j < labelArray.length; j++) {
+			char c = labelArray[j];
+			g.edgeLabelBuf.putChar(labelOffset,c);
+			labelOffset += 2;  // increment by 2 as it is a char (2 bytes)
+		}
+		
+		int edgeId = this.numberOfEdges; // the new edge is at the end of edge list
+		
+		// place the new edge
+		this.edgeBuf.rewind();
+		g.edgeBuf.rewind();
+		g.edgeBuf.put(this.edgeBuf);
+		g.edgeBuf.putInt(EDGE_LABEL_START_OFFSET+edgeId*EDGE_BYTE_SIZE,labelStart); // label start
+		g.edgeBuf.putShort(EDGE_LABEL_LENGTH_OFFSET+edgeId*EDGE_BYTE_SIZE,labelLength); // label size
+		g.edgeBuf.putInt(EDGE_NODE1_OFFSET+edgeId*EDGE_BYTE_SIZE,n1); // one end of edge
+		g.edgeBuf.putInt(EDGE_NODE2_OFFSET+edgeId*EDGE_BYTE_SIZE,n2); // other end of edge
+		g.edgeBuf.putInt(EDGE_WEIGHT_OFFSET+edgeId*EDGE_BYTE_SIZE,es.getWeight()); // weight
+		g.edgeBuf.put(EDGE_TYPE_OFFSET+edgeId*EDGE_BYTE_SIZE,es.getType()); // type
+		g.edgeBuf.put(EDGE_AGE_OFFSET+edgeId*EDGE_BYTE_SIZE,es.getAge()); // age
+
+		g.name = this.name;
+		
+		this.connectionBuf.rewind();
+		g.connectionBuf.rewind();
+		g.connectionBuf.put(this.connectionBuf);
+		g.edgeBuf.rewind();
+		
+		// add new connection elements to the connectionBuf,
+		// this leaves the old connections as redundant data
+		// but its better than attempting to insert a new edge node pair
+		// and changing a large number of node connection offsets
+		int connectionOffset = this.nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+n1*NODE_BYTE_SIZE);
+		int degree = this.getNodeInDegree(n1);
+		int[] n1In = new int[degree*2]; // for the edge node pairs
+		for(int i = 0; i < degree*2; i++) {
+			int offset = connectionOffset+(i*4);
+			int id = this.connectionBuf.getInt(offset);
+			n1In[i] = id;
+		}
+		connectionOffset = this.nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+n1*NODE_BYTE_SIZE);
+		degree = this.getNodeOutDegree(n1);
+		int[] n1Out = new int[degree*2+2]; // for the edge node pairs, plus the new one
+		for(int i = 0; i < degree*2; i++) {
+			int offset = connectionOffset+(i*4);
+			int id = this.connectionBuf.getInt(offset);
+			n1Out[i] = id;
+		}
+		n1Out[n1Out.length-2] = edgeId;
+		n1Out[n1Out.length-1] = n2;
+		connectionOffset = this.nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+n2*NODE_BYTE_SIZE);
+		degree = this.getNodeInDegree(n2);
+		int[] n2In = new int[degree*2+2]; // for the edge node pairs, plus the new one
+		for(int i = 0; i < degree*2; i++) {
+			int offset = connectionOffset+(i*4);
+			int id = this.connectionBuf.getInt(offset);
+			n2In[i] = id;
+		}
+		n2In[n2In.length-2] = edgeId;
+		n2In[n2In.length-1] = n1;
+		connectionOffset = this.nodeBuf.getInt(NODE_OUT_CONNECTION_START_OFFSET+n2*NODE_BYTE_SIZE);
+		degree = this.getNodeOutDegree(n2);
+		int[] n2Out = new int[degree*2]; // for the edge node pairs
+		for(int i = 0; i < degree*2; i++) {
+			int offset = connectionOffset+(i*4);
+			int id = this.connectionBuf.getInt(offset);
+			n2Out[i] = id;
+		}
+		g.connectionBuf.rewind();
+		g.connectionBuf.put(this.connectionBuf);
+
+		
+		if(n1 != n2) {
+			int n1InStart = this.connectionBuf.capacity();
+			for(int i = 0; i < n1In.length; i++) {
+				g.connectionBuf.putInt(n1InStart+i*4,n1In[i]);
+			}
+			int n1OutStart = n1InStart+n1In.length*4;
+			for(int i = 0; i < n1Out.length; i++) {
+				g.connectionBuf.putInt(n1OutStart+i*4,n1Out[i]);
+			}
+			int n2InStart = n1OutStart+n1Out.length*4;
+			for(int i = 0; i < n2In.length; i++) {
+				g.connectionBuf.putInt(n2InStart+i*4,n2In[i]);
+			}
+			int n2OutStart = n2InStart+n2In.length*4;
+			for(int i = 0; i < n2Out.length; i++) {
+				g.connectionBuf.putInt(n2OutStart+i*4,n2Out[i]);
+			}
+
+			int n1InDegree = this.getNodeInDegree(n1);
+			int n1OutDegree = this.getNodeOutDegree(n1)+1;
+			int n2InDegree = this.getNodeInDegree(n2)+1;
+			int n2OutDegree = this.getNodeOutDegree(n2);
+			g.nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+n1*NODE_BYTE_SIZE,n1InStart); // offset for inward connecting edges/nodes
+			g.nodeBuf.putInt(NODE_IN_DEGREE_OFFSET+n1*NODE_BYTE_SIZE,n1InDegree); // number of inward connecting edges/nodes
+			g.nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+n1*NODE_BYTE_SIZE,n1OutStart); // offset for outward connecting edges/nodes
+			g.nodeBuf.putInt(NODE_OUT_DEGREE_OFFSET+n1*NODE_BYTE_SIZE,n1OutDegree); // number of outward connecting edges/nodes
+			g.nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+n2*NODE_BYTE_SIZE,n2InStart); // offset for inward connecting edges/nodes
+			g.nodeBuf.putInt(NODE_IN_DEGREE_OFFSET+n2*NODE_BYTE_SIZE,n2InDegree); // number of inward connecting edges/nodes
+			g.nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+n2*NODE_BYTE_SIZE,n2OutStart); // offset for outward connecting edges/nodes
+			g.nodeBuf.putInt(NODE_OUT_DEGREE_OFFSET+n2*NODE_BYTE_SIZE,n2OutDegree); // number of outward connecting edges/nodes
+		} else { // self sourcing edge
+
+			// recall n1 and n2 are the same
+			// as we are adding one to both in and out lists of the node
+			// the new information is in n2In and n1Out, so use those
+			int n1InStart = this.connectionBuf.capacity();
+			for(int i = 0; i < n2In.length; i++) {
+				g.connectionBuf.putInt(n1InStart+i*4,n2In[i]);
+			}
+			int n1OutStart = n1InStart+n2In.length*4;
+			for(int i = 0; i < n1Out.length; i++) {
+				g.connectionBuf.putInt(n1OutStart+i*4,n1Out[i]);
+			}
+
+			int n1InDegree = this.getNodeInDegree(n1)+1;
+			int n1OutDegree = this.getNodeOutDegree(n1)+1;
+			g.nodeBuf.putInt(NODE_IN_CONNECTION_START_OFFSET+n1*NODE_BYTE_SIZE,n1InStart); 
+			g.nodeBuf.putInt(NODE_IN_DEGREE_OFFSET+n1*NODE_BYTE_SIZE,n1InDegree); 
+			g.nodeBuf.putInt(NODE_OUT_CONNECTION_START_OFFSET+n1*NODE_BYTE_SIZE,n1OutStart); 
+			g.nodeBuf.putInt(NODE_OUT_DEGREE_OFFSET+n1*NODE_BYTE_SIZE,n1OutDegree); 
+		}
+
+		return g;
+	}
+	
+
+	/**
+	 * 
+	 * Generates a new FastGraph with the label of id changed. Redundant space may be left in or added to
+	 * nodeLabelBuf if the new label is not the same size as the old.
+	 * 
+	 * @param id the node to have a new label
+	 * @param label the new label
+	 * @return the new graph
+	 * @throws Exception Throws if the new FastGraph does not build correctly. Most likely out of memory error.
+	 */
+	public FastGraph generateGraphByRelabellingNode(int id, String label) throws Exception {
+		FastGraph g = new FastGraph(this.numberOfNodes,this.numberOfEdges,this.direct);
+	
+		// nodeLabelBuf and edgeLabelBuf no longer allocated in init
+		int nodeLabelBufSize = this.nodeLabelBuf.capacity();
+		String originalLabel = g.getNodeLabel(id);
+		if(label.length() > originalLabel.length()) { // if the label is bigger, a new label is needed at the end of the buffer
+			nodeLabelBufSize += label.length()*2;
+		}
+		if(!direct) {
+			g.nodeLabelBuf = ByteBuffer.allocate(nodeLabelBufSize);
+			g.edgeLabelBuf = ByteBuffer.allocate(edgeLabelBuf.capacity());
+			// connectionBuf may be set to wrong size in init()
+			g.connectionBuf = ByteBuffer.allocate(this.connectionBuf.capacity());
+		} else {
+			g.nodeLabelBuf = ByteBuffer.allocateDirect(nodeLabelBufSize);
+			g.edgeLabelBuf = ByteBuffer.allocateDirect(edgeLabelBuf.capacity());
+			// connectionBuf may be set to wrong size in init()
+			g.connectionBuf = ByteBuffer.allocate(this.connectionBuf.capacity());
+		}
+
+		this.nodeBuf.rewind();
+		this.edgeBuf.rewind();
+		this.nodeLabelBuf.rewind();
+		this.edgeLabelBuf.rewind();
+		this.connectionBuf.rewind();
+
+		g.nodeBuf.rewind();
+		g.edgeBuf.rewind();
+		g.nodeLabelBuf.rewind();
+		g.edgeLabelBuf.rewind();
+		g.connectionBuf.rewind();
+		
+		g.nodeBuf.put(this.nodeBuf);
+		g.edgeBuf.put(this.edgeBuf);
+		g.nodeLabelBuf.put(this.nodeLabelBuf);
+		g.edgeLabelBuf.put(this.edgeLabelBuf);
+		g.connectionBuf.put(this.connectionBuf);
+
+		int labelStart = 0;
+		if(label.length() <= originalLabel.length()) { // new offset needed, its the end of the old buffer
+			labelStart = this.nodeLabelBuf.capacity();
+			this.nodeBuf.putInt(NODE_LABEL_START_OFFSET+id*NODE_BYTE_SIZE,id);
+		} else { // label start not changed
+			labelStart = this.nodeBuf.getInt(NODE_LABEL_START_OFFSET+id*NODE_BYTE_SIZE);
+		}
+
+		short labelLength = (short)(label.length());		
+		g.nodeBuf.putShort(NODE_LABEL_LENGTH_OFFSET+id*NODE_BYTE_SIZE,labelLength); // label size
+		
+		for(int i = 0; i < label.length(); i++) {
+			int offset = labelStart+i*2;
+			g.nodeLabelBuf.putChar(offset,label.charAt(i));
+		}
+		
+		return g;
+
+	}
 }

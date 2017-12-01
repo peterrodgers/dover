@@ -35,453 +35,526 @@ public class FastGraphTest {
 	public void test001() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get0Node0Edge(),false);
 		assertEquals(0,g.getNumberOfNodes());
+		assertTrue(g.checkConsistency());
 	}
 		
 	@Test
 	public void test002() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get0Node0Edge(),false);
 		assertEquals(0,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test003() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get0Node0Edge(),false);
 		assertTrue(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test004() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get0Node0Edge(),true);
 		assertEquals(0,g.getNumberOfNodes());
-		
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test005() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get0Node0Edge(),true);
 		assertEquals(0,g.getNumberOfEdges());
-		
+		assertTrue(g.checkConsistency());
+
 	}
 	
 	@Test
 	public void test006() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get0Node0Edge(),true);
 		assertTrue(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test007() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get1Node0Edge(),false);
 		assertEquals(1,g.getNumberOfNodes());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test008() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get1Node0Edge(),false);
 		assertEquals(0,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test009() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get1Node0Edge(),false);
 		assertTrue(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test010() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get1Node0Edge(),true);
 		assertEquals(1,g.getNumberOfNodes());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test011() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get1Node0Edge(),true);
 		assertEquals(0,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test012() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get1Node0Edge(),true);
 		assertTrue(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test013() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),false);
 		assertEquals(2,g.getNumberOfNodes());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test014() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),false);
 		assertEquals(0,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test015() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),false);
 		assertFalse(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test016() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),false);
 		assertEquals("node label 0",g.getNodeLabel(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test017() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),false);
 		assertEquals(12,g.getNodeWeight(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test018() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),false);
 		assertEquals(1,g.getNodeType(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test019() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),false);
 		assertEquals(0,g.getNodeAge(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test020() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),false);
 		assertEquals("node label 1",g.getNodeLabel(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test021() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),false);
 		assertEquals(6,g.getNodeWeight(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test022() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),false);
 		assertEquals(0,g.getNodeType(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test023() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),false);
 		assertEquals(0,g.getNodeAge(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test024() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),true);
 		assertEquals(2,g.getNumberOfNodes());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test025() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),true);
 		assertEquals(0,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test026() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),true);
 		assertFalse(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test027() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),true);
 		assertEquals("node label 0",g.getNodeLabel(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test028() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),true);
 		assertEquals(12,g.getNodeWeight(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test029() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),true);
 		assertEquals(1,g.getNodeType(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test030() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),true);
 		assertEquals(0,g.getNodeAge(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test031() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),true);
 		assertEquals("node label 1",g.getNodeLabel(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test032() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),true);
 		assertEquals(6,g.getNodeWeight(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test033() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),true);
 		assertEquals(0,g.getNodeType(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test034() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node0Edge(),true);
 		assertEquals(0,g.getNodeAge(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test035() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node1Edge(),false);
 		assertEquals(2,g.getNumberOfNodes());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test036() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node1Edge(),false);
 		assertEquals(1,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test037() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node1Edge(),false);
 		assertTrue(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test038() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node1Edge(),true);
 		assertEquals(2,g.getNumberOfNodes());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test039() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node1Edge(),true);
 		assertEquals(1,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test040() {
-		
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node1Edge(),true);
 		assertTrue(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test041() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals(2,g.getNumberOfNodes());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test042() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals(2,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test043() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertTrue(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test044() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals("node label 0",g.getNodeLabel(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test045() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals(12,g.getNodeWeight(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test046() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals(1,g.getNodeType(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test047() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals(0,g.getNodeAge(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test048() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals("edge label 0",g.getEdgeLabel(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test049() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals(0,g.getEdgeNode1(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test050() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals(1,g.getEdgeNode2(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test051() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals(43,g.getEdgeWeight(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test052() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals(6,g.getEdgeType(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test053() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals(0,g.getEdgeAge(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test054() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals("edge label 1",g.getEdgeLabel(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test055() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals(0,g.getEdgeNode1(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test056() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals(0,g.getEdgeNode2(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test057() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals(32,g.getEdgeWeight(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test058() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals(9,g.getEdgeType(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test059() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals(0,g.getEdgeAge(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test060() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals("node label 0",g.getNodeLabel(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test061() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals(12,g.getNodeWeight(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test062() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals(1,g.getNodeType(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test063() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals(0,g.getNodeAge(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test064() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals("edge label 0",g.getEdgeLabel(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test065() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals(0,g.getEdgeNode1(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test066() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals(1,g.getEdgeNode2(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test067() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals(43,g.getEdgeWeight(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test068() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals(6,g.getEdgeType(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test069() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals(0,g.getEdgeAge(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test070() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals("edge label 1",g.getEdgeLabel(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test071() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals(0,g.getEdgeNode1(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test072() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals(0,g.getEdgeNode2(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test073() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals(32,g.getEdgeWeight(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test074() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals(9,g.getEdgeType(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test075() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),true);
 		assertEquals(0,g.getEdgeAge(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -490,6 +563,7 @@ public class FastGraphTest {
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
 		assertTrue(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -498,6 +572,7 @@ public class FastGraphTest {
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
 		assertTrue(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -506,6 +581,7 @@ public class FastGraphTest {
 		assertEquals(10,g.getNumberOfNodes());
 		assertEquals(5,g.getNumberOfEdges());
 		assertFalse(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -514,12 +590,14 @@ public class FastGraphTest {
 		assertEquals(10,g.getNumberOfNodes());
 		assertEquals(5,g.getNumberOfEdges());
 		assertFalse(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
 	public void test080() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get5Node4Edge(),true);
 		assertFalse(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -528,6 +606,7 @@ public class FastGraphTest {
 		assertEquals(0,g.getNodeInDegree(0));
 		assertEquals(0,g.getNodeOutDegree(0));
 		assertEquals(0,g.getNodeOutDegree(0));
+		assertTrue(g.checkConsistency());
 	}
 
 	@Test
@@ -536,6 +615,7 @@ public class FastGraphTest {
 		assertEquals(0,g.getNodeInDegree(0));
 		assertEquals(1,g.getNodeOutDegree(0));
 		assertEquals(1,g.getNodeDegree(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -544,6 +624,7 @@ public class FastGraphTest {
 		assertEquals(1,g.getNodeInDegree(1));
 		assertEquals(0,g.getNodeOutDegree(1));
 		assertEquals(1,g.getNodeDegree(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -552,6 +633,7 @@ public class FastGraphTest {
 		assertEquals(0,g.getNodeInDegree(0));
 		assertEquals(2,g.getNodeOutDegree(0));
 		assertEquals(2,g.getNodeDegree(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -560,6 +642,7 @@ public class FastGraphTest {
 		assertEquals(2,g.getNodeInDegree(1));
 		assertEquals(1,g.getNodeOutDegree(1));
 		assertEquals(3,g.getNodeDegree(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -568,6 +651,7 @@ public class FastGraphTest {
 		assertEquals(1,g.getNodeInDegree(2));
 		assertEquals(2,g.getNodeOutDegree(2));
 		assertEquals(3,g.getNodeDegree(2));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -576,6 +660,7 @@ public class FastGraphTest {
 		assertEquals(2,g.getNodeInDegree(3));
 		assertEquals(0,g.getNodeOutDegree(3));
 		assertEquals(2,g.getNodeDegree(3));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -584,6 +669,7 @@ public class FastGraphTest {
 		assertEquals(1,g.getNodeInDegree(0));
 		assertEquals(2,g.getNodeOutDegree(0));
 		assertEquals(3,g.getNodeDegree(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -592,6 +678,7 @@ public class FastGraphTest {
 		assertEquals(1,g.getNodeInDegree(1));
 		assertEquals(0,g.getNodeOutDegree(1));
 		assertEquals(1,g.getNodeDegree(1));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -603,6 +690,7 @@ public class FastGraphTest {
 		assertEquals("empty",g2.getName());
 		assertEquals(0,g2.getNumberOfNodes());
 		assertEquals(0,g2.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -631,6 +719,7 @@ public class FastGraphTest {
 		assertEquals(4,g2.getEdgeType(4));
 		assertEquals(0,g2.getEdgeAge(4));
 		assertTrue(Connected.connected(g2));
+		assertTrue(g.checkConsistency());
 	}
 
 	@Test
@@ -649,6 +738,7 @@ public class FastGraphTest {
 		assertEquals(0,connections.length);
 		connections = g.getNodeConnectingOutEdges(0);
 		assertEquals(0,connections.length);
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -681,6 +771,7 @@ public class FastGraphTest {
 		assertEquals(1,connections[0]);
 		g.getNodeConnectingOutEdges(connections,0);
 		assertEquals(0,connections[0]);
+		assertTrue(g.checkConsistency());
 	}
 
 	@Test
@@ -720,6 +811,7 @@ public class FastGraphTest {
 		g.getNodeConnectingOutEdges(connections,2);
 		assertEquals(4,connections[1]);
 
+		assertTrue(g.checkConsistency());
 	}
 
 	@Test
@@ -758,6 +850,7 @@ public class FastGraphTest {
 		assertEquals(0,connections[1]);
 		g.getNodeConnectingOutEdges(connections,0);
 		assertEquals(1,connections[1]);
+		assertTrue(g.checkConsistency());
 	}
 
 	@Test
@@ -766,6 +859,7 @@ public class FastGraphTest {
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
 		assertTrue(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 
 	@Test
@@ -784,6 +878,7 @@ public class FastGraphTest {
 		assertEquals("45",g.getNodeLabel(0));
 		assertEquals("76",g.getNodeLabel(1));
 		assertTrue(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 
 
@@ -798,6 +893,7 @@ public class FastGraphTest {
 		assertEquals(1,connections.length);
 		assertEquals(1,connections[0]);
 		assertTrue(Connected.connected(g));
+		assertTrue(g.checkConsistency());
 	}
 
 	@Test
@@ -823,6 +919,7 @@ public class FastGraphTest {
 		assertEquals(3,g.maximumDegree());
 		assertEquals(2,g.maximumInDegree());
 		assertEquals(2,g.maximumOutDegree());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -834,6 +931,7 @@ public class FastGraphTest {
 		assertEquals(g.getName(),displayGraph.getLabel());
 		assertEquals(0,displayGraph.getNodes().size());
 		assertEquals(0,displayGraph.getEdges().size());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -849,6 +947,7 @@ public class FastGraphTest {
 		assertEquals(g.getNodeWeight(0),(int)(displayGraph.getNodes().get(0).getScore()));
 		assertEquals(g.getNodeAge(0),(int)(displayGraph.getNodes().get(0).getAge()));
 		assertEquals("age0",displayGraph.getNodes().get(0).getType().getLabel());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -870,6 +969,7 @@ public class FastGraphTest {
 		assertEquals(Byte.toString(g.getEdgeType(0)),displayGraph.getEdges().get(0).getType().getLabel());
 		assertEquals(g.getNodeLabel(0),displayGraph.getEdges().get(0).getFrom().getLabel());
 		assertEquals(g.getNodeLabel(1),displayGraph.getEdges().get(0).getTo().getLabel());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -890,6 +990,7 @@ public class FastGraphTest {
 		assertEquals(Byte.toString(g.getEdgeType(1)),displayGraph.getEdges().get(1).getType().getLabel());
 		assertEquals(g.getNodeLabel(0),displayGraph.getEdges().get(1).getFrom().getLabel());
 		assertEquals(g.getNodeLabel(0),displayGraph.getEdges().get(1).getTo().getLabel());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -911,6 +1012,7 @@ public class FastGraphTest {
 		assertEquals(Byte.toString(g.getEdgeType(4)),displayGraph.getEdges().get(4).getType().getLabel());
 		assertEquals(g.getNodeLabel(3),displayGraph.getEdges().get(4).getFrom().getLabel());
 		assertEquals(g.getNodeLabel(4),displayGraph.getEdges().get(4).getTo().getLabel());
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -924,6 +1026,7 @@ public class FastGraphTest {
 		Graph displayGraph2 = g.generateDisplayGraph();
 		assertTrue(displayGraph2.consistent());
 		assertTrue(displayGraph.isomorphic(displayGraph2));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -948,8 +1051,10 @@ public class FastGraphTest {
 		Graph displayGraph2 = g.generateDisplayGraph();
 		assertTrue(displayGraph.consistent());
 		assertTrue(displayGraph.isomorphic(displayGraph2));
+		assertTrue(g.checkConsistency());
 	}
 	
+
 	@Test
 	public void test109() {
 		Graph displayGraph = new Graph("two nodes, one edge");
@@ -1069,6 +1174,8 @@ public class FastGraphTest {
 		
 		String[] edgeLabels = {};
 		g.setAllEdgeLabels(edgeLabels);
+		assertTrue(g.checkConsistency());
+
 	}
 	
 	
@@ -1078,6 +1185,7 @@ public class FastGraphTest {
 		String[] nodeLabels = {"node label 1"};
 		g.setAllNodeLabels(nodeLabels);
 		assertEquals(g.getNodeLabel(0),nodeLabels[0]);
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -1086,6 +1194,7 @@ public class FastGraphTest {
 		String[] edgeLabels = {"edge label 1"};
 		g.setAllEdgeLabels(edgeLabels);
 		assertEquals(g.getEdgeLabel(0),edgeLabels[0]);
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -1105,6 +1214,7 @@ public class FastGraphTest {
 		assertEquals(g.getEdgeLabel(1),edgeLabels[1]);
 		assertEquals(g.getEdgeLabel(2),edgeLabels[2]);
 		assertEquals(g.getEdgeLabel(3),edgeLabels[3]);
+		assertTrue(g.checkConsistency());
 
 	}
 	
@@ -1127,6 +1237,7 @@ public class FastGraphTest {
 		String[] edgeLabels2 = {"e1","e2.2"};
 		g.setAllEdgeLabels(edgeLabels2);
 		assertEquals(g.getEdgeLabel(0),edgeLabels2[0]);
+		assertTrue(g.checkConsistency());
 
 	}
 	
@@ -1140,6 +1251,7 @@ public class FastGraphTest {
 		assertEquals(g.getNodeWeight(0),33);
 		assertEquals(g.getNodeType(0),34);
 		assertEquals(g.getNodeAge(0),35);
+		assertTrue(g.checkConsistency());
 	}
 
 	@Test
@@ -1151,6 +1263,7 @@ public class FastGraphTest {
 		assertEquals(g.getNodeWeight(4),43);
 		assertEquals(g.getNodeType(4),44);
 		assertEquals(g.getNodeAge(4),45);
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -1162,6 +1275,7 @@ public class FastGraphTest {
 		assertEquals(g.getEdgeWeight(0),63);
 		assertEquals(g.getEdgeType(0),64);
 		assertEquals(g.getEdgeAge(0),65);
+		assertTrue(g.checkConsistency());
 	}
 
 	@Test
@@ -1173,6 +1287,7 @@ public class FastGraphTest {
 		assertEquals(g.getEdgeWeight(4),73);
 		assertEquals(g.getEdgeType(4),74);
 		assertEquals(g.getEdgeAge(4),75);
+		assertTrue(g.checkConsistency());
 	}
 
 	@Test
@@ -1214,6 +1329,8 @@ public class FastGraphTest {
 		assertEquals(44,g1.getEdgeWeight(0));
 		assertEquals(45,g1.getEdgeType(0));
 		assertEquals(0,g1.getEdgeAge(0));
+		assertTrue(g.checkConsistency());
+		assertTrue(g1.checkConsistency());
 
 	}
 
@@ -1244,6 +1361,8 @@ public class FastGraphTest {
 		displayGraph.addNode(n1);
 		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
 		assertTrue(displayGraph.consistent());
+		assertTrue(g.checkConsistency());
+		assertTrue(g1.checkConsistency());
 		
 		nodes = new int[2];
 		edges = new int[1];
@@ -1255,6 +1374,8 @@ public class FastGraphTest {
 		displayGraph.addEdge(e0);
 		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
 		assertTrue(displayGraph.consistent());
+		assertTrue(g.checkConsistency());
+		assertTrue(g1.checkConsistency());
 		
 		nodes = new int[3];
 		edges = new int[3];
@@ -1273,6 +1394,8 @@ public class FastGraphTest {
 		displayGraph.addEdge(e2);
 		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
 		assertTrue(displayGraph.consistent());
+		assertTrue(g.checkConsistency());
+		assertTrue(g1.checkConsistency());
 
 		nodes = new int[5];
 		edges = new int[5];
@@ -1297,6 +1420,8 @@ public class FastGraphTest {
 		displayGraph.addEdge(e4);
 		assertTrue(displayGraph.isomorphic(g1.generateDisplayGraph()));
 		assertTrue(displayGraph.consistent());
+		assertTrue(g.checkConsistency());
+		assertTrue(g1.checkConsistency());
 
 	}
 
@@ -1308,12 +1433,14 @@ public class FastGraphTest {
 		assertEquals(g.oppositeEnd(4,4),3);
 		assertEquals(g.oppositeEnd(0,1),0);
 		assertEquals(g.oppositeEnd(0,0),1);
+		assertTrue(g.checkConsistency());
 	}
 		
 	@Test
 	public void test123() {
 		FastGraph g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		assertEquals(g.oppositeEnd(1,0),0);
+		assertTrue(g.checkConsistency());
 	}
 
 	@Test
@@ -1332,6 +1459,8 @@ public class FastGraphTest {
 		assertEquals(5,g1.getNumberOfEdges());
 		displayGraph = g1.generateDisplayGraph();
 		assertTrue(displayGraph.consistent());
+		assertTrue(g.checkConsistency());
+		assertTrue(g1.checkConsistency());
 		
 		nodes = new int[0];
 		edges = new int[1];
@@ -1342,6 +1471,8 @@ public class FastGraphTest {
 		assertEquals("edge label 4",g1.getEdgeLabel(3));
 		displayGraph = g1.generateDisplayGraph();
 		assertTrue(displayGraph.consistent());
+		assertTrue(g.checkConsistency());
+		assertTrue(g1.checkConsistency());
 		
 		nodes = new int[1];
 		nodes[0] = 1;
@@ -1353,6 +1484,8 @@ public class FastGraphTest {
 		assertEquals("edge label 1",g1.getEdgeLabel(0));
 		displayGraph = g1.generateDisplayGraph();
 		assertTrue(displayGraph.consistent());
+		assertTrue(g.checkConsistency());
+		assertTrue(g1.checkConsistency());
 		
 		nodes = new int[0];
 		edges = new int[5];
@@ -1366,6 +1499,8 @@ public class FastGraphTest {
 		assertEquals(0,g1.getNumberOfEdges());
 		displayGraph = g1.generateDisplayGraph();
 		assertTrue(displayGraph.consistent());
+		assertTrue(g.checkConsistency());
+		assertTrue(g1.checkConsistency());
 		
 		nodes = new int[5];
 		nodes[0] = 0;
@@ -1379,7 +1514,8 @@ public class FastGraphTest {
 		assertEquals(0,g1.getNumberOfEdges());
 		displayGraph = g1.generateDisplayGraph();
 		assertTrue(displayGraph.consistent());
-		
+		assertTrue(g.checkConsistency());
+		assertTrue(g1.checkConsistency());
 	}
 
 	@Test
@@ -1387,6 +1523,7 @@ public class FastGraphTest {
 		FastGraph g = FastGraph.nodeListEdgeListGraphFactory(0, 0, Launcher.startingWorkingDirectory+File.separatorChar+"testData", "test1", false);
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
 	}
 
 	@Test
@@ -1398,6 +1535,7 @@ public class FastGraphTest {
 		assertEquals(23,g.getNodeWeight(0));
 		assertEquals(12,g.getNodeType(0));
 		assertEquals(0,g.getNodeAge(0));
+		assertTrue(g.checkConsistency());
 	}
 
 	@Test
@@ -1419,7 +1557,7 @@ public class FastGraphTest {
 		assertEquals(0,g.getEdgeAge(0));
 		displayGraph = g.generateDisplayGraph();
 		assertTrue(displayGraph.consistent());
-
+		assertTrue(g.checkConsistency());
 	}
 
 	@Test
@@ -1441,7 +1579,7 @@ public class FastGraphTest {
 		assertEquals(0,g.getEdgeAge(3));
 		displayGraph = g.generateDisplayGraph();
 		assertTrue(displayGraph.consistent());
-
+		assertTrue(g.checkConsistency());
 	}
 
 	@Test
@@ -1454,7 +1592,6 @@ public class FastGraphTest {
 		assertEquals(overMaxShort*2,g.getNodeDegree(0));
 		assertEquals(overMaxShort-1,g.getNodeConnectingEdges(0)[overMaxShort-1]);
 		assertEquals(0,g.getNodeConnectingNodes(0)[overMaxShort-1]);
-
 	}
 
 	@Test
@@ -1567,6 +1704,7 @@ public class FastGraphTest {
 		arr = g.outDegreeProfile();
 		int[] correct2b = {1};
 		assertArrayEquals(correct2b,arr);
+		assertTrue(g.checkConsistency());
 		
 		g = FastGraph.jsonStringGraphFactory(TestRunner.get5Node5Edge(),false);
 		arr = g.degreeProfile();
@@ -1578,6 +1716,7 @@ public class FastGraphTest {
 		arr = g.outDegreeProfile();
 		int[] correct3b = {1,3,1};
 		assertArrayEquals(correct3b,arr);
+		assertTrue(g.checkConsistency());
 		
 		g = FastGraph.jsonStringGraphFactory(TestRunner.get2Node2Edge(),false);
 		arr = g.degreeProfile();
@@ -1589,6 +1728,7 @@ public class FastGraphTest {
 		arr = g.outDegreeProfile();
 		int[] correct4b = {1,0,1};
 		assertArrayEquals(correct4b,arr);
+		assertTrue(g.checkConsistency());
 		
 	}
 
@@ -1604,6 +1744,8 @@ public class FastGraphTest {
 		assertTrue((g.getEdgeNode2(0) != g1.getEdgeNode2(0)) || (g.getEdgeNode2(1) != g1.getEdgeNode2(1)) || (g.getEdgeNode2(2) != g1.getEdgeNode2(2)) || (g.getEdgeNode2(3) != g1.getEdgeNode2(3)) || (g.getEdgeNode2(4) != g1.getEdgeNode2(4)));
 		assertArrayEquals(g.inDegreeProfile(),g1.inDegreeProfile());
 		assertArrayEquals(g.outDegreeProfile(),g1.outDegreeProfile());
+		assertTrue(g.checkConsistency());
+		assertTrue(g1.checkConsistency());
 		
 		g = FastGraph.jsonStringGraphFactory(TestRunner.get4Node5Edge(),false);
 		g1 = g.generateRandomRewiredGraph(10,111);
@@ -1611,7 +1753,8 @@ public class FastGraphTest {
 		assertTrue((g.getEdgeNode1(1) != g1.getEdgeNode1(1)) || (g.getEdgeNode2(1) != g1.getEdgeNode2(1)));
 		assertArrayEquals(g.inDegreeProfile(),g1.inDegreeProfile());
 		assertArrayEquals(g.outDegreeProfile(),g1.outDegreeProfile());
-		
+		assertTrue(g.checkConsistency());
+		assertTrue(g1.checkConsistency());
 	}
 	
 	
@@ -1634,6 +1777,7 @@ public class FastGraphTest {
 
 		assertEquals(1,g1.edgesBetween(0, 1).size());
 		assertTrue(g1.edgesBetween(0, 1).get(0) == 0);
+		assertTrue(g1.checkConsistency());
 	}
 	
 	
@@ -1656,6 +1800,7 @@ public class FastGraphTest {
 
 		assertEquals(1,g1.edgesBetween(0, 1).size());
 		assertTrue(g1.edgesBetween(0, 1).get(0) == 0);
+		assertTrue(g1.checkConsistency());
 	}
 	
 	
@@ -1672,6 +1817,7 @@ public class FastGraphTest {
 
 		assertEquals(1,g1.edgesBetween(0, 1).size());
 		assertTrue(g1.edgesBetween(0, 1).get(0) == 0);
+		assertTrue(g1.checkConsistency());
 	}
 	
 	
@@ -1698,6 +1844,7 @@ public class FastGraphTest {
 		assertTrue(g1.edgesBetween(0, 1).get(0) == 2);
 		assertTrue(g1.edgesBetween(0, 1).get(1) == 0);
 		assertTrue(g1.edgesBetween(0, 1).get(2) == 3);
+		assertTrue(g1.checkConsistency());
 	}
 	
 	
@@ -1720,6 +1867,7 @@ public class FastGraphTest {
 
 		assertEquals(1,g1.edgesBetween(0, 1).size());
 		assertTrue(g1.edgesBetween(0, 1).get(0) == 0);
+		assertTrue(g1.checkConsistency());
 	}
 	
 	
@@ -1741,6 +1889,7 @@ public class FastGraphTest {
 		FastGraph g1 = FastGraph.displayGraphFactory(displayGraph1,false);
 
 		assertEquals(0,g1.edgesBetween(0, 1).size());
+		assertTrue(g1.checkConsistency());
 	}
 	
 	
@@ -1752,6 +1901,7 @@ public class FastGraphTest {
 		assertEquals(0,g.findMinimumNodeAge());
 		assertEquals(0,g.findMaximumEdgeAge());
 		assertEquals(0,g.findMinimumEdgeAge());
+		assertTrue(g.checkConsistency());
 	}
 	
 	
@@ -1771,6 +1921,8 @@ public class FastGraphTest {
 		assertEquals(0,g2.getNumberOfNodes());
 		assertEquals(0,g2.getNumberOfEdges());
 
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 	}
 
 	
@@ -1831,6 +1983,9 @@ public class FastGraphTest {
 		assertEquals(2,g3.getEdgeNode2(1));
 		
 
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		assertTrue(g3.checkConsistency());
 	}
 	
 	@Test
@@ -1890,6 +2045,8 @@ public class FastGraphTest {
 		assertEquals(2,g2.getEdgeNode1(3));
 		assertEquals(3,g2.getEdgeNode2(3));
 
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 	}
 	
 	@Test
@@ -2037,6 +2194,9 @@ public class FastGraphTest {
 		assertEquals(6,g3.getEdgeNode1(14));
 		assertEquals(8,g3.getEdgeNode2(14));
 
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		assertTrue(g3.checkConsistency());
 	}
 	
 	
@@ -2118,6 +2278,8 @@ public class FastGraphTest {
 		assertEquals(3,g2.getEdgeNode1(5));
 		assertEquals(4,g2.getEdgeNode2(5));
 
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 	}
 	
 	@Test
@@ -2205,7 +2367,8 @@ public class FastGraphTest {
 		assertEquals(3,g2.getEdgeNode1(7));
 		assertEquals(5,g2.getEdgeNode2(7));
 		
-
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 	}
 	
 	
@@ -2288,6 +2451,9 @@ public class FastGraphTest {
 		
 		assertEquals(3,g2.getEdgeNode1(8));
 		assertEquals(5,g2.getEdgeNode2(8));
+		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 	}
 	
 	
@@ -2375,6 +2541,8 @@ public class FastGraphTest {
 		assertEquals(3,g2.getEdgeNode1(7));
 		assertEquals(5,g2.getEdgeNode2(7));
 		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 	}
 	
 	
@@ -2443,7 +2611,9 @@ public class FastGraphTest {
 
 		assertEquals(0,g3.getEdgeAge(0));
 		assertEquals(2,g3.getEdgeAge(1));
-		
+
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 	}
 		
 	
@@ -2464,6 +2634,7 @@ public class FastGraphTest {
 
 		assertEquals(0,g1.getGeneration());
 
+		assertTrue(g1.checkConsistency());
 	}
 		
 	@Test
@@ -2483,6 +2654,7 @@ public class FastGraphTest {
 
 		assertEquals(7,g1.getGeneration());
 
+		assertTrue(g1.checkConsistency());
 	}
 		
 
@@ -2651,6 +2823,11 @@ public class FastGraphTest {
 		assertEquals(4,g5.getEdgeNode1(6));
 		assertEquals(6,g5.getEdgeNode2(6));
 
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		assertTrue(g3.checkConsistency());
+		assertTrue(g4.checkConsistency());
+		assertTrue(g5.checkConsistency());
 	}
 	
 	
@@ -2700,6 +2877,7 @@ public class FastGraphTest {
 		assertEquals(1,g1.getEdgeNode1(0));
 		assertEquals(0,g1.getEdgeNode2(0));
 		
+		assertTrue(g1.checkConsistency());
 	}		
 
 	
@@ -2721,6 +2899,8 @@ public class FastGraphTest {
 		assertEquals(0,g2.getNumberOfNodes());
 		assertEquals(0,g2.getNumberOfEdges());
 		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 	}
 
 	@Test
@@ -2748,6 +2928,8 @@ public class FastGraphTest {
 		assertEquals(2,g2.getNumberOfNodes());
 		assertEquals(1,g2.getNumberOfEdges());
 		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 	}
 
 	@Test
@@ -2800,8 +2982,9 @@ public class FastGraphTest {
 		assertEquals(0,ga.getEdgeNode1(0));
 		assertEquals(1,ga.getEdgeNode2(0));
 		
-
-		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		assertTrue(ga.checkConsistency());
 	}
 
 	
@@ -2930,6 +3113,7 @@ public class FastGraphTest {
 		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
 		ret = g.findParallelEdges();
 		assertEquals(0,ret.size());
+		assertTrue(g.checkConsistency());
 		
 		addNodes = new LinkedList<NodeStructure>();
 		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
@@ -2948,6 +3132,7 @@ public class FastGraphTest {
 		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
 		ret = g.findParallelEdges();
 		assertEquals(0,ret.size());
+		assertTrue(g.checkConsistency());
 		
 		addNodes = new LinkedList<NodeStructure>();
 		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
@@ -2965,6 +3150,7 @@ public class FastGraphTest {
 		assertEquals(2,ret.get(0).size());
 		assertEquals(0,(int)((ret.get(0)).get(0)));
 		assertEquals(1,(int)((ret.get(0)).get(1)));
+		assertTrue(g.checkConsistency());
 		
 		addNodes = new LinkedList<NodeStructure>();
 		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
@@ -2982,6 +3168,7 @@ public class FastGraphTest {
 		assertEquals(2,ret.get(0).size());
 		assertEquals(0,(int)((ret.get(0)).get(0)));
 		assertEquals(1,(int)((ret.get(0)).get(1)));
+		assertTrue(g.checkConsistency());
 		
 		addNodes = new LinkedList<NodeStructure>();
 		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
@@ -3002,6 +3189,7 @@ public class FastGraphTest {
 		assertEquals(0,(int)((ret.get(0)).get(0)));
 		assertEquals(1,(int)((ret.get(0)).get(1)));
 		assertEquals(2,(int)((ret.get(0)).get(2)));
+		assertTrue(g.checkConsistency());
 		
 
 		addNodes = new LinkedList<NodeStructure>();
@@ -3022,6 +3210,7 @@ public class FastGraphTest {
 		assertEquals(2,ret.get(0).size());
 		assertEquals(0,(int)((ret.get(0)).get(0)));
 		assertEquals(1,(int)((ret.get(0)).get(1)));
+		assertTrue(g.checkConsistency());
 
 		
 		addNodes = new LinkedList<NodeStructure>();
@@ -3056,6 +3245,7 @@ public class FastGraphTest {
 		assertEquals(2,ret.get(1).size());
 		assertEquals(1,(int)((ret.get(1)).get(0)));
 		assertEquals(5,(int)((ret.get(1)).get(1)));
+		assertTrue(g.checkConsistency());
 		
 	}
 	
@@ -3092,6 +3282,8 @@ public class FastGraphTest {
 	    g2 = FastGraph.loadBuffersGraphFactory(null,"testName");
 		assertEquals("testName",g1.getName());
 		assertEquals("testName",g2.getName());
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 	}
 
 
@@ -3155,6 +3347,7 @@ public class FastGraphTest {
 		intArray[1] = 1;
 		intArray[2] = 1;
 		assertArrayEquals(intArray,g1.findOutDegrees());
+		assertTrue(g1.checkConsistency());
 
 	}
 	
@@ -3229,6 +3422,7 @@ public class FastGraphTest {
 		intArray = new int[0];
 		ret = g1.getNodeConnectingOutNodesOfSameAge(2);
 		assertArrayEquals(intArray,ret);
+		assertTrue(g1.checkConsistency());
 
 		dg1 = new Graph("dg1");
 		dg1.addAdjacencyEdge("n0", "n1");
@@ -3282,6 +3476,8 @@ public class FastGraphTest {
 		intArray = new int[0];
 		ret = g1.getNodeConnectingOutNodesOfSameAge(2);
 		assertArrayEquals(intArray,ret);
+		assertTrue(g1.checkConsistency());
+
 	}
 
 	
@@ -3311,6 +3507,7 @@ public class FastGraphTest {
 		addEdges.add(es1);
 		addEdges.add(es2);
 		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
+		assertTrue(g1.checkConsistency());
 		
 		intArray = new int[1];
 		intArray[0] = 1;
@@ -3362,6 +3559,7 @@ public class FastGraphTest {
 
 	@Test
 	public void test165() throws Exception {
+		FastGraph g1,g2,g3,g4;
 		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
 		NodeStructure ns10 = new NodeStructure(0,"aaa", 1, (byte)2, (byte)3);
 		NodeStructure ns11 = new NodeStructure(1,"bb", 11, (byte)12, (byte)13);
@@ -3370,46 +3568,55 @@ public class FastGraphTest {
 		nodes1.add(ns11);
 		nodes1.add(ns12);
 		List<EdgeStructure> edges1 = new ArrayList<EdgeStructure>();
-		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
-		Graph dg;
+		g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
 		
-		g1 = g1.generateGraphByDeletingSingletonNode(1);
-		assertEquals(2,g1.getNumberOfNodes());
-		assertEquals(0,g1.getNumberOfEdges());
-		assertEquals("aaa",g1.getNodeLabel(0));
-		assertEquals(1,g1.getNodeWeight(0));
-		assertEquals(2,g1.getNodeType(0));
-		assertEquals(3,g1.getNodeAge(0));
-		assertEquals("cccc",g1.getNodeLabel(1));
-		assertEquals(21,g1.getNodeWeight(1));
-		assertEquals(22,g1.getNodeType(1));
-		assertEquals(23,g1.getNodeAge(1));
+		g2 = g1.generateGraphByDeletingSingletonNode(1);
+		assertEquals(2,g2.getNumberOfNodes());
+		assertEquals(0,g2.getNumberOfEdges());
+		assertEquals("aaa",g2.getNodeLabel(0));
+		assertEquals(1,g2.getNodeWeight(0));
+		assertEquals(2,g2.getNodeType(0));
+		assertEquals(3,g2.getNodeAge(0));
+		assertEquals("cccc",g2.getNodeLabel(1));
+		assertEquals(21,g2.getNodeWeight(1));
+		assertEquals(22,g2.getNodeType(1));
+		assertEquals(23,g2.getNodeAge(1));
 		
-		g1 = g1.generateGraphByDeletingSingletonNode(0);
-		assertEquals(1,g1.getNumberOfNodes());
-		assertEquals(0,g1.getNumberOfEdges());
-		assertEquals("cccc",g1.getNodeLabel(0));
-		assertEquals(21,g1.getNodeWeight(0));
-		assertEquals(22,g1.getNodeType(0));
-		assertEquals(23,g1.getNodeAge(0));
+		g3 = g2.generateGraphByDeletingSingletonNode(0);
+		assertEquals(1,g3.getNumberOfNodes());
+		assertEquals(0,g3.getNumberOfEdges());
+		assertEquals("cccc",g3.getNodeLabel(0));
+		assertEquals(21,g3.getNodeWeight(0));
+		assertEquals(22,g3.getNodeType(0));
+		assertEquals(23,g3.getNodeAge(0));
 
-		g1 = g1.generateGraphByDeletingSingletonNode(0);
-		assertEquals(0,g1.getNumberOfNodes());
+		g4 = g3.generateGraphByDeletingSingletonNode(0);
 		
-		dg = g1.generateDisplayGraph();
-		assertTrue(dg.consistent());
+		assertEquals(3,g1.getNumberOfNodes());
+		assertEquals(0,g1.getNumberOfEdges());
+		assertEquals(2,g2.getNumberOfNodes());
+		assertEquals(0,g2.getNumberOfEdges());
+		assertEquals(1,g3.getNumberOfNodes());
+		assertEquals(0,g3.getNumberOfEdges());
+		assertEquals(0,g4.getNumberOfNodes());
+		assertEquals(0,g4.getNumberOfEdges());
+
+		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		assertTrue(g3.checkConsistency());
+		assertTrue(g4.checkConsistency());
 
 	}
 
 	@Test
 	public void test166() throws Exception {
-		FastGraph g1;
+		FastGraph g1,g2;
 		NodeStructure ns0,ns1,ns2;
 		EdgeStructure es0;
 		LinkedList<NodeStructure> addNodes;
 		LinkedList<EdgeStructure> addEdges;
 		addNodes = new LinkedList<NodeStructure>();
-		Graph dg;
 		
 		ns0 = new NodeStructure(0,"ns01", 1, (byte)2, (byte)3);
 		ns1 = new NodeStructure(1,"ns11", 11, (byte)12, (byte)13);
@@ -3422,49 +3629,50 @@ public class FastGraphTest {
 		addEdges.add(es0);
 		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
 		
-		dg = g1.generateDisplayGraph();
-		assertTrue(dg.consistent());
+		assertTrue(g1.checkConsistency());
 
 		assertEquals(null,g1.generateGraphByDeletingSingletonNode(0));
-		dg = g1.generateDisplayGraph();
-		assertTrue(dg.consistent());
-		
-		g1 = g1.generateGraphByDeletingSingletonNode(1);
-		assertEquals(2,g1.getNumberOfNodes());
+		assertEquals(3,g1.getNumberOfNodes());
 		assertEquals(1,g1.getNumberOfEdges());
-		assertEquals("ns01",g1.getNodeLabel(0));
-		assertEquals(1,g1.getNodeWeight(0));
-		assertEquals(2,g1.getNodeType(0));
-		assertEquals(3,g1.getNodeAge(0));
-		assertEquals("ns21",g1.getNodeLabel(1));
-		assertEquals(21,g1.getNodeWeight(1));
-		assertEquals(22,g1.getNodeType(1));
-		assertEquals(23,g1.getNodeAge(1));
-		assertEquals("es01",g1.getEdgeLabel(0));
-		assertEquals(1,g1.getEdgeWeight(0));
-		assertEquals(2,g1.getEdgeType(0));
-		assertEquals(3,g1.getEdgeAge(0));
-		assertEquals(0,g1.getEdgeNode1(0));
-		assertEquals(1,g1.getEdgeNode2(0));
+		assertTrue(g1.checkConsistency());
+		
+		g2 = g1.generateGraphByDeletingSingletonNode(1);
+		assertEquals(3,g1.getNumberOfNodes());
+		assertEquals(1,g1.getNumberOfEdges());
+		assertEquals(2,g2.getNumberOfNodes());
+		assertEquals(1,g2.getNumberOfEdges());
+		assertEquals("ns01",g2.getNodeLabel(0));
+		assertEquals(1,g2.getNodeWeight(0));
+		assertEquals(2,g2.getNodeType(0));
+		assertEquals(3,g2.getNodeAge(0));
+		assertEquals("ns21",g2.getNodeLabel(1));
+		assertEquals(21,g2.getNodeWeight(1));
+		assertEquals(22,g2.getNodeType(1));
+		assertEquals(23,g2.getNodeAge(1));
+		assertEquals("es01",g2.getEdgeLabel(0));
+		assertEquals(1,g2.getEdgeWeight(0));
+		assertEquals(2,g2.getEdgeType(0));
+		assertEquals(3,g2.getEdgeAge(0));
+		assertEquals(0,g2.getEdgeNode1(0));
+		assertEquals(1,g2.getEdgeNode2(0));
 
-		dg = g1.generateDisplayGraph();
-		assertTrue(dg.consistent());
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 
-		assertEquals(null,g1.generateGraphByDeletingSingletonNode(1));
-		dg = g1.generateDisplayGraph();
-		assertTrue(dg.consistent());
+		assertEquals(null,g2.generateGraphByDeletingSingletonNode(1));
+		
+		assertTrue(g2.checkConsistency());
 		
 	}
 
 	@Test
 	public void test167() throws Exception {
-		FastGraph g1;
+		FastGraph g1,g2;
 		NodeStructure ns0,ns1,ns2;
 		EdgeStructure es0,es1;
 		LinkedList<NodeStructure> addNodes;
 		LinkedList<EdgeStructure> addEdges;
 		addNodes = new LinkedList<NodeStructure>();
-		Graph dg;
 		
 		ns0 = new NodeStructure(0,"ns01", 1, (byte)2, (byte)3);
 		ns1 = new NodeStructure(1,"ns11", 11, (byte)12, (byte)13);
@@ -3480,49 +3688,109 @@ public class FastGraphTest {
 		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
 		
 		assertEquals(null,g1.generateGraphByDeletingSingletonNode(2));
-		dg = g1.generateDisplayGraph();
-		assertTrue(dg.consistent());
-		
-		assertEquals(null,g1.generateGraphByDeletingSingletonNode(1));
-		dg = g1.generateDisplayGraph();
-		assertTrue(dg.consistent());
-		
-		g1 = g1.generateGraphByDeletingSingletonNode(0);
-		assertEquals(2,g1.getNumberOfNodes());
+		assertEquals(3,g1.getNumberOfNodes());
 		assertEquals(2,g1.getNumberOfEdges());
-		assertEquals("ns11",g1.getNodeLabel(0));
-		assertEquals(11,g1.getNodeWeight(0));
-		assertEquals(12,g1.getNodeType(0));
-		assertEquals(13,g1.getNodeAge(0));
-		assertEquals("ns21",g1.getNodeLabel(1));
-		assertEquals(21,g1.getNodeWeight(1));
-		assertEquals(22,g1.getNodeType(1));
-		assertEquals(23,g1.getNodeAge(1));
-		assertEquals("es01",g1.getEdgeLabel(0));
-		assertEquals(1,g1.getEdgeWeight(0));
-		assertEquals(2,g1.getEdgeType(0));
-		assertEquals(3,g1.getEdgeAge(0));
-		assertEquals(0,g1.getEdgeNode1(0));
-		assertEquals(1,g1.getEdgeNode2(0));
-		assertEquals("es02",g1.getEdgeLabel(1));
-		assertEquals(11,g1.getEdgeWeight(1));
-		assertEquals(12,g1.getEdgeType(1));
-		assertEquals(13,g1.getEdgeAge(1));
-		assertEquals(0,g1.getEdgeNode1(1));
-		assertEquals(0,g1.getEdgeNode2(1));
-
-		dg = g1.generateDisplayGraph();
-		assertTrue(dg.consistent());
-
-		assertEquals(null,g1.generateGraphByDeletingSingletonNode(1));
-		dg = g1.generateDisplayGraph();
-		assertTrue(dg.consistent());
+		assertTrue(g1.checkConsistency());
 		
+		assertEquals(null,g1.generateGraphByDeletingSingletonNode(1));
+		assertEquals(3,g1.getNumberOfNodes());
+		assertEquals(2,g1.getNumberOfEdges());
+		assertTrue(g1.checkConsistency());
+		
+		g2 = g1.generateGraphByDeletingSingletonNode(0);
+		assertEquals(3,g1.getNumberOfNodes());
+		assertEquals(2,g1.getNumberOfEdges());
+		assertEquals(2,g2.getNumberOfNodes());
+		assertEquals(2,g2.getNumberOfEdges());
+		assertEquals("ns11",g2.getNodeLabel(0));
+		assertEquals(11,g2.getNodeWeight(0));
+		assertEquals(12,g2.getNodeType(0));
+		assertEquals(13,g2.getNodeAge(0));
+		assertEquals("ns21",g2.getNodeLabel(1));
+		assertEquals(21,g2.getNodeWeight(1));
+		assertEquals(22,g2.getNodeType(1));
+		assertEquals(23,g2.getNodeAge(1));
+		assertEquals("es01",g2.getEdgeLabel(0));
+		assertEquals(1,g2.getEdgeWeight(0));
+		assertEquals(2,g2.getEdgeType(0));
+		assertEquals(3,g2.getEdgeAge(0));
+		assertEquals(0,g2.getEdgeNode1(0));
+		assertEquals(1,g2.getEdgeNode2(0));
+		assertEquals("es02",g2.getEdgeLabel(1));
+		assertEquals(11,g2.getEdgeWeight(1));
+		assertEquals(12,g2.getEdgeType(1));
+		assertEquals(13,g2.getEdgeAge(1));
+		assertEquals(0,g2.getEdgeNode1(1));
+		assertEquals(0,g2.getEdgeNode2(1));
+
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+
+		assertEquals(null,g2.generateGraphByDeletingSingletonNode(1));
+		assertTrue(g2.checkConsistency());
 	}
+	
 	
 	@Test
 	public void test168() throws Exception {
-		FastGraph g1;
+		FastGraph g1,g2;
+		NodeStructure ns0,ns1,ns2;
+		EdgeStructure es0,es1;
+		LinkedList<NodeStructure> addNodes;
+		LinkedList<EdgeStructure> addEdges;
+		addNodes = new LinkedList<NodeStructure>();
+		
+		ns0 = new NodeStructure(0,"ns01", 1, (byte)2, (byte)3);
+		ns1 = new NodeStructure(1,"ns11", 11, (byte)12, (byte)13);
+		ns2 = new NodeStructure(2,"ns21", 21, (byte)22, (byte)23);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addNodes.add(ns2);
+		addEdges = new LinkedList<EdgeStructure>();
+		es0 = new EdgeStructure(0,"es01", 1, (byte)2, (byte)3, 1, 2);
+		es1 = new EdgeStructure(1,"es02", 11, (byte)12, (byte)13, 1, 1);
+		addEdges.add(es0);
+		addEdges.add(es1);
+		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
+		
+		assertEquals(null,g1.generateGraphByDeletingSingletonNode(2));
+		assertTrue(g1.checkConsistency());
+		
+		
+		g2 = g1.generateGraphByDeletingSingletonNode(0);
+		assertEquals(3,g1.getNumberOfNodes());
+		assertEquals(2,g1.getNumberOfEdges());
+		assertEquals(2,g2.getNumberOfNodes());
+		assertEquals(2,g2.getNumberOfEdges());
+		assertEquals("ns11",g2.getNodeLabel(0));
+		assertEquals(11,g2.getNodeWeight(0));
+		assertEquals(12,g2.getNodeType(0));
+		assertEquals(13,g2.getNodeAge(0));
+		assertEquals("ns21",g2.getNodeLabel(1));
+		assertEquals(21,g2.getNodeWeight(1));
+		assertEquals(22,g2.getNodeType(1));
+		assertEquals(23,g2.getNodeAge(1));
+		assertEquals("es01",g2.getEdgeLabel(0));
+		assertEquals(1,g2.getEdgeWeight(0));
+		assertEquals(2,g2.getEdgeType(0));
+		assertEquals(3,g2.getEdgeAge(0));
+		assertEquals(0,g2.getEdgeNode1(0));
+		assertEquals(1,g2.getEdgeNode2(0));
+		assertEquals("es02",g2.getEdgeLabel(1));
+		assertEquals(11,g2.getEdgeWeight(1));
+		assertEquals(12,g2.getEdgeType(1));
+		assertEquals(13,g2.getEdgeAge(1));
+		assertEquals(0,g2.getEdgeNode1(1));
+		assertEquals(0,g2.getEdgeNode2(1));
+
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+
+	}
+	
+	@Test
+	public void test169() throws Exception {
+		FastGraph g1,g2,g3;
 		NodeStructure ns;
 
 		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
@@ -3533,41 +3801,46 @@ public class FastGraphTest {
 		assertEquals(0,g1.getNumberOfEdges());
 		
 		ns = new NodeStructure(-1,"node0", 1, (byte)2, (byte)3);
-		g1 = g1.generateGraphByAddingSingletonNode(ns);
+		g2 = g1.generateGraphByAddingNode(ns);
 		
-		assertEquals(1,g1.getNumberOfNodes());
+		assertEquals(0,g1.getNumberOfNodes());
 		assertEquals(0,g1.getNumberOfEdges());
-		assertEquals("node0",g1.getNodeLabel(0));
-		assertEquals(1,g1.getNodeWeight(0));
-		assertEquals(2,g1.getNodeType(0));
-		assertEquals(3,g1.getNodeAge(0));
+		assertEquals(1,g2.getNumberOfNodes());
+		assertEquals(0,g2.getNumberOfEdges());
+		assertEquals("node0",g2.getNodeLabel(0));
+		assertEquals(1,g2.getNodeWeight(0));
+		assertEquals(2,g2.getNodeType(0));
+		assertEquals(3,g2.getNodeAge(0));
 		
 		ns = new NodeStructure(-1,"node1", 11, (byte)12, (byte)13);
-		g1 = g1.generateGraphByAddingSingletonNode(ns);
+		g3 = g2.generateGraphByAddingNode(ns);
 		
-		assertEquals(2,g1.getNumberOfNodes());
-		assertEquals(0,g1.getNumberOfEdges());
-		assertEquals("node0",g1.getNodeLabel(0));
-		assertEquals(1,g1.getNodeWeight(0));
-		assertEquals(2,g1.getNodeType(0));
-		assertEquals(3,g1.getNodeAge(0));
-		assertEquals("node1",g1.getNodeLabel(1));
-		assertEquals(11,g1.getNodeWeight(1));
-		assertEquals(12,g1.getNodeType(1));
-		assertEquals(13,g1.getNodeAge(1));
+		assertEquals(1,g2.getNumberOfNodes());
+		assertEquals(0,g2.getNumberOfEdges());
+		assertEquals(2,g3.getNumberOfNodes());
+		assertEquals(0,g3.getNumberOfEdges());
+		assertEquals("node0",g3.getNodeLabel(0));
+		assertEquals(1,g3.getNodeWeight(0));
+		assertEquals(2,g3.getNodeType(0));
+		assertEquals(3,g3.getNodeAge(0));
+		assertEquals("node1",g3.getNodeLabel(1));
+		assertEquals(11,g3.getNodeWeight(1));
+		assertEquals(12,g3.getNodeType(1));
+		assertEquals(13,g3.getNodeAge(1));
 		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
 	}
 
 	
 	@Test
-	public void test169() throws Exception {
+	public void test170() throws Exception {
 		NodeStructure ns;
 		FastGraph g1;
 		NodeStructure ns0,ns1,ns2,ns3;
 		EdgeStructure es0,es1,es2;
 		LinkedList<NodeStructure> addNodes;
 		LinkedList<EdgeStructure> addEdges;
-		Graph dg;
 
 		addNodes = new LinkedList<NodeStructure>();
 		ns0 = new NodeStructure(0,"ns01", 1, (byte)1, (byte)0);
@@ -3588,7 +3861,7 @@ public class FastGraphTest {
 		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
 		
 		ns = new NodeStructure(-1,"node", 71, (byte)72, (byte)73);
-		g1 = g1.generateGraphByAddingSingletonNode(ns);
+		g1 = g1.generateGraphByAddingNode(ns);
 		
 		assertEquals(5,g1.getNumberOfNodes());
 		assertEquals(3,g1.getNumberOfEdges());
@@ -3597,8 +3870,556 @@ public class FastGraphTest {
 		assertEquals(72,g1.getNodeType(4));
 		assertEquals(73,g1.getNodeAge(4));
 		
-		dg = g1.generateDisplayGraph();
-		assertTrue(dg.consistent());
+		assertTrue(g1.checkConsistency());
 	}
 	
+	@Test
+	public void test171() throws Exception {
+		FastGraph g1,g2;
+		NodeStructure ns0,ns1;
+		EdgeStructure es0;
+		LinkedList<NodeStructure> addNodes;
+		LinkedList<EdgeStructure> addEdges;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns01", 1, (byte)1, (byte)0);
+		ns1 = new NodeStructure(1,"ns11", 1, (byte)1, (byte)0);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addEdges = new LinkedList<EdgeStructure>();
+		es0 = new EdgeStructure(0,"es01", 1, (byte)0, (byte)1, 1, 0);
+		addEdges.add(es0);
+		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
+		g2 = g1.generateGraphByDeletingEdge(0);
+		
+		assertEquals(0,g2.getNumberOfEdges());
+		assertEquals(2,g2.getNumberOfNodes());
+		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+	}
+	
+	@Test
+	public void test172() throws Exception {
+		FastGraph g1,g2,g3,g4,g5;
+		NodeStructure ns0,ns1,ns2,ns3;
+		EdgeStructure es0,es1,es2,es3;
+		LinkedList<NodeStructure> addNodes;
+		LinkedList<EdgeStructure> addEdges;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns01", 1, (byte)1, (byte)0);
+		ns1 = new NodeStructure(1,"ns11", 1, (byte)1, (byte)0);
+		ns2 = new NodeStructure(2,"ns21", 1, (byte)1, (byte)0);
+		ns3 = new NodeStructure(3,"ns31", 1, (byte)1, (byte)0);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addNodes.add(ns2);
+		addNodes.add(ns3);
+		addEdges = new LinkedList<EdgeStructure>();
+		es0 = new EdgeStructure(0,"es01", 1, (byte)0, (byte)1, 1, 0);
+		es1 = new EdgeStructure(1,"es02", 1, (byte)0, (byte)1, 1, 2);
+		es2 = new EdgeStructure(2,"es03", 1, (byte)0, (byte)1, 2, 3);
+		es3 = new EdgeStructure(3,"es04", 1, (byte)0, (byte)1, 3, 0);
+		addEdges.add(es0);
+		addEdges.add(es1);
+		addEdges.add(es2);
+		addEdges.add(es3);
+		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
+
+		g2 = g1.generateGraphByDeletingEdge(2);
+		assertEquals(4,g1.getNumberOfEdges());
+		assertEquals(4,g1.getNumberOfNodes());
+		assertEquals("es04",g1.getEdgeLabel(3));
+		assertEquals(3,g2.getNumberOfEdges());
+		assertEquals(4,g2.getNumberOfNodes());
+		assertEquals("es01",g2.getEdgeLabel(0));
+		assertEquals("es02",g2.getEdgeLabel(1));
+		assertEquals("es04",g2.getEdgeLabel(2));
+		
+		g3 = g2.generateGraphByDeletingEdge(0);
+		assertEquals(3,g2.getNumberOfEdges());
+		assertEquals(4,g2.getNumberOfNodes());
+		assertEquals("es04",g2.getEdgeLabel(2));
+		assertEquals(2,g3.getNumberOfEdges());
+		assertEquals(4,g3.getNumberOfNodes());
+		assertEquals("es02",g3.getEdgeLabel(0));
+		assertEquals("es04",g3.getEdgeLabel(1));
+		
+		g4 = g3.generateGraphByDeletingEdge(1);
+		assertEquals(2,g3.getNumberOfEdges());
+		assertEquals("es02",g3.getEdgeLabel(0));
+		assertEquals(4,g3.getNumberOfNodes());
+		assertEquals(1,g4.getNumberOfEdges());
+		assertEquals(4,g4.getNumberOfNodes());
+		assertEquals("es02",g4.getEdgeLabel(0));
+		
+		g5 = g4.generateGraphByDeletingEdge(0);
+		assertEquals(1,g4.getNumberOfEdges());
+		assertEquals(4,g4.getNumberOfNodes());
+		assertEquals(0,g5.getNumberOfEdges());
+		assertEquals(4,g5.getNumberOfNodes());
+
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		assertTrue(g3.checkConsistency());
+		assertTrue(g4.checkConsistency());
+		assertTrue(g5.checkConsistency());
+	}
+	
+	@Test
+	public void test173() throws Exception {
+		FastGraph g1,g2;
+		NodeStructure ns0,ns1;
+		EdgeStructure es0;
+		LinkedList<NodeStructure> addNodes;
+		LinkedList<EdgeStructure> addEdges;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns01", 1, (byte)1, (byte)0);
+		ns1 = new NodeStructure(1,"ns11", 1, (byte)1, (byte)0);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addEdges = new LinkedList<EdgeStructure>();
+		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
+
+		es0 = new EdgeStructure(0,"es0", 1, (byte)2, (byte)3, 0, 1);
+
+		g2 = g1.generateGraphByAddingEdge(es0);
+		
+		assertEquals(1,g2.getNumberOfEdges());
+		assertEquals(2,g2.getNumberOfNodes());
+		assertEquals("es0",g2.getEdgeLabel(0));
+		assertEquals(1,g2.getEdgeWeight(0));
+		assertEquals(2,g2.getEdgeType(0));
+		assertEquals(3,g2.getEdgeAge(0));
+		assertEquals(0,g2.getEdgeNode1(0));
+		assertEquals(1,g2.getEdgeNode2(0));
+		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+	}
+	
+	@Test
+	public void test174() throws Exception {
+		FastGraph g1,g2;
+		NodeStructure ns0;
+		EdgeStructure es0;
+		LinkedList<NodeStructure> addNodes;
+		LinkedList<EdgeStructure> addEdges;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
+		addNodes.add(ns0);
+		addEdges = new LinkedList<EdgeStructure>();
+		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
+
+		es0 = new EdgeStructure(0,"es0", 1, (byte)2, (byte)3, 0, 0);
+
+		g2 = g1.generateGraphByAddingEdge(es0);
+		
+		assertEquals(1,g2.getNumberOfEdges());
+		assertEquals(1,g2.getNumberOfNodes());
+		assertEquals("es0",g2.getEdgeLabel(0));
+		assertEquals(1,g2.getEdgeWeight(0));
+		assertEquals(2,g2.getEdgeType(0));
+		assertEquals(3,g2.getEdgeAge(0));
+		assertEquals(0,g2.getEdgeNode1(0));
+		assertEquals(0,g2.getEdgeNode2(0));
+		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+	}
+	
+	@Test
+	public void test175() throws Exception {
+		FastGraph g1,g;
+		NodeStructure ns0;
+		EdgeStructure es0;
+		LinkedList<NodeStructure> addNodes;
+		LinkedList<EdgeStructure> addEdges;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns0", 10, (byte)20, (byte)30);
+		addNodes.add(ns0);
+		addEdges = new LinkedList<EdgeStructure>();
+		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
+
+		es0 = new EdgeStructure(0,"", 0, (byte)0, (byte)0, 0, 0);
+		g = g1.generateGraphByAddingEdge(es0);
+		
+		assertEquals(1,g.getNumberOfEdges());
+		assertEquals(1,g.getNumberOfNodes());
+		assertEquals("",g.getEdgeLabel(0));
+		assertEquals(0,g.getEdgeWeight(0));
+		assertEquals(0,g.getEdgeType(0));
+		assertEquals(0,g.getEdgeAge(0));
+		assertEquals(0,g.getEdgeNode1(0));
+		assertEquals(0,g.getEdgeNode2(0));
+		assertTrue(g1.checkConsistency());
+		assertTrue(g.checkConsistency());
+	}
+
+	@Test
+	public void test176() throws Exception {
+		FastGraph g1,g;
+		NodeStructure ns0,ns1,ns2,ns3;
+		EdgeStructure es0;
+		LinkedList<NodeStructure> addNodes;
+		LinkedList<EdgeStructure> addEdges;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns0", 10, (byte)20, (byte)30);
+		ns1 = new NodeStructure(1,"ns1", 11, (byte)21, (byte)31);
+		ns2 = new NodeStructure(2,"ns2", 12, (byte)22, (byte)32);
+		ns3 = new NodeStructure(3,"ns3", 13, (byte)23, (byte)33);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addNodes.add(ns2);
+		addNodes.add(ns3);
+		addEdges = new LinkedList<EdgeStructure>();
+		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
+
+		es0 = new EdgeStructure(0,"es0", 1, (byte)2, (byte)3, 3, 2);
+		g = g1.generateGraphByAddingEdge(es0);
+		assertEquals(1,g.getNumberOfEdges());
+		assertEquals(4,g.getNumberOfNodes());
+		assertEquals("es0",g.getEdgeLabel(0));
+		assertEquals(1,g.getEdgeWeight(0));
+		assertEquals(2,g.getEdgeType(0));
+		assertEquals(3,g.getEdgeAge(0));
+		assertEquals(3,g.getEdgeNode1(0));
+		assertEquals(2,g.getEdgeNode2(0));
+		assertTrue(g1.checkConsistency());
+		assertTrue(g.checkConsistency());
+		
+		es0 = new EdgeStructure(0,"edge1", 1, (byte)2, (byte)3, 1, 0);
+		g = g.generateGraphByAddingEdge(es0);
+		assertEquals(2,g.getNumberOfEdges());
+		assertEquals(4,g.getNumberOfNodes());
+		assertEquals("es0",g.getEdgeLabel(0));
+		assertEquals("edge1",g.getEdgeLabel(1));
+		assertEquals(1,g.getEdgeNode1(1));
+		assertEquals(0,g.getEdgeNode2(1));
+		assertTrue(g.checkConsistency());
+
+		es0 = new EdgeStructure(0,"e2", 21, (byte)22, (byte)23, 3, 2);
+		g = g.generateGraphByAddingEdge(es0);
+		assertEquals(3,g.getNumberOfEdges());
+		assertEquals(4,g.getNumberOfNodes());
+		assertEquals("edge1",g.getEdgeLabel(1));
+		assertEquals("e2",g.getEdgeLabel(2));
+		assertEquals(21,g.getEdgeWeight(2));
+		assertEquals(22,g.getEdgeType(2));
+		assertEquals(23,g.getEdgeAge(2));
+		assertEquals(3,g.getEdgeNode1(2));
+		assertEquals(2,g.getEdgeNode2(2));
+		assertEquals("es0",g.getEdgeLabel(0));
+		assertEquals(1,g.getEdgeWeight(0));
+		assertEquals(2,g.getEdgeType(0));
+		assertEquals(3,g.getEdgeAge(0));
+		assertEquals(3,g.getEdgeNode1(0));
+		assertEquals(2,g.getEdgeNode2(0));
+		assertTrue(g.checkConsistency());
+		
+		es0 = new EdgeStructure(0,"edge label 3", 31, (byte)32, (byte)33, 2, 3);
+		g = g.generateGraphByAddingEdge(es0);
+		assertEquals(4,g.getNumberOfEdges());
+		assertEquals(4,g.getNumberOfNodes());
+		assertEquals("edge label 3",g.getEdgeLabel(3));
+		assertEquals(2,g.getNodeOutDegree(3));
+		assertEquals(1,g.getNodeInDegree(3));
+		assertTrue(g.checkConsistency());
+		
+		es0 = new EdgeStructure(0,"", 0, (byte)0, (byte)0, 2, 2);
+		g = g.generateGraphByAddingEdge(es0);
+		assertEquals(5,g.getNumberOfEdges());
+		assertEquals(4,g.getNumberOfNodes());
+		assertEquals(0,g.getEdgeWeight(4));
+		assertEquals(2,g.getNodeOutDegree(2));
+		assertEquals(3,g.getNodeInDegree(2));
+		assertTrue(g.checkConsistency());
+
+	}
+
+
+	@Test
+	public void test177() throws Exception {
+		FastGraph g1,g2,g3,g4;
+		NodeStructure ns0;
+		LinkedList<NodeStructure> addNodes;
+		LinkedList<EdgeStructure> addEdges;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns0", 10, (byte)20, (byte)30);
+		addNodes.add(ns0);
+		addEdges = new LinkedList<EdgeStructure>();
+		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
+
+		g2 = g1.generateGraphByRelabellingNode(0,"abc");
+		assertEquals("ns0",g1.getNodeLabel(0));
+		assertEquals("abc",g2.getNodeLabel(0));
+		
+		g3 = g2.generateGraphByRelabellingNode(0,"x");
+		assertEquals("abc",g2.getNodeLabel(0));
+		assertEquals("x",g3.getNodeLabel(0));
+		
+		g4 = g3.generateGraphByRelabellingNode(0,"1234");
+		assertEquals("x",g3.getNodeLabel(0));
+		assertEquals("1234",g4.getNodeLabel(0));
+		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		assertTrue(g3.checkConsistency());
+		assertTrue(g4.checkConsistency());
+		
+	}
+	
+	@Test
+	public void test178() throws Exception {
+		FastGraph g1,g2,g3,g4,g5;
+		NodeStructure ns0,ns1,ns2,ns3;
+		EdgeStructure es0,es1,es2,es3;
+		LinkedList<NodeStructure> addNodes;
+		LinkedList<EdgeStructure> addEdges;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"0", 1, (byte)1, (byte)0);
+		ns1 = new NodeStructure(1,"", 1, (byte)1, (byte)0);
+		ns2 = new NodeStructure(2,"node 2 label", 1, (byte)1, (byte)0);
+		ns3 = new NodeStructure(3,"ns30", 1, (byte)1, (byte)0);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addNodes.add(ns2);
+		addNodes.add(ns3);
+		addEdges = new LinkedList<EdgeStructure>();
+		es0 = new EdgeStructure(0,"es01", 1, (byte)0, (byte)1, 1, 0);
+		es1 = new EdgeStructure(1,"es02", 1, (byte)0, (byte)1, 1, 2);
+		es2 = new EdgeStructure(2,"es03", 1, (byte)0, (byte)1, 2, 3);
+		es3 = new EdgeStructure(3,"es04", 1, (byte)0, (byte)1, 3, 0);
+		addEdges.add(es0);
+		addEdges.add(es1);
+		addEdges.add(es2);
+		addEdges.add(es3);
+		g1 = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
+		
+		g2 = g1.generateGraphByRelabellingNode(2,"abc");
+		assertEquals("node 2 label",g1.getNodeLabel(2));
+		assertEquals("abc",g2.getNodeLabel(2));
+		
+		g3 = g2.generateGraphByRelabellingNode(2,"qwerty");
+		assertEquals("abc",g2.getNodeLabel(2));
+		assertEquals("qwerty",g3.getNodeLabel(2));
+		
+		g4 = g3.generateGraphByRelabellingNode(0,"");
+		assertEquals("0",g3.getNodeLabel(0));
+		assertEquals("",g4.getNodeLabel(0));
+		
+		g5 = g4.generateGraphByRelabellingNode(1,"1234");
+		assertEquals("",g4.getNodeLabel(1));
+		assertEquals("1234",g5.getNodeLabel(1));
+		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		assertTrue(g3.checkConsistency());
+		assertTrue(g4.checkConsistency());
+		assertTrue(g5.checkConsistency());
+
+	}
+	
+	@Test
+	public void test179() throws Exception {
+		FastGraph g;
+		LinkedList<NodeStructure> addNodes;
+		LinkedList<EdgeStructure> addEdges;
+		NodeStructure ns;
+		EdgeStructure es;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		addEdges = new LinkedList<EdgeStructure>();
+		g = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
+		
+		ns = new NodeStructure(-1,"nlkjh", 1, (byte)1, (byte)0);
+		g = g.generateGraphByAddingNode(ns);
+		assertEquals("nlkjh",g.getNodeLabel(0));
+		assertTrue(g.checkConsistency());
+
+		ns = new NodeStructure(-1,"yhtggtff", 1, (byte)8, (byte)0);
+		g = g.generateGraphByAddingNode(ns);
+		assertEquals(8,g.getNodeType(1));
+		assertTrue(g.checkConsistency());
+		
+		es = new EdgeStructure(-1,"edge label", 12, (byte)0, (byte)1, 0, 1);
+		g = g.generateGraphByAddingEdge(es);
+		assertEquals(12,g.getEdgeWeight(0));
+		assertTrue(g.checkConsistency());
+		
+		ns = new NodeStructure(-1,"", 1, (byte)8, (byte)0);
+		g = g.generateGraphByAddingNode(ns);
+		assertEquals(1,g.getNodeWeight(2));
+		assertTrue(g.checkConsistency());
+		
+		es = new EdgeStructure(-1,"1", 9, (byte)0, (byte)0, 1, 2);
+		g = g.generateGraphByAddingEdge(es);
+		assertEquals("1",g.getEdgeLabel(1));
+		assertTrue(g.checkConsistency());
+		
+		es = new EdgeStructure(-1,"two", 5, (byte)0, (byte)0, 2, 0);
+		g = g.generateGraphByAddingEdge(es);
+		assertEquals(0,g.getEdgeAge(2));
+		assertEquals(3,g.getNumberOfNodes());
+		assertEquals(3,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+		
+		g = g.generateGraphByDeletingEdge(1);
+		g = g.generateGraphByDeletingEdge(0);
+		assertEquals("two",g.getEdgeLabel(0));
+		assertEquals(3,g.getNumberOfNodes());
+		assertEquals(1,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+
+		es = new EdgeStructure(-1,"one-a", 5, (byte)0, (byte)0, 0, 0);
+		g = g.generateGraphByAddingEdge(es);
+		assertEquals("one-a",g.getEdgeLabel(1));
+		assertEquals(3,g.getNumberOfNodes());
+		assertEquals(2,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+		
+		ns = new NodeStructure(-1,"node three", 7, (byte)9, (byte)0);
+		g = g.generateGraphByAddingNode(ns);
+		assertEquals(7,g.getNodeWeight(3));
+		assertEquals(4,g.getNumberOfNodes());
+		assertEquals(2,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+		
+		g = g.generateGraphByDeletingSingletonNode(1);
+		assertEquals("node three",g.getNodeLabel(2));
+		assertEquals(3,g.getNumberOfNodes());
+		assertEquals(2,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+
+		g = g.generateGraphByRelabellingNode(1, "a new label for 1");
+		assertEquals("a new label for 1",g.getNodeLabel(1));
+		assertEquals(3,g.getNumberOfNodes());
+		assertEquals(2,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+
+		es = new EdgeStructure(-1,"two-a", 5, (byte)0, (byte)0, 2, 2);
+		g = g.generateGraphByAddingEdge(es);
+		assertEquals("two-a",g.getEdgeLabel(2));
+		assertEquals(3,g.getNumberOfNodes());
+		assertEquals(3,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+
+		g = g.generateGraphByRelabellingNode(2, "2");
+		assertEquals("2",g.getNodeLabel(2));
+		assertEquals(3,g.getNumberOfNodes());
+		assertEquals(3,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+		
+		FastGraph gNull = g.generateGraphByDeletingSingletonNode(2);
+		assertEquals(null,gNull);
+		
+		g = g.generateGraphByDeletingEdge(1);
+		g = g.generateGraphByDeletingEdge(1);
+		g = g.generateGraphByDeletingEdge(0);
+		assertEquals(3,g.getNumberOfNodes());
+		assertEquals(0,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+
+		g = g.generateGraphByDeletingSingletonNode(1);
+		g = g.generateGraphByDeletingSingletonNode(1);
+		g = g.generateGraphByDeletingSingletonNode(0);
+		assertEquals(0,g.getNumberOfNodes());
+		assertEquals(0,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+	}
+
+
+	@Test
+	public void test180() throws Exception {
+		FastGraph g;
+		LinkedList<NodeStructure> addNodes;
+		LinkedList<EdgeStructure> addEdges;
+		NodeStructure ns;
+		EdgeStructure es;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		addEdges = new LinkedList<EdgeStructure>();
+		g = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,true);
+		
+		ns = new NodeStructure(-1,"Amanda Panda", 1, (byte)1, (byte)2);
+		g = g.generateGraphByAddingNode(ns);
+		assertEquals(2,g.getNodeAge(0));
+		assertTrue(g.checkConsistency());
+
+		es = new EdgeStructure(-1,"linky", 5, (byte)0, (byte)0, 0, 0);
+		g = g.generateGraphByAddingEdge(es);
+		assertEquals("linky",g.getEdgeLabel(0));
+		assertEquals(1,g.getNumberOfNodes());
+		assertEquals(1,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+
+		ns = new NodeStructure(-1,"Justin Time", 1, (byte)7, (byte)2);
+		g = g.generateGraphByAddingNode(ns);
+		assertEquals(7,g.getNodeType(1));
+		assertEquals(2,g.getNumberOfNodes());
+		assertEquals(1,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+
+		es = new EdgeStructure(-1,"multi", 5, (byte)0, (byte)2, 1, 0);
+		g = g.generateGraphByAddingEdge(es);
+		g = g.generateGraphByAddingEdge(es);
+		g = g.generateGraphByAddingEdge(es);
+		assertEquals("multi",g.getEdgeLabel(2));
+		assertEquals(2,g.getNumberOfNodes());
+		assertEquals(4,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+
+		es = new EdgeStructure(-1,"four", 5, (byte)0, (byte)2, 0, 1);
+		g = g.generateGraphByAddingEdge(es);
+		assertEquals("four",g.getEdgeLabel(4));
+		assertEquals(2,g.getNumberOfNodes());
+		assertEquals(5,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+
+		g = g.generateGraphByRelabellingNode(0, "zero");
+		assertEquals("zero",g.getNodeLabel(0));
+		assertEquals(2,g.getNumberOfNodes());
+		assertEquals(5,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+		
+		g = g.generateGraphByRelabellingNode(0, "");
+		assertEquals("",g.getNodeLabel(0));
+		assertEquals(2,g.getNumberOfNodes());
+		assertEquals(5,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+		
+		g = g.generateGraphByRelabellingNode(0, "A");
+		assertEquals("A",g.getNodeLabel(0));
+		assertEquals(2,g.getNumberOfNodes());
+		assertEquals(5,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+		
+		FastGraph gNull = g.generateGraphByDeletingSingletonNode(1);
+		assertEquals(null,gNull);
+
+		g = g.generateGraphByDeletingEdge(1);
+		g = g.generateGraphByDeletingEdge(1);
+		g = g.generateGraphByDeletingEdge(2);
+		g = g.generateGraphByDeletingEdge(0);
+		g = g.generateGraphByDeletingEdge(0);
+		assertEquals(2,g.getNumberOfNodes());
+		assertEquals(0,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+
+		g = g.generateGraphByDeletingSingletonNode(0);
+		g = g.generateGraphByDeletingSingletonNode(0);
+		assertEquals(0,g.getNumberOfNodes());
+		assertEquals(0,g.getNumberOfEdges());
+		assertTrue(g.checkConsistency());
+
+	}
+
+
 }
