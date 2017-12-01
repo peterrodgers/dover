@@ -28,9 +28,9 @@ public class NodeDegreeDifference extends GraphSimilarity {
 		while(true) {
 			try {
 				if(numberOfEdges < MILLION) {
-					System.out.println("nodes "+numberOfNodes+" edges "+numberOfEdges);
+					System.out.println("nodes: "+numberOfNodes+", edges: "+numberOfEdges);
 				} else {
-					System.out.println("nodes "+numberOfNodes/(MILLION*1.0)+" million edges "+numberOfEdges/(MILLION*1.0)+" million");
+					System.out.println("nodes: "+numberOfNodes/(MILLION*1.0)+" million, edges: "+numberOfEdges/(MILLION*1.0)+" million");
 				}
 				time = System.currentTimeMillis();
 				g1 = FastGraph.randomGraphFactory(numberOfNodes, numberOfEdges, false);
