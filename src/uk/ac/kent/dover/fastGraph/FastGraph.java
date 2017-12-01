@@ -1,8 +1,5 @@
 package uk.ac.kent.dover.fastGraph;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.*;

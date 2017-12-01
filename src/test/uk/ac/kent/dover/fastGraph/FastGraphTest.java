@@ -4237,7 +4237,7 @@ public class FastGraphTest {
 		
 		addNodes = new LinkedList<NodeStructure>();
 		addEdges = new LinkedList<EdgeStructure>();
-		g = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,false);
+		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
 		
 		ns = new NodeStructure(-1,"nlkjh", 1, (byte)1, (byte)0);
 		g = g.generateGraphByAddingNode(ns);
@@ -4346,7 +4346,7 @@ public class FastGraphTest {
 		
 		addNodes = new LinkedList<NodeStructure>();
 		addEdges = new LinkedList<EdgeStructure>();
-		g = FastGraph.structureFactory("g1",(byte)0,addNodes,addEdges,true);
+		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,true);
 		
 		ns = new NodeStructure(-1,"Amanda Panda", 1, (byte)1, (byte)2);
 		g = g.generateGraphByAddingNode(ns);

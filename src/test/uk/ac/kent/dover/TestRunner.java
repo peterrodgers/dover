@@ -5,6 +5,7 @@ import org.junit.runner.notification.*;
 
 import test.uk.ac.kent.dover.fastGraph.*;
 import test.uk.ac.kent.dover.fastGraph.graphSimilarity.*;
+import test.uk.ac.kent.dover.fastGraph.editOperation.*;
 
 
 public class TestRunner {
@@ -62,6 +63,12 @@ public class TestRunner {
 		result = JUnitCore.runClasses(NodeDegreeDifferenceTest.class);
 		for (Failure failure : result.getFailures()) {
 			System.out.println(failure.toString());
+		}
+		System.out.println(result.wasSuccessful());
+		
+		result = JUnitCore.runClasses(EditOperationTest.class);
+		for (Failure failure : result.getFailures()) {
+			System.out.println("EditOperation "+failure.toString());
 		}
 		System.out.println(result.wasSuccessful());
    }
