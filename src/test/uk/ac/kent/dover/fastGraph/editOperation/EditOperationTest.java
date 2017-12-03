@@ -7,7 +7,6 @@ import java.io.IOException;
 import org.junit.Test;
 
 import uk.ac.kent.dover.fastGraph.*;
-import uk.ac.kent.dover.fastGraph.comparators.AlwaysTrueNodeComparator;
 import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
 import uk.ac.kent.dover.fastGraph.editOperation.*;
 
@@ -65,6 +64,7 @@ public class EditOperationTest {
 		assertEquals(1,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
 		assertEquals("new name",g.getNodeLabel(0));
+		assertTrue(g.checkConsistency());
 	}
 	
 	@Test
@@ -72,8 +72,9 @@ public class EditOperationTest {
 		EditOperation deleteNode, addNode, deleteEdge, addEdge, relabelNode;		
 		EditList el1,el2;
 		FastGraph g,g2;
+		SimpleNodeLabelComparator snlc;
 		
-		el1 = new EditList(8);
+		el1 = new EditList();
 		addNode = new EditOperation(EditOperation.ADD_NODE,3,-1,"node 0",-1,-1);
 		el1.addOperation(addNode);
 		addNode = new EditOperation(EditOperation.ADD_NODE,1,-1,"node 1",-1,-1);
@@ -105,8 +106,42 @@ public class EditOperationTest {
 		g2 = FastGraph.randomGraphFactory(0, 0, false);
 		g2 = el1.applyOperations(g2);
 		
-		SimpleNodeLabelComparator snlc = new SimpleNodeLabelComparator(g,g2);
+		snlc = new SimpleNodeLabelComparator(g,g2);
 		assertTrue(ExactIsomorphism.isomorphic(g,g2,true,snlc));
+		assertTrue(g.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		
+		g = FastGraph.randomGraphFactory(0, 0, false);
+		g = el1.applyOperations(g);
+		el2 = new EditList(el1);
+		g2 = FastGraph.randomGraphFactory(0, 0, false);
+		g2 = el2.applyOperations(g2);
+		assertEquals(8,el1.getEditList().size());
+		assertEquals(8,el2.getEditList().size());
+		snlc = new SimpleNodeLabelComparator(g,g2);
+		assertTrue(ExactIsomorphism.isomorphic(g,g2,true,snlc));
+		assertTrue(g.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		
+		addNode = new EditOperation(EditOperation.ADD_NODE,1,-1,"node 3",-1,-1);
+		el1.addOperation(addNode);
+		assertEquals(9,el1.getEditList().size());
+		assertEquals(8,el2.getEditList().size());
+		g = FastGraph.randomGraphFactory(0, 0, false);
+		g = el1.applyOperations(g);
+		assertTrue(g.checkConsistency());
+		
+		addNode = new EditOperation(EditOperation.ADD_NODE,1,-1,"node 3",-1,-1);
+		el2.addOperation(addNode);
+		g2 = FastGraph.randomGraphFactory(0, 0, false);
+		g2 = el2.applyOperations(g2);
+		assertEquals(9,el1.getEditList().size());
+		assertEquals(9,el2.getEditList().size());
+		g2 = FastGraph.randomGraphFactory(0, 0, false);
+		g2 = el2.applyOperations(g2);
+		snlc = new SimpleNodeLabelComparator(g,g2);
+		assertTrue(ExactIsomorphism.isomorphic(g,g2,true,snlc));
+		assertTrue(g2.checkConsistency());
 		
 	}
 	

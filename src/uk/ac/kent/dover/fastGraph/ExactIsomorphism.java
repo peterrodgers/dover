@@ -558,7 +558,6 @@ bruteForceStartTime = -1;
 	private boolean directedIsomorphic(FastGraph g) {
 numberOfIsomorphismTests++;
 isomorphismStartTime = System.currentTimeMillis();
-
 		FastGraph g1 = fastGraph;
 		FastGraph g2 = g;
 		
@@ -630,7 +629,6 @@ timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
 			return false;
 		}
-		
 		
 		am2 = new AdjacencyMatrix(g);
 		matrix2 = am2.buildIntAdjacencyMatrix();

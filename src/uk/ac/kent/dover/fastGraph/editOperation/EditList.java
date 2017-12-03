@@ -11,18 +11,11 @@ import uk.ac.kent.dover.fastGraph.*;
  */
 public class EditList {
 
-	ArrayList<EditOperation> editList;
+	LinkedList<EditOperation> editList;
 	double cost = 0.0;
 			
 	public EditList() {
-		editList = new ArrayList<EditOperation>();
-	}
-
-	/**
-	 * @param capacity the initial capacity of the list
-	 */
-	public EditList(int capacity) {
-		editList = new ArrayList<EditOperation>(capacity);
+		editList = new LinkedList<EditOperation>();
 	}
 
 	/**
@@ -33,15 +26,14 @@ public class EditList {
 	 * @param an existing list to copy. 
 	 */
 	public EditList(EditList el) {
-		editList = new ArrayList<EditOperation>(el.getEditList().size());
-		editList.addAll(el.getEditList());
+		editList = new LinkedList<EditOperation>(el.getEditList());
 	}
 
 	/**
 	 * 
 	 * @return the editList
 	 */
-	public ArrayList<EditOperation> getEditList() {
+	public List<EditOperation> getEditList() {
 		return editList;
 	}
 	

@@ -17,14 +17,14 @@ public class SimpleNodeLabelComparator extends NodeComparator {
 
 	
 	/**
-	 * Just compares the labels via standard string comparateTo
-	 * 
 	 * Just compares the labels via standard string comparateTo, except returns equal (0) if the pattern label is empty. 
+	 * 
+	 * @return comparison of node label strings by standard Java compareTo: a negative integer, zero, or a positive integer as the first argument is less than, equal to, or greater than the second
 	 */
 	@Override
-	public int compare(Integer target, Integer pattern) {
-		String label1 = g1.getNodeLabel(target);
-		String label2 = g2.getNodeLabel(pattern);
+	public int compare(Integer n1, Integer n2) {
+		String label1 = g1.getNodeLabel(n1);
+		String label2 = g2.getNodeLabel(n2);
 		if(label2.equals("")) {
 			return 0;
 		}

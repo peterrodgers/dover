@@ -47,11 +47,34 @@ public class EditOperation {
 	
 
 	/**
-	 * 
 	 * @return the cost of the operation
 	 */
 	public double getCost() { return cost;}
 
+	/**
+	 * @return the code of the operation
+	 */
+	public int getOperationCode() {return operationCode;}
+
+	/**
+	 * @return the id of the item to be changed or removed
+	 */
+	public int getId() {return id;}
+
+	/**
+	 * @return the new label
+	 */
+	public String getLabel() {return label;}
+
+	/**
+	 * @return the source node of the edge to be added
+	 */
+	public int getN1() {return n1;}
+
+	/**
+	 * @return the target node of the edge to be added
+	 */
+	public int getN2() {return n2;}
 
 	/**
 	 * Call this to apply the edit to a graph.

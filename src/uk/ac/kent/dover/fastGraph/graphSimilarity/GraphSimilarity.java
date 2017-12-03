@@ -6,7 +6,7 @@ import uk.ac.kent.dover.fastGraph.FastGraph;
  * Base graph for all similarity measures.
  * Including Graph Edit Distance.
  * 
- * @author pjr
+ * @author Peter Rodgers
  *
  */
 public abstract class GraphSimilarity {
@@ -34,7 +34,7 @@ public abstract class GraphSimilarity {
 
 	/**
 	 * This returns the difference between the two graphs. 
-	 * Zero means the graphs are the same. Greater values mean more dissimilarity. 
+	 * Zero means the graphs isomorphic. Greater values mean more dissimilarity. 
 	 * 
 	 * @param g1 the first graph to be compared.
 	 * @param g2 the second graph to be compared.
