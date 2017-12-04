@@ -4,6 +4,7 @@ import java.util.*;
 
 import uk.ac.kent.dover.fastGraph.*;
 import uk.ac.kent.dover.fastGraph.comparators.NodeDegreeComparator;
+import uk.ac.kent.dover.fastGraph.comparators.ReverseIntegerComparator;
 import uk.ac.kent.dover.fastGraph.editOperation.*;
 
 /**
@@ -16,6 +17,10 @@ import uk.ac.kent.dover.fastGraph.editOperation.*;
 public class ApproximateGEDSimple extends GraphEditDistance {
 
 	private boolean nodeLabels;
+	
+	private long nodeSwapTimeLimit;
+	private int nodeSwapAttempts;
+	private long randomSeed;
 	
 	private Double deleteNodeCost;
 	private Double addNodeCost;
@@ -31,6 +36,8 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 	private HashMap<Integer,Integer> addEdgeMapping; // g1 new node Index to g2 nodes to be added
 	private LinkedList<Integer> addEdgeNode1List; // g1 new node Index to g1 node1 to be added
 	private LinkedList<Integer> addEdgeNode2List; // g1 new node Index to g1 node2 to be added
+	
+	private ReverseIntegerComparator reverseComparator = new ReverseIntegerComparator();
 	
 	public static void main(String [] args) {
 		
@@ -78,7 +85,6 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 			double res = ged.similarity(g1, g2);
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -100,6 +106,10 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 		this.editCosts = defaultEditCosts;
 
 		this.nodeLabels = false;
+		this.nodeSwapTimeLimit = 0;
+		this.nodeSwapAttempts = 0;
+		this.randomSeed = System.currentTimeMillis();
+		
 		init();
 	}
 
@@ -112,12 +122,18 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 	 */
 	public ApproximateGEDSimple(HashMap<Integer,Double> editCosts) throws FastGraphException {
 		super(editCosts);
+		
 		this.nodeLabels = false;
+		this.nodeSwapTimeLimit = 0;
+		this.nodeSwapAttempts = 0;
+		this.randomSeed = System.currentTimeMillis();
+		
 		init();
 	}
 
 	/**
 	 * editOperations should include nodeDelete, nodeAdd, edgeDelete and edgeAdd.
+	 * Defaults to no attempted node map swaps
 	 * 
 	 * @param directed true if the graph is treated as directed, false if undirected
 	 * @param nodeLabels true if node label operations should be considered, false if they are ignored
@@ -126,10 +142,56 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 	 */
 	public ApproximateGEDSimple(boolean directed, boolean nodeLabels, HashMap<Integer,Double> editCosts) throws FastGraphException {
 		super(directed,editCosts);
+		
 		this.nodeLabels = nodeLabels;
+		this.nodeSwapTimeLimit = 0;
+		this.nodeSwapAttempts = 0;
+		this.randomSeed = System.currentTimeMillis();
+		
 		init();
 	}
 
+
+
+	/**
+	 * 
+	 * editOperations should include nodeDelete, nodeAdd, edgeDelete and edgeAdd.
+	 * Set either nodeSwapTimeLimit or nodeSwapAttempts to -1 to ensure it is not used.
+	 * Will throw an exception if both are -1.
+	 * 
+	 * @param directed true if the graph is treated as directed, false if undirected
+	 * @param nodeLabels true if node label operations should be considered, false if they are ignored
+	 * @param editCosts are a mapping between edit codes and their costs DELETE_NODE, ADD_NODE, DELETE_EDGE, ADD_EDGE, if @see{nodeLabels} is true, RELABEL_NODE also needs to be present
+	 * @param nodeSwapTimeLimit time in milliseconds to exit approximation
+	 * @param nodeSwapAttempts number of iterations of the node swap routine
+	 * @param randomSeed set to System.currentTimeMillis() for true random
+	 * @throws FastGraphException if an edit operation cost is missing or if both limits are -1
+	 */
+	public ApproximateGEDSimple(boolean directed, boolean nodeLabels, HashMap<Integer,Double> editCosts, long nodeSwapTimeLimit, int nodeSwapAttempts, long randomSeed) throws FastGraphException {
+		super(directed,editCosts);
+
+		if(nodeSwapTimeLimit == -1 && nodeSwapAttempts == -1) {
+			throw new FastGraphException("Cannot have both nodeSwapTimeLimit and nodeSwapAttempts set to unlimited.");
+		}
+		this.nodeLabels = nodeLabels;
+		this.nodeSwapTimeLimit = nodeSwapTimeLimit;
+		if(nodeSwapTimeLimit == -1) {
+			this.nodeSwapTimeLimit = Long.MAX_VALUE;
+		}
+		this.nodeSwapAttempts = nodeSwapAttempts;
+		if(nodeSwapAttempts == -1) {
+			this.nodeSwapAttempts = Integer.MAX_VALUE;
+		}
+		this.randomSeed = randomSeed;
+		
+		init();
+	}
+
+	/**
+	 * Set up the edit operation costs from the cost mapping.
+	 * 
+	 * @throws FastGraphException if any required cost is not present
+	 */
 	private void init() throws FastGraphException {
 
 		deleteNodeCost = editCosts.get(EditOperation.DELETE_NODE);
@@ -196,8 +258,6 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 		NodeDegreeComparator ndc2 = new NodeDegreeComparator(g2,g2); // comparing nodes from the same graph
 		ndc2.setAscending(false);
 		n2List.sort(ndc2);
-System.out.println("n1List "+n1List);
-System.out.println("n2List "+n2List);
 
 		// create initial mapping, and either deleted or added arrays
 		// depending on the number of nodes in g1 and g2
@@ -226,23 +286,61 @@ System.out.println("n2List "+n2List);
 			n2List.remove(0);
 		}
 
-System.out.println("g1 to g2 node mapping "+nodeMapping);
-System.out.println("g2 to g1 node mapping "+reverseNodeMapping);
-System.out.println("add node mapping "+addNodeMapping);
-System.out.println("delete node list "+deleteNodes);
 
 		findEdgeChanges(g1,g2);
 		
+//System.out.println("g1 to g2 node mapping "+nodeMapping);
+//System.out.println("g2 to g1 node mapping "+reverseNodeMapping);
+//System.out.println("add node mapping "+addNodeMapping);
+//System.out.println("delete node list "+deleteNodes);
+//System.out.println("delete edges list "+deleteEdges);
+//System.out.println("add edge node1 list "+addEdgeNode1List);
+//System.out.println("add edge node2 list "+addEdgeNode2List);
+
+		createEditList(g1,g2);
+		
 		// find new mapping and check cost loop 
+		//TODO use nodeSwapTimeLimit and nodeSwapAttempts
 		
 		
-		editList = new EditList();
-		// create edit list
-		// remove extra nodes
-		// add needed nodes
 		return editList.getCost();
+	}
+
+	private void createEditList(FastGraph g1, FastGraph g2) {
+		editList = new EditList();
+		
+		EditOperation eo;
+		// add nodes
+		for(Integer n : addNodeMapping.keySet()) {
+			Integer g2n = addNodeMapping.get(n);
+			String label = g2.getNodeLabel(g2n);
+			eo = new EditOperation(EditOperation.ADD_NODE,addNodeCost,-1,label,-1,-1);
+			editList.addOperation(eo);
+		}
+		// add edges
+		while(!addEdgeNode1List.isEmpty()) {
+			int node1 = addEdgeNode1List.pop();
+			int node2 = addEdgeNode2List.pop();
+			eo = new EditOperation(EditOperation.ADD_EDGE,addEdgeCost,-1,"",node1,node2);
+			editList.addOperation(eo);
+		}
+		
+		// delete edges, need to be largest id first
+		deleteEdges.sort(reverseComparator);
+		for(Integer e : deleteEdges) {
+			eo = new EditOperation(EditOperation.DELETE_EDGE,deleteEdgeCost,e,null,-1,-1);
+			editList.addOperation(eo);
+		}
+		
+		// delete nodes, need to be largest id first
+		deleteNodes.sort(reverseComparator);
+		for(Integer n : deleteNodes) {
+			eo = new EditOperation(EditOperation.DELETE_NODE,deleteNodeCost,n,null,-1,-1);
+			editList.addOperation(eo);
+		}
 		
 	}
+	
 
 	/**
 	 * populate the edge addition and deletion data structures.
@@ -310,16 +408,21 @@ System.out.println("delete node list "+deleteNodes);
 			
 			Integer node1Map = reverseNodeMapping.get(g2Node1);
 			Integer node2Map = reverseNodeMapping.get(g2Node2);
-			
-			// check for a corresponding edge in g1
-			int[] connecting = g1.getNodeConnectingEdges(node1Map);
+
 			boolean found = false;
-			for(int connectingE = 0; connectingE < connecting.length; connectingE++) {
-				int connectingN = g1.oppositeEnd(connectingE, node1Map);
-//System.out.println("connectingE "+connectingE+"oppNode "+connectingN);
-				if(connectingN == node2Map) {
-					found = true;
-					break;
+			if(addNodeMapping.get(node1Map) != null || addNodeMapping.get(node2Map) != null) {
+				// if either node is going to be added, we will need to add the edge
+				found = false;
+			} else {
+				// both nodes are in g1, so check for a corresponding edge in g1
+				int[] connecting = g1.getNodeConnectingEdges(node1Map);
+				for(int connectingE = 0; connectingE < connecting.length; connectingE++) {
+					int connectingN = g1.oppositeEnd(connectingE, node1Map);
+	//System.out.println("connectingE "+connectingE+"oppNode "+connectingN);
+					if(connectingN == node2Map) {
+						found = true;
+						break;
+					}
 				}
 			}
 
@@ -352,7 +455,6 @@ System.out.println("delete node list "+deleteNodes);
 					count++;
 				}
 			}
-System.out.println("count "+" edges.size() "+edges.size());
 			// if there are too many edges in g1, add some to the remove list 
 			while(count < edges.size()) {
 				Integer removeEdge = edges.pop();
@@ -367,9 +469,6 @@ System.out.println("count "+" edges.size() "+edges.size());
 			}
 
 		}
-System.out.println("deleteEdges "+deleteEdges);	
-System.out.println("addEdgeNode1List "+addEdgeNode1List);	
-System.out.println("addEdgeNode2List "+addEdgeNode2List);	
 		// find the edges that need adding
 		
 	}

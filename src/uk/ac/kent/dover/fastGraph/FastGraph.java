@@ -4825,7 +4825,7 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 	 * @throws Exception Throws if the new FastGraph does not build correctly. Most likely out of memory error.
 	 */
 	public FastGraph generateGraphByAddingEdge(EdgeStructure es) throws Exception {
-//TODO		
+		
 		if(es.getNode1() >= this.getNumberOfNodes()) {
 			throw new FastGraphException("node n1 is greater than the number of nodes");
 		}
@@ -5068,4 +5068,21 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		return g;
 
 	}
+	
+	
+	public String toString() {
+		
+		StringBuffer sb = new StringBuffer("name: "+name+" number of Nodes: "+numberOfNodes+" number of Edges: "+numberOfEdges+"\n");
+		
+		for(int i = 0; i < numberOfNodes; i++) {
+			sb.append("node: "+i+" label: "+getNodeLabel(i)+" weight: "+getNodeWeight(i)+" type: "+getNodeType(i)+" age: "+getNodeAge(i)+"\n");
+		}
+		for(int i = 0; i < numberOfEdges; i++) {
+			sb.append("edge: "+i+" node1: "+getEdgeNode1(i)+" node2: "+getEdgeNode2(i)+" label: "+getEdgeLabel(i)+" weight: "+getEdgeWeight(i)+" type: "+getEdgeType(i)+" age: "+getNodeAge(i)+"\n");
+		}
+		
+		return sb.toString();
+		
+	}
+	
 }

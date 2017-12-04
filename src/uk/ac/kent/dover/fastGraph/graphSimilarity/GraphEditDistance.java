@@ -46,9 +46,11 @@ public abstract class GraphEditDistance extends GraphSimilarity {
 	}
 
 	/**
+	 * Apply this after calling @see{similarity}.
+	 * 
 	 * @return returns the edit list after the algorithm has run
 	 */
-	EditList getEditList() {return editList;}
+	public EditList getEditList() {return editList;}
 	
 	/**
 	 * This returns the graph edit distance calculation between the two graphs. 

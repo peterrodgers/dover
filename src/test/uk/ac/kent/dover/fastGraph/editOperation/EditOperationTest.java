@@ -2,8 +2,6 @@ package test.uk.ac.kent.dover.fastGraph.editOperation;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
-
 import org.junit.Test;
 
 import uk.ac.kent.dover.fastGraph.*;
