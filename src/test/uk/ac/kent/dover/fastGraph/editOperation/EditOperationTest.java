@@ -2,11 +2,15 @@ package test.uk.ac.kent.dover.fastGraph.editOperation;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+import java.util.List;
+
 import org.junit.Test;
 
 import uk.ac.kent.dover.fastGraph.*;
 import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
 import uk.ac.kent.dover.fastGraph.editOperation.*;
+import uk.ac.kent.dover.fastGraph.graphSimilarity.ApproximateGEDSimple;
 
 /**
  * 
@@ -142,6 +146,52 @@ public class EditOperationTest {
 		assertTrue(g2.checkConsistency());
 		
 	}
+	
+	
+	@Test
+	public void test003() throws Exception {
+		double ret;
+		FastGraph g2;
+		EditOperation eo;		
+		EditList el;
+		ApproximateGEDSimple ged;
+
+		el = new EditList();
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"order 1",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"order 2",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"order 2",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"order 2",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"order 3",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",0,2);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 1",1,3);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 2",0,4);
+		el.addOperation(eo);
+		g2 = FastGraph.randomGraphFactory(0, 0, false);
+		g2 = el.applyOperations(g2);
+		
+		
+		int[] c = g2.getNodeConnectingEdges(0);
+		assertEquals(2,c.length);
+		assertEquals(0,g2.getEdgeNode1(c[0]));
+		assertEquals(2,g2.getEdgeNode2(c[0]));
+		assertEquals(0,g2.getEdgeNode1(c[1]));
+		assertEquals(4,g2.getEdgeNode2(c[1]));
+		
+for(int e = 0; e < c.length; e++) {
+System.out.println("e "+e+" node1 "+g2.getEdgeNode1(e)+" node2 "+g2.getEdgeNode2(e));
+}			
+System.out.println(g2.checkConsistency());
+System.out.println("XXXXXX");
+
+	}
+
 	
 	
 }

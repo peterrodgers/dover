@@ -1,5 +1,8 @@
 package uk.ac.kent.dover.fastGraph.graphSimilarity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.*;
 
 import uk.ac.kent.dover.fastGraph.*;
@@ -22,6 +25,9 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 	private int nodeSwapAttempts;
 	private long randomSeed;
 	
+	private int nodeSwaps = 0;
+	private long approximationTime = 0;;
+	
 	private Double deleteNodeCost;
 	private Double addNodeCost;
 	private Double deleteEdgeCost;
@@ -39,51 +45,68 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 	
 	private ReverseIntegerComparator reverseComparator = new ReverseIntegerComparator();
 	
+	private Random random;
+	
 	public static void main(String [] args) {
 		
 		try {
-			FastGraph g1,g2;
-			EditOperation eo;		
-			EditList el1,el2;
-			FastGraph g;
-			HashMap<Integer,Double> editCosts;
-			ApproximateGEDSimple ged;
-			
-			editCosts = new HashMap<>();
-			editCosts.put(EditOperation.DELETE_NODE,2.0);
-			editCosts.put(EditOperation.ADD_NODE,2.0);
-			editCosts.put(EditOperation.DELETE_EDGE,2.0);
-			editCosts.put(EditOperation.ADD_EDGE,2.0);
-			editCosts.put(EditOperation.RELABEL_NODE,2.0);
-			
-			el1 = new EditList();
-			eo = new EditOperation(EditOperation.ADD_NODE,1.0,-1,"node 0",-1,-1);
-			el1.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_NODE,1.0,-1,"node 1",-1,-1);
-			el1.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_EDGE,1.0,-1,"edge 0",1,0);
-			el1.addOperation(eo);
-			g1 = FastGraph.randomGraphFactory(0, 0, false);
-			g1 = el1.applyOperations(g1);
-		
-			el2 = new EditList();
-			eo = new EditOperation(EditOperation.ADD_NODE,1.0,-1,"node 0",-1,-1);
-			el2.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_NODE,1.0,-1,"node 1",-1,-1);
-			el2.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_NODE,1.0,-1,"node 2",-1,-1);
-			el2.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_EDGE,1.0,-1,"edge 0",1,2);
-			el2.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_EDGE,1.0,-1,"edge 1",1,2);
-			el2.addOperation(eo);
-			g2 = FastGraph.randomGraphFactory(0, 0, false);
-			g2 = el2.applyOperations(g2);
 
-			ged = new ApproximateGEDSimple(editCosts);
-			
-			double res = ged.similarity(g1, g2);
-			
+			int nodes = 1000000;
+			while(true) {
+				double ret;
+				List<EditOperation> retList;
+				FastGraph g1,g2,gRet;
+				HashMap<Integer,Double> editCosts;
+				EditList retEditList1, retEditList2;
+				ApproximateGEDSimple ged;
+				
+				editCosts = new HashMap<>();
+				editCosts.put(EditOperation.DELETE_NODE,1.0);
+				editCosts.put(EditOperation.ADD_NODE,2.0);
+				editCosts.put(EditOperation.DELETE_EDGE,3.0);
+				editCosts.put(EditOperation.ADD_EDGE,4.0);
+				editCosts.put(EditOperation.RELABEL_NODE,5.0);
+				
+				int edges = nodes*10;
+				
+				g1 = FastGraph.randomGraphFactory(nodes, edges, 7777,false);
+				
+				g2 = FastGraph.randomGraphFactory(nodes, edges, 5555, false);
+				
+				long start1 = System.currentTimeMillis();
+				
+				ged = new ApproximateGEDSimple(false,false,editCosts,0,0,111);
+				
+				ret = ged.similarity(g1, g2);
+				
+				System.out.println("NO OPTIMIZATION nodes "+nodes+" edges "+edges);
+				System.out.println("similarity time "+(System.currentTimeMillis()-start1)/1000.0);
+				System.out.println("cost "+ged.getEditList().getCost()+" length "+ged.getEditList().getEditList().size());
+				
+				retEditList1 = ged.getEditList();
+				retList = retEditList1.getEditList();
+//				gRet = retEditList1.applyOperations(g1);
+				long start2 = System.currentTimeMillis();
+						
+				ged = new ApproximateGEDSimple(false,false,editCosts,1000,0,777777);
+				
+				ret = ged.similarity(g1, g2);
+				
+				System.out.println("OPTIMIZATION nodes "+nodes+" edges "+edges);
+				System.out.println("similarity time "+(System.currentTimeMillis()-start2)/1000.0);
+				
+				retEditList2 = ged.getEditList();
+				retList = retEditList2.getEditList();
+				
+				System.out.println("node swaps "+ged.getNodeSwaps());
+				System.out.println("cost "+retEditList2.getCost()+" length "+retList.size());
+				
+//				gRet = retEditList2.applyOperations(g1);
+System.out.println("checks "+g1.checkConsistency()+" "+g2.checkConsistency()+" ");
+				nodes = (nodes * 3)/2;
+
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -156,8 +179,9 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 	/**
 	 * 
 	 * editOperations should include nodeDelete, nodeAdd, edgeDelete and edgeAdd.
-	 * Set either nodeSwapTimeLimit or nodeSwapAttempts to -1 to ensure it is not used.
-	 * Will throw an exception if both are -1.
+	 * Set either nodeSwapTimeLimit or nodeSwapAttempts to 0 to ensure it is not used.
+	 * The expectation is that one or the other, or both is 0. If both are non-zero then
+	 * the one that means greater number of node swaps is the limit.
 	 * 
 	 * @param directed true if the graph is treated as directed, false if undirected
 	 * @param nodeLabels true if node label operations should be considered, false if they are ignored
@@ -216,7 +240,20 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 			throw new FastGraphException("Missing editCosts entry for EditOperation.RELABEL_NODE");
 		}
 		
+		random = new Random(randomSeed);
 	}
+
+	/**
+	 * 
+	 * @return how many node swaps were made
+	 */
+	public int getNodeSwaps() {return nodeSwaps;}
+
+	/**
+	 * 
+	 * @return how long the node swaps were made for in milliseconds.
+	 */
+	public long getApproximationTime() {return approximationTime;}
 	
 	/**
 	 * This returns the graph edit distance calculation between the two graphs. 
@@ -262,7 +299,9 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 		// create initial mapping, and either deleted or added arrays
 		// depending on the number of nodes in g1 and g2
 		while(true) {
-			if(n1List.size() == 0) { // run out of g1 nodes, so put the rest of g2 in the add nodes list
+			if(n1List.size() == 0) {
+				// run out of g1 nodes, so put the rest of g2 in the add nodes list
+				// this happens after the existing nodes are mapped, below
 				for(int j = 0; j < n2List.size() ;j++) {
 					int g1NodeIndex = g1.getNumberOfNodes()+j;
 					int g2NodeIndex = n2List.get(j);
@@ -286,28 +325,128 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 			n2List.remove(0);
 		}
 
-
 		findEdgeChanges(g1,g2);
+		editList = createEditList(g1,g2);
 		
-//System.out.println("g1 to g2 node mapping "+nodeMapping);
-//System.out.println("g2 to g1 node mapping "+reverseNodeMapping);
-//System.out.println("add node mapping "+addNodeMapping);
-//System.out.println("delete node list "+deleteNodes);
-//System.out.println("delete edges list "+deleteEdges);
-//System.out.println("add edge node1 list "+addEdgeNode1List);
-//System.out.println("add edge node2 list "+addEdgeNode2List);
+		if(g1.getNumberOfNodes() == 0 && g1.getNumberOfNodes() == 0) {
+			return editList.getCost();
+		}
+		
+		long startTime = System.currentTimeMillis();
+		boolean keepBadMove = false;
+		approximationTime = System.currentTimeMillis()-startTime;
+		nodeSwaps = 0;
+		while( approximationTime < nodeSwapTimeLimit || nodeSwaps < nodeSwapAttempts) {
+			HashMap<Integer,Integer> oldNodeMapping = new HashMap<>(nodeMapping);
+			HashMap<Integer,Integer> oldReverseNodeMapping = new HashMap<>(reverseNodeMapping);
+			HashMap<Integer,Integer> oldAddNodeMapping = new HashMap<>(addNodeMapping);
+			ArrayList<Integer> oldDeleteNodes = new ArrayList<>(deleteNodes);
+			
+			int size = g2.getNumberOfNodes();
+			if(g1.getNumberOfNodes() > g2.getNumberOfNodes()) {
+				size = g1.getNumberOfNodes();
+			}
 
-		createEditList(g1,g2);
+			int g1Node1 = random.nextInt(size);
+			int g1Node2 = random.nextInt(size);
+			if(g1Node1 == g1Node2) {
+				nodeSwaps++;
+				approximationTime = System.currentTimeMillis()-startTime;
+				continue;
+			}
+			
+			// if both are delete nodes, no changes required
+			if(deleteNodes.contains(g1Node1) && deleteNodes.contains(g1Node2)) {
+				nodeSwaps++;
+				approximationTime = System.currentTimeMillis()-startTime;
+				continue;
+			}
+			// if one is a delete node then modify the various lists and maps
+			// will not need to worry about add nodes
+			if(deleteNodes.contains(g1Node1)) {
+				int g2Node2 = nodeMapping.get(g1Node2);
+				int index = deleteNodes.indexOf(g1Node1);
+				deleteNodes.remove(index);
+				deleteNodes.add(g1Node2);
+				nodeMapping.put(g1Node1,g2Node2);
+			}
+			if(deleteNodes.contains(g1Node2)) {
+				int g2Node1 = nodeMapping.get(g1Node1);
+				int index = deleteNodes.indexOf(g1Node2);
+				deleteNodes.remove(index);
+				deleteNodes.add(g1Node1);
+				nodeMapping.put(g1Node2,g2Node1);
+			}
+			
+			if(!deleteNodes.contains(g1Node1) && !deleteNodes.contains(g1Node2)) {
+				int g2Node1 = nodeMapping.get(g1Node1);
+				int g2Node2 = nodeMapping.get(g1Node2);
+				nodeMapping.put(g1Node1,g2Node2);
+				nodeMapping.put(g1Node2,g2Node1);
+				reverseNodeMapping.put(g2Node2, g1Node1);
+				reverseNodeMapping.put(g2Node1, g1Node2);
+				// if only one is in an add node, leave it as
+				// an add node, as add ids are at the end
+				// but change its mapping
+				if(addNodeMapping.get(g1Node1) != null & addNodeMapping.get(g1Node2) == null) {
+					addNodeMapping.put(g1Node1,g2Node2);
+				} else 	if(addNodeMapping.get(g1Node1) == null & addNodeMapping.get(g1Node2) != null) {
+					addNodeMapping.put(g1Node2,g2Node1);
+				}
+			}
 		
-		// find new mapping and check cost loop 
-		//TODO use nodeSwapTimeLimit and nodeSwapAttempts
-		
-		
+			findEdgeChanges(g1,g2);
+			EditList testEditList = createEditList(g1,g2);
+			
+			if(keepBadMove || testEditList.getCost() < editList.getCost()) {
+				editList = testEditList;
+//System.out.println(keepBadMove+" swapNodes g1Node1 "+g1Node1+" g1Node2 "+g1Node2+" cost "+editList.getCost()+"\n"+editList);
+//System.out.println("swapped "+g1Node1+" "+g1Node2);
+			} else { // no benefit, so revert unless bad move allowed
+				nodeMapping = oldNodeMapping;
+				reverseNodeMapping = oldReverseNodeMapping;
+				addNodeMapping = oldAddNodeMapping;
+				deleteNodes = oldDeleteNodes;
+			}
+			
+			nodeSwaps++;
+			approximationTime = System.currentTimeMillis()-startTime;
+			
+			double remainingTime = 1.0-approximationTime/(nodeSwapTimeLimit*1.0);
+			double remainingIteration = 1.0-nodeSwaps/(nodeSwapAttempts*1.0);
+			double remainingPercent = 0.0;
+			if(nodeSwapTimeLimit == 0) {
+				remainingPercent = remainingIteration;
+			} else if(nodeSwapAttempts == 0) {
+				remainingPercent = remainingTime;
+			} else if(remainingIteration > remainingTime) {
+				remainingPercent = remainingIteration;
+			} else {
+				remainingPercent = remainingTime;
+			}
+			double chanceOfBadMove = remainingPercent-0.25;
+			if(chanceOfBadMove < 0) {
+				chanceOfBadMove = 0;
+			}
+			keepBadMove = false;
+			if(random.nextDouble() < chanceOfBadMove) {
+				keepBadMove = true;
+			}
+			
+		}
+
 		return editList.getCost();
 	}
+	
 
-	private void createEditList(FastGraph g1, FastGraph g2) {
-		editList = new EditList();
+	/**
+	 * Take the required changes and create the appropriate edit list.
+	 * @param g1 the graph to be changed
+	 * @param g2 the target graph
+	 * @return the edit list of required operations
+	 */
+	private EditList createEditList(FastGraph g1, FastGraph g2) {
+		EditList ret = new EditList();
 		
 		EditOperation eo;
 		// add nodes
@@ -315,29 +454,31 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 			Integer g2n = addNodeMapping.get(n);
 			String label = g2.getNodeLabel(g2n);
 			eo = new EditOperation(EditOperation.ADD_NODE,addNodeCost,-1,label,-1,-1);
-			editList.addOperation(eo);
+			ret.addOperation(eo);
 		}
 		// add edges
 		while(!addEdgeNode1List.isEmpty()) {
 			int node1 = addEdgeNode1List.pop();
 			int node2 = addEdgeNode2List.pop();
 			eo = new EditOperation(EditOperation.ADD_EDGE,addEdgeCost,-1,"",node1,node2);
-			editList.addOperation(eo);
+			ret.addOperation(eo);
 		}
 		
 		// delete edges, need to be largest id first
 		deleteEdges.sort(reverseComparator);
 		for(Integer e : deleteEdges) {
 			eo = new EditOperation(EditOperation.DELETE_EDGE,deleteEdgeCost,e,null,-1,-1);
-			editList.addOperation(eo);
+			ret.addOperation(eo);
 		}
 		
 		// delete nodes, need to be largest id first
 		deleteNodes.sort(reverseComparator);
 		for(Integer n : deleteNodes) {
 			eo = new EditOperation(EditOperation.DELETE_NODE,deleteNodeCost,n,null,-1,-1);
-			editList.addOperation(eo);
+			ret.addOperation(eo);
 		}
+		
+		return ret;
 		
 	}
 	
@@ -361,21 +502,28 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 			int node2 = g1.getEdgeNode2(e);
 			
 			// if the g1 node is being deleted, the edge must be deleted
-			if(deleteNodes.contains(node1) || deleteNodes.contains(node1)) {
+			if(deleteNodes.contains(node1) || deleteNodes.contains(node2)) {
 				deleteEdges.add(e);
 				continue;
 			}
 			
 			// check for a corresponding edge in g2
+			boolean found = false;
 			Integer node1Map = nodeMapping.get(node1);
 			Integer node2Map = nodeMapping.get(node2);
-			int[] connecting = g2.getNodeConnectingEdges(node1Map);
-			boolean found = false;
-			for(int connectingE = 0; connectingE < connecting.length; connectingE++) {
-				int connectingN = g2.oppositeEnd(connectingE, node1Map);
-				if(connectingN == node2Map) {
-					found = true;
-					break;
+			if(node1Map == null || node2Map == null) {
+				// if connecting node in n2 does not exist, then there is no edge
+				found = false;
+			} else {
+
+				int[] connecting = g2.getNodeConnectingEdges(node1Map);
+				for(int connectingIndex = 0; connectingIndex < connecting.length; connectingIndex++) {
+					int connectingE = connecting[connectingIndex];
+					int connectingN = g2.oppositeEnd(connectingE, node1Map);
+					if(connectingN == node2Map) {
+						found = true;
+						break;
+					}
 				}
 			}
 			if(found == false) {
@@ -397,7 +545,6 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 			}
 			edges.add(e);
 		}
-		
 		// find the edges to add where g1 does not currently have an edge
 		// checks for g2 edges that are not in g1
 		addEdgeNode1List = new LinkedList<>();
@@ -416,9 +563,9 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 			} else {
 				// both nodes are in g1, so check for a corresponding edge in g1
 				int[] connecting = g1.getNodeConnectingEdges(node1Map);
-				for(int connectingE = 0; connectingE < connecting.length; connectingE++) {
+				for(int connectingIndex = 0; connectingIndex < connecting.length; connectingIndex++) {
+					int connectingE = connecting[connectingIndex];
 					int connectingN = g1.oppositeEnd(connectingE, node1Map);
-	//System.out.println("connectingE "+connectingE+"oppNode "+connectingN);
 					if(connectingN == node2Map) {
 						found = true;
 						break;
@@ -444,17 +591,22 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 			
 			Integer node1Map = nodeMapping.get(node1);
 			Integer node2Map = nodeMapping.get(node2);
-
-			// we know there is an edge in g1. 
-			// test to see if there are less in g2, and delete the excess
+			// we know there is at least one edge in g1. Lets see if there is the same number in g2
 			int count = 0;
 			int[] connecting = g2.getNodeConnectingEdges(node1Map);
-			for(int connectingE = 0; connectingE < connecting.length; connectingE++) {
+			for(int connectingIndex = 0; connectingIndex < connecting.length; connectingIndex++) {
+				int connectingE = connecting[connectingIndex];
 				int connectingN = g2.oppositeEnd(connectingE, node1Map);
 				if(connectingN == node2Map) {
 					count++;
 				}
 			}
+			
+			// don't want to count self sourcing twice
+			if(node1 == node2) {
+				count = count/2;
+			}
+			
 			// if there are too many edges in g1, add some to the remove list 
 			while(count < edges.size()) {
 				Integer removeEdge = edges.pop();
@@ -462,10 +614,12 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 			}
 			
 			// if there are too few edges in g1, add some to the add list
-			if(count > edges.size())
-			for(int i = 0; i < (count - edges.size());i++) {
-				addEdgeNode1List.push(node1);
-				addEdgeNode2List.push(node2);
+			if(count > edges.size()) {
+				for(int i = 0; i < (count - edges.size());i++) {
+					addEdgeNode1List.add(node1);
+					addEdgeNode2List.add(node2);
+
+				}
 			}
 
 		}

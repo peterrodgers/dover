@@ -75,6 +75,71 @@ public class EditList {
  		
  		return ret;
  	}
+ 	
+
+ 	/**
+ 	 * 
+ 	 * @return returns only theh delete node operations
+ 	 */
+ 	public List<EditOperation> findDeleteNodeOperations () {
+ 		LinkedList<EditOperation> ret = new LinkedList<>();
+ 		
+ 		for(EditOperation eo : editList) {
+ 			if(eo.getOperationCode() == EditOperation.DELETE_NODE) {
+ 				ret.add(eo);
+ 			}
+ 		}
+ 		
+ 		return ret;
+ 	}
+
+ 	/**
+ 	 * 
+ 	 * @return returns only theh add node operations
+ 	 */
+ 	public List<EditOperation> findAddNodeOperations () {
+ 		LinkedList<EditOperation> ret = new LinkedList<>();
+ 		
+ 		for(EditOperation eo : editList) {
+ 			if(eo.getOperationCode() == EditOperation.ADD_NODE) {
+ 				ret.add(eo);
+ 			}
+ 		}
+ 		
+ 		return ret;
+ 	}
+
+ 	/**
+ 	 * 
+ 	 * @return returns only theh delete edge operations
+ 	 */
+ 	public List<EditOperation> findDeleteEdgeOperations () {
+ 		LinkedList<EditOperation> ret = new LinkedList<>();
+ 		
+ 		for(EditOperation eo : editList) {
+ 			if(eo.getOperationCode() == EditOperation.DELETE_EDGE) {
+ 				ret.add(eo);
+ 			}
+ 		}
+ 		
+ 		return ret;
+ 	}
+
+ 	/**
+ 	 * 
+ 	 * @return returns only theh add edge operations
+ 	 */
+ 	public List<EditOperation> findAddEdgeOperations () {
+ 		LinkedList<EditOperation> ret = new LinkedList<>();
+ 		
+ 		for(EditOperation eo : editList) {
+ 			if(eo.getOperationCode() == EditOperation.ADD_EDGE) {
+ 				ret.add(eo);
+ 			}
+ 		}
+ 		
+ 		return ret;
+ 	}
 
  	
 	/**

@@ -709,7 +709,6 @@ g1.outputInternalData();
 		
 		int connectionOffset = nodeBuf.getInt(NODE_IN_CONNECTION_START_OFFSET+nodeIndex*NODE_BYTE_SIZE); // in offset is the first one
 		int degree = getNodeDegree(nodeIndex);
-		
 		int[] ret = new int[degree];
 		
 		for(int i = 0; i < degree; i++) {
@@ -5078,7 +5077,7 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 			sb.append("node: "+i+" label: "+getNodeLabel(i)+" weight: "+getNodeWeight(i)+" type: "+getNodeType(i)+" age: "+getNodeAge(i)+"\n");
 		}
 		for(int i = 0; i < numberOfEdges; i++) {
-			sb.append("edge: "+i+" node1: "+getEdgeNode1(i)+" node2: "+getEdgeNode2(i)+" label: "+getEdgeLabel(i)+" weight: "+getEdgeWeight(i)+" type: "+getEdgeType(i)+" age: "+getNodeAge(i)+"\n");
+			sb.append("edge: "+i+" node1: "+getEdgeNode1(i)+" node2: "+getEdgeNode2(i)+" label: "+getEdgeLabel(i)+" weight: "+getEdgeWeight(i)+" type: "+getEdgeType(i)+" age: "+getEdgeAge(i)+"\n");
 		}
 		
 		return sb.toString();
