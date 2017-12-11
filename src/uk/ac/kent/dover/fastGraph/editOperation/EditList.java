@@ -69,6 +69,7 @@ public class EditList {
  		for(EditOperation eo : editList) {
  			ret = eo.edit(ret);
  			if(ret == null) {
+ System.out.println("NULL eo "+eo);
  				return null;
  			}
  		}

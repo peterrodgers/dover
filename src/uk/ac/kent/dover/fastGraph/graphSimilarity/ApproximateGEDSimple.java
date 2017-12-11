@@ -8,6 +8,7 @@ import java.util.*;
 import uk.ac.kent.dover.fastGraph.*;
 import uk.ac.kent.dover.fastGraph.comparators.NodeDegreeComparator;
 import uk.ac.kent.dover.fastGraph.comparators.ReverseIntegerComparator;
+import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
 import uk.ac.kent.dover.fastGraph.editOperation.*;
 
 /**
@@ -37,11 +38,10 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 	private HashMap<Integer,Integer> nodeMapping; // g1 nodes to g2 nodes
 	private HashMap<Integer,Integer> reverseNodeMapping; // g2 nodes to g1 nodes
 	private ArrayList<Integer> deleteNodes; // g1 nodes to be removed
-	private HashMap<Integer,Integer> addNodeMapping; // g1 new node Index to g2 nodes to be added
+	private HashSet<Integer> addNodeSet; // g1 new node Index to g2 nodes to be added
 	private ArrayList<Integer> deleteEdges; // g1 nodes to be removed
-	private HashMap<Integer,Integer> addEdgeMapping; // g1 new node Index to g2 nodes to be added
-	private LinkedList<Integer> addEdgeNode1List; // g1 new node Index to g1 node1 to be added
-	private LinkedList<Integer> addEdgeNode2List; // g1 new node Index to g1 node2 to be added
+	private LinkedList<Integer> addEdgeNode1List; // g1 new node1 to be added
+	private LinkedList<Integer> addEdgeNode2List; // g1 new node2 to be added
 	
 	private ReverseIntegerComparator reverseComparator = new ReverseIntegerComparator();
 	
@@ -50,9 +50,47 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 	public static void main(String [] args) {
 		
 		try {
+			if(true) {
+				double ret;
+				List<EditOperation> retList;
+				FastGraph g1,g2,gRet;
+				HashMap<Integer,Double> editCosts;
+				EditList retEditList1, retEditList2;
+				ApproximateGEDSimple ged;
+				editCosts = new HashMap<>();
+				editCosts.put(EditOperation.DELETE_NODE,1.0);
+				editCosts.put(EditOperation.ADD_NODE,2.0);
+				editCosts.put(EditOperation.DELETE_EDGE,3.0);
+				editCosts.put(EditOperation.ADD_EDGE,4.0);
+				editCosts.put(EditOperation.RELABEL_NODE,5.0);
+				
+				g1 = FastGraph.randomGraphFactory(13, 3, 999,false);
+				
+				g2 = FastGraph.randomGraphFactory(10, 20, 888, false);
 
+				
+				ged = new ApproximateGEDSimple(false,false,editCosts,0,100,333);
+				
+				ret = ged.similarity(g1, g2);
+				retEditList2 = ged.getEditList();
+				retList = retEditList2.getEditList();
+System.out.println(retEditList2);
+
+				gRet = retEditList2.applyOperations(g1);
+System.out.println(gRet);
+ged = new ApproximateGEDSimple(false,false,editCosts,0,10000,333);
+				
+//System.out.println("g1\n"+g1);
+//System.out.println("XXXXXX");
+//System.out.println("g2\n"+g2);
+
+
+
+}
+			
 			int nodes = 1000000;
-			while(true) {
+//			while(true) {
+if(false && true) {
 				double ret;
 				List<EditOperation> retList;
 				FastGraph g1,g2,gRet;
@@ -249,11 +287,13 @@ System.out.println("checks "+g1.checkConsistency()+" "+g2.checkConsistency()+" "
 	 */
 	public int getNodeSwaps() {return nodeSwaps;}
 
+	
 	/**
 	 * 
-	 * @return how long the node swaps were made for in milliseconds.
+	 * @return how long the node swaps took in milliseconds.
 	 */
 	public long getApproximationTime() {return approximationTime;}
+
 	
 	/**
 	 * This returns the graph edit distance calculation between the two graphs. 
@@ -267,8 +307,8 @@ System.out.println("checks "+g1.checkConsistency()+" "+g2.checkConsistency()+" "
 	public double similarity(FastGraph g1, FastGraph g2) {
 		
 		int addCapacity = 0;
-		if((g2.getNumberOfNodes() > g1.getNumberOfNodes())) {
-			addCapacity = (g2.getNumberOfNodes()-g1.getNumberOfNodes())*4;
+		if((g1.getNumberOfNodes() < g2.getNumberOfNodes())) {
+			addCapacity = (g2.getNumberOfNodes()-g1.getNumberOfNodes());
 		}
 		int deleteCapacity = 0;
 		if((g1.getNumberOfNodes() > g2.getNumberOfNodes())) {
@@ -276,10 +316,11 @@ System.out.println("checks "+g1.checkConsistency()+" "+g2.checkConsistency()+" "
 		}
 		nodeMapping = new HashMap<>(g1.getNumberOfNodes()*4); // g1 nodes to g2 nodes
 		reverseNodeMapping = new HashMap<>(g1.getNumberOfNodes()*4); // g2 nodes to g1 nodes
-		addNodeMapping = new HashMap<>(addCapacity); // g2 nodes to be added
+		addNodeSet = new HashSet<>(addCapacity*4); // g2 nodes to be added
 		deleteNodes = new ArrayList<>(deleteCapacity); // g1 nodes to be removed
 		
-		// find initial node mappings based on degree
+		// find initial node mappings based on degree, this will work OK
+		// for the labelled version as long as the node label edit cost is not too high
 		ArrayList<Integer> n1List = new ArrayList<Integer>();
 		for(int i =0; i < g1.getNumberOfNodes(); i++) {
 			n1List.add(i);
@@ -305,7 +346,7 @@ System.out.println("checks "+g1.checkConsistency()+" "+g2.checkConsistency()+" "
 				for(int j = 0; j < n2List.size() ;j++) {
 					int g1NodeIndex = g1.getNumberOfNodes()+j;
 					int g2NodeIndex = n2List.get(j);
-					addNodeMapping.put(g1NodeIndex,g2NodeIndex);
+					addNodeSet.add(g1NodeIndex);
 					nodeMapping.put(g1NodeIndex,g2NodeIndex); // also add to the node mapping, as we will need this to add edges
 					reverseNodeMapping.put(g2NodeIndex,g1NodeIndex);
 
@@ -339,7 +380,6 @@ System.out.println("checks "+g1.checkConsistency()+" "+g2.checkConsistency()+" "
 		while( approximationTime < nodeSwapTimeLimit || nodeSwaps < nodeSwapAttempts) {
 			HashMap<Integer,Integer> oldNodeMapping = new HashMap<>(nodeMapping);
 			HashMap<Integer,Integer> oldReverseNodeMapping = new HashMap<>(reverseNodeMapping);
-			HashMap<Integer,Integer> oldAddNodeMapping = new HashMap<>(addNodeMapping);
 			ArrayList<Integer> oldDeleteNodes = new ArrayList<>(deleteNodes);
 			
 			int size = g2.getNumberOfNodes();
@@ -368,14 +408,20 @@ System.out.println("checks "+g1.checkConsistency()+" "+g2.checkConsistency()+" "
 				int index = deleteNodes.indexOf(g1Node1);
 				deleteNodes.remove(index);
 				deleteNodes.add(g1Node2);
+				nodeMapping.remove(g1Node2);
 				nodeMapping.put(g1Node1,g2Node2);
+				reverseNodeMapping.remove(g2Node2);
+				reverseNodeMapping.put(g2Node2,g1Node1);
 			}
 			if(deleteNodes.contains(g1Node2)) {
 				int g2Node1 = nodeMapping.get(g1Node1);
 				int index = deleteNodes.indexOf(g1Node2);
 				deleteNodes.remove(index);
 				deleteNodes.add(g1Node1);
+				nodeMapping.remove(g1Node1);
 				nodeMapping.put(g1Node2,g2Node1);
+				reverseNodeMapping.remove(g2Node1);
+				reverseNodeMapping.put(g2Node1,g1Node2);
 			}
 			
 			if(!deleteNodes.contains(g1Node1) && !deleteNodes.contains(g1Node2)) {
@@ -385,27 +431,19 @@ System.out.println("checks "+g1.checkConsistency()+" "+g2.checkConsistency()+" "
 				nodeMapping.put(g1Node2,g2Node1);
 				reverseNodeMapping.put(g2Node2, g1Node1);
 				reverseNodeMapping.put(g2Node1, g1Node2);
-				// if only one is in an add node, leave it as
-				// an add node, as add ids are at the end
-				// but change its mapping
-				if(addNodeMapping.get(g1Node1) != null & addNodeMapping.get(g1Node2) == null) {
-					addNodeMapping.put(g1Node1,g2Node2);
-				} else 	if(addNodeMapping.get(g1Node1) == null & addNodeMapping.get(g1Node2) != null) {
-					addNodeMapping.put(g1Node2,g2Node1);
-				}
+				
 			}
 		
 			findEdgeChanges(g1,g2);
+
 			EditList testEditList = createEditList(g1,g2);
 			
 			if(keepBadMove || testEditList.getCost() < editList.getCost()) {
 				editList = testEditList;
-//System.out.println(keepBadMove+" swapNodes g1Node1 "+g1Node1+" g1Node2 "+g1Node2+" cost "+editList.getCost()+"\n"+editList);
 //System.out.println("swapped "+g1Node1+" "+g1Node2);
 			} else { // no benefit, so revert unless bad move allowed
 				nodeMapping = oldNodeMapping;
 				reverseNodeMapping = oldReverseNodeMapping;
-				addNodeMapping = oldAddNodeMapping;
 				deleteNodes = oldDeleteNodes;
 			}
 			
@@ -435,6 +473,14 @@ System.out.println("checks "+g1.checkConsistency()+" "+g2.checkConsistency()+" "
 			
 		}
 
+//System.out.println(editList);
+//System.out.println("node Mapping    "+nodeMapping);
+//System.out.println("reverse Mapping "+reverseNodeMapping);
+//System.out.println("delete node list "+deleteNodes);
+//System.out.println("delete edge list "+deleteEdges);
+//System.out.println("add node set "+addNodeSet);
+//System.out.println("add edge lists "+addEdgeNode1List+" "+addEdgeNode2List);
+
 		return editList.getCost();
 	}
 	
@@ -450,16 +496,18 @@ System.out.println("checks "+g1.checkConsistency()+" "+g2.checkConsistency()+" "
 		
 		EditOperation eo;
 		// add nodes
-		for(Integer n : addNodeMapping.keySet()) {
-			Integer g2n = addNodeMapping.get(n);
+		for(Integer n : addNodeSet) {
+			Integer g2n = nodeMapping.get(n);
 			String label = g2.getNodeLabel(g2n);
 			eo = new EditOperation(EditOperation.ADD_NODE,addNodeCost,-1,label,-1,-1);
 			ret.addOperation(eo);
 		}
 		// add edges
-		while(!addEdgeNode1List.isEmpty()) {
-			int node1 = addEdgeNode1List.pop();
-			int node2 = addEdgeNode2List.pop();
+		LinkedList<Integer> listNode1 = new LinkedList<Integer>(addEdgeNode1List);
+		LinkedList<Integer> listNode2 = new LinkedList<Integer>(addEdgeNode2List);
+		while(!listNode1.isEmpty()) {
+			int node1 = listNode1.pop();
+			int node2 = listNode2.pop();
 			eo = new EditOperation(EditOperation.ADD_EDGE,addEdgeCost,-1,"",node1,node2);
 			ret.addOperation(eo);
 		}
@@ -469,6 +517,21 @@ System.out.println("checks "+g1.checkConsistency()+" "+g2.checkConsistency()+" "
 		for(Integer e : deleteEdges) {
 			eo = new EditOperation(EditOperation.DELETE_EDGE,deleteEdgeCost,e,null,-1,-1);
 			ret.addOperation(eo);
+		}
+		// change node labels if flag set, must be before the node delete
+		// as it uses g1 ids
+		if(nodeLabels) {
+			for(Integer n : nodeMapping.keySet()) {
+				if(!addNodeSet.contains(n)) { // need to be existing nodes
+					Integer g2n = nodeMapping.get(n);
+					String nLabel = g1.getNodeLabel(n);
+					String g2nLabel = g2.getNodeLabel(g2n);
+					if(!nLabel.equals(g2nLabel)) {
+						eo = new EditOperation(EditOperation.RELABEL_NODE,relabelNodeCost,n,g2nLabel,-1,-1);
+						ret.addOperation(eo);
+					}
+				}
+			}
 		}
 		
 		// delete nodes, need to be largest id first
@@ -557,7 +620,7 @@ System.out.println("checks "+g1.checkConsistency()+" "+g2.checkConsistency()+" "
 			Integer node2Map = reverseNodeMapping.get(g2Node2);
 
 			boolean found = false;
-			if(addNodeMapping.get(node1Map) != null || addNodeMapping.get(node2Map) != null) {
+			if(addNodeSet.contains(node1Map) || addNodeSet.contains(node2Map)) {
 				// if either node is going to be added, we will need to add the edge
 				found = false;
 			} else {
@@ -618,13 +681,10 @@ System.out.println("checks "+g1.checkConsistency()+" "+g2.checkConsistency()+" "
 				for(int i = 0; i < (count - edges.size());i++) {
 					addEdgeNode1List.add(node1);
 					addEdgeNode2List.add(node2);
-
 				}
 			}
-
 		}
-		// find the edges that need adding
-		
+
 	}
 	
 	

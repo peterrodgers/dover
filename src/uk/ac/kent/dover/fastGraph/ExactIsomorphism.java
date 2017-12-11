@@ -345,8 +345,6 @@ isomorphismStartTime = -1;
 		matrix2 = am2.buildIntAdjacencyMatrix();
 		eigenvalues2 = am2.findEigenvalues(matrix2);
 		eigenvalues2 = Util.roundArray(eigenvalues2, DECIMAL_PLACES);
-//System.out.println(Arrays.toString(eigenvalues1));
-//System.out.println(Arrays.toString(eigenvalues2));
 		if(!compareEigenValues(eigenvalues2)) {
 //System.out.println("Not isomorphic: eigenvalues are different");
 failOnEigenvalues++;

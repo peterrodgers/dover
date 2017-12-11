@@ -91,8 +91,6 @@ public class FastGraph {
 	
 	public static void main(String [] args) throws Exception {
 		
-		System.out.println("XXXXX");
-		
 		Debugger.enabled = true;
 		
 		FastGraph g,g1;
@@ -5011,10 +5009,10 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 	 */
 	public FastGraph generateGraphByRelabellingNode(int id, String label) throws Exception {
 		FastGraph g = new FastGraph(this.numberOfNodes,this.numberOfEdges,this.direct);
-	
 		// nodeLabelBuf and edgeLabelBuf no longer allocated in init
 		int nodeLabelBufSize = this.nodeLabelBuf.capacity();
-		String originalLabel = g.getNodeLabel(id);
+		String originalLabel = this.getNodeLabel(id);
+		
 		if(label.length() > originalLabel.length()) { // if the label is bigger, a new label is needed at the end of the buffer
 			nodeLabelBufSize += label.length()*2;
 		}
@@ -5048,11 +5046,10 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		g.edgeLabelBuf.put(this.edgeLabelBuf);
 		g.connectionBuf.put(this.connectionBuf);
 
-		int labelStart = 0;
-		if(label.length() <= originalLabel.length()) { // new offset needed, its the end of the old buffer
+		int labelStart = 0;		if(label.length() > originalLabel.length()) { // if the new offset needed, it is the end of the old buffer
 			labelStart = this.nodeLabelBuf.capacity();
-			this.nodeBuf.putInt(NODE_LABEL_START_OFFSET+id*NODE_BYTE_SIZE,id);
-		} else { // label start not changed
+			g.nodeBuf.putInt(NODE_LABEL_START_OFFSET+id*NODE_BYTE_SIZE,labelStart);
+		} else { // label start offset not changed
 			labelStart = this.nodeBuf.getInt(NODE_LABEL_START_OFFSET+id*NODE_BYTE_SIZE);
 		}
 

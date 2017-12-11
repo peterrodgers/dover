@@ -183,13 +183,6 @@ public class EditOperationTest {
 		assertEquals(2,g2.getEdgeNode2(c[0]));
 		assertEquals(0,g2.getEdgeNode1(c[1]));
 		assertEquals(4,g2.getEdgeNode2(c[1]));
-		
-for(int e = 0; e < c.length; e++) {
-System.out.println("e "+e+" node1 "+g2.getEdgeNode1(e)+" node2 "+g2.getEdgeNode2(e));
-}			
-System.out.println(g2.checkConsistency());
-System.out.println("XXXXXX");
-
 	}
 
 	

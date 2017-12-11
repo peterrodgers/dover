@@ -20,6 +20,7 @@ import uk.ac.kent.dover.fastGraph.FastGraphEdgeType;
 import uk.ac.kent.dover.fastGraph.FastGraphException;
 import uk.ac.kent.dover.fastGraph.Launcher;
 import uk.ac.kent.dover.fastGraph.NodeStructure;
+import uk.ac.kent.dover.fastGraph.editOperation.EditList;
 import uk.ac.kent.dover.fastGraph.graphSimilarity.NodeDegreeDifference;
 
 
@@ -4418,6 +4419,24 @@ public class FastGraphTest {
 		assertEquals(0,g.getNumberOfNodes());
 		assertEquals(0,g.getNumberOfEdges());
 		assertTrue(g.checkConsistency());
+
+	}
+	
+	@Test
+	public void test181() throws Exception {
+		FastGraph g1,g2,g3;
+		g1 = FastGraph.randomGraphFactory(2, 0, 667777, false);
+		g2 = g1.generateGraphByRelabellingNode(0, "yellow");
+		g3 = g2.generateGraphByRelabellingNode(1, "turquoise");
+
+		assertEquals("yellow",g2.getNodeLabel(0));
+		assertEquals("n1",g2.getNodeLabel(1));
+		assertEquals("yellow",g3.getNodeLabel(0));
+		assertEquals("turquoise",g3.getNodeLabel(1));
+		
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		assertTrue(g3.checkConsistency());
 
 	}
 
