@@ -9,6 +9,9 @@ import uk.ac.kent.displayGraph.Graph;
 /**
  * Testing the structural similarity of two FastGraphs
  * 
+ * TODO Its a bit slow on sparse graphs, needs to break down disconnected components
+ * and test them separately for better performance.
+ * 
  * @author Peter Rodgers
  *
  */
