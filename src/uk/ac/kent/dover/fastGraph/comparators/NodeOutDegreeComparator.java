@@ -3,17 +3,17 @@ package uk.ac.kent.dover.fastGraph.comparators;
 import uk.ac.kent.dover.fastGraph.FastGraph;
 
 /**
- * Simple degree comparison for nodes within the same graph. Defaults to ascending,
+ * Simple indegree comparison for nodes within the same graph. Defaults to ascending,
  * set ascending to false to use descending order.
  * 
  * @author Peter Rodgers
  *
  */
-public class NodeDegreeComparator extends NodeComparator {
+public class NodeOutDegreeComparator extends NodeComparator {
 
 	boolean ascending = true;
 
-	public NodeDegreeComparator(FastGraph g1, FastGraph g2) {
+	public NodeOutDegreeComparator(FastGraph g1, FastGraph g2) {
 		super(g1,g2);
 	}
 
@@ -30,17 +30,17 @@ public class NodeDegreeComparator extends NodeComparator {
 
 	
 	/**
-	 * Just compares the degrees via standard Integer comparison
+	 * Just compares the outdegrees via standard Integer comparison
 	 * 
 	 * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or greater than the second
 	 */
 	@Override
 	public int compare(Integer n1, Integer n2) {
-		int degree1 = g1.getNodeDegree(n1);
-		int degree2 = g2.getNodeDegree(n2);
+		int degree1 = g1.getNodeOutDegree(n1);
+		int degree2 = g2.getNodeOutDegree(n2);
 		if(!ascending) {
-			degree2 = g1.getNodeDegree(n1);
-			degree1 = g2.getNodeDegree(n2);
+			degree2 = g1.getNodeOutDegree(n1);
+			degree1 = g2.getNodeOutDegree(n2);
 		}
 		if(degree1 < degree2) {
 			return -1;

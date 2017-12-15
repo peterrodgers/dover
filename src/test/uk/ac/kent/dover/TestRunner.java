@@ -16,67 +16,67 @@ public class TestRunner {
 		for (Failure failure : result.getFailures()) {
 			System.out.println(failure.toString());
 		}
-		System.out.println(result.wasSuccessful());
+		System.out.println(result.wasSuccessful()+" FastGraphTest");
 
 		result = JUnitCore.runClasses(ExactIsomorphismTest.class);
 		for (Failure failure : result.getFailures()) {
 			System.out.println(failure.toString());
 		}
-		System.out.println(result.wasSuccessful());
+		System.out.println(result.wasSuccessful()+" ExactIsomorphismTest");
 		
 		result = JUnitCore.runClasses(AdjacencyMatrixTest.class);
 		for (Failure failure : result.getFailures()) {
 			System.out.println(failure.toString());
 		}
-		System.out.println(result.wasSuccessful());
+		System.out.println(result.wasSuccessful()+" AdjacencyMatrixTest");
 		
 		result = JUnitCore.runClasses(InducedSubgraphTest.class);
 		for (Failure failure : result.getFailures()) {
 			System.out.println(failure.toString());
 		}
-		System.out.println(result.wasSuccessful());
+		System.out.println(result.wasSuccessful()+" InducedSubgraphTest");
 
 		result = JUnitCore.runClasses(ExactMotifFinderTest.class);
 		for (Failure failure : result.getFailures()) {
 			System.out.println(failure.toString());
 		}
-		System.out.println(result.wasSuccessful());
+		System.out.println(result.wasSuccessful()+" ExactMotifFinderTest");
 		
 		result = JUnitCore.runClasses(ExactSubgraphIsomorphismTest.class);
 		for (Failure failure : result.getFailures()) {
 			System.out.println(failure.toString());
 		}
-		System.out.println(result.wasSuccessful());
+		System.out.println(result.wasSuccessful()+" ExactSubgraphIsomorphismTest");
 
 		result = JUnitCore.runClasses(ApproximateSubgraphIsomorphismTest.class);
 		for (Failure failure : result.getFailures()) {
 			System.out.println(failure.toString());
 		}
-		System.out.println(result.wasSuccessful());
+		System.out.println(result.wasSuccessful()+" ApproximateSubgraphIsomorphismTest");
 		
 		result = JUnitCore.runClasses(RandomTimeSliceTest.class);
 		for (Failure failure : result.getFailures()) {
 			System.out.println(failure.toString());
 		}
-		System.out.println(result.wasSuccessful());
+		System.out.println(result.wasSuccessful()+" RandomTimeSliceTest");
 		
 		result = JUnitCore.runClasses(NodeDegreeDifferenceTest.class);
 		for (Failure failure : result.getFailures()) {
 			System.out.println(failure.toString());
 		}
-		System.out.println(result.wasSuccessful());
+		System.out.println(result.wasSuccessful()+" NodeDegreeDifferenceTest");
 		
 		result = JUnitCore.runClasses(EditOperationTest.class);
 		for (Failure failure : result.getFailures()) {
 			System.out.println(failure.toString());
 		}
-		System.out.println(result.wasSuccessful());
+		System.out.println(result.wasSuccessful()+" EditOperationTest");
 		
 		result = JUnitCore.runClasses(ApproximateGEDSimpleTest.class);
 		for (Failure failure : result.getFailures()) {
 			System.out.println(failure.toString());
 		}
-		System.out.println(result.wasSuccessful());
+		System.out.println(result.wasSuccessful()+" ApproximateGEDSimpleTest");
    }
 	
 	public static String get0Node0Edge() {

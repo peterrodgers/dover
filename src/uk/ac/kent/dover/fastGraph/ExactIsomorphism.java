@@ -294,7 +294,7 @@ isomorphismStartTime = System.currentTimeMillis();
 		}
 		
 		if(numberOfNodes1 == 0 && numberOfNodes2 == 0) {
-//System.out.println("Isomorphic: empty graphs");
+Debugger.log("Isomorphic: empty graphs");
 succeed++;
 timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
@@ -309,7 +309,7 @@ isomorphismStartTime = -1;
 		}
 
 		if(numberOfNodes1 != numberOfNodes2) {
-//System.out.println("Not isomorphic: different number of nodes");
+Debugger.log("Not isomorphic: different number of nodes");
 failOnNodeCount++;
 timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
@@ -317,7 +317,7 @@ isomorphismStartTime = -1;
 		}
 				
 		if(numberOfEdges1 != numberOfEdges2) {
-//System.out.println("Not isomorphic: different number of edges");
+Debugger.log("Not isomorphic: different number of edges");
 failOnEdgeCount++;
 timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
@@ -332,7 +332,7 @@ isomorphismStartTime = -1;
 		degreeBuckets2 = new int[maxDegree2+1];
 		g.findDegreeBuckets(degreeBuckets2,degrees2);
 		if(!Arrays.equals(degreeBuckets1, degreeBuckets2)) {
-//System.out.println("Not isomorphic: different quantities of nodes with the same degree");
+Debugger.log("Not isomorphic: different quantities of nodes with the same degree");
 failOnDegreeComparison++;
 timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
@@ -346,7 +346,7 @@ isomorphismStartTime = -1;
 		eigenvalues2 = am2.findEigenvalues(matrix2);
 		eigenvalues2 = Util.roundArray(eigenvalues2, DECIMAL_PLACES);
 		if(!compareEigenValues(eigenvalues2)) {
-//System.out.println("Not isomorphic: eigenvalues are different");
+Debugger.log("Not isomorphic: eigenvalues are different");
 failOnEigenvalues++;
 timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
@@ -380,7 +380,7 @@ if(isomorphismStartTime == -1) {
 				i++;
 			}
 			if(i == 0) {
-//System.out.println("Not isomorphic: no possible match for node "+n1+" from g1");
+Debugger.log("Not isomorphic: no possible match for node "+n1+" from g1");
 failOnNodeMatches++;
 timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
@@ -414,7 +414,7 @@ isomorphismStartTime = -1;
 				matchesIndex[currentNode]= 0;
 				currentNode--;
 				if(currentNode == -1) {
-//System.out.println("Not isomorphic: brute force");
+Debugger.log("Not isomorphic: brute force");
 failOnBruteForce++;
 timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
@@ -438,7 +438,7 @@ bruteForceStartTime = -1;
 				matches2[possibleMatch] = currentNode;
 				currentNode++;
 				if(currentNode == numberOfNodes1) {
-//System.out.println("Isomorphic");
+Debugger.log("Isomorphic");
 succeed++;
 timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
@@ -571,7 +571,7 @@ isomorphismStartTime = System.currentTimeMillis();
 		}
 		
 		if(numberOfNodes1 == 0 && numberOfNodes2 == 0) {
-//System.out.println("Isomorphic: empty graphs");
+Debugger.log("Isomorphic: empty graphs");
 succeed++;
 timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
@@ -586,7 +586,7 @@ isomorphismStartTime = -1;
 		}
 
 		if(numberOfNodes1 != numberOfNodes2) {
-//System.out.println("Not isomorphic: different number of nodes");
+Debugger.log("Not isomorphic: different number of nodes");
 failOnNodeCount++;
 timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
@@ -594,7 +594,7 @@ isomorphismStartTime = -1;
 		}
 				
 		if(numberOfEdges1 != numberOfEdges2) {
-//System.out.println("Not isomorphic: different number of edges");
+Debugger.log("Not isomorphic: different number of edges");
 failOnEdgeCount++;
 timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
@@ -611,7 +611,7 @@ isomorphismStartTime = -1;
 		inDegreeBuckets2 = new int[maxInDegree2+1];
 		g.findDegreeBuckets(inDegreeBuckets2,inDegrees2);
 		if(!Arrays.equals(inDegreeBuckets1, inDegreeBuckets2)) {
-//System.out.println("Not isomorphic: different quantities of nodes with the same indegree");
+Debugger.log("Not isomorphic: different quantities of nodes with the same indegree");
 failOnDegreeComparison++;
 timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
@@ -633,7 +633,7 @@ isomorphismStartTime = -1;
 		eigenvalues2 = am2.findEigenvalues(matrix2);
 		eigenvalues2 = Util.roundArray(eigenvalues2, DECIMAL_PLACES);
 		if(!compareEigenValues(eigenvalues2)) {
-//System.out.println("Not isomorphic: eigenvalues are different");
+Debugger.log("Not isomorphic: eigenvalues are different");
 failOnEigenvalues++;
 timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
@@ -671,7 +671,7 @@ if(isomorphismStartTime == -1) {
 				i++;
 			}
 			if(i == 0) {
-//System.out.println("Not isomorphic: no possible match for node "+n1+" from g1");
+Debugger.log("Not isomorphic: no possible match for node "+n1+" from g1");
 failOnNodeMatches++;
 timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
@@ -705,7 +705,7 @@ isomorphismStartTime = -1;
 				matchesIndex[currentNode]= 0;
 				currentNode--;
 				if(currentNode == -1) {
-//System.out.println("Not isomorphic: brute force");
+Debugger.log("Not isomorphic: brute force");
 failOnBruteForce++;
 timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
@@ -729,7 +729,7 @@ bruteForceStartTime = -1;
 				matches2[possibleMatch] = currentNode;
 				currentNode++;
 				if(currentNode == numberOfNodes1) {
-//System.out.println("Isomorphic");
+Debugger.log("Isomorphic");
 succeed++;
 timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
