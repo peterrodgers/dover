@@ -2940,4 +2940,76 @@ public class ApproximateGEDSimpleTest {
 
 	}
 	
+	
+	
+	@Test
+	public void test050() throws Exception {
+		
+		long seed = 1513326782068L;
+		Random r = new Random(seed);
+		FastGraph g1,g2,gRet;
+		HashMap<Integer,Double> editCosts;
+		ApproximateGEDSimple ged;
+		EditList el, retEditList2;
+		SimpleNodeLabelComparator nlc;
+		int maxNodes = 9;
+		int maxEdges = 8;
+	
+		editCosts = new HashMap<>();
+		editCosts.put(EditOperation.DELETE_NODE,90.9);
+		editCosts.put(EditOperation.ADD_NODE,80.4);
+		editCosts.put(EditOperation.DELETE_EDGE,70.8);
+		editCosts.put(EditOperation.ADD_EDGE,60.2);
+		editCosts.put(EditOperation.RELABEL_NODE,50.1);
+
+		g1 = FastGraph.randomGraphFactory(r.nextInt(maxNodes)+1, r.nextInt(maxEdges+1), seed+10, false);
+		el = new EditList();
+		for(int i = 0; i < g1.getNumberOfNodes(); i++) {
+			String color = "yellow";
+			int a = r.nextInt(4);
+			if(a == 0) {
+				color = "teal";
+			}
+			if(a == 1) {
+				color = "black";
+			}
+			if(a == 2) {
+				color = "red";
+			};
+			el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,-1,i,color,-1,-1));
+		}
+		g1 = el.applyOperations(g1);
+
+		g2 = FastGraph.randomGraphFactory(r.nextInt(maxNodes)+1, r.nextInt(maxEdges+1), seed+20, false);
+		el = new EditList();
+		for(int i = 0; i < g2.getNumberOfNodes(); i++) {
+			String color = "yellow";
+			int a = r.nextInt(4);
+			if(a == 0) {
+				color = "teal";
+			}
+			if(a == 1) {
+				color = "black";
+			}
+			if(a == 2) {
+				color = "red";
+			};
+			el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,-1,i,color,-1,-1));
+		}
+		g2 = el.applyOperations(g2);
+
+		ged = new ApproximateGEDSimple(true,true,editCosts,0,1000,seed+30);
+		
+		ged.similarity(g1, g2);
+		retEditList2 = ged.getEditList();
+		
+		gRet = retEditList2.applyOperations(g1);
+		
+		nlc = new SimpleNodeLabelComparator(g2, gRet);
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,nlc));
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		assertTrue(gRet.checkConsistency());
+	}
+	
 }

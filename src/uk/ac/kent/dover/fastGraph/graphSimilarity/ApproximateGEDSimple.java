@@ -1,7 +1,5 @@
 package uk.ac.kent.dover.fastGraph.graphSimilarity;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.*;
 
 import uk.ac.kent.dover.fastGraph.*;
@@ -43,13 +41,18 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 	private ReverseIntegerComparator reverseComparator = new ReverseIntegerComparator();
 	
 	private Random random;
+
+	private int addCapacity;
+	private int addStart;
 	
 	public static void main(String [] args) {
 		
-		Debugger.enabled = true;
+		Debugger.enabled = false;
 		
 		try {
 			
+//			randomTestLoop();
+
 			int startNodes = 100000;
 			int nodes = startNodes;
 			while(true) {
@@ -86,9 +89,7 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 				retEditList1 = ged.getEditList();
 				retList = retEditList1.getEditList();
 				long start2 = System.currentTimeMillis();
-						
 				ged = new ApproximateGEDSimple(false,false,editCosts,1000,0,777777);
-				
 				ret = ged.similarity(g1, g2);
 				
 				System.out.println("OPTIMIZATION nodes "+nodes+" edges "+edges);
@@ -266,7 +267,8 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 	@Override
 	public double similarity(FastGraph g1, FastGraph g2) {
 	
-		int addCapacity = 0;
+		addCapacity = 0;
+		addStart = g1.getNumberOfNodes();
 		if((g1.getNumberOfNodes() < g2.getNumberOfNodes())) {
 			addCapacity = (g2.getNumberOfNodes()-g1.getNumberOfNodes());
 		}
@@ -314,6 +316,7 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 
 			int g1Node1 = random.nextInt(size);
 			int g1Node2 = random.nextInt(size);
+
 			if(g1Node1 == g1Node2) {
 				nodeSwaps++;
 				approximationTime = System.currentTimeMillis()-startTime;
@@ -573,8 +576,8 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 		EditList ret = new EditList();
 		
 		EditOperation eo;
-		// add nodes
-		for(Integer n : addNodeSet) {
+		// add nodes, must be in order of their index, otherwise subtle bugs occur
+		for(int n = addStart; n < addCapacity+addStart; n++) {
 			Integer g2n = nodeMapping.get(n);
 			String label = g2.getNodeLabel(g2n);
 			eo = new EditOperation(EditOperation.ADD_NODE,addNodeCost,-1,label,-1,-1);
@@ -600,7 +603,7 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 		// as it uses g1 ids
 		if(nodeLabels) {
 			for(Integer n : nodeMapping.keySet()) {
-				if(!addNodeSet.contains(n)) { // need to be existing nodes
+				if(n < addStart) { // need to be existing nodes
 					Integer g2n = nodeMapping.get(n);
 					String nLabel = g1.getNodeLabel(n);
 					String g2nLabel = g2.getNodeLabel(g2n);
@@ -907,6 +910,202 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 					addEdgeNode1List.add(node1);
 					addEdgeNode2List.add(node2);
 				}
+			}
+		}
+	}
+	
+
+	/**
+	 * Run this to test randomly generated graphs infinitely.
+	 * 
+	 * @throws FastGraphException if a generator fails.
+	 */
+	public static void randomTestLoop() throws FastGraphException {
+		while(true) {
+			long seed = System.currentTimeMillis();
+			Random r = new Random(seed);
+			double ret;
+			FastGraph g1,g2,gRet;
+			HashMap<Integer,Double> editCosts;
+			ApproximateGEDSimple ged;
+			EditList el, retEditList1, retEditList2;
+			SimpleNodeLabelComparator nlc;
+			int maxNodes = 20;
+			int maxEdges = 80;
+		
+			editCosts = new HashMap<>();
+			editCosts.put(EditOperation.DELETE_NODE,90.9);
+			editCosts.put(EditOperation.ADD_NODE,80.4);
+			editCosts.put(EditOperation.DELETE_EDGE,70.8);
+			editCosts.put(EditOperation.ADD_EDGE,60.2);
+			editCosts.put(EditOperation.RELABEL_NODE,50.1);
+
+			g1 = FastGraph.randomGraphFactory(r.nextInt(maxNodes)+1, r.nextInt(maxEdges+1), seed+10, false);
+			el = new EditList();
+			for(int i = 0; i < g1.getNumberOfNodes(); i++) {
+				String color = "yellow";
+				int a = r.nextInt(4);
+				if(a == 0) {
+					color = "teal";
+				}
+				if(a == 1) {
+					color = "black";
+				}
+				if(a == 2) {
+					color = "red";
+				};
+				el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,-1,i,color,-1,-1));
+			}
+			g1 = el.applyOperations(g1);
+
+			g2 = FastGraph.randomGraphFactory(r.nextInt(maxNodes)+1, r.nextInt(maxEdges+1), seed+20, false);
+			el = new EditList();
+			for(int i = 0; i < g2.getNumberOfNodes(); i++) {
+				String color = "yellow";
+				int a = r.nextInt(4);
+				if(a == 0) {
+					color = "teal";
+				}
+				if(a == 1) {
+					color = "black";
+				}
+				if(a == 2) {
+					color = "red";
+				};
+				el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,-1,i,color,-1,-1));
+			}
+			g2 = el.applyOperations(g2);
+
+			ged = new ApproximateGEDSimple(false,false,editCosts,0,0,-1);
+			ret = ged.similarity(g1, g2);
+			retEditList1 = ged.getEditList();
+			gRet = retEditList1.applyOperations(g1);
+			if(!ExactIsomorphism.isomorphic(g2,gRet,false,null)||!g1.checkConsistency()||!g2.checkConsistency()||!gRet.checkConsistency()) {
+				System.out.println(ExactIsomorphism.isomorphic(g2,gRet,false,null)+" "+g1.checkConsistency()+" "+g2.checkConsistency()+" "+gRet.checkConsistency());
+				System.out.println("AAA problem seed "+seed);
+				System.exit(0);
+			} else {
+				System.out.println("AAA OK "+seed);
+			}
+
+			ged = new ApproximateGEDSimple(false,false,editCosts,0,1000,seed+30);
+			ret = ged.similarity(g1, g2);
+			retEditList2 = ged.getEditList();
+			gRet = retEditList2.applyOperations(g1);
+			nlc = new SimpleNodeLabelComparator(g2, gRet);
+			if(!ExactIsomorphism.isomorphic(g2,gRet,false,null)||!g1.checkConsistency()||!g2.checkConsistency()||!gRet.checkConsistency()) {
+				Debugger.enabled = true;
+				System.out.println(ExactIsomorphism.isomorphic(g2,gRet,false,null)+" "+g1.checkConsistency()+" "+g2.checkConsistency()+" "+gRet.checkConsistency());
+				System.out.println("BBB problem seed "+seed);
+				System.exit(0);
+			} else {
+				System.out.println("BBB OK "+seed);
+			}
+
+			ged = new ApproximateGEDSimple(false,true,editCosts,0,0,-1);
+			ret = ged.similarity(g1, g2);
+			retEditList1 = ged.getEditList();
+			gRet = retEditList1.applyOperations(g1);
+			nlc = new SimpleNodeLabelComparator(g2, gRet);
+			if(!ExactIsomorphism.isomorphic(g2,gRet,false,nlc)||!g1.checkConsistency()||!g2.checkConsistency()||!gRet.checkConsistency()) {
+				System.out.println(ExactIsomorphism.isomorphic(g2,gRet,false,nlc)+" "+g1.checkConsistency()+" "+g2.checkConsistency()+" "+gRet.checkConsistency());
+				System.out.println("AAA problem seed "+seed);
+				System.exit(0);
+			} else {
+				System.out.println("AAA OK "+seed);
+			}
+
+			ged = new ApproximateGEDSimple(false,true,editCosts,0,1000,seed+30);
+			ret = ged.similarity(g1, g2);
+			retEditList2 = ged.getEditList();
+			gRet = retEditList2.applyOperations(g1);
+			nlc = new SimpleNodeLabelComparator(g2, gRet);
+			if(!ExactIsomorphism.isomorphic(g2,gRet,false,nlc)||!g1.checkConsistency()||!g2.checkConsistency()||!gRet.checkConsistency()) {
+				Debugger.enabled = true;
+				System.out.println(ExactIsomorphism.isomorphic(g2,gRet,false,nlc)+" "+g1.checkConsistency()+" "+g2.checkConsistency()+" "+gRet.checkConsistency());
+				System.out.println("BBB problem seed "+seed);
+				System.exit(0);
+			} else {
+				System.out.println("BBB OK "+seed);
+			}
+
+			ged = new ApproximateGEDSimple(true,false,editCosts,0,0,-1);
+			ret = ged.similarity(g1, g2);
+			retEditList1 = ged.getEditList();
+			gRet = retEditList1.applyOperations(g1);
+			if(!ExactIsomorphism.isomorphic(g2,gRet,true,null)||!g1.checkConsistency()||!g2.checkConsistency()||!gRet.checkConsistency()) {
+				System.out.println(ExactIsomorphism.isomorphic(g2,gRet,true,null)+" "+g1.checkConsistency()+" "+g2.checkConsistency()+" "+gRet.checkConsistency());
+				System.out.println("CCC problem seed "+seed);
+				System.exit(0);
+			} else {
+				System.out.println("CCC OK "+seed);
+			}
+
+			ged = new ApproximateGEDSimple(true,false,editCosts,0,1000,seed+30);
+			ret = ged.similarity(g1, g2);
+			retEditList2 = ged.getEditList();
+			gRet = retEditList2.applyOperations(g1);
+			if(!ExactIsomorphism.isomorphic(g2,gRet,true,null)||!g1.checkConsistency()||!g2.checkConsistency()||!gRet.checkConsistency()) {
+				Debugger.enabled = true;
+				System.out.println(ExactIsomorphism.isomorphic(g2,gRet,true,null)+" "+g1.checkConsistency()+" "+g2.checkConsistency()+" "+gRet.checkConsistency());
+				System.out.println("DDD problem seed "+seed);
+				System.exit(0);
+			} else {
+				System.out.println("DDD OK "+seed);
+			}
+
+			ged = new ApproximateGEDSimple(true,true,editCosts,0,0,-1);
+			ret = ged.similarity(g1, g2);
+			retEditList1 = ged.getEditList();
+			gRet = retEditList1.applyOperations(g1);
+			nlc = new SimpleNodeLabelComparator(g2, gRet);
+			if(!ExactIsomorphism.isomorphic(g2,gRet,true,nlc)||!g1.checkConsistency()||!g2.checkConsistency()||!gRet.checkConsistency()) {
+				System.out.println(ExactIsomorphism.isomorphic(g2,gRet,true,nlc)+" "+g1.checkConsistency()+" "+g2.checkConsistency()+" "+gRet.checkConsistency());
+				System.out.println("EEE problem seed "+seed);
+				System.exit(0);
+			} else {
+				System.out.println("EEE OK "+seed);
+			}
+
+			ged = new ApproximateGEDSimple(true,true,editCosts,0,1000,seed+30);
+			ret = ged.similarity(g1, g2);
+			retEditList2 = ged.getEditList();
+			gRet = retEditList2.applyOperations(g1);
+			nlc = new SimpleNodeLabelComparator(g2, gRet);
+			if(!ExactIsomorphism.isomorphic(g2,gRet,true,nlc)||!g1.checkConsistency()||!g2.checkConsistency()||!gRet.checkConsistency()) {
+				Debugger.enabled = true;
+				System.out.println(ExactIsomorphism.isomorphic(g2,gRet,true,nlc)+" "+g1.checkConsistency()+" "+g2.checkConsistency()+" "+gRet.checkConsistency());
+				System.out.println("FFF problem seed "+seed);
+				System.exit(0);
+			} else {
+				System.out.println("FFF OK "+seed);
+			}
+
+			ged = new ApproximateGEDSimple(true,true,editCosts,0,0,-1);
+			ret = ged.similarity(g1, g2);
+			retEditList1 = ged.getEditList();
+			gRet = retEditList1.applyOperations(g1);
+			nlc = new SimpleNodeLabelComparator(g2, gRet);
+			if(!ExactIsomorphism.isomorphic(g2,gRet,true,nlc)||!g1.checkConsistency()||!g2.checkConsistency()||!gRet.checkConsistency()) {
+				System.out.println(ExactIsomorphism.isomorphic(g2,gRet,true,nlc)+" "+g1.checkConsistency()+" "+g2.checkConsistency()+" "+gRet.checkConsistency());
+				System.out.println("GGG problem seed "+seed);
+				System.exit(0);
+			} else {
+				System.out.println("GGG OK "+seed);
+			}
+
+			ged = new ApproximateGEDSimple(true,true,editCosts,0,1000,seed+30);
+			ret = ged.similarity(g1, g2);
+			retEditList2 = ged.getEditList();
+			gRet = retEditList2.applyOperations(g1);
+			nlc = new SimpleNodeLabelComparator(g2, gRet);
+			if(!ExactIsomorphism.isomorphic(g2,gRet,true,nlc)||!g1.checkConsistency()||!g2.checkConsistency()||!gRet.checkConsistency()) {
+				Debugger.enabled = true;
+				System.out.println(ExactIsomorphism.isomorphic(g2,gRet,true,nlc)+" "+g1.checkConsistency()+" "+g2.checkConsistency()+" "+gRet.checkConsistency());
+				System.out.println("GGG problem seed "+seed);
+				System.exit(0);
+			} else {
+				System.out.println("GGG OK "+seed);
 			}
 		}
 	}
