@@ -74,7 +74,6 @@ public class EditOperationTest {
 		EditOperation deleteNode, addNode, deleteEdge, addEdge, relabelNode;		
 		EditList el1,el2;
 		FastGraph g,g2;
-		SimpleNodeLabelComparator snlc;
 		
 		el1 = new EditList();
 		addNode = new EditOperation(EditOperation.ADD_NODE,3,-1,"node 0",-1,-1);
@@ -108,8 +107,7 @@ public class EditOperationTest {
 		g2 = FastGraph.randomGraphFactory(0, 0, false);
 		g2 = el1.applyOperations(g2);
 		
-		snlc = new SimpleNodeLabelComparator(g,g2);
-		assertTrue(ExactIsomorphism.isomorphic(g,g2,true,snlc));
+		assertTrue(ExactIsomorphism.isomorphic(g,g2,true,true));
 		assertTrue(g.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		
@@ -120,8 +118,7 @@ public class EditOperationTest {
 		g2 = el2.applyOperations(g2);
 		assertEquals(8,el1.getEditList().size());
 		assertEquals(8,el2.getEditList().size());
-		snlc = new SimpleNodeLabelComparator(g,g2);
-		assertTrue(ExactIsomorphism.isomorphic(g,g2,true,snlc));
+		assertTrue(ExactIsomorphism.isomorphic(g,g2,true,true));
 		assertTrue(g.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		
@@ -141,8 +138,7 @@ public class EditOperationTest {
 		assertEquals(9,el2.getEditList().size());
 		g2 = FastGraph.randomGraphFactory(0, 0, false);
 		g2 = el2.applyOperations(g2);
-		snlc = new SimpleNodeLabelComparator(g,g2);
-		assertTrue(ExactIsomorphism.isomorphic(g,g2,true,snlc));
+		assertTrue(ExactIsomorphism.isomorphic(g,g2,true,true));
 		assertTrue(g2.checkConsistency());
 		
 	}

@@ -1154,7 +1154,7 @@ public class ExactIsomorphismTest {
 	public void test29()  {
 
 		ExactIsomorphism ei;
-		SimpleNodeLabelComparator nodeComparator;
+		
 		Graph dg1 = new Graph("dg1");
 		dg1.addAdjacencyEdge("n0", "n1");
 		dg1.addAdjacencyEdge("n1", "n2");
@@ -1167,21 +1167,21 @@ public class ExactIsomorphismTest {
 
 		FastGraph g1 = FastGraph.displayGraphFactory(dg1, false);
 		FastGraph g2 = FastGraph.displayGraphFactory(dg2, false);
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
-		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
 		
-		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,true));
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,true));
+		
+		ei = new ExactIsomorphism(g1,false,true);
 		assertTrue(ei.isomorphic(g2));
 		
 		int[] mapping = {2,0,1};
 		assertTrue(Arrays.equals(mapping, ei.getLastMatch()));
 		
-		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		ei = new ExactIsomorphism(g1,true,true);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		ei = new ExactIsomorphism(g2,false,true);
 		assertTrue(ei.isomorphic(g1));
-		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		ei = new ExactIsomorphism(g2,true,true);
 		assertTrue(ei.isomorphic(g1));
 
 	}
@@ -1191,7 +1191,7 @@ public class ExactIsomorphismTest {
 	public void test30()  {
 	
 		ExactIsomorphism ei;
-		SimpleNodeLabelComparator nodeComparator;
+		
 		Graph dg1 = new Graph("dg1");
 		dg1.addAdjacencyEdge("n0", "n1");
 		dg1.addAdjacencyEdge("n1", "n2");
@@ -1206,45 +1206,43 @@ public class ExactIsomorphismTest {
 		FastGraph g1 = FastGraph.displayGraphFactory(dg1, false);
 		FastGraph g2 = FastGraph.displayGraphFactory(dg2, false);
 		
-		nodeComparator = null;
-		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
-		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,false));
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,false));
 		
-		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		ei = new ExactIsomorphism(g1,false,false);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		ei = new ExactIsomorphism(g1,true,false);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		ei = new ExactIsomorphism(g2,false,false);
 		assertTrue(ei.isomorphic(g1));
-		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		ei = new ExactIsomorphism(g2,true,false);
 		assertTrue(ei.isomorphic(g1));
 
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		assertFalse(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		assertFalse(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		assertFalse(ExactIsomorphism.isomorphic(g1,g2,false,true));
+		
+		assertFalse(ExactIsomorphism.isomorphic(g2,g1,true,true));
 
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		assertFalse(ExactIsomorphism.isomorphic(g2,g1,false,nodeComparator));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		assertFalse(ExactIsomorphism.isomorphic(g1,g2,true,nodeComparator));
+		assertFalse(ExactIsomorphism.isomorphic(g2,g1,false,true));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		
+		assertFalse(ExactIsomorphism.isomorphic(g1,g2,true,true));
+		
+		
+		ei = new ExactIsomorphism(g1,false,true);
 		assertFalse(ei.isomorphic(g2));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		
+		ei = new ExactIsomorphism(g2,false,true);
 		assertFalse(ei.isomorphic(g1));
 
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		
+		ei = new ExactIsomorphism(g2,true,true);
 		assertFalse(ei.isomorphic(g1));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		
+		ei = new ExactIsomorphism(g2,true,true);
 		assertFalse(ei.isomorphic(g1));
 
 	}
@@ -1265,17 +1263,17 @@ public class ExactIsomorphismTest {
 		
 		assertNotEquals(l1,l2);
 		
-		SimpleNodeLabelComparator nodeComparator;
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		
+		
+		ei = new ExactIsomorphism(g1,false,true);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		ei = new ExactIsomorphism(g1,true,true);
 		assertTrue(ei.isomorphic(g2));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		
+		ei = new ExactIsomorphism(g2,false,true);
 		assertTrue(ei.isomorphic(g1));
-		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		ei = new ExactIsomorphism(g2,true,true);
 		assertTrue(ei.isomorphic(g1));
 	}
 
@@ -1284,7 +1282,7 @@ public class ExactIsomorphismTest {
 	public void test032()  {
 		
 		ExactIsomorphism ei;
-		SimpleNodeLabelComparator nodeComparator;
+		
 		
 		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
 		NodeStructure ns10 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
@@ -1326,34 +1324,34 @@ public class ExactIsomorphismTest {
 		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
 		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
 
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
-		assertTrue(ExactIsomorphism.isomorphic(g1,g2,true,nodeComparator));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		assertTrue(ExactIsomorphism.isomorphic(g2,g1,false,nodeComparator));
-		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,true));
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,true,true));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,false,true));
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,true));
+		
+		
+		ei = new ExactIsomorphism(g1,false,true);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		ei = new ExactIsomorphism(g1,true,true);
 		assertTrue(ei.isomorphic(g2));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		
+		ei = new ExactIsomorphism(g2,false,true);
 		assertTrue(ei.isomorphic(g1));
-		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		ei = new ExactIsomorphism(g2,true,true);
 		assertTrue(ei.isomorphic(g1));
 		
-		ei = new ExactIsomorphism(g1,true,null);
+		ei = new ExactIsomorphism(g1,true,false);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,true,null);
+		ei = new ExactIsomorphism(g2,true,false);
 		assertTrue(ei.isomorphic(g1));
 
-		ei = new ExactIsomorphism(g1,false,null);
+		ei = new ExactIsomorphism(g1,false,false);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,false,null);
+		ei = new ExactIsomorphism(g2,false,false);
 		assertTrue(ei.isomorphic(g1));
 
 	}
@@ -1363,7 +1361,7 @@ public class ExactIsomorphismTest {
 	public void test033()  {
 		
 		ExactIsomorphism ei;
-		SimpleNodeLabelComparator nodeComparator;
+		
 		
 		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
 		NodeStructure ns10 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
@@ -1405,34 +1403,34 @@ public class ExactIsomorphismTest {
 		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
 		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
 
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
-		assertFalse(ExactIsomorphism.isomorphic(g1,g2,true,nodeComparator));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		assertTrue(ExactIsomorphism.isomorphic(g2,g1,false,nodeComparator));
-		assertFalse(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,true));
+		assertFalse(ExactIsomorphism.isomorphic(g1,g2,true,true));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,false,true));
+		assertFalse(ExactIsomorphism.isomorphic(g2,g1,true,true));
+		
+		
+		ei = new ExactIsomorphism(g1,false,true);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		ei = new ExactIsomorphism(g1,true,true);
 		assertFalse(ei.isomorphic(g2));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		
+		ei = new ExactIsomorphism(g2,false,true);
 		assertTrue(ei.isomorphic(g1));
-		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		ei = new ExactIsomorphism(g2,true,true);
 		assertFalse(ei.isomorphic(g1));
 		
-		ei = new ExactIsomorphism(g1,true,null);
+		ei = new ExactIsomorphism(g1,true,false);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,true,null);
+		ei = new ExactIsomorphism(g2,true,false);
 		assertTrue(ei.isomorphic(g1));
 
-		ei = new ExactIsomorphism(g1,false,null);
+		ei = new ExactIsomorphism(g1,false,false);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,false,null);
+		ei = new ExactIsomorphism(g2,false,false);
 		assertTrue(ei.isomorphic(g1));
 	}
 
@@ -1441,7 +1439,7 @@ public class ExactIsomorphismTest {
 	public void test034()  {
 		
 		ExactIsomorphism ei;
-		SimpleNodeLabelComparator nodeComparator;
+		
 		
 		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
 		NodeStructure ns10 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
@@ -1459,34 +1457,34 @@ public class ExactIsomorphismTest {
 		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
 		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
 
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
-		assertTrue(ExactIsomorphism.isomorphic(g1,g2,true,nodeComparator));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		assertTrue(ExactIsomorphism.isomorphic(g2,g1,false,nodeComparator));
-		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,true));
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,true,true));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,false,true));
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,true));
+		
+		
+		ei = new ExactIsomorphism(g1,false,true);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		ei = new ExactIsomorphism(g1,true,true);
 		assertTrue(ei.isomorphic(g2));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		
+		ei = new ExactIsomorphism(g2,false,true);
 		assertTrue(ei.isomorphic(g1));
-		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		ei = new ExactIsomorphism(g2,true,true);
 		assertTrue(ei.isomorphic(g1));
 		
-		ei = new ExactIsomorphism(g1,true,null);
+		ei = new ExactIsomorphism(g1,true,false);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,true,null);
+		ei = new ExactIsomorphism(g2,true,false);
 		assertTrue(ei.isomorphic(g1));
 
-		ei = new ExactIsomorphism(g1,false,null);
+		ei = new ExactIsomorphism(g1,false,false);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,false,null);
+		ei = new ExactIsomorphism(g2,false,false);
 		assertTrue(ei.isomorphic(g1));
 		
 		assertTrue(g1.checkConsistency());
@@ -1499,7 +1497,7 @@ public class ExactIsomorphismTest {
 	public void test035()  {
 		
 		ExactIsomorphism ei;
-		SimpleNodeLabelComparator nodeComparator;
+		
 		
 		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
 		NodeStructure ns10 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
@@ -1557,34 +1555,34 @@ public class ExactIsomorphismTest {
 		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
 		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
 
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
-		assertTrue(ExactIsomorphism.isomorphic(g1,g2,true,nodeComparator));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		assertTrue(ExactIsomorphism.isomorphic(g2,g1,false,nodeComparator));
-		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,true));
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,true,true));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,false,true));
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,true));
+		
+		
+		ei = new ExactIsomorphism(g1,false,true);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		ei = new ExactIsomorphism(g1,true,true);
 		assertTrue(ei.isomorphic(g2));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		
+		ei = new ExactIsomorphism(g2,false,true);
 		assertTrue(ei.isomorphic(g1));
-		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		ei = new ExactIsomorphism(g2,true,true);
 		assertTrue(ei.isomorphic(g1));
 		
-		ei = new ExactIsomorphism(g1,true,null);
+		ei = new ExactIsomorphism(g1,true,false);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,true,null);
+		ei = new ExactIsomorphism(g2,true,false);
 		assertTrue(ei.isomorphic(g1));
 
-		ei = new ExactIsomorphism(g1,false,null);
+		ei = new ExactIsomorphism(g1,false,false);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,false,null);
+		ei = new ExactIsomorphism(g2,false,false);
 		assertTrue(ei.isomorphic(g1));
 		
 		assertTrue(g1.checkConsistency());
@@ -1596,7 +1594,7 @@ public class ExactIsomorphismTest {
 	public void test036()  {
 		
 		ExactIsomorphism ei;
-		SimpleNodeLabelComparator nodeComparator;
+		
 		
 		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
 		NodeStructure ns10 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
@@ -1662,34 +1660,34 @@ public class ExactIsomorphismTest {
 		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
 		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
 
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
-		assertTrue(ExactIsomorphism.isomorphic(g1,g2,true,nodeComparator));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		assertTrue(ExactIsomorphism.isomorphic(g2,g1,false,nodeComparator));
-		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,true));
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,true,true));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,false,true));
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,true,true));
+		
+		
+		ei = new ExactIsomorphism(g1,false,true);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		ei = new ExactIsomorphism(g1,true,true);
 		assertTrue(ei.isomorphic(g2));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		
+		ei = new ExactIsomorphism(g2,false,true);
 		assertTrue(ei.isomorphic(g1));
-		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		ei = new ExactIsomorphism(g2,true,true);
 		assertTrue(ei.isomorphic(g1));
 		
-		ei = new ExactIsomorphism(g1,true,null);
+		ei = new ExactIsomorphism(g1,true,false);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,true,null);
+		ei = new ExactIsomorphism(g2,true,false);
 		assertTrue(ei.isomorphic(g1));
 
-		ei = new ExactIsomorphism(g1,false,null);
+		ei = new ExactIsomorphism(g1,false,false);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,false,null);
+		ei = new ExactIsomorphism(g2,false,false);
 		assertTrue(ei.isomorphic(g1));
 
 		assertTrue(g1.checkConsistency());
@@ -1702,7 +1700,7 @@ public class ExactIsomorphismTest {
 	public void test037()  {
 		
 		ExactIsomorphism ei;
-		SimpleNodeLabelComparator nodeComparator;
+		
 		
 		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
 		NodeStructure ns10 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
@@ -1760,34 +1758,34 @@ public class ExactIsomorphismTest {
 		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
 		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
 
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
-		assertFalse(ExactIsomorphism.isomorphic(g1,g2,true,nodeComparator));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		assertTrue(ExactIsomorphism.isomorphic(g2,g1,false,nodeComparator));
-		assertFalse(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,true));
+		assertFalse(ExactIsomorphism.isomorphic(g1,g2,true,true));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		
+		assertTrue(ExactIsomorphism.isomorphic(g2,g1,false,true));
+		assertFalse(ExactIsomorphism.isomorphic(g2,g1,true,true));
+		
+		
+		ei = new ExactIsomorphism(g1,false,true);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		ei = new ExactIsomorphism(g1,true,true);
 		assertFalse(ei.isomorphic(g2));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		
+		ei = new ExactIsomorphism(g2,false,true);
 		assertTrue(ei.isomorphic(g1));
-		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		ei = new ExactIsomorphism(g2,true,true);
 		assertFalse(ei.isomorphic(g1));
 		
-		ei = new ExactIsomorphism(g1,true,null);
+		ei = new ExactIsomorphism(g1,true,false);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,true,null);
+		ei = new ExactIsomorphism(g2,true,false);
 		assertTrue(ei.isomorphic(g1));
 
-		ei = new ExactIsomorphism(g1,false,null);
+		ei = new ExactIsomorphism(g1,false,false);
 		assertTrue(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,false,null);
+		ei = new ExactIsomorphism(g2,false,false);
 		assertTrue(ei.isomorphic(g1));
 		
 		assertTrue(g1.checkConsistency());
@@ -1828,14 +1826,14 @@ public class ExactIsomorphismTest {
 		FastGraph g2 = FastGraph.displayGraphFactory(dg2, false);
 
 		
-		ei = new ExactIsomorphism(g1,true,null);
+		ei = new ExactIsomorphism(g1,true,false);
 		assertFalse(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,true,null);
+		ei = new ExactIsomorphism(g2,true,false);
 		assertFalse(ei.isomorphic(g1));
 
-		ei = new ExactIsomorphism(g1,false,null);
+		ei = new ExactIsomorphism(g1,false,false);
 		assertFalse(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,false,null);
+		ei = new ExactIsomorphism(g2,false,false);
 		assertFalse(ei.isomorphic(g1));
 		
 		assertTrue(g1.checkConsistency());
@@ -1848,7 +1846,6 @@ public class ExactIsomorphismTest {
 	public void test039()  {
 		
 		ExactIsomorphism ei;
-		SimpleNodeLabelComparator nodeComparator;
 		
 		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
 		NodeStructure ns10 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
@@ -1878,34 +1875,34 @@ public class ExactIsomorphismTest {
 		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
 		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
 
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		assertFalse(ExactIsomorphism.isomorphic(g1,g2,false,nodeComparator));
-		assertFalse(ExactIsomorphism.isomorphic(g1,g2,true,nodeComparator));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		assertFalse(ExactIsomorphism.isomorphic(g2,g1,false,nodeComparator));
-		assertFalse(ExactIsomorphism.isomorphic(g2,g1,true,nodeComparator));
+		assertFalse(ExactIsomorphism.isomorphic(g1,g2,false,true));
+		assertFalse(ExactIsomorphism.isomorphic(g1,g2,true,true));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g1, g2);
-		ei = new ExactIsomorphism(g1,false,nodeComparator);
+		
+		assertFalse(ExactIsomorphism.isomorphic(g2,g1,false,true));
+		assertFalse(ExactIsomorphism.isomorphic(g2,g1,true,true));
+		
+		
+		ei = new ExactIsomorphism(g1,false,true);
 		assertFalse(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g1,true,nodeComparator);
+		ei = new ExactIsomorphism(g1,true,true);
 		assertFalse(ei.isomorphic(g2));
 		
-		nodeComparator = new SimpleNodeLabelComparator(g2, g1);
-		ei = new ExactIsomorphism(g2,false,nodeComparator);
+		
+		ei = new ExactIsomorphism(g2,false,true);
 		assertFalse(ei.isomorphic(g1));
-		ei = new ExactIsomorphism(g2,true,nodeComparator);
+		ei = new ExactIsomorphism(g2,true,true);
 		assertFalse(ei.isomorphic(g1));
 		
-		ei = new ExactIsomorphism(g1,true,null);
+		ei = new ExactIsomorphism(g1,true,false);
 		assertFalse(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,true,null);
+		ei = new ExactIsomorphism(g2,true,false);
 		assertFalse(ei.isomorphic(g1));
 
-		ei = new ExactIsomorphism(g1,false,null);
+		ei = new ExactIsomorphism(g1,false,false);
 		assertFalse(ei.isomorphic(g2));
-		ei = new ExactIsomorphism(g2,false,null);
+		ei = new ExactIsomorphism(g2,false,false);
 		assertFalse(ei.isomorphic(g1));
 		
 		assertTrue(g1.checkConsistency());

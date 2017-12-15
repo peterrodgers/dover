@@ -12,7 +12,6 @@ import uk.ac.kent.displayGraph.Graph;
 import uk.ac.kent.displayGraph.Node;
 import uk.ac.kent.dover.fastGraph.*;
 import uk.ac.kent.dover.fastGraph.comparators.NodeDegreeComparator;
-import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
 import uk.ac.kent.dover.fastGraph.editOperation.*;
 import uk.ac.kent.dover.fastGraph.graphSimilarity.ApproximateGEDSimple;
 
@@ -1619,7 +1618,6 @@ public class ApproximateGEDSimpleTest {
 		HashMap<Integer,Double> editCosts;
 		EditList retEditList1, retEditList2;
 		ApproximateGEDSimple ged;
-		SimpleNodeLabelComparator nodeComparator;
 		
 		Graph dg1 = new Graph("dg1");
 		Node n0 = new Node("Green");
@@ -1666,8 +1664,7 @@ public class ApproximateGEDSimpleTest {
 		assertEquals(ret,retEditList1.getCost(), 0.001);
 
 		gRet = retEditList1.applyOperations(g1);
-		nodeComparator = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -1682,8 +1679,7 @@ public class ApproximateGEDSimpleTest {
 		assertEquals(4,retList.size());
 		
 		gRet = retEditList2.applyOperations(g1);
-		nodeComparator = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -1698,7 +1694,7 @@ public class ApproximateGEDSimpleTest {
 		EditList el, retEditList1, retEditList2;
 		ApproximateGEDSimple ged;
 		Random r = new Random(456);
-		SimpleNodeLabelComparator nodeComparator;
+		
 		
 		editCosts = new HashMap<>();
 		editCosts.put(EditOperation.DELETE_NODE,1.0);
@@ -1738,8 +1734,7 @@ public class ApproximateGEDSimpleTest {
 		assertEquals(ret,retEditList1.getCost(), 0.001);
 
 		gRet = retEditList1.applyOperations(g1);
-		nodeComparator = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -1752,8 +1747,7 @@ public class ApproximateGEDSimpleTest {
 		assertTrue(retEditList1.getCost() > retEditList2.getCost());
 		
 		gRet = retEditList2.applyOperations(g1);
-		nodeComparator = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -1769,7 +1763,7 @@ public class ApproximateGEDSimpleTest {
 		EditList el, retEditList1, retEditList2;
 		ApproximateGEDSimple ged;
 		Random r = new Random(3456);
-		SimpleNodeLabelComparator nodeComparator;
+		
 		
 		editCosts = new HashMap<>();
 		editCosts.put(EditOperation.DELETE_NODE,1.0);
@@ -1810,8 +1804,7 @@ public class ApproximateGEDSimpleTest {
 		assertEquals(ret,retEditList1.getCost(),0.0001);
 		
 		gRet = retEditList1.applyOperations(g1);
-		nodeComparator = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -1826,8 +1819,7 @@ public class ApproximateGEDSimpleTest {
 		assertTrue(retList1.size() > retList2.size());
 		
 		gRet = retEditList2.applyOperations(g1);
-		nodeComparator = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -1843,7 +1835,7 @@ public class ApproximateGEDSimpleTest {
 		EditList el, retEditList1, retEditList2;
 		ApproximateGEDSimple ged;
 		Random r = new Random(3456);
-		SimpleNodeLabelComparator nodeComparator;
+		
 		
 		editCosts = new HashMap<>();
 		editCosts.put(EditOperation.DELETE_NODE,1.0);
@@ -1884,8 +1876,7 @@ public class ApproximateGEDSimpleTest {
 		assertEquals(ret,retEditList1.getCost(),0.0001);
 		
 		gRet = retEditList1.applyOperations(g1);
-		nodeComparator = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -1900,8 +1891,7 @@ public class ApproximateGEDSimpleTest {
 		assertTrue(retList1.size() > retList2.size());
 		
 		gRet = retEditList2.applyOperations(g1);
-		nodeComparator = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -1916,7 +1906,7 @@ public class ApproximateGEDSimpleTest {
 		EditList el, retEditList1, retEditList2;
 		ApproximateGEDSimple ged;
 		Random r = new Random(456);
-		SimpleNodeLabelComparator nodeComparator;
+		
 		
 		editCosts = new HashMap<>();
 		editCosts.put(EditOperation.DELETE_NODE,1.0);
@@ -1967,8 +1957,7 @@ public class ApproximateGEDSimpleTest {
 		assertEquals(ret,retEditList1.getCost(), 0.001);
 
 		gRet = retEditList1.applyOperations(g1);
-		nodeComparator = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -1981,8 +1970,7 @@ public class ApproximateGEDSimpleTest {
 		assertTrue(retEditList1.getCost() > retEditList2.getCost());
 		
 		gRet = retEditList2.applyOperations(g1);
-		nodeComparator = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -1998,7 +1986,7 @@ public class ApproximateGEDSimpleTest {
 		EditList el, retEditList1, retEditList2;
 		ApproximateGEDSimple ged;
 		Random r = new Random(3456);
-		SimpleNodeLabelComparator nodeComparator;
+		
 		
 		editCosts = new HashMap<>();
 		editCosts.put(EditOperation.DELETE_NODE,1.0);
@@ -2051,8 +2039,7 @@ public class ApproximateGEDSimpleTest {
 		assertEquals(ret,retEditList1.getCost(),0.0001);
 		
 		gRet = retEditList1.applyOperations(g1);
-		nodeComparator = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -2067,8 +2054,7 @@ public class ApproximateGEDSimpleTest {
 		assertTrue(retList1.size() > retList2.size());
 		
 		gRet = retEditList2.applyOperations(g1);
-		nodeComparator = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,nodeComparator));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -2547,7 +2533,6 @@ public class ApproximateGEDSimpleTest {
 		ApproximateGEDSimple ged;
 		EditOperation eo;		
 		EditList el, retEditList;
-		SimpleNodeLabelComparator nlc;
 		
 		editCosts = new HashMap<>();
 		editCosts.put(EditOperation.DELETE_NODE,1.0);
@@ -2598,8 +2583,7 @@ public class ApproximateGEDSimpleTest {
 		assertEquals(24.0,retEditList.getCost(),0.001);
 		
 		gRet = retEditList.applyOperations(g1);
-		nlc = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,nlc));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -2614,8 +2598,7 @@ public class ApproximateGEDSimpleTest {
 		assertEquals(21.0,retEditList.getCost(),0.001);
 		
 		gRet = retEditList.applyOperations(g1);
-		nlc = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,nlc));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -2631,7 +2614,6 @@ public class ApproximateGEDSimpleTest {
 		HashMap<Integer,Double> editCosts;
 		ApproximateGEDSimple ged;
 		EditList retEditList;
-		SimpleNodeLabelComparator nlc;
 		
 		editCosts = new HashMap<>();
 		editCosts.put(EditOperation.DELETE_NODE,1.0);
@@ -2654,8 +2636,7 @@ public class ApproximateGEDSimpleTest {
 		assertEquals(0.0,retEditList.getCost(),0.001);
 		
 		gRet = retEditList.applyOperations(g1);
-		nlc = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,nlc));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -2670,7 +2651,7 @@ public class ApproximateGEDSimpleTest {
 		assertEquals(0.0,retEditList.getCost(),0.001);
 		
 		gRet = retEditList.applyOperations(g1);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,nlc));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -2780,7 +2761,6 @@ public class ApproximateGEDSimpleTest {
 		HashMap<Integer,Double> editCosts;
 		ApproximateGEDSimple ged;
 		EditList el, retEditList1, retEditList2;
-		SimpleNodeLabelComparator nlc;
 		Random r = new Random(887766);
 		
 		editCosts = new HashMap<>();
@@ -2833,8 +2813,7 @@ public class ApproximateGEDSimpleTest {
 		assertEquals(ret,retEditList1.getCost(),0.001);
 		
 		gRet = retEditList1.applyOperations(g1);
-		nlc = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,nlc));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -2848,8 +2827,7 @@ public class ApproximateGEDSimpleTest {
 		assertTrue(retEditList2.getCost() < retEditList1.getCost());
 		
 		gRet = retEditList2.applyOperations(g1);
-		nlc = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,nlc));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -2864,7 +2842,6 @@ public class ApproximateGEDSimpleTest {
 		HashMap<Integer,Double> editCosts;
 		ApproximateGEDSimple ged;
 		EditList el, retEditList1, retEditList2;
-		SimpleNodeLabelComparator nlc;
 		Random r = new Random(443322);
 	
 		editCosts = new HashMap<>();
@@ -2917,8 +2894,7 @@ public class ApproximateGEDSimpleTest {
 		assertEquals(ret,retEditList1.getCost(),0.001);
 		
 		gRet = retEditList1.applyOperations(g1);
-		nlc = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,nlc));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -2932,8 +2908,7 @@ public class ApproximateGEDSimpleTest {
 		assertTrue(retEditList2.getCost() < retEditList1.getCost());
 		
 		gRet = retEditList2.applyOperations(g1);
-		nlc = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,nlc));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -2951,7 +2926,6 @@ public class ApproximateGEDSimpleTest {
 		HashMap<Integer,Double> editCosts;
 		ApproximateGEDSimple ged;
 		EditList el, retEditList2;
-		SimpleNodeLabelComparator nlc;
 		int maxNodes = 9;
 		int maxEdges = 8;
 	
@@ -3005,8 +2979,7 @@ public class ApproximateGEDSimpleTest {
 		
 		gRet = retEditList2.applyOperations(g1);
 		
-		nlc = new SimpleNodeLabelComparator(g2, gRet);
-		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,nlc));
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
@@ -3024,7 +2997,6 @@ public class ApproximateGEDSimpleTest {
 			HashMap<Integer,Double> editCosts;
 			ApproximateGEDSimple ged;
 			EditList el, retEditList1, retEditList2;
-			SimpleNodeLabelComparator nlc;
 			int maxNodes = 20;
 			int maxEdges = 80;
 		
@@ -3076,7 +3048,7 @@ public class ApproximateGEDSimpleTest {
 			retEditList1 = ged.getEditList();
 			gRet = retEditList1.applyOperations(g1);
 			
-			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,null));
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,false));
 			assertTrue(g1.checkConsistency());
 			assertTrue(g2.checkConsistency());
 			assertTrue(gRet.checkConsistency());
@@ -3086,7 +3058,7 @@ public class ApproximateGEDSimpleTest {
 			retEditList2 = ged.getEditList();
 			
 			gRet = retEditList2.applyOperations(g1);
-			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,null));
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,false));
 			assertTrue(g1.checkConsistency());
 			assertTrue(g2.checkConsistency());
 			assertTrue(gRet.checkConsistency());
@@ -3096,8 +3068,7 @@ public class ApproximateGEDSimpleTest {
 			retEditList1 = ged.getEditList();
 			gRet = retEditList1.applyOperations(g1);
 			
-			nlc = new SimpleNodeLabelComparator(g2, gRet);
-			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,nlc));
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
 			assertTrue(g1.checkConsistency());
 			assertTrue(g2.checkConsistency());
 			assertTrue(gRet.checkConsistency());
@@ -3107,8 +3078,7 @@ public class ApproximateGEDSimpleTest {
 			retEditList2 = ged.getEditList();
 			gRet = retEditList2.applyOperations(g1);
 			
-			nlc = new SimpleNodeLabelComparator(g2, gRet);
-			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,nlc));
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
 			assertTrue(g1.checkConsistency());
 			assertTrue(g2.checkConsistency());
 			assertTrue(gRet.checkConsistency());
@@ -3118,7 +3088,7 @@ public class ApproximateGEDSimpleTest {
 			retEditList1 = ged.getEditList();
 			gRet = retEditList1.applyOperations(g1);
 
-			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,null));
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,false));
 			assertTrue(g1.checkConsistency());
 			assertTrue(g2.checkConsistency());
 			assertTrue(gRet.checkConsistency());
@@ -3128,7 +3098,7 @@ public class ApproximateGEDSimpleTest {
 			retEditList2 = ged.getEditList();
 			gRet = retEditList2.applyOperations(g1);
 			
-			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,null));
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,false));
 			assertTrue(g1.checkConsistency());
 			assertTrue(g2.checkConsistency());
 			assertTrue(gRet.checkConsistency());
@@ -3137,9 +3107,8 @@ public class ApproximateGEDSimpleTest {
 			ged.similarity(g1, g2);
 			retEditList1 = ged.getEditList();
 			gRet = retEditList1.applyOperations(g1);
-			nlc = new SimpleNodeLabelComparator(g2, gRet);
 			
-			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,nlc));
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,true));
 			assertTrue(g1.checkConsistency());
 			assertTrue(g2.checkConsistency());
 			assertTrue(gRet.checkConsistency());
@@ -3148,9 +3117,8 @@ public class ApproximateGEDSimpleTest {
 			ged.similarity(g1, g2);
 			retEditList2 = ged.getEditList();
 			gRet = retEditList2.applyOperations(g1);
-			nlc = new SimpleNodeLabelComparator(g2, gRet);
 			
-			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,nlc));
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,true));
 			assertTrue(g1.checkConsistency());
 			assertTrue(g2.checkConsistency());
 			assertTrue(gRet.checkConsistency());

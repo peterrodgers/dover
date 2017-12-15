@@ -7,10 +7,8 @@ import uk.ac.kent.dover.fastGraph.comparators.*;
 import uk.ac.kent.displayGraph.Graph;
 
 /**
- * Testing the structural similarity of two FastGraphs
- * 
- * TODO Its a bit slow on sparse graphs, needs to break down disconnected components
- * and test them separately for better performance.
+ * Testing the structural similarity of two FastGraphs. Now splits the graph
+ * into connected components and tests individual components.
  * 
  * @author Peter Rodgers
  *
@@ -21,13 +19,16 @@ public class ExactIsomorphism {
 	
 	private FastGraph fastGraph;
 	private boolean directed; // if true, treat the graph as directed, false undirected
-	private NodeComparator nodeComparator; // if not null, use to test matching nodes
+	private boolean nodeLabels; // if true, use node label comparison, if false ignore node labels
+	ArrayList<FastGraph> connectedList1;
 	private AdjacencyMatrix am1;
 	private AdjacencyMatrix am2;
 	private int[][] matrix1;
 	private int[][] matrix2;
 	private double[] eigenvalues1;
 	private double[] eigenvalues2;
+	
+	private SimpleNodeLabelComparator nodeLabelComparator;
 	
 	private int[] matches1;
 	private int[] matches2;
@@ -76,6 +77,7 @@ public class ExactIsomorphism {
 	private static long isomorphismStartTime = -1;
 	private static long bruteForceStartTime = -1;
 	
+	private static int failOnConnectedness = 0;
 	private static int failOnNodeCount = 0;
 	private static int failOnEdgeCount = 0;
 	private static int failOnEigenvalues = 0;
@@ -91,7 +93,7 @@ public class ExactIsomorphism {
 		ExactIsomorphism ei;
 		
 		try {
-
+			
 			int nodes = 50;
 			int edges = 500;
 			long time;
@@ -99,14 +101,6 @@ public class ExactIsomorphism {
 				g1 = FastGraph.randomGraphFactory(nodes, edges, false);
 				g2 = ExactIsomorphism.generateRandomIsomorphicGraph(g1, System.currentTimeMillis(), false);
 				time = System.currentTimeMillis();
-/*				if(ExactIsomorphism.isomorphic(g1, g2, false)) {
-					System.out.println("Ids changed undirected isomorphic nodes "+nodes+" edges "+edges+" time "+(System.currentTimeMillis()-time)/1000.0);
-				} else {
-					System.out.println("NOT ISOMORPHIC Ids changed undirected isomorphic nodes "+nodes+" edges "+edges+" time "+(System.currentTimeMillis()-time)/1000.0+" saving");
-					g1.saveBuffers(".", System.currentTimeMillis()+"A");
-					g2.saveBuffers(".", System.currentTimeMillis()+"A");
-				}
-*/				time = System.currentTimeMillis();
 				if(ExactIsomorphism.isomorphic(g1, g2, true)) {
 					System.out.println("Ids changed directed isomorphic nodes "+nodes+" edges "+edges+" time "+(System.currentTimeMillis()-time)/1000.0);
 				} else {
@@ -153,7 +147,7 @@ public class ExactIsomorphism {
 
 		this.fastGraph = fastGraph;
 		this.directed = false;
-		this.nodeComparator = null;
+		this.nodeLabels = false;
 		init();
 	}
 
@@ -171,7 +165,7 @@ public class ExactIsomorphism {
 
 		this.fastGraph = fastGraph;
 		this.directed = directed;
-		this.nodeComparator = null;
+		this.nodeLabels = false;
 		init();
 	}
 	
@@ -187,11 +181,11 @@ public class ExactIsomorphism {
 	 * @param nodeComparator if set, used to compare the node attributes for a match, if null, only the topology is tested, node attributes will not affect matching.
 	 * g1 in the node comparator should be the first parameter, g2 should be the graph to be tested for isomorphism
 	 */
-	public ExactIsomorphism(FastGraph fastGraph, boolean directed, NodeComparator nodeComparator) {
+	public ExactIsomorphism(FastGraph fastGraph, boolean directed, boolean nodeLabels) {
 
 		this.fastGraph = fastGraph;
 		this.directed = directed;
-		this.nodeComparator = nodeComparator;
+		this.nodeLabels = nodeLabels;
 		init();
 	}
 	
@@ -201,6 +195,8 @@ public class ExactIsomorphism {
 	 */
 	private void init() {
 
+		connectedList1 = fastGraph.breakIntoConnectedComponents();
+		
 		am1 = new AdjacencyMatrix(fastGraph);
 		if(fastGraph.getNumberOfNodes() == 0) {
 			matrix1 = new int[0][0];
@@ -260,6 +256,58 @@ public class ExactIsomorphism {
 	 * @return true if there is an equality with the given graph, null if is not.
 	 */
 	public boolean isomorphic(FastGraph g) {
+		ArrayList<FastGraph> connectedList2 = g.breakIntoConnectedComponents();
+		if(connectedList1.size() != connectedList2.size()) {
+Debugger.log("Not isomorphic: different number of nodes");
+failOnConnectedness++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;		
+			return false;
+		}
+		
+		if(connectedList1.size() == 1) {
+			return(isomorphicConnected(g));
+		}
+
+		// if there are multiple components, we have to iterate through them
+		// this discards all the speed up in init(), which might be fixed later
+		for(FastGraph g1 : connectedList1) {
+			boolean found = false;
+			int foundIndex = 0;
+			for(FastGraph g2 : connectedList2) {
+				ExactIsomorphism ei = new ExactIsomorphism(g1,directed,nodeLabels);
+				if(ei.isomorphic(g2)) {
+					found = true;
+					break;
+				}
+				foundIndex++;
+			}
+			if(!found) {
+				return false;
+			} else {
+				connectedList2.remove(foundIndex);
+			}
+
+		}
+		
+		return true;
+		
+	}
+	
+	/**
+	 * Will actually return isomorphism of any graph, connected or disconnected
+	 * but is inefficient for sparse graphs.
+	 * 
+	 * @param g
+	 * @return
+	 */
+	private boolean isomorphicConnected(FastGraph g) {
+		
+		nodeLabelComparator = null;
+		if(nodeLabels) {
+			nodeLabelComparator = new SimpleNodeLabelComparator(fastGraph, g);
+		}
+		
 		boolean ret = true;
 		if(directed) {
 			ret = directedIsomorphic(g);
@@ -267,6 +315,7 @@ public class ExactIsomorphism {
 			ret = undirectedIsomorphic(g);
 		}
 		return ret;
+		
 	}
 
 
@@ -284,7 +333,7 @@ isomorphismStartTime = System.currentTimeMillis();
 
 		FastGraph g1 = fastGraph;
 		FastGraph g2 = g;
-		
+
 		int numberOfNodes1 = g1.getNumberOfNodes();
 		int numberOfNodes2 = g2.getNumberOfNodes();
 
@@ -304,12 +353,14 @@ isomorphismStartTime = -1;
 			return true;
 		}
 
-		if(!Connected.connected(g1) && Connected.connected(g2)) {
-			return false;
-		}
-		if(Connected.connected(g1) && !Connected.connected(g2)) {
-			return false;
-		}
+		// commented out because the connected components code subsumes this
+		// Connected c = new Connected();
+		//if(!c.connected(g1) && c.connected(g2)) {
+		//	return false;
+		//}
+		//if(c.connected(g1) && !c.connected(g2)) {
+		//	return false;
+		//}
 
 		if(numberOfNodes1 != numberOfNodes2) {
 Debugger.log("Not isomorphic: different number of nodes");
@@ -374,8 +425,8 @@ if(isomorphismStartTime == -1) {
 				if(degrees1[n1] != degrees2[n2]) { // make sure the number of connecting edges is equal
 					continue;
 				}
-				if(nodeComparator != null) {
-					if(nodeComparator.compare(n1, n2) != 0) {
+				if(nodeLabels) {
+					if(nodeLabelComparator.compare(n1, n2) != 0) {
 						continue;
 					}
 				}
@@ -506,8 +557,8 @@ bruteForceStartTime = -1;
 				return false;
 			}
 			
-			if(nodeComparator != null) {
-				if(nodeComparator.compare(node, matchNode) != 0) { // the matched neighbours have different labels
+			if(nodeLabels) {
+				if(nodeLabelComparator.compare(node, matchNode) != 0) { // the matched neighbours have different labels
 					return false;
 				}
 			}
@@ -581,12 +632,14 @@ isomorphismStartTime = -1;
 			return true;
 		}
 
-		if(!Connected.connected(g1) && Connected.connected(g2)) {
-			return false;
-		}
-		if(Connected.connected(g1) && !Connected.connected(g2)) {
-			return false;
-		}
+		// commented out because the connected components code subsumes this
+		//Connected c = new Connected();
+		//if(!c.connected(g1) && c.connected(g2)) {
+		//	return false;
+		//}
+		//if(c.connected(g1) && !c.connected(g2)) {
+		//	return false;
+		//}
 
 		if(numberOfNodes1 != numberOfNodes2) {
 Debugger.log("Not isomorphic: different number of nodes");
@@ -665,8 +718,8 @@ if(isomorphismStartTime == -1) {
 				if(outDegrees1[n1] != outDegrees2[n2]) { // make sure the number of connecting out edges is equal
 					continue;
 				}
-				if(nodeComparator != null) {
-					if(nodeComparator.compare(n1, n2) != 0) {
+				if(nodeLabels) {
+					if(nodeLabelComparator.compare(n1, n2) != 0) {
 						continue;
 					}
 				}
@@ -793,8 +846,8 @@ bruteForceStartTime = -1;
 				return false;
 			}
 			
-			if(nodeComparator != null) {
-				if(nodeComparator.compare(node, matchNode) != 0) { // the matched neighbours have different labels
+			if(nodeLabels) {
+				if(nodeLabelComparator.compare(node, matchNode) != 0) { // the matched neighbours have different labels
 					return false;
 				}
 			}
@@ -845,8 +898,8 @@ bruteForceStartTime = -1;
 				return false;
 			}
 			
-			if(nodeComparator != null) {
-				if(nodeComparator.compare(node, matchNode) != 0) { // the matched neighbours have different labels
+			if(nodeLabels) {
+				if(nodeLabelComparator.compare(node, matchNode) != 0) { // the matched neighbours have different labels
 					return false;
 				}
 			}
@@ -1055,8 +1108,8 @@ bruteForceStartTime = -1;
 	 * g1 and g2 in the node comparator should correspond to the first and second parameter, respectively.
 	 * @return true if g1 and g2 are isomorphic, false otherwise
 	 */
-	public static boolean isomorphic(FastGraph g1, FastGraph g2, boolean directed, NodeComparator nodeComparator) {
-		ExactIsomorphism ei = new ExactIsomorphism(g1,directed,nodeComparator);
+	public static boolean isomorphic(FastGraph g1, FastGraph g2, boolean directed, boolean nodeLabels) {
+		ExactIsomorphism ei = new ExactIsomorphism(g1,directed,nodeLabels);
 		boolean ret = ei.isomorphic(g2);
 		return ret;
 	}
@@ -1212,8 +1265,9 @@ bruteForceStartTime = -1;
 	 */
 	public static void reportFailRatios() {
 		
-		double total = failOnNodeCount+failOnEdgeCount+failOnEigenvalues+failOnDegreeComparison+failOnNodeMatches+failOnBruteForce+succeed;
+		double total = failOnConnectedness+failOnNodeCount+failOnEdgeCount+failOnEigenvalues+failOnDegreeComparison+failOnNodeMatches+failOnBruteForce+succeed;
 		
+		System.out.println("fail on Connectedness "+failOnConnectedness+" "+(100.0*failOnConnectedness/total)+" % of calls");
 		System.out.println("fail on Node Count "+failOnNodeCount+" "+(100.0*failOnNodeCount/total)+" % of calls");
 		System.out.println("fail on Edge Count "+failOnEdgeCount+" "+(100.0*failOnEdgeCount/total)+" % of calls");
 		System.out.println("fail on Degree Comparison "+failOnDegreeComparison+" "+(100.0*failOnDegreeComparison/total)+" % of calls");

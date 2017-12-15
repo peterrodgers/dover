@@ -53,7 +53,8 @@ public class EnumerateSubgraphRandom {
 			//convert and add FastGraph
 			FastGraph sub = g.generateGraphFromSubgraph(Util.convertLinkedList(nodes), Util.convertHashSet(edges));
 			
-			if(Connected.connected(sub)) {
+			Connected c = new Connected();
+			if(c.connected(sub)) {
 				ret.add(sub);
 				subgraphsFound++;
 			} else {

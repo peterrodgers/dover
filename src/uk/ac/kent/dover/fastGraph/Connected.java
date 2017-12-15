@@ -9,14 +9,25 @@ import java.util.LinkedList;
 */
 public class Connected {
 	
+	// holds the nodes that have been visited
+	private LinkedList<Integer> visitedNodes;
+	
 	/**
 	 *
 	 * Create a Connected before running {@link #connected(FastGraph) connected}.
 	 *
 	 */
 	public Connected() {
-
 	}
+
+	/**
+	 * Call this after calling @link{connected}.
+	 * 
+	 * @return returns a list of nodes that form a connected component of the graph
+	 */
+	public LinkedList<Integer> getVisitedNodes() {return visitedNodes;}
+
+
 	
 	
 	/** Breadth first search through the graph.
@@ -27,9 +38,11 @@ public class Connected {
 	 * 
 	 * @return true if the graph is connected, false otherwise. Empty graphs are connected.
 	 */
-	public static boolean connected(FastGraph g) {
+	public boolean connected(FastGraph g) {
 
 		int numberOfNodes = g.getNumberOfNodes();
+		
+		visitedNodes = new LinkedList<Integer>();
 		
 		boolean[] nodeFlag = new boolean[numberOfNodes];
 		
@@ -46,6 +59,7 @@ public class Connected {
 		while(queue.size() != 0) {
 			int currentNode = queue.removeFirst();
 			nodeCount++;
+			visitedNodes.add(currentNode);
 			
 			int connectionOffset = g.getNodeBuf().getInt(FastGraph.NODE_IN_CONNECTION_START_OFFSET+currentNode*FastGraph.NODE_BYTE_SIZE);
 			int degree = g.getNodeDegree(currentNode);
@@ -67,6 +81,7 @@ public class Connected {
 		}	
 		return allVisited;
 	}
+
 
 
 

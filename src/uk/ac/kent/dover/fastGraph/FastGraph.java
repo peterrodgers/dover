@@ -5064,8 +5064,126 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		return g;
 
 	}
+
+
+	/**
+	 * @return a list of connected components
+	 */
+	public ArrayList<FastGraph> breakIntoConnectedComponents() {
+		ArrayList<FastGraph> ret = new ArrayList<>();
+		Connected c = new Connected();
+		
+		FastGraph g = this;
+		int i = 0;
+		while(g.getNumberOfNodes() > 0) {
+			
+			// first build the new connected component
+			c.connected(g);
+			LinkedList<Integer> connectedNodes = c.getVisitedNodes();
+			
+			HashSet<Integer> connectedNodeSet = new HashSet(connectedNodes.size()*3); // to speed up contains test
+			ArrayList<NodeStructure> nsList = new ArrayList<>();
+			ArrayList<EdgeStructure> esList = new ArrayList<>();
+			HashMap<Integer,Integer> nodeMapping = new HashMap<>(); // mapping from old to new node ids
+
+			int id = 0;
+			for(Integer n : connectedNodes) {
+				NodeStructure ns = g.generateNodeStructure(n);
+				ns.setId(id);
+				nsList.add(ns);
+
+				nodeMapping.put(n, id);
+				connectedNodeSet.add(n);
+				id++;
+			}
+
+			// this could be done through running through connected edges of connectedNodes
+			// but this will do for now
+			for(int e = 0; e < g.getNumberOfEdges(); e++) {
+				int node1 = g.getEdgeNode1(e);
+				int node2 = g.getEdgeNode2(e);
+				if(connectedNodeSet.contains(node1)) {
+					EdgeStructure es = g.generateEdgeStructure(e);
+					es.setNode1(nodeMapping.get(node1));
+					es.setNode2(nodeMapping.get(node2));
+					esList.add(es);
+				}
+			}
+			FastGraph gSub = structureFactory(g.getName()+"-"+i,g.getGeneration(),nsList,esList,g.getDirect());
+			ret.add(gSub);
+			
+			// now take the rest of the graph and form the subgraph
+			
+			nsList = new ArrayList<>();
+			esList = new ArrayList<>();
+			nodeMapping = new HashMap<>(); // mapping from old to new node ids
+			id = 0;
+			for(int n = 0; n < g.getNumberOfNodes(); n++) {
+				if(connectedNodeSet.contains(n)) {
+					continue;
+				}
+				NodeStructure ns = g.generateNodeStructure(n);
+				ns.setId(id);
+				nsList.add(ns);
+
+				nodeMapping.put(n, id);
+				id++;
+			}
+
+			for(int e = 0; e < g.getNumberOfEdges(); e++) {
+				int node1 = g.getEdgeNode1(e);
+				int node2 = g.getEdgeNode2(e);
+				if(!connectedNodeSet.contains(node1)) {
+					EdgeStructure es = g.generateEdgeStructure(e);
+					es.setNode1(nodeMapping.get(node1));
+					es.setNode2(nodeMapping.get(node2));
+					esList.add(es);
+				}
+			}
+
+			g = structureFactory(g.getName(),g.getGeneration(),nsList,esList,g.getDirect());
+			
+			i++;
+		}
+
+		return ret;
+	}
 	
+	/**
+	 * 
+	 * @param n the node to base the NodeStructure on.
+	 * @return the new NodeStructure with the node info.
+	 */
+	public NodeStructure generateNodeStructure(Integer n) {
+		String label = getNodeLabel(n);
+		int weight = getNodeWeight(n);
+		byte type = getNodeType(n);
+		byte age = getNodeAge(n);
+		NodeStructure ns = new NodeStructure(n,label,weight,type,age);
+		return ns;
+	}
+
 	
+	/**
+	 * 
+	 * @param e the edge to base the EdgeStructure on.
+	 * @return the new EdgeStructure with the node info.
+	 */
+	public EdgeStructure generateEdgeStructure(Integer e) {
+		String label = getEdgeLabel(e);
+		int weight = getEdgeWeight(e);
+		byte type = getEdgeType(e);
+		byte age = getEdgeAge(e);
+		int node1 = getEdgeNode1(e);
+		int node2 = getEdgeNode2(e);
+		EdgeStructure es = new EdgeStructure(e,label,weight,type,age,node1,node2);
+		return es;
+	}
+
+
+	/**
+	 * @return the graph information as a human readable String.
+	 */
 	public String toString() {
 		
 		StringBuffer sb = new StringBuffer("name: "+name+" number of Nodes: "+numberOfNodes+" number of Edges: "+numberOfEdges+"\n");
@@ -5080,5 +5198,6 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		return sb.toString();
 		
 	}
-	
+
+
 }
