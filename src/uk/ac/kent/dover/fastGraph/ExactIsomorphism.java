@@ -21,6 +21,7 @@ public class ExactIsomorphism {
 	private boolean directed; // if true, treat the graph as directed, false undirected
 	private boolean nodeLabels; // if true, use node label comparison, if false ignore node labels
 	ArrayList<FastGraph> connectedList1;
+	ArrayList<ExactIsomorphism> eiList1;
 	private AdjacencyMatrix am1;
 	private AdjacencyMatrix am2;
 	private int[][] matrix1;
@@ -28,6 +29,7 @@ public class ExactIsomorphism {
 	private double[] eigenvalues1;
 	private double[] eigenvalues2;
 	
+	private boolean connected; // set in init() if the graph is connected
 	private SimpleNodeLabelComparator nodeLabelComparator;
 	
 	private int[] matches1;
@@ -40,7 +42,6 @@ public class ExactIsomorphism {
 	private int[] inDegrees2;
 	private int[] outDegrees1;
 	private int[] outDegrees2;
-
 
 	private int[] degreeBuckets1; // how many of nodes each degree
 	private int[] degreeBuckets2; // how many of nodes each degree
@@ -195,7 +196,18 @@ public class ExactIsomorphism {
 	 */
 	private void init() {
 
-		connectedList1 = fastGraph.breakIntoConnectedComponents();
+		Connected c = new Connected();
+		connected = c.connected(fastGraph);
+		
+		if(!connected) {
+			connectedList1 = fastGraph.breakIntoConnectedComponents();
+			eiList1 = new ArrayList<>();
+			for(FastGraph g : connectedList1) {
+				ExactIsomorphism ei = new ExactIsomorphism(g,directed,nodeLabels);
+				eiList1.add(ei);
+				
+			}
+		}
 		
 		am1 = new AdjacencyMatrix(fastGraph);
 		if(fastGraph.getNumberOfNodes() == 0) {
@@ -256,26 +268,31 @@ public class ExactIsomorphism {
 	 * @return true if there is an equality with the given graph, null if is not.
 	 */
 	public boolean isomorphic(FastGraph g) {
-		ArrayList<FastGraph> connectedList2 = g.breakIntoConnectedComponents();
-		if(connectedList1.size() != connectedList2.size()) {
-Debugger.log("Not isomorphic: different number of nodes");
-failOnConnectedness++;
-timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
-isomorphismStartTime = -1;		
-			return false;
-		}
 		
-		if(connectedList1.size() == 1) {
+		if(connected) {
 			return(isomorphicConnected(g));
 		}
 
+		ArrayList<FastGraph> connectedList2 = g.breakIntoConnectedComponents();
+		if(connectedList1.size() != connectedList2.size()) {
+Debugger.log("Not isomorphic: different number of connected components");
+failOnConnectedness++;
+timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
+isomorphismStartTime = -1;
+			return false;
+		}
+		
 		// if there are multiple components, we have to iterate through them
 		// this discards all the speed up in init(), which might be fixed later
-		for(FastGraph g1 : connectedList1) {
+		
+		for(int i = 0; i < connectedList1.size(); i++) {
+			
+			FastGraph g1 = connectedList1.get(i);
+			ExactIsomorphism ei = eiList1.get(i);
+			
 			boolean found = false;
 			int foundIndex = 0;
 			for(FastGraph g2 : connectedList2) {
-				ExactIsomorphism ei = new ExactIsomorphism(g1,directed,nodeLabels);
 				if(ei.isomorphic(g2)) {
 					found = true;
 					break;

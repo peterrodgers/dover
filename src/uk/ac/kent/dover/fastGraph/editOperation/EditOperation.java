@@ -46,7 +46,22 @@ public class EditOperation {
 		this.n1 = n1;
 		this.n2 = n2;
 	}
-	
+
+	/**
+	 * Create an EditOperation just like the parameter.
+	 * 
+	 * @param eo the edit operation to copy.
+	 */
+	public EditOperation(EditOperation eo) {
+		this.operationCode = eo.operationCode;
+		this.cost = eo.cost;
+		this.id = eo.id;
+		this.label = eo.label;
+		this.n1 = eo.n1;
+		this.n2 = eo.n2;
+	}
+
+
 
 	/**
 	 * @return the cost of the operation
@@ -77,6 +92,42 @@ public class EditOperation {
 	 * @return the target node of the edge to be added
 	 */
 	public int getN2() {return n2;}
+
+	/**
+	 * 
+	 * @param operationCode the new operation code
+	 */
+	public void setOperationCode(int operationCode) {this.operationCode = operationCode;}
+
+	/**
+	 * 
+	 * @param cost the new cost
+	 */
+	public void setCost(double cost) {this.cost = cost;}
+	/**
+	 * 
+	 * @param id the new id
+	 */
+	public void setId(int id) {this.id = id;}
+	
+	/**
+	 * 
+	 * @param label the new label
+	 */
+	public void setLabel(String label) {this.label = label;}
+	
+	/**
+	 * 
+	 * @param n1 the new n1
+	 */
+	public void setN1(int n1) {this.n1 = n1;}
+	
+	/**
+	 * 
+	 * @param n2 the new n2
+	 */
+	public void setN2(int n2) {this.n2 = n2;}
+
 
 	/**
 	 * Call this to apply the edit to a graph.

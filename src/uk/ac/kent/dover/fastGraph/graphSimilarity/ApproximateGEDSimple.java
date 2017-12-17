@@ -16,6 +16,7 @@ import uk.ac.kent.dover.fastGraph.editOperation.*;
 public class ApproximateGEDSimple extends GraphEditDistance {
 
 	private boolean nodeLabels;
+	private boolean directed;
 	
 	private long nodeSwapTimeLimit;
 	private int nodeSwapAttempts;
@@ -38,6 +39,7 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 	private LinkedList<Integer> addEdgeNode2List; // g1 new node2 to be added
 	
 	private ReverseIntegerComparator reverseComparator = new ReverseIntegerComparator();
+	HashMap<Integer,Double> editCosts;
 	
 	private Random random;
 
@@ -71,7 +73,7 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 				
 				int edges = nodes*10;
 				
-				g1 = FastGraph.randomGraphFactory(nodes, edges, 7777,false);
+				g1 = FastGraph.randomGraphFactory(nodes, edges, 7777, false);
 				
 				g2 = FastGraph.randomGraphFactory(nodes, edges, 5555, false);
 				
@@ -141,8 +143,10 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 	 * @throws FastGraphException if an edit operation cost is missing
 	 */
 	public ApproximateGEDSimple(HashMap<Integer,Double> editCosts) throws FastGraphException {
-		super(editCosts);
 		
+		super();
+		this.editCosts = editCosts;
+		this.directed = false;
 		this.nodeLabels = false;
 		this.nodeSwapTimeLimit = 0;
 		this.nodeSwapAttempts = 0;
@@ -161,8 +165,10 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 	 * @throws FastGraphException if an edit operation cost is missing
 	 */
 	public ApproximateGEDSimple(boolean directed, boolean nodeLabels, HashMap<Integer,Double> editCosts) throws FastGraphException {
-		super(directed,editCosts);
-		
+
+		super();
+		this.editCosts = editCosts;
+		this.directed = directed;
 		this.nodeLabels = nodeLabels;
 		this.nodeSwapTimeLimit = 0;
 		this.nodeSwapAttempts = 0;
@@ -189,11 +195,12 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 	 * @throws FastGraphException if an edit operation cost is missing or if both limits are -1
 	 */
 	public ApproximateGEDSimple(boolean directed, boolean nodeLabels, HashMap<Integer,Double> editCosts, long nodeSwapTimeLimit, int nodeSwapAttempts, long randomSeed) throws FastGraphException {
-		super(directed,editCosts);
-
+		super();
+		this.editCosts = editCosts;
 		if(nodeSwapTimeLimit == -1 && nodeSwapAttempts == -1) {
 			throw new FastGraphException("Cannot have both nodeSwapTimeLimit and nodeSwapAttempts set to unlimited.");
 		}
+		this.directed = directed;
 		this.nodeLabels = nodeLabels;
 		this.nodeSwapTimeLimit = nodeSwapTimeLimit;
 		if(nodeSwapTimeLimit == -1) {

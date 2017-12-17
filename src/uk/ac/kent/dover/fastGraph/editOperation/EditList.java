@@ -27,6 +27,7 @@ public class EditList {
 	 */
 	public EditList(EditList el) {
 		editList = new LinkedList<EditOperation>(el.getEditList());
+		cost = el.getCost();
 	}
 
 	/**
@@ -79,9 +80,9 @@ public class EditList {
 
  	/**
  	 * 
- 	 * @return returns only theh delete node operations
+ 	 * @return returns only the delete node operations
  	 */
- 	public List<EditOperation> findDeleteNodeOperations () {
+ 	public List<EditOperation> findDeleteNodeOperations() {
  		LinkedList<EditOperation> ret = new LinkedList<>();
  		
  		for(EditOperation eo : editList) {
@@ -95,9 +96,9 @@ public class EditList {
 
  	/**
  	 * 
- 	 * @return returns only theh add node operations
+ 	 * @return returns only the add node operations
  	 */
- 	public List<EditOperation> findAddNodeOperations () {
+ 	public List<EditOperation> findAddNodeOperations() {
  		LinkedList<EditOperation> ret = new LinkedList<>();
  		
  		for(EditOperation eo : editList) {
@@ -111,9 +112,9 @@ public class EditList {
 
  	/**
  	 * 
- 	 * @return returns only theh delete edge operations
+ 	 * @return returns only the delete edge operations
  	 */
- 	public List<EditOperation> findDeleteEdgeOperations () {
+ 	public List<EditOperation> findDeleteEdgeOperations() {
  		LinkedList<EditOperation> ret = new LinkedList<>();
  		
  		for(EditOperation eo : editList) {
@@ -127,13 +128,29 @@ public class EditList {
 
  	/**
  	 * 
- 	 * @return returns only theh add edge operations
+ 	 * @return returns only the add edge operations
  	 */
- 	public List<EditOperation> findAddEdgeOperations () {
+ 	public List<EditOperation> findAddEdgeOperations() {
  		LinkedList<EditOperation> ret = new LinkedList<>();
  		
  		for(EditOperation eo : editList) {
  			if(eo.getOperationCode() == EditOperation.ADD_EDGE) {
+ 				ret.add(eo);
+ 			}
+ 		}
+ 		
+ 		return ret;
+ 	}
+
+ 	/**
+ 	 * 
+ 	 * @return returns only the relabel node operations
+ 	 */
+ 	public List<EditOperation> findRelabelNodeOperations() {
+ 		LinkedList<EditOperation> ret = new LinkedList<>();
+ 		
+ 		for(EditOperation eo : editList) {
+ 			if(eo.getOperationCode() == EditOperation.RELABEL_NODE) {
  				ret.add(eo);
  			}
  		}

@@ -11,7 +11,6 @@ import uk.ac.kent.dover.fastGraph.editOperation.*;
  */
 public abstract class GraphEditDistance extends GraphSimilarity {
 
-	HashMap<Integer,Double> editCosts;
 	EditList editList;
 
 
@@ -25,25 +24,6 @@ public abstract class GraphEditDistance extends GraphSimilarity {
 		super();
 	}
 	
-	
-	/**
-	 * defaults to treating graph as undirected.
-	 * 
-	 * @param editOperations gives the allowed operations and their cost
-	 */
-	public GraphEditDistance(HashMap<Integer,Double> editCosts) {
-		super();
-		this.editCosts = editCosts;
-	}
-
-	/**
-	 * @param directed true if the graph should be treated as directed, false if undirected
-	 * @param editOperations gives the allowed operations by edit code and their cost
-	 */
-	public GraphEditDistance(boolean directed,HashMap<Integer,Double> editCosts) {
-		super(directed);
-		this.editCosts = editCosts;
-	}
 
 	/**
 	 * Apply this after calling @see{similarity}.
