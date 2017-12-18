@@ -465,17 +465,18 @@ public class ExactGEDAStarIsoTest {
 	
 	@Test
 	public void test011() throws Exception {
+		double maxCost = 80.0;
 		int count = 0;
 		while(count < 10) {
 			count++;
-			long seed = 22114433;
+			long seed = 8866*count;
 			Random r = new Random(seed);
 			FastGraph g1,g2,gRet;
 			HashMap<Integer,Double> editCosts;
 			ExactGEDAStarIso ged;
 			EditList el, retEditList1;
-			int maxNodes = 4;
-			int maxEdges = 7;
+			int maxNodes = 3;
+			int maxEdges = 4;
 		
 			editCosts = new HashMap<>();
 			editCosts.put(EditOperation.DELETE_NODE,11.0);
@@ -521,6 +522,7 @@ public class ExactGEDAStarIsoTest {
 			g2 = el.applyOperations(g2);
 
 			ged = new ExactGEDAStarIso(false,false,editCosts);
+			ged.setMaxCost(maxCost);
 			ged.similarity(g1, g2);
 			retEditList1 = ged.getEditList();
 			gRet = retEditList1.applyOperations(g1);
@@ -531,6 +533,7 @@ public class ExactGEDAStarIsoTest {
 			assertTrue(gRet.checkConsistency());
 
 			ged = new ExactGEDAStarIso(false,true,editCosts);
+			ged.setMaxCost(maxCost);
 			ged.similarity(g1, g2);
 			retEditList1 = ged.getEditList();
 			gRet = retEditList1.applyOperations(g1);
@@ -541,6 +544,7 @@ public class ExactGEDAStarIsoTest {
 			assertTrue(gRet.checkConsistency());
 
 			ged = new ExactGEDAStarIso(true,false,editCosts);
+			ged.setMaxCost(maxCost);
 			ged.similarity(g1, g2);
 			retEditList1 = ged.getEditList();
 			gRet = retEditList1.applyOperations(g1);
@@ -551,6 +555,7 @@ public class ExactGEDAStarIsoTest {
 			assertTrue(gRet.checkConsistency());
 
 			ged = new ExactGEDAStarIso(true,true,editCosts);
+			ged.setMaxCost(maxCost);
 			ged.similarity(g1, g2);
 			retEditList1 = ged.getEditList();
 			gRet = retEditList1.applyOperations(g1);
