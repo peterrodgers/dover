@@ -12,6 +12,12 @@ import uk.ac.kent.dover.fastGraph.editOperation.*;
 import uk.ac.kent.dover.fastGraph.graphSimilarity.ApproximateGEDSimple;
 import uk.ac.kent.dover.fastGraph.graphSimilarity.ExactGEDAStarIso;
 
+/**
+ * Tests for the ExactGDAAStarIso class
+ * 
+ * @author Peter Rodgers
+ *
+ */
 public class ExactGEDAStarIsoTest {
 
 	
@@ -139,6 +145,8 @@ public class ExactGEDAStarIsoTest {
 		assertEquals(0,retEditList.findDeleteEdgeOperations().size());
 		assertEquals(0,retEditList.findAddEdgeOperations().size());
 
+		ged = new ExactGEDAStarIso(false,false,editCosts);
+		
 		gRet = retEditList.applyOperations(g1);
 		assertTrue(ExactIsomorphism.isomorphic(gRet,g2,false));
 		assertTrue(g1.checkConsistency());
@@ -149,7 +157,6 @@ public class ExactGEDAStarIsoTest {
 		ret = ged.similarity(g2, g1);
 		retEditList = ged.getEditList();
 		retList = retEditList.getEditList();
-
 		assertEquals(retEditList.getCost(), ret, 0.001);
 		assertEquals(3,retEditList.getCost(), 0.001);
 		assertEquals(1,retList.size());
@@ -225,6 +232,7 @@ public class ExactGEDAStarIsoTest {
 		assertTrue(g2.checkConsistency());
 		assertTrue(gRet.checkConsistency());
 		
+		ged = new ExactGEDAStarIso(false,false,editCosts);
 
 		ret = ged.similarity(g2, g1);
 		retEditList = ged.getEditList();
@@ -463,7 +471,6 @@ public class ExactGEDAStarIsoTest {
 	
 	@Test
 	public void test011() throws Exception {
-		double maxCost = 80.0;
 		int count = 0;
 		while(count < 10) {
 			count++;
@@ -522,7 +529,6 @@ public class ExactGEDAStarIsoTest {
 			g2 = el.applyOperations(g2);
 
 			ged = new ExactGEDAStarIso(false,false,editCosts);
-			ged.setMaxCost(maxCost);
 			ged.similarity(g1, g2);
 			retEditList1 = ged.getEditList();
 			gRet = retEditList1.applyOperations(g1);
@@ -537,7 +543,6 @@ public class ExactGEDAStarIsoTest {
 			assertTrue(gRet.checkConsistency());
 
 			ged = new ExactGEDAStarIso(false,true,editCosts);
-			ged.setMaxCost(maxCost);
 			ged.similarity(g1, g2);
 			retEditList1 = ged.getEditList();
 			gRet = retEditList1.applyOperations(g1);
@@ -552,7 +557,6 @@ public class ExactGEDAStarIsoTest {
 			assertTrue(gRet.checkConsistency());
 
 			ged = new ExactGEDAStarIso(true,false,editCosts);
-			ged.setMaxCost(maxCost);
 			ged.similarity(g1, g2);
 			retEditList1 = ged.getEditList();
 			gRet = retEditList1.applyOperations(g1);
@@ -567,7 +571,6 @@ public class ExactGEDAStarIsoTest {
 			assertTrue(gRet.checkConsistency());
 
 			ged = new ExactGEDAStarIso(true,true,editCosts);
-			ged.setMaxCost(maxCost);
 			ged.similarity(g1, g2);
 			retEditList1 = ged.getEditList();
 			gRet = retEditList1.applyOperations(g1);

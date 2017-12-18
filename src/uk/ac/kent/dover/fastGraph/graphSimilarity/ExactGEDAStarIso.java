@@ -33,21 +33,26 @@ public class ExactGEDAStarIso extends GraphEditDistance {
 	private int maxDegree2 = 0;
 	private int maxInDegree2 = 0;
 	private int maxOutDegree2 = 0;
+	
 private int countPruneByMaxNodeDegree = 0;
 private int countPruneByNotAddingNodes = 0;
 private int countPruneByNotDeletingNodes = 0;
 private int countPruneBySingleRelabelling = 0;
+private int countPruneByEdgePreviouslyAdded = 0;
+private int countPruneByEdgePreviouslyDeleted = 0;
+
 
 	public static void main(String [] args) {
 		
 		Debugger.enabled = false;
 		
 		try {
-			double maxCost = 80.0;
+			
+			
 			int count = 0;
 			while(count < 10) {
 				count++;
-				long seed = 8866*count;
+				long seed = 884455*count;
 				Random r = new Random(seed);
 				FastGraph g1,g2,gRet;
 				HashMap<Integer,Double> editCosts;
@@ -55,11 +60,11 @@ private int countPruneBySingleRelabelling = 0;
 				EditList el, retEditList1;
 				ApproximateGEDSimple aged;
 				
-				int maxNodes = 5;
-				int maxEdges = 7;
+				int maxNodes = 4;
+				int maxEdges = 6;
 			
-				boolean directed = true;
-				boolean nodeLabels = true;
+				boolean directed = false;
+				boolean nodeLabels = false;
 		
 				editCosts = new HashMap<>();
 				editCosts.put(EditOperation.DELETE_NODE,11.0);
@@ -111,7 +116,6 @@ System.out.println("GED TEST "+count);
 long approxStartTime = System.currentTimeMillis();
 System.out.println("approx time "+(System.currentTimeMillis()-approxStartTime)/1000.0+" approx cost "+aged.getEditList().getCost()+" approx length "+aged.getEditList().getEditList().size());	
 				ged = new ExactGEDAStarIso(directed,nodeLabels,editCosts);
-				ged.setMaxCost(maxCost);
 				ged.similarity(g1, g2);
 				retEditList1 = ged.getEditList();
 				if(retEditList1 == null) {
@@ -232,11 +236,7 @@ if(retEditList1 != null) {
 
 	/** 
 	 * 
-	 * Setting this to a sensible value just above the expected cost
-	 * can greatly improve search speeds. For instance, it is possible to
-	 * keep increasing this slightly until a edit list is found. It will throw
-	 * away any solutions above maximum cost, so increases both space and time
-	 * performance, but particularly space.
+	 * Don't use this unless you have a pressing reason, the algorithm defaults this to an approximation GED.
 	 * 
 	 * @param maxCost defines the cost, which, if exceeded, stops the search.
 	 */
@@ -259,6 +259,16 @@ long fullSearchTime = 0;
 	 */
 	@Override
 	public double similarity(FastGraph g1, FastGraph g2) {
+
+		if(Math.abs(Double.MAX_VALUE-maxCost) < 0.001) { // if maxCost has not been set, use an approximation to set it.
+			try {
+				ApproximateGEDSimple aged = new ApproximateGEDSimple(directed,nodeLabels,editCosts,0,100,888);
+				double approxCost = aged.similarity(g1, g2);
+				maxCost = approxCost + 0.001;
+			} catch (FastGraphException e) {} // if it fails, then never mind.
+		}
+
+
 
 		g2NodeLabelSet = new HashSet<>(g2.getNumberOfNodes());
 		for(int i = 0; i < g2.getNumberOfNodes(); i++) {
@@ -322,7 +332,8 @@ if(iterations%100000 == 0) {
 	System.out.println("iterations "+iterations/1000000.0+ " million, directed: "+directed+", nodeLabels: "+nodeLabels);
 	System.out.println("time: total\tfindCheapest\tisomorphism\tfindAdditional\t"+(fullSearchTime/1000.0)+"\t"+(findCheapestTime/1000.0)+"\t"+(isomorphicTime/1000.0)+"\t"+(addAdditionalTime/1000.0));
 	System.out.println("currentCandidates.size() "+currentCandidates.size()/1000000.0+ " million\t");
-	System.out.println("countPruneByMaxNodeDegree: "+countPruneByMaxNodeDegree/1000000.0+ " million"+" countPruneByNotAddingNodes: "+countPruneByNotAddingNodes/1000000.0+ " million "+"countPruneByNotDeletingNodes: "+countPruneByNotDeletingNodes/1000000.0+ " million\t"+" countPruneBySingleRelabelling: "+countPruneBySingleRelabelling/1000000.0+ " million\t");	
+	System.out.println("countPruneByMaxNodeDegree: "+countPruneByMaxNodeDegree/1000000.0+ " million"+" countPruneByNotAddingNodes: "+countPruneByNotAddingNodes/1000000.0+ " million "+"countPruneByNotDeletingNodes: "+countPruneByNotDeletingNodes/1000000.0+ " million\t"+" countPruneBySingleRelabelling: "+countPruneBySingleRelabelling/1000000.0+ " million countPruneByEdgePreviouslyAdded: "+countPruneByEdgePreviouslyAdded/1000000.0+ " million countPruneByEdgePreviouslyDeleted: "+countPruneByEdgePreviouslyDeleted/1000000.0+ " million");	
+	
 //	System.out.print("tryEditList\n"+tryEditList);
 	System.out.println("tryEditList.getCost() "+tryEditList.getCost());
 	System.out.println("tryEditList.getEditList().size() "+tryEditList.getEditList().size());
@@ -350,10 +361,10 @@ fullSearchTime = (System.currentTimeMillis()-startSearchTime);
 		HashSet<EditList> ret = new HashSet<>();
 		
 		ArrayList<Integer> relabelledNodes = new ArrayList<>(gTarget.getNumberOfNodes());
-		ArrayList<Integer> edgeN1Added = new ArrayList<>(gTarget.getNumberOfNodes());
-		ArrayList<Integer> edgeN2Added = new ArrayList<>(gTarget.getNumberOfNodes());
 		ArrayList<Integer> edgeN1Deleted = new ArrayList<>(gTarget.getNumberOfNodes());
 		ArrayList<Integer> edgeN2Deleted = new ArrayList<>(gTarget.getNumberOfNodes());
+		ArrayList<Integer> edgeN1Added = new ArrayList<>(gTarget.getNumberOfNodes());
+		ArrayList<Integer> edgeN2Added = new ArrayList<>(gTarget.getNumberOfNodes());
 /*
 try {
 g = FastGraph.randomGraphFactory(10, 0, false);
@@ -387,13 +398,13 @@ System.out.println("n2 Deleted 13 8");
 			if(eo.getOperationCode() == EditOperation.RELABEL_NODE) {
 				relabelledNodes.add(eo.getId());
 			}
-			if(eo.getOperationCode() == EditOperation.ADD_EDGE) {
-				edgeN1Added.add(eo.getN1());
-				edgeN2Added.add(eo.getN2());
-			}
 			if(eo.getOperationCode() == EditOperation.DELETE_EDGE) {
 				edgeN1Deleted.add(eo.getN1());
 				edgeN2Deleted.add(eo.getN2());
+			}
+			if(eo.getOperationCode() == EditOperation.ADD_EDGE) {
+				edgeN1Added.add(eo.getN1());
+				edgeN2Added.add(eo.getN2());
 			}
 			
 			// have to sort out potential node id changes
@@ -412,7 +423,25 @@ System.out.println("n2 Deleted 13 8");
 					}
 				}
 
-				// added lists
+				// deleted edge lists
+				for (int i = 0; i < edgeN1Deleted.size(); i++) {
+					int n1 = edgeN1Deleted.get(i);
+					int n2 = edgeN2Deleted.get(i);
+					if(n1 == deletedNode || n2 == deletedNode) { // a connection was deleted - presumably after this edge was added then deleted, so delete from consideration
+						edgeN1Deleted.remove(i);
+						edgeN2Deleted.remove(i);
+						i--;
+					}  else {
+						if(n1 > deletedNode) {
+							edgeN1Deleted.set(i, n1-1);
+						}
+						if(n2 > deletedNode) {
+							edgeN2Deleted.set(i, n2-1);
+						}
+					}
+				}
+
+				// added edge lists
 				for (int i = 0; i < edgeN1Added.size(); i++) {
 					int n1 = edgeN1Added.get(i);
 					int n2 = edgeN2Added.get(i);
@@ -429,23 +458,6 @@ System.out.println("n2 Deleted 13 8");
 						}
 					}
 				}
-				// deleted lists
-				for (int i = 0; i < edgeN1Deleted.size(); i++) {
-					int n1 = edgeN1Deleted.get(i);
-					int n2 = edgeN2Deleted.get(i);
-					if(n1 == deletedNode || n2 == deletedNode) { // a connection was deleted after this edge was deleted, so delete from consideration
-						edgeN1Deleted.remove(i);
-						edgeN2Deleted.remove(i);
-						i--;
-					}  else {
-						if(n1 > deletedNode) {
-							edgeN1Deleted.set(i, n1-1);
-						}
-						if(n2 > deletedNode) {
-							edgeN2Deleted.set(i, n2-1);
-						}
-					}
-				}
 
 			}
 		}
@@ -455,9 +467,9 @@ System.out.println("n1 Added : "+edgeN1Added);
 System.out.println("n2 Added : "+edgeN2Added);
 System.out.println("n1 Deleted : "+edgeN1Deleted);
 System.out.println("n2 Deleted : "+edgeN2Deleted);
-if(true) {
-	System.exit(0);
-}
+//if(true) {
+//	System.exit(0);
+//}
 */
 
 		// add node
@@ -503,6 +515,19 @@ countPruneByNotDeletingNodes++;
 countPruneByMaxNodeDegree++;
 					continue;
 				}
+				for (int i = 0; i < edgeN1Deleted.size(); i++) { // test to avoid adding nodes that are deleted in the EditList
+					int nodeDeleted1 = edgeN1Deleted.get(i);
+					int nodeDeleted2 = edgeN2Deleted.get(i);
+					if(n1 == nodeDeleted1 && n2 == nodeDeleted2) { // a connection was deleted - presumably after this edge was added then deleted, so delete from consideration
+countPruneByEdgePreviouslyDeleted++;
+						continue;
+					}
+					if(!directed && n2 == nodeDeleted1 && n2 == nodeDeleted2) { // without direction, we should check both ways
+countPruneByEdgePreviouslyDeleted++;
+						continue;
+					}
+				}
+
 				EditOperation newEO = new EditOperation(EditOperation.ADD_EDGE,addEdgeCost,-1,"",n1,n2);
 				EditList newEL = new EditList(el);
 				newEL.addOperation(newEO);
@@ -514,7 +539,22 @@ countPruneByMaxNodeDegree++;
 		
 		// delete edge
 		for(int e = 0; e < g.getNumberOfEdges(); e++) {
-			EditOperation newEO = new EditOperation(EditOperation.DELETE_EDGE,deleteEdgeCost,e,null,-1,-1);
+			int n1 = g.getEdgeNode1(e);
+			int n2 = g.getEdgeNode2(e);
+			for (int i = 0; i < edgeN1Added.size(); i++) { // test to avoid deleting nodes that are added in the EditList
+				int nodeAdded1 = edgeN1Added.get(i);
+				int nodeAdded2 = edgeN2Added.get(i);
+				if(n1 == nodeAdded1 && n2 == nodeAdded2) { // a connection was deleted - presumably after this edge was added then deleted, so delete from consideration
+countPruneByEdgePreviouslyAdded++;
+					continue;
+				}
+				if(!directed && n2 == nodeAdded1 && n2 == nodeAdded2) { // without direction, we should check both ways
+countPruneByEdgePreviouslyAdded++;
+					continue;
+				}
+			}
+
+			EditOperation newEO = new EditOperation(EditOperation.DELETE_EDGE,deleteEdgeCost,e,null,n1,n1);
 			EditList newEL = new EditList(el);
 			newEL.addOperation(newEO);
 			if(newEL.getCost() < getMaxCost()) {
