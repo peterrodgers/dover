@@ -12,6 +12,7 @@ import uk.ac.kent.displayGraph.Graph;
 import uk.ac.kent.displayGraph.Node;
 import uk.ac.kent.dover.fastGraph.*;
 import uk.ac.kent.dover.fastGraph.editOperation.*;
+import uk.ac.kent.dover.fastGraph.graphSimilarity.ApproximateGEDSimple;
 import uk.ac.kent.dover.fastGraph.graphSimilarity.ExactGEDAStarIso;
 
 public class ExactGEDAStarIsoTest {
@@ -475,6 +476,8 @@ public class ExactGEDAStarIsoTest {
 			HashMap<Integer,Double> editCosts;
 			ExactGEDAStarIso ged;
 			EditList el, retEditList1;
+			ApproximateGEDSimple aged;
+			
 			int maxNodes = 3;
 			int maxEdges = 4;
 		
@@ -527,6 +530,10 @@ public class ExactGEDAStarIsoTest {
 			retEditList1 = ged.getEditList();
 			gRet = retEditList1.applyOperations(g1);
 			
+			aged = new ApproximateGEDSimple(false,false,editCosts,0,1000,888);
+			aged.similarity(g1, g2);
+			assertTrue(retEditList1.getCost() <= aged.similarity(g1, g2));
+
 			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,false));
 			assertTrue(g1.checkConsistency());
 			assertTrue(g2.checkConsistency());
@@ -538,6 +545,10 @@ public class ExactGEDAStarIsoTest {
 			retEditList1 = ged.getEditList();
 			gRet = retEditList1.applyOperations(g1);
 			
+			aged = new ApproximateGEDSimple(false,true,editCosts,0,1000,888);
+			aged.similarity(g1, g2);
+			assertTrue(retEditList1.getCost() <= aged.similarity(g1, g2));
+
 			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
 			assertTrue(g1.checkConsistency());
 			assertTrue(g2.checkConsistency());
@@ -548,6 +559,10 @@ public class ExactGEDAStarIsoTest {
 			ged.similarity(g1, g2);
 			retEditList1 = ged.getEditList();
 			gRet = retEditList1.applyOperations(g1);
+			
+			aged = new ApproximateGEDSimple(true,false,editCosts,0,1000,888);
+			aged.similarity(g1, g2);
+			assertTrue(retEditList1.getCost() <= aged.similarity(g1, g2));
 
 			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,false));
 			assertTrue(g1.checkConsistency());
@@ -560,6 +575,10 @@ public class ExactGEDAStarIsoTest {
 			retEditList1 = ged.getEditList();
 			gRet = retEditList1.applyOperations(g1);
 			
+			aged = new ApproximateGEDSimple(true,true,editCosts,0,1000,888);
+			aged.similarity(g1, g2);
+			assertTrue(retEditList1.getCost() <= aged.similarity(g1, g2));
+
 			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,true));
 			assertTrue(g1.checkConsistency());
 			assertTrue(g2.checkConsistency());

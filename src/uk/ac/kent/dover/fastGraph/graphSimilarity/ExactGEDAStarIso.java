@@ -36,7 +36,7 @@ public class ExactGEDAStarIso extends GraphEditDistance {
 private int countPruneByMaxNodeDegree = 0;
 private int countPruneByNotAddingNodes = 0;
 private int countPruneByNotDeletingNodes = 0;
-
+private int countPruneBySingleRelabelling = 0;
 
 	public static void main(String [] args) {
 		
@@ -46,12 +46,14 @@ private int countPruneByNotDeletingNodes = 0;
 		try {
 			while(count < 10) {
 				count++;
-				long seed = 6655*count;
+				long seed = 6699*count;
 				Random r = new Random(seed);
 				FastGraph g1,g2,gRet;
 				HashMap<Integer,Double> editCosts;
 				ExactGEDAStarIso ged;
 				EditList el, retEditList1;
+				ApproximateGEDSimple aged;
+
 				int maxNodes = 3;
 				int maxEdges = 5;
 		
@@ -97,8 +99,8 @@ private int countPruneByNotDeletingNodes = 0;
 					el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,-1,i,color,-1,-1));
 				}
 				g2 = el.applyOperations(g2);
-System.out.println(g1);
-System.out.println(g2);
+//System.out.println(g1);
+//System.out.println(g2);
 	
 				ged = new ExactGEDAStarIso(false,false,editCosts);
 				ged.setMaxCost(110.0);
@@ -110,9 +112,14 @@ System.out.println(g2);
 					gRet = retEditList1.applyOperations(g1);
 				}
 
-System.out.println("ITERATION "+count);
-System.out.print(retEditList1);
+System.out.println("GED TEST "+count);
+//System.out.print(retEditList1);
 if(retEditList1 != null) {
+long approxStartTime = System.currentTimeMillis();
+	aged = new ApproximateGEDSimple(false,false,editCosts,0,1000,888);
+	aged.similarity(g1, g2);
+	System.out.println("exact time "+(ged.fullSearchTime)/1000.0+" approx time "+(System.currentTimeMillis()-approxStartTime)/1000.0);
+	System.out.println("exact cost "+retEditList1.getCost()+" approx cost "+aged.getEditList().getCost()+" exact length "+retEditList1.getEditList().size());
 	System.out.println(ExactIsomorphism.isomorphic(gRet, g2)+" "+gRet.checkConsistency());
 }
 			}
@@ -229,7 +236,7 @@ if(retEditList1 != null) {
 	public void setMaxCost(Double maxCost) {this.maxCost = maxCost;}
 	
 
-
+long fullSearchTime = 0;
 	
 	/**
 	 * This returns an the graph edit distance between the two graphs. 
@@ -298,17 +305,18 @@ time = System.currentTimeMillis();
 addAdditionalTime += System.currentTimeMillis()-time;
 
 if(iterations%100000 == 0) {
-	System.out.println("iterations "+iterations/1000000.0+ " million" +" directed "+directed+" nodeLabels "+nodeLabels);
-	System.out.println("time: total\tfindCheapest\tisomorphism\tfindAdditional\t"+((System.currentTimeMillis()-startSearchTime)/1000.0)+"\t"+(findCheapestTime/1000.0)+"\t"+(isomorphicTime/1000.0)+"\t"+(addAdditionalTime/1000.0));
+	fullSearchTime = (System.currentTimeMillis()-startSearchTime);
+	System.out.println("iterations "+iterations/1000000.0+ " million, directed: "+directed+", nodeLabels: "+nodeLabels);
+	System.out.println("time: total\tfindCheapest\tisomorphism\tfindAdditional\t"+(fullSearchTime/1000.0)+"\t"+(findCheapestTime/1000.0)+"\t"+(isomorphicTime/1000.0)+"\t"+(addAdditionalTime/1000.0));
 	System.out.println("currentCandidates.size() "+currentCandidates.size()/1000000.0+ " million\t");
-	System.out.println("countPruneByMaxNodeDegree\tcountPruneByNotAddingNodes\tcountPruneByNotDeletingNodes\t"+countPruneByMaxNodeDegree/1000000.0+ " million\t"+countPruneByNotAddingNodes/1000000.0+ " million\t"+countPruneByNotDeletingNodes/1000000.0+ " million\t");
-	
+	System.out.println("countPruneByMaxNodeDegree: "+countPruneByMaxNodeDegree/1000000.0+ " million"+" countPruneByNotAddingNodes: "+countPruneByNotAddingNodes/1000000.0+ " million "+"countPruneByNotDeletingNodes: "+countPruneByNotDeletingNodes/1000000.0+ " million\t"+" countPruneBySingleRelabelling: "+countPruneBySingleRelabelling/1000000.0+ " million\t");	
 //	System.out.print("tryEditList\n"+tryEditList);
 	System.out.println("tryEditList.getCost() "+tryEditList.getCost());
 	System.out.println("tryEditList.getEditList().size() "+tryEditList.getEditList().size());
 }
 			
 		}
+fullSearchTime = (System.currentTimeMillis()-startSearchTime);
 		
 		editList = resultEditList;
 		return editList.getCost();	
@@ -325,6 +333,43 @@ if(iterations%100000 == 0) {
 	private HashSet<EditList> addAllPossibleEdits(EditList el,FastGraph g, FastGraph gTarget) {
 		
 		HashSet<EditList> ret = new HashSet<>();
+		
+		HashSet<Integer> relabelledNodes = new HashSet<>();
+		for(EditOperation eo : el.getEditList()) {
+			if(eo.getOperationCode() == EditOperation.RELABEL_NODE) {
+				relabelledNodes.add(eo.getId());
+			}
+			
+			// have to sort out potential node id changes
+			 // it will only impact on operations that occured before the delete
+			if(eo.getOperationCode() == EditOperation.DELETE_NODE) {
+				int deletedNode = eo.getId();
+				HashMap<Integer,Integer> nodeDeleteChanges  = new HashMap<>(); // store changes to avoid concurrent access
+				for(int n : relabelledNodes) {
+					if(n == deletedNode) {
+						nodeDeleteChanges.put(n,-1);
+					}
+					if(n > deletedNode) {
+						Integer nMap = nodeDeleteChanges.get(n);
+						if(nMap == null) {
+							nMap = n-1;
+						} else {
+							nMap--;
+						}
+						nodeDeleteChanges.put(n, nMap);
+					}
+				}
+				for(Integer n : nodeDeleteChanges.keySet()) {
+					Integer nMap = nodeDeleteChanges.get(n);
+					if(nMap == -1) {
+						relabelledNodes.remove(n);
+					} else {
+						relabelledNodes.remove(n);
+						relabelledNodes.add(nMap);
+					}
+				}
+			}
+		}
 
 		// add node
 		if(nodeLabels || (g.getNumberOfNodes() < gTarget.getNumberOfNodes())) {
@@ -391,16 +436,21 @@ countPruneByMaxNodeDegree++;
 		// relabel node
 		if(nodeLabels) {
 			for(int n = 0; n < g.getNumberOfNodes(); n++) {
-				for(String label : g2NodeLabelSet) {
-					if(!g.getNodeLabel(n).equals(label)) {
-						EditOperation newEO = new EditOperation(EditOperation.RELABEL_NODE,relabelNodeCost,n,label,-1,-1);;
-						EditList newEL = new EditList(el);
-						newEL.addOperation(newEO);
-						if(newEL.getCost() < getMaxCost()) {
-							ret.add(newEL);
+				if(!relabelledNodes.contains(n)) {
+					for(String label : g2NodeLabelSet) {
+						if(!g.getNodeLabel(n).equals(label)) {
+							EditOperation newEO = new EditOperation(EditOperation.RELABEL_NODE,relabelNodeCost,n,label,-1,-1);;
+							EditList newEL = new EditList(el);
+							newEL.addOperation(newEO);
+							if(newEL.getCost() < getMaxCost()) {
+								ret.add(newEL);
+							}
 						}
 					}
+				} else {
+countPruneBySingleRelabelling++;
 				}
+
 			}
 		}
 		
