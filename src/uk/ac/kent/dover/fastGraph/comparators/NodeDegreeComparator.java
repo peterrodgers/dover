@@ -13,6 +13,11 @@ public class NodeDegreeComparator extends NodeComparator {
 
 	boolean ascending = true;
 
+	/**
+	 * 
+	 * @param g1 the graph containing n1
+	 * @param g2 the graph containing n2
+	 */
 	public NodeDegreeComparator(FastGraph g1, FastGraph g2) {
 		super(g1,g2);
 	}
@@ -32,7 +37,8 @@ public class NodeDegreeComparator extends NodeComparator {
 	/**
 	 * Just compares the degrees via standard Integer comparison
 	 * 
-	 * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or greater than the second
+	 * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or greater than the second,
+	 * unless ascending is set to false in which case negative and positive are swapped.
 	 */
 	@Override
 	public int compare(Integer n1, Integer n2) {

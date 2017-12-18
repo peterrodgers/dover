@@ -14,7 +14,7 @@ import java.util.Comparator;
 	public class ReverseIntegerComparator implements Comparator<Integer> {  
 		
 		/**
-		 * Constructor does nothing.
+		 * Constructor does nothing extra.
 		 */
 		public ReverseIntegerComparator() {
 			super();

@@ -474,8 +474,8 @@ public class ExactGEDAStarIsoTest {
 			HashMap<Integer,Double> editCosts;
 			ExactGEDAStarIso ged;
 			EditList el, retEditList1;
-			int maxNodes = 5;
-			int maxEdges = 10;
+			int maxNodes = 4;
+			int maxEdges = 7;
 		
 			editCosts = new HashMap<>();
 			editCosts.put(EditOperation.DELETE_NODE,11.0);

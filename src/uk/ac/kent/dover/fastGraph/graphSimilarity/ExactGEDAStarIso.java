@@ -39,8 +39,8 @@ public class ExactGEDAStarIso extends GraphEditDistance {
 			HashMap<Integer,Double> editCosts;
 			ExactGEDAStarIso ged;
 			EditList el, retEditList1;
-			int maxNodes = 4;
-			int maxEdges = 7;
+			int maxNodes = 5;
+			int maxEdges = 8;
 		
 			editCosts = new HashMap<>();
 			editCosts.put(EditOperation.DELETE_NODE,11.0);
@@ -206,7 +206,8 @@ System.out.println(ExactIsomorphism.isomorphic(gRet, g2)+" "+gRet.checkConsisten
 			g2NodeLabelSet.add(g2.getNodeLabel(i));
 		}
 		
-		HashSet<EditList> currentCandidates = new HashSet<>(1000000);
+		EditListCostComparator elc = new EditListCostComparator();
+		PriorityQueue<EditList> currentCandidates = new PriorityQueue<>(1000000,elc);
 		
 		EditList startEL = new EditList();
 		currentCandidates.add(startEL);
@@ -215,28 +216,45 @@ System.out.println(ExactIsomorphism.isomorphic(gRet, g2)+" "+gRet.checkConsisten
 
 		EditList resultEditList = null;
 		boolean found = false;
+		int iterations = 0;
+long startSearchTime = System.currentTimeMillis();
+long findCheapestTime = 0;
+long isomorphicTime = 0;
+long addAdditionalTime = 0;
+long time;
 		while(!found) {
-			
+			iterations++;
+
+time = System.currentTimeMillis();
 			EditList tryEditList = null;
 			FastGraph g = null;
 			while(g == null) { // get the cheapest valid edit list
 				tryEditList = findCheapestEditList(currentCandidates);
-				currentCandidates.remove(tryEditList);
 				g = tryEditList.applyOperations(g1);
 			}
-			
+findCheapestTime += System.currentTimeMillis()-time;
+
+time = System.currentTimeMillis();
 			if(ei.isomorphic(g)) {
 				found = true;
 				resultEditList = tryEditList;
 				break;
 			}
-			
+isomorphicTime += System.currentTimeMillis()-time;
+
+time = System.currentTimeMillis();
 			HashSet<EditList> additionalEditLists = addAllPossibleEdits(tryEditList,g);
 			currentCandidates.addAll(additionalEditLists);
-//System.out.println("currentCandidates.size() "+currentCandidates.size());
-//System.out.println("tryEditList.getCost() "+tryEditList.getCost());
-//System.out.println("tryEditList.getEditList().size() "+tryEditList.getEditList().size());
-//System.out.println("tryEditList\n"+tryEditList);
+addAdditionalTime += System.currentTimeMillis()-time;
+
+if(iterations%100000 == 0) {
+	System.out.println("iterations "+iterations/1000000.0+ " million");
+	System.out.println("time: total\tfindCheapest\tisomorphism\tfindAdditional\t"+((System.currentTimeMillis()-startSearchTime)/1000.0)+"\t"+(findCheapestTime/1000.0)+"\t"+(isomorphicTime/1000.0)+"\t"+(addAdditionalTime/1000.0));
+	System.out.println("currentCandidates.size() "+currentCandidates.size()/1000000.0+ " million");
+//	System.out.print("tryEditList"+tryEditList);
+	System.out.println("tryEditList.getCost() "+tryEditList.getCost());
+	System.out.println("tryEditList.getEditList().size() "+tryEditList.getEditList().size());
+}
 			
 		}
 		
@@ -300,7 +318,6 @@ System.out.println(ExactIsomorphism.isomorphic(gRet, g2)+" "+gRet.checkConsisten
 				}
 			}
 		}
-
 		
 		return ret;
 
@@ -308,24 +325,14 @@ System.out.println(ExactIsomorphism.isomorphic(gRet, g2)+" "+gRet.checkConsisten
 
 
 	/**
+	 * Find the cheapest candidate and remove from list.
 	 * 
 	 * @param currentCandidates collection of EditLists
 	 * @return the cheapest of the EditLists or null if the collection is empty
 	 */
-	private EditList findCheapestEditList(HashSet<EditList> editLists) {
-		
-		EditList ret = null;
-		double cheapest = Double.MAX_VALUE;
-
-		for(EditList el : editLists) {
-			if(el.getCost() < cheapest) {
-				cheapest = el.getCost();
-				ret = el;
-			}
-		}
-		
+	private EditList findCheapestEditList(PriorityQueue<EditList> editLists) {
+		EditList ret = editLists.remove();
 		return ret;
-
 	}
 	
 	

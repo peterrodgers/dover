@@ -1,25 +1,26 @@
 package uk.ac.kent.dover.fastGraph.comparators;
 
+import java.util.Comparator;
+
 import uk.ac.kent.dover.fastGraph.FastGraph;
+import uk.ac.kent.dover.fastGraph.editOperation.EditList;
 
 /**
- * Simple indegree comparison for nodes within the same graph. Defaults to ascending,
+ * Simple degree comparison for nodes within the same graph. Defaults to ascending,
  * set ascending to false to use descending order.
  * 
  * @author Peter Rodgers
  *
  */
-public class NodeOutDegreeComparator extends NodeComparator {
+public class EditListCostComparator implements Comparator<EditList> {
 
 	boolean ascending = true;
 
 	/**
-	 * 
-	 * @param g1 the graph containing n1
-	 * @param g2 the graph containing n2
+	 * default constructor
 	 */
-	public NodeOutDegreeComparator(FastGraph g1, FastGraph g2) {
-		super(g1,g2);
+	public EditListCostComparator() {
+		super();
 	}
 
 
@@ -35,26 +36,19 @@ public class NodeOutDegreeComparator extends NodeComparator {
 
 	
 	/**
-	 * Just compares the outdegrees via standard Integer comparison
+	 * Just compares the costs via standard Double comparison
 	 * 
 	 * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or greater than the second,
 	 * unless ascending is set to false in which case negative and positive are swapped.
 	 */
 	@Override
-	public int compare(Integer n1, Integer n2) {
-		int degree1 = g1.getNodeOutDegree(n1);
-		int degree2 = g2.getNodeOutDegree(n2);
-		if(!ascending) {
-			degree2 = g1.getNodeOutDegree(n1);
-			degree1 = g2.getNodeOutDegree(n2);
+	public int compare(EditList el1, EditList el2) {
+		if(ascending) {
+			return Double.compare(el1.getCost(), el2.getCost());
 		}
-		if(degree1 < degree2) {
-			return -1;
-		}
-		if(degree1 > degree2) {
-			return 1;
-		}
-		return 0;
+		
+		return Double.compare(el2.getCost(), el1.getCost());
+
 	}
 
 }
