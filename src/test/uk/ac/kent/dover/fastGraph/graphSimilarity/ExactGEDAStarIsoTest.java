@@ -7,9 +7,6 @@ import java.util.*;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
-import uk.ac.kent.displayGraph.Edge;
-import uk.ac.kent.displayGraph.Graph;
-import uk.ac.kent.displayGraph.Node;
 import uk.ac.kent.dover.fastGraph.*;
 import uk.ac.kent.dover.fastGraph.editOperation.*;
 import uk.ac.kent.dover.fastGraph.graphSimilarity.ApproximateGEDSimple;

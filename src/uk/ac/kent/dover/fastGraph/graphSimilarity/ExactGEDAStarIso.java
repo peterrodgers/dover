@@ -42,23 +42,24 @@ private int countPruneBySingleRelabelling = 0;
 		
 		Debugger.enabled = false;
 		
-		int count = 0;
 		try {
+			double maxCost = 80.0;
+			int count = 0;
 			while(count < 10) {
 				count++;
-				long seed = 6644*count;
+				long seed = 8866*count;
 				Random r = new Random(seed);
 				FastGraph g1,g2,gRet;
 				HashMap<Integer,Double> editCosts;
 				ExactGEDAStarIso ged;
 				EditList el, retEditList1;
 				ApproximateGEDSimple aged;
-
-				boolean directed = false;
-				boolean nodeLabels = false;
-
-				int maxNodes = 3;
-				int maxEdges = 5;
+				
+				int maxNodes = 5;
+				int maxEdges = 7;
+			
+				boolean directed = true;
+				boolean nodeLabels = true;
 		
 				editCosts = new HashMap<>();
 				editCosts.put(EditOperation.DELETE_NODE,11.0);
@@ -110,7 +111,7 @@ System.out.println("GED TEST "+count);
 long approxStartTime = System.currentTimeMillis();
 System.out.println("approx time "+(System.currentTimeMillis()-approxStartTime)/1000.0+" approx cost "+aged.getEditList().getCost()+" approx length "+aged.getEditList().getEditList().size());	
 				ged = new ExactGEDAStarIso(directed,nodeLabels,editCosts);
-				ged.setMaxCost(106.0);
+				ged.setMaxCost(maxCost);
 				ged.similarity(g1, g2);
 				retEditList1 = ged.getEditList();
 				if(retEditList1 == null) {
@@ -254,6 +255,7 @@ long fullSearchTime = 0;
 	 * @param g1 the first graph to be compared.
 	 * @param g2 the second graph to be compared.
 	 * @return the cost of the edits between two graphs or -1 if a cost cannot be found due to no solutions less than maxCost.
+	 * @throws FastGraphException if an EditList tries to delete an attached node
 	 */
 	@Override
 	public double similarity(FastGraph g1, FastGraph g2) {
@@ -287,7 +289,7 @@ time = System.currentTimeMillis();
 			FastGraph g = null;
 			while(g == null) { // get the cheapest valid edit list
 				tryEditList = findCheapestEditList(currentCandidates);
-				if(tryEditList == null) { // no candiates left
+				if(tryEditList == null) { // no candidates left
 					return -1;
 				}
 				g = tryEditList.applyOperations(g1);
@@ -306,8 +308,13 @@ time = System.currentTimeMillis();
 isomorphicTime += System.currentTimeMillis()-time;
 
 time = System.currentTimeMillis();
-			HashSet<EditList> additionalEditLists = addAllPossibleEdits(tryEditList,g,g2);
-			currentCandidates.addAll(additionalEditLists);
+			try {
+				HashSet<EditList> additionalEditLists = addAllPossibleEdits(tryEditList,g,g1,g2);
+				currentCandidates.addAll(additionalEditLists);
+			} catch (FastGraphException e) {
+				e.printStackTrace();
+				return -1;
+			}
 addAdditionalTime += System.currentTimeMillis()-time;
 
 if(iterations%100000 == 0) {
@@ -333,14 +340,16 @@ fullSearchTime = (System.currentTimeMillis()-startSearchTime);
 	 * 
 	 * @param el the edit list to add edits to
 	 * @param g the graph created from g1 by applying el
+	 * @param gSource the graph the edits started from
 	 * @param gTarget the graph the edits are aiming at
 	 * @return a collection of edit lists, these are copies of el with every valid edit that can be applied to g, or null if maxCost is exceeded
+	 * @throws FastGraphException if an EditList tries to delete an attached node
 	 */
-	private HashSet<EditList> addAllPossibleEdits(EditList el,FastGraph g, FastGraph gTarget) {
+	private HashSet<EditList> addAllPossibleEdits(EditList el,FastGraph g, FastGraph gSource, FastGraph gTarget) throws FastGraphException {
 		
 		HashSet<EditList> ret = new HashSet<>();
 		
-		HashSet<Integer> relabelledNodes = new HashSet<>(gTarget.getNumberOfNodes()*2);
+		ArrayList<Integer> relabelledNodes = new ArrayList<>(gTarget.getNumberOfNodes());
 		ArrayList<Integer> edgeN1Added = new ArrayList<>(gTarget.getNumberOfNodes());
 		ArrayList<Integer> edgeN2Added = new ArrayList<>(gTarget.getNumberOfNodes());
 		ArrayList<Integer> edgeN1Deleted = new ArrayList<>(gTarget.getNumberOfNodes());
@@ -350,28 +359,30 @@ try {
 g = FastGraph.randomGraphFactory(10, 0, false);
 } catch(Exception e) {}
 el = new EditList();
-el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,111,44,"def",-1,-1));
-el.addOperation(new EditOperation(EditOperation.ADD_EDGE,111,-1,"blue",12,12));
-el.addOperation(new EditOperation(EditOperation.DELETE_EDGE,111,-1,"blue",7,12));
+el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,111,10,"def",-1,-1));
+el.addOperation(new EditOperation(EditOperation.ADD_EDGE,111,-1,"blue",15,12));
+el.addOperation(new EditOperation(EditOperation.DELETE_EDGE,111,-1,"blue",7,17));
 el.addOperation(new EditOperation(EditOperation.DELETE_NODE,111,0,null,-1,-1));
 el.addOperation(new EditOperation(EditOperation.DELETE_EDGE,111,-1,"blue",12,11));
-el.addOperation(new EditOperation(EditOperation.ADD_EDGE,111,-1,"blue",11,7));
+el.addOperation(new EditOperation(EditOperation.ADD_EDGE,111,-1,"blue",11,3));
 el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,111,43,"hykr",-1,-1));
 el.addOperation(new EditOperation(EditOperation.DELETE_NODE,111,4,null,-1,-1));
 el.addOperation(new EditOperation(EditOperation.ADD_EDGE,111,-1,"blue",4,40));
 el.addOperation(new EditOperation(EditOperation.ADD_EDGE,111,-1,"",15,50));
 el.addOperation(new EditOperation(EditOperation.DELETE_EDGE,111,-1,"blue",2,500));
-el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,111,31,"red",-1,-1));
+el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,111,87,"red",-1,-1));
 el.addOperation(new EditOperation(EditOperation.DELETE_NODE,111,45,null,-1,-1));
-el.addOperation(new EditOperation(EditOperation.DELETE_NODE,111,10,null,-1,-1));
+el.addOperation(new EditOperation(EditOperation.DELETE_NODE,111,8,null,-1,-1));
+el.addOperation(new EditOperation(EditOperation.DELETE_NODE,111,498,null,-1,-1));
+el.addOperation(new EditOperation(EditOperation.DELETE_NODE,111,3,null,-1,-1));
 
-System.out.println("relabeled nodes 30 41");
-System.out.println("n1 Added 4 14");
-System.out.println("n2 Added 6 39 48");
-System.out.println("n1 Deleted 2 5 10");
-System.out.println("n2 Deleted 498");
+System.out.println("relabeled nodes 40 84");
+System.out.println("n1 Added 11 3 13");
+System.out.println("n2 Added 8 38 47");
+System.out.println("n1 Deleted 4 9");
+System.out.println("n2 Deleted 13 8");
 //System.out.println(el);
-*/		
+*/
 		for(EditOperation eo : el.getEditList()) {
 			if(eo.getOperationCode() == EditOperation.RELABEL_NODE) {
 				relabelledNodes.add(eo.getId());
@@ -386,114 +397,53 @@ System.out.println("n2 Deleted 498");
 			}
 			
 			// have to sort out potential node id changes
-			 // it will only impact on operations that occured before the delete
 			if(eo.getOperationCode() == EditOperation.DELETE_NODE) {
-				HashMap<Integer,Integer> nodeRelabelChanges = new HashMap<>(gTarget.getNumberOfNodes()); // store changes to avoid concurrent access
-				HashMap<Integer,Integer> edgeN1AddedChanges = new HashMap<>(gTarget.getNumberOfNodes()); // store changes to avoid concurrent access
-				HashMap<Integer,Integer> edgeN2AddedChanges = new HashMap<>(gTarget.getNumberOfNodes()); // store changes to avoid concurrent access
-				HashMap<Integer,Integer> edgeN1DeletedChanges = new HashMap<>(gTarget.getNumberOfNodes()); // store changes to avoid concurrent access
-				HashMap<Integer,Integer> edgeN2DeletedChanges = new HashMap<>(gTarget.getNumberOfNodes()); // store changes to avoid concurrent access
 				int deletedNode = eo.getId();
 				
 				// relabelling 
-				for(int n : relabelledNodes) {
+				for (int i = 0; i < relabelledNodes.size(); i++) {
+					int n = relabelledNodes.get(i);
 					if(n == deletedNode) {
-						nodeRelabelChanges.put(n,-1);
+						relabelledNodes.remove(i);
+						i--;
 					}
 					if(n > deletedNode) {
-						nodeRelabelChanges.put(n, n-1);
-					}
-				}
-				for(Integer n : nodeRelabelChanges.keySet()) {
-					Integer nMap = nodeRelabelChanges.get(n);
-					while(nodeRelabelChanges.containsKey(nMap)) { // here multiple mapping converge on the same node
-						nMap = nodeRelabelChanges.get(nMap);
-					}
-					relabelledNodes.remove(n);
-					if(nMap != -1) {
-						relabelledNodes.add(nMap);
+						relabelledNodes.set(i,n-1);
 					}
 				}
 
-				// n1 added 
-				for(int n : edgeN1Added) {
-					if(n == deletedNode) {
-						edgeN1AddedChanges.put(n,-1);
-					}
-					if(n > deletedNode) {
-						edgeN1AddedChanges.put(n, n-1);
-					}
-				}
-				for(Integer n : edgeN1AddedChanges.keySet()) {
-					Integer nMap = edgeN1AddedChanges.get(n);
-					while(edgeN1AddedChanges.containsKey(nMap)) { // here multiple mapping converge on the same node
-						nMap = edgeN1AddedChanges.get(nMap);
-					}
-					edgeN1Added.remove(n);
-					if(nMap != -1) {
-						edgeN1Added.add(nMap);
+				// added lists
+				for (int i = 0; i < edgeN1Added.size(); i++) {
+					int n1 = edgeN1Added.get(i);
+					int n2 = edgeN2Added.get(i);
+					if(n1 == deletedNode || n2 == deletedNode) { // a connection was deleted - presumably after this edge was added then deleted, so delete from consideration
+						edgeN1Added.remove(i);
+						edgeN2Added.remove(i);
+						i--;
+					}  else {
+						if(n1 > deletedNode) {
+							edgeN1Added.set(i, n1-1);
+						}
+						if(n2 > deletedNode) {
+							edgeN2Added.set(i, n2-1);
+						}
 					}
 				}
-				
-				// n2 added 
-				for(int n : edgeN2Added) {
-					if(n == deletedNode) {
-						edgeN2AddedChanges.put(n,-1);
-					}
-					if(n > deletedNode) {
-						edgeN2AddedChanges.put(n, n-1);
-					}
-				}
-				for(Integer n : edgeN2AddedChanges.keySet()) {
-					Integer nMap = edgeN2AddedChanges.get(n);
-					while(edgeN2AddedChanges.containsKey(nMap)) { // here multiple mapping converge on the same node
-						nMap = edgeN2AddedChanges.get(nMap);
-					}
-					edgeN2Added.remove(n);
-					if(nMap != -1) {
-						edgeN2Added.add(nMap);
-					}
-				}
-
-
-				// n1 deleted 
-				for(int n : edgeN1Deleted) {
-					if(n == deletedNode) {
-						edgeN1DeletedChanges.put(n,-1);
-					}
-					if(n > deletedNode) {
-						edgeN1DeletedChanges.put(n, n-1);
-					}
-				}
-				for(Integer n : edgeN1DeletedChanges.keySet()) {
-					Integer nMap = edgeN1DeletedChanges.get(n);
-					while(edgeN1DeletedChanges.containsKey(nMap)) { // here multiple mapping converge on the same node
-						nMap = edgeN1DeletedChanges.get(nMap);
-					}
-					edgeN1Deleted.remove(n);
-					if(nMap != -1) {
-						edgeN1Deleted.add(nMap);
-					}
-				}
-				
-				// n2 deleted 
-				for(int n : edgeN2Deleted) {
-
-					if(n == deletedNode) {
-						edgeN2DeletedChanges.put(n,-1);
-					}
-					if(n > deletedNode) {
-						edgeN2DeletedChanges.put(n, n-1);
-					}
-				}
-				for(Integer n : edgeN2DeletedChanges.keySet()) {
-					Integer nMap = edgeN2DeletedChanges.get(n);
-					while(edgeN2DeletedChanges.containsKey(nMap)) { // here multiple mapping converge on the same node
-						nMap = edgeN2DeletedChanges.get(nMap);
-					}
-					edgeN2Deleted.remove(n);
-					if(nMap != -1) {
-						edgeN2Deleted.add(nMap);
+				// deleted lists
+				for (int i = 0; i < edgeN1Deleted.size(); i++) {
+					int n1 = edgeN1Deleted.get(i);
+					int n2 = edgeN2Deleted.get(i);
+					if(n1 == deletedNode || n2 == deletedNode) { // a connection was deleted after this edge was deleted, so delete from consideration
+						edgeN1Deleted.remove(i);
+						edgeN2Deleted.remove(i);
+						i--;
+					}  else {
+						if(n1 > deletedNode) {
+							edgeN1Deleted.set(i, n1-1);
+						}
+						if(n2 > deletedNode) {
+							edgeN2Deleted.set(i, n2-1);
+						}
 					}
 				}
 
