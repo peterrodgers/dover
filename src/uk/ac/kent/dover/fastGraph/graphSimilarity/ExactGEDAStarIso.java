@@ -236,7 +236,7 @@ if(retEditList1 != null) {
 
 	/** 
 	 * 
-	 * Don't use this unless you have a pressing reason, the algorithm defaults this to an approximation GED.
+	 * Don't use this unless you have a pressing reason, the algorithm defaults this to an approximation of GED.
 	 * 
 	 * @param maxCost defines the cost, which, if exceeded, stops the search.
 	 */
