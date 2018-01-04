@@ -1,13 +1,12 @@
 package uk.ac.kent.dover.fastGraph.graphSimilarity;
 
 import java.util.*;
-import static java.lang.Math.*; 
 
 import uk.ac.kent.dover.fastGraph.*;
-import uk.ac.kent.dover.fastGraph.comparators.*;
 import uk.ac.kent.dover.fastGraph.editOperation.*;
 
 import blogspot.software_and_algorithms.stern_library.optimization.HungarianAlgorithm;
+import edu.isi.karma.modeling.research.graphmatching.algorithms.VJAccess;
 
 /**
  * An approximation method for GED from:
@@ -20,7 +19,7 @@ import blogspot.software_and_algorithms.stern_library.optimization.HungarianAlgo
  * 
  * Hungarian Algorithm from: https://github.com/KevinStern/software-and-algorithms used this
  * has been compared against that from: https://www.programcreek.com/java-api-examples/index.php?source_dir=JContextExplorer-master/JContextExplorer/src/operonClustering/HungarianAlgorithm.java
- * and both seem to return the same results on random diagrams,
+ * and both seem to return the same results on random matrices,
  * but the former is faster as it appears to have a better time complexity.
  * 
  * @author Peter Rodgers
@@ -31,33 +30,15 @@ public class ApproximateGEDBipartite extends GraphEditDistance {
 	private boolean nodeLabels;
 	private boolean directed;
 	
-	private long nodeSwapTimeLimit;
-	private int nodeSwapAttempts;
-	private long randomSeed;
-	
-	private int nodeSwaps = 0;
-	private long approximationTime = 0;;
-	
 	private Double deleteNodeCost;
 	private Double addNodeCost;
 	private Double deleteEdgeCost;
 	private Double addEdgeCost;
 	private Double relabelNodeCost;
 
-	private HashMap<Integer,Integer> nodeMapping; // g1 nodes to g2 nodes
-	private HashMap<Integer,Integer> reverseNodeMapping; // g2 nodes to g1 nodes
-	private ArrayList<Integer> deleteNodes; // g1 nodes to be removed
-	private ArrayList<Integer> deleteEdges; // g1 nodes to be removed
-	private LinkedList<Integer> addEdgeNode1List; // g1 new node1 to be added
-	private LinkedList<Integer> addEdgeNode2List; // g1 new node2 to be added
-	
-	private ReverseIntegerComparator reverseComparator = new ReverseIntegerComparator();
 	HashMap<Integer,Double> editCosts;
 	
-	private Random random;
-
-	private int addCapacity;
-	private int addStart;
+	private long approximationTime;
 	
 	public static void main(String [] args) {
 		
@@ -66,22 +47,10 @@ public class ApproximateGEDBipartite extends GraphEditDistance {
 		try {
 //			double[][] costMatrix = {{2,3,5},{7,4,3},{6,2,4}};
 			
-			int size = 100;
-			double[][] costMatrix = new double[size][size];
-			Random r = new Random(99643322L);
-			for(int i = 0; i < costMatrix.length; i++) {
-				for(int j = 0; j < costMatrix.length; j++) {
-					costMatrix[i][j] = r.nextDouble();
-				}
-			}
-long start = System.currentTimeMillis();
-			HungarianAlgorithm ha = new HungarianAlgorithm(costMatrix);
-			int[] ret = ha.execute();
-System.out.println("time "+(System.currentTimeMillis()-start)/1000.0);
-			
-			for(int i = 0; i < ret.length; i++) {
-//				System.out.println("MISMATCH "+i+" : "+ret[i]);
-			}
+
+			ApproximateGEDBipartite AGED = new ApproximateGEDBipartite();
+			AGED.test();
+
 			
 
 		} catch (Exception e) {
@@ -89,6 +58,46 @@ System.out.println("time "+(System.currentTimeMillis()-start)/1000.0);
 		}
 
 	}
+	
+	
+	
+
+	private void test() {
+long start;
+
+		int size = 1000;
+		double[][] costMatrix = new double[size][size];
+//		Random r = new Random(99643322L);
+		Random r = new Random(System.currentTimeMillis());
+		for(int i = 0; i < costMatrix.length; i++) {
+			for(int j = 0; j < costMatrix.length; j++) {
+				costMatrix[i][j] = r.nextDouble();
+			}
+		}
+		
+start = System.currentTimeMillis();
+		VJAccess vja = new VJAccess();
+		vja.computeAssignment(costMatrix);
+		int[] retVJ = vja.getAssignment();
+System.out.println("VJ time "+(System.currentTimeMillis()-start)/1000.0);
+
+start = System.currentTimeMillis();
+		HungarianAlgorithm ha = new HungarianAlgorithm(costMatrix);
+		int[] retH = ha.execute();
+System.out.println("Hungarian time "+(System.currentTimeMillis()-start)/1000.0);
+
+
+		for(int i = 0; i< size; i++) {
+//			System.out.println("i "+retH[i]+" "+retVJ[i]);
+			if(retH[i] != retVJ[i]) {
+				System.out.println("MISMATCH "+i+" : "+retH[i]+" "+retVJ[i]);
+			}
+		}
+		
+	}
+
+
+
 
 	/**
 	 * defaults to treating graph as undirected and no node label comparison,
@@ -106,9 +115,6 @@ System.out.println("time "+(System.currentTimeMillis()-start)/1000.0);
 		this.editCosts = defaultEditCosts;
 
 		this.nodeLabels = false;
-		this.nodeSwapTimeLimit = 0;
-		this.nodeSwapAttempts = 0;
-		this.randomSeed = System.currentTimeMillis();
 		
 		init();
 	}
@@ -126,9 +132,6 @@ System.out.println("time "+(System.currentTimeMillis()-start)/1000.0);
 		this.editCosts = editCosts;
 		this.directed = false;
 		this.nodeLabels = false;
-		this.nodeSwapTimeLimit = 0;
-		this.nodeSwapAttempts = 0;
-		this.randomSeed = System.currentTimeMillis();
 		
 		init();
 	}
@@ -148,50 +151,11 @@ System.out.println("time "+(System.currentTimeMillis()-start)/1000.0);
 		this.editCosts = editCosts;
 		this.directed = directed;
 		this.nodeLabels = nodeLabels;
-		this.nodeSwapTimeLimit = 0;
-		this.nodeSwapAttempts = 0;
-		this.randomSeed = System.currentTimeMillis();
 		
 		init();
 	}
 
 
-
-	/**
-	 * 
-	 * editOperations should include nodeDelete, nodeAdd, edgeDelete and edgeAdd.
-	 * Set either nodeSwapTimeLimit or nodeSwapAttempts to 0 to ensure it is not used.
-	 * The expectation is that one or the other, or both is 0. If both are non-zero then
-	 * the one that means greater number of node swaps is the limit.
-	 * 
-	 * @param directed true if the graph is treated as directed, false if undirected
-	 * @param nodeLabels true if node label operations should be considered, false if they are ignored
-	 * @param editCosts are a mapping between edit codes and their costs DELETE_NODE, ADD_NODE, DELETE_EDGE, ADD_EDGE, if @see{nodeLabels} is true, RELABEL_NODE also needs to be present
-	 * @param nodeSwapTimeLimit time in milliseconds to exit approximation
-	 * @param nodeSwapAttempts number of iterations of the node swap routine
-	 * @param randomSeed set to System.currentTimeMillis() for true random
-	 * @throws FastGraphException if an edit operation cost is missing or if both limits are -1
-	 */
-	public ApproximateGEDBipartite(boolean directed, boolean nodeLabels, HashMap<Integer,Double> editCosts, long nodeSwapTimeLimit, int nodeSwapAttempts, long randomSeed) throws FastGraphException {
-		super();
-		this.editCosts = editCosts;
-		if(nodeSwapTimeLimit == -1 && nodeSwapAttempts == -1) {
-			throw new FastGraphException("Cannot have both nodeSwapTimeLimit and nodeSwapAttempts set to unlimited.");
-		}
-		this.directed = directed;
-		this.nodeLabels = nodeLabels;
-		this.nodeSwapTimeLimit = nodeSwapTimeLimit;
-		if(nodeSwapTimeLimit == -1) {
-			this.nodeSwapTimeLimit = Long.MAX_VALUE;
-		}
-		this.nodeSwapAttempts = nodeSwapAttempts;
-		if(nodeSwapAttempts == -1) {
-			this.nodeSwapAttempts = Integer.MAX_VALUE;
-		}
-		this.randomSeed = randomSeed;
-		
-		init();
-	}
 
 	/**
 	 * Set up the edit operation costs from the cost mapping.
@@ -221,20 +185,11 @@ System.out.println("time "+(System.currentTimeMillis()-start)/1000.0);
 		if(nodeLabels && relabelNodeCost == null) {
 			throw new FastGraphException("Missing editCosts entry for EditOperation.RELABEL_NODE");
 		}
-		
-		random = new Random(randomSeed);
 	}
 
 	/**
 	 * 
-	 * @return how many node swaps were made
-	 */
-	public int getNodeSwaps() {return nodeSwaps;}
-
-	
-	/**
-	 * 
-	 * @return how long the node swaps took in milliseconds.
+	 * @return how long the approximation took.
 	 */
 	public long getApproximationTime() {return approximationTime;}
 
@@ -250,663 +205,122 @@ System.out.println("time "+(System.currentTimeMillis()-start)/1000.0);
 	 */
 	@Override
 	public double similarity(FastGraph g1, FastGraph g2) {
-	
-		addCapacity = 0;
-		addStart = g1.getNumberOfNodes();
-		if((g1.getNumberOfNodes() < g2.getNumberOfNodes())) {
-			addCapacity = (g2.getNumberOfNodes()-g1.getNumberOfNodes());
-		}
-		int deleteCapacity = 0;
-		if((g1.getNumberOfNodes() > g2.getNumberOfNodes())) {
-			deleteCapacity = (g1.getNumberOfNodes()-g2.getNumberOfNodes());
-		}
-		nodeMapping = new HashMap<>(g1.getNumberOfNodes()*4); // g1 nodes to g2 nodes
-		reverseNodeMapping = new HashMap<>(g1.getNumberOfNodes()*4); // g2 nodes to g1 nodes
-		deleteNodes = new ArrayList<>(deleteCapacity); // g1 nodes to be removed
-
-		// initial node mapping (and final mapping if there are no swaps), based on degree
-		if(directed) {
-			createDirectedMapping(g1,g2);
-		} else {
-			createUndirectedMapping(g1,g2);
-		}
-
-		if(directed) {
-			findDirectedEdgeChanges(g1,g2);
-		} else {
-			findUndirectedEdgeChanges(g1,g2);
-		}
-		
-		editList = createEditList(g1,g2);
-		
-		if(g1.getNumberOfNodes() == 0 && g1.getNumberOfNodes() == 0) {
-			return editList.getCost();
-		}
 		
 		long startTime = System.currentTimeMillis();
-		boolean keepBadMove = false;
-		approximationTime = System.currentTimeMillis()-startTime;
-		nodeSwaps = 0;
-		while( approximationTime < nodeSwapTimeLimit || nodeSwaps < nodeSwapAttempts) {
-			HashMap<Integer,Integer> oldNodeMapping = new HashMap<>(nodeMapping);
-			HashMap<Integer,Integer> oldReverseNodeMapping = new HashMap<>(reverseNodeMapping);
-			ArrayList<Integer> oldDeleteNodes = new ArrayList<>(deleteNodes);
-			
-			int size = g2.getNumberOfNodes();
-			if(g1.getNumberOfNodes() > g2.getNumberOfNodes()) {
-				size = g1.getNumberOfNodes();
-			}
-
-			int g1Node1 = random.nextInt(size);
-			int g1Node2 = random.nextInt(size);
-
-			if(g1Node1 == g1Node2) {
-				nodeSwaps++;
-				approximationTime = System.currentTimeMillis()-startTime;
-				continue;
-			}
-			
-			// if both are delete nodes, no changes required
-			if(deleteNodes.contains(g1Node1) && deleteNodes.contains(g1Node2)) {
-				nodeSwaps++;
-				approximationTime = System.currentTimeMillis()-startTime;
-				continue;
-			}
-			// if one is a delete node then modify the various lists and maps
-			// will not need to worry about add nodes
-			if(deleteNodes.contains(g1Node1)) {
-				int g2Node2 = nodeMapping.get(g1Node2);
-				int index = deleteNodes.indexOf(g1Node1);
-				deleteNodes.remove(index);
-				deleteNodes.add(g1Node2);
-				nodeMapping.remove(g1Node2);
-				nodeMapping.put(g1Node1,g2Node2);
-				reverseNodeMapping.remove(g2Node2);
-				reverseNodeMapping.put(g2Node2,g1Node1);
-			}
-			if(deleteNodes.contains(g1Node2)) {
-				int g2Node1 = nodeMapping.get(g1Node1);
-				int index = deleteNodes.indexOf(g1Node2);
-				deleteNodes.remove(index);
-				deleteNodes.add(g1Node1);
-				nodeMapping.remove(g1Node1);
-				nodeMapping.put(g1Node2,g2Node1);
-				reverseNodeMapping.remove(g2Node1);
-				reverseNodeMapping.put(g2Node1,g1Node2);
-			}
-			
-			if(!deleteNodes.contains(g1Node1) && !deleteNodes.contains(g1Node2)) {
-				int g2Node1 = nodeMapping.get(g1Node1);
-				int g2Node2 = nodeMapping.get(g1Node2);
-				nodeMapping.put(g1Node1,g2Node2);
-				nodeMapping.put(g1Node2,g2Node1);
-				reverseNodeMapping.put(g2Node2, g1Node1);
-				reverseNodeMapping.put(g2Node1, g1Node2);
-				
-			}
 		
-			if(directed) {
-				findDirectedEdgeChanges(g1,g2);
-			} else {
-				findUndirectedEdgeChanges(g1,g2);
-			}
-
-			EditList testEditList = createEditList(g1,g2);
-			
-			if(keepBadMove || testEditList.getCost() < editList.getCost()) {
-				editList = testEditList;
-//System.out.println("swapped "+g1Node1+" "+g1Node2);
-			} else { // no benefit, so revert unless bad move allowed
-				nodeMapping = oldNodeMapping;
-				reverseNodeMapping = oldReverseNodeMapping;
-				deleteNodes = oldDeleteNodes;
-			}
-			
-			nodeSwaps++;
-			approximationTime = System.currentTimeMillis()-startTime;
-			
-			double remainingTime = 1.0-approximationTime/(nodeSwapTimeLimit*1.0);
-			double remainingIteration = 1.0-nodeSwaps/(nodeSwapAttempts*1.0);
-			double remainingPercent = 0.0;
-			if(nodeSwapTimeLimit == 0) {
-				remainingPercent = remainingIteration;
-			} else if(nodeSwapAttempts == 0) {
-				remainingPercent = remainingTime;
-			} else if(remainingIteration > remainingTime) {
-				remainingPercent = remainingIteration;
-			} else {
-				remainingPercent = remainingTime;
-			}
-			double chanceOfBadMove = remainingPercent-0.25;
-			if(chanceOfBadMove < 0) {
-				chanceOfBadMove = 0;
-			}
-			keepBadMove = false;
-			if(random.nextDouble() < chanceOfBadMove) {
-				keepBadMove = true;
-			}
-			
+		int size = g1.getNumberOfNodes();
+		int deleteNodeStart = g2.getNumberOfNodes(); // matrix has deleted nodes on left
+		int addNodeStart = Integer.MAX_VALUE; // matrix has no added nodes on bottom
+		if(size < g2.getNumberOfNodes()) {
+			size = g2.getNumberOfNodes();
+			deleteNodeStart = Integer.MAX_VALUE; // matrix has no deleted nodes on left
+			addNodeStart = g1.getNumberOfNodes(); // matrix has added nodes on bottom
 		}
-
-//System.out.println(editList);
-//System.out.println("node Mapping    "+nodeMapping);
-//System.out.println("reverse Mapping "+reverseNodeMapping);
-//System.out.println("delete node list "+deleteNodes);
-//System.out.println("delete edge list "+deleteEdges);
-//System.out.println("add node set "+addNodeSet);
-//System.out.println("add edge lists "+addEdgeNode1List+" "+addEdgeNode2List);
-
+		
+		double[][] costMatrix = new double[size][size];
+		
+		for(int y = 0; y < size; y++) {
+			for(int x = 0; x < size; x++) {
+				if(x >= deleteNodeStart) { // left hand side of the matrix
+					if(deleteNodeStart-x == y) { // cost of a node deletion appears on diagonal
+						costMatrix[x][y] = deleteNodeCost;
+					} else {
+						costMatrix[x][y] = Double.MAX_VALUE;
+					}
+				} else if(y >= addNodeStart) { // bottom of the matrix
+					if(deleteNodeStart-y == x) { // cost of a node addition appears on diagonal
+						costMatrix[x][y] = addNodeCost;
+					} else {
+						costMatrix[x][y] = Double.MAX_VALUE;
+					}
+				} else { // filling in the top right
+					costMatrix[x][y] = singleNodeEditCost(x,y,g1,g2);
+				}
+			}
+		}
+System.out.println(formatMatrix(costMatrix));		
+		
+		EditList editList = new EditList();
+		
+		approximationTime = startTime-System.currentTimeMillis();
+		
+		// form the edit list
+		
 		return editList.getCost();
+	
+
 	}
 	
-
 	/**
-	 * Set the initial mapping for undirected graphs. Compare the nodes
-	 * by degree size, largest first. This will work OK
-	 * for the labelled version as long as the node label edit cost is not too high.
-	 * 
-	 * @param g1 the first graph to be compared.
-	 * @param g2 the second graph to be compared.
+	 * Find the smallest cost to turn n1 into n2.
+	 *
+	 * @param n1 the node in g1
+	 * @param n2 the node in g2
+	 * @param g1 the graph for n1
+	 * @param f2 the graph for n2
+	 * @return the total cost
 	 */
-	private void createUndirectedMapping(FastGraph g1, FastGraph g2) {
-		ArrayList<Integer> n1List = new ArrayList<Integer>(g1.getNumberOfNodes());
-		ArrayList<Integer> n2List = new ArrayList<Integer>(g2.getNumberOfNodes());
-		for(int i =0; i < g1.getNumberOfNodes(); i++) {
-			n1List.add(i);
-		}
-		for(int i =0; i < g2.getNumberOfNodes(); i++) {
-			n2List.add(i);
-		}
-		NodeDegreeComparator ndc1 = new NodeDegreeComparator(g1,g1); // comparing nodes from the same graph
-		ndc1.setAscending(false);
-		n1List.sort(ndc1);
-
-		NodeDegreeComparator ndc2 = new NodeDegreeComparator(g2,g2); // comparing nodes from the same graph
-		ndc2.setAscending(false);
-		n2List.sort(ndc2);
+	private double singleNodeEditCost(int n1, int n2, FastGraph g1, FastGraph g2) {
+		double ret = 0.0;
 		
-		// create initial mapping, and either deleted or added arrays
-		// depending on the number of nodes in g1 and g2
-		while(true) {
-			if(n1List.size() == 0) {
-				// run out of g1 nodes, so put the rest of g2 in the add nodes list
-				// this happens after the existing nodes are mapped, below
-				for(int j = 0; j < n2List.size() ;j++) {
-					int g1NodeIndex = g1.getNumberOfNodes()+j;
-					int g2NodeIndex = n2List.get(j);
-					nodeMapping.put(g1NodeIndex,g2NodeIndex); // also add to the node mapping, as we will need this to add edges
-					reverseNodeMapping.put(g2NodeIndex,g1NodeIndex);
-
-				}
-				break;
-			} else if(n2List.size() == 0) { // run out of g2 nodes, so put the rest of g1 in the delete nodes list
-				for(int j = 0; j < n1List.size() ;j++) {
-					deleteNodes.add(n1List.get(j));
-				}
-				break;
-
-			}
-			// largest degrees match
-			nodeMapping.put(n1List.get(0),n2List.get(0));
-			reverseNodeMapping.put(n2List.get(0),n1List.get(0));
-			n1List.remove(0);
-			n2List.remove(0);
-		}
-	}
-	
-	
-	/**
-	 * Set the initial mapping for directed graphs. Compare the nodes
-	 * alternately by indegree and outdegree size, largest first. This will work OK
-	 * for the labelled version as long as the node label edit cost is not too high.
-	 * 
-	 * @param g1 the first graph to be compared.
-	 * @param g2 the second graph to be compared.
-	 */
-	private void createDirectedMapping(FastGraph g1, FastGraph g2) {
-		ArrayList<Integer> n1InList = new ArrayList<Integer>(g1.getNumberOfNodes());
-		ArrayList<Integer> n1OutList = new ArrayList<Integer>(g1.getNumberOfNodes());
-		ArrayList<Integer> n2InList = new ArrayList<Integer>(g2.getNumberOfNodes());
-		ArrayList<Integer> n2OutList = new ArrayList<Integer>(g2.getNumberOfNodes());
-		for(int i =0; i < g1.getNumberOfNodes(); i++) {
-			n1InList.add(i);
-			n1OutList.add(i);
-		}
-		for(int i =0; i < g2.getNumberOfNodes(); i++) {
-			n2InList.add(i);
-			n2OutList.add(i);
-		}
-		NodeInDegreeComparator ndcIn1 = new NodeInDegreeComparator(g1,g1); // comparing nodes from the same graph
-		ndcIn1.setAscending(false);
-		n1InList.sort(ndcIn1);
-
-		NodeOutDegreeComparator ndcOut1 = new NodeOutDegreeComparator(g1,g1); // comparing nodes from the same graph
-		ndcOut1.setAscending(false);
-		n1OutList.sort(ndcOut1);
-
-		NodeInDegreeComparator ndcIn2 = new NodeInDegreeComparator(g2,g2); // comparing nodes from the same graph
-		ndcIn2.setAscending(false);
-		n2InList.sort(ndcIn2);
-		
-		NodeOutDegreeComparator ndcOut2 = new NodeOutDegreeComparator(g2,g2); // comparing nodes from the same graph
-		ndcOut2.setAscending(false);
-		n2OutList.sort(ndcOut2);
-		
-		// create initial mapping, and either deleted or added arrays
-		// depending on the number of nodes in g1 and g2
-		boolean pickingOut = false;
-		while(true) {
-			if(n1InList.size() == 0) {
-				// run out of g1 nodes, so put the rest of g2 in the add nodes list
-				// this happens after the existing nodes are mapped, below
-				for(int j = 0; j < n2InList.size() ;j++) {
-					int g1NodeIndex = g1.getNumberOfNodes()+j;
-					int g2NodeIndex = n2InList.get(j);
-					nodeMapping.put(g1NodeIndex,g2NodeIndex); // also add to the node mapping, as we will need this to add edges
-					reverseNodeMapping.put(g2NodeIndex,g1NodeIndex);
-
-				}
-				break;
-			} else if(n2InList.size() == 0) { // run out of g2 nodes, so put the rest of g1 in the delete nodes list
-				for(int j = 0; j < n1InList.size() ;j++) {
-					deleteNodes.add(n1InList.get(j));
-				}
-				break;
-
-			}
-			
-			// largest degrees match, alternate between in and out degree lists
-			if(pickingOut) {
-				int n1 = n1OutList.get(0);
-				int n2 = n2OutList.get(0);
-				nodeMapping.put(n1,n2);
-				reverseNodeMapping.put(n2,n1);
-				n1OutList.remove(0);
-				n2OutList.remove(0);
-				int index1 = n1InList.indexOf(n1);
-				int index2 = n2InList.indexOf(n2);
-				n1InList.remove(index1);
-				n2InList.remove(index2);
-				pickingOut = false;
-			} else {
-				int n1 = n1InList.get(0);
-				int n2 = n2InList.get(0);
-				nodeMapping.put(n1,n2);
-				reverseNodeMapping.put(n2,n1);
-				n1InList.remove(0);
-				n2InList.remove(0);
-				int index1 = n1OutList.indexOf(n1);
-				int index2 = n2OutList.indexOf(n2);
-				n1OutList.remove(index1);
-				n2OutList.remove(index2);
-				pickingOut = true;
-			}
-		}
-		
-	}
-	
-
-	/**
-	 * Take the required changes and create the appropriate edit list.
-	 * 
-	 * @param g1 the graph to be changed
-	 * @param g2 the target graph
-	 * @return the edit list of required operations
-	 */
-	private EditList createEditList(FastGraph g1, FastGraph g2) {
-		EditList ret = new EditList();
-		
-		EditOperation eo;
-		// add nodes, must be in order of their index, otherwise subtle bugs occur
-		for(int n = addStart; n < addCapacity+addStart; n++) {
-			Integer g2n = nodeMapping.get(n);
-			String label = g2.getNodeLabel(g2n);
-			eo = new EditOperation(EditOperation.ADD_NODE,addNodeCost,-1,label,-1,-1);
-			ret.addOperation(eo);
-		}
-		// add edges
-		LinkedList<Integer> listNode1 = new LinkedList<Integer>(addEdgeNode1List);
-		LinkedList<Integer> listNode2 = new LinkedList<Integer>(addEdgeNode2List);
-		while(!listNode1.isEmpty()) {
-			int node1 = listNode1.pop();
-			int node2 = listNode2.pop();
-			eo = new EditOperation(EditOperation.ADD_EDGE,addEdgeCost,-1,"",node1,node2);
-			ret.addOperation(eo);
-		}
-		
-		// delete edges, need to be largest id first
-		deleteEdges.sort(reverseComparator);
-		for(Integer e : deleteEdges) {
-			eo = new EditOperation(EditOperation.DELETE_EDGE,deleteEdgeCost,e,null,-1,-1);
-			ret.addOperation(eo);
-		}
-		// change node labels if flag set, must be before the node delete
-		// as it uses g1 ids
 		if(nodeLabels) {
-			for(Integer n : nodeMapping.keySet()) {
-				if(n < addStart) { // need to be existing nodes
-					Integer g2n = nodeMapping.get(n);
-					String nLabel = g1.getNodeLabel(n);
-					String g2nLabel = g2.getNodeLabel(g2n);
-					if(!nLabel.equals(g2nLabel)) {
-						eo = new EditOperation(EditOperation.RELABEL_NODE,relabelNodeCost,n,g2nLabel,-1,-1);
-						ret.addOperation(eo);
-					}
-				}
+			String n1Label = g1.getNodeLabel(n1);
+			String n2Label = g2.getNodeLabel(n2);
+			if(!n1Label.equals(n2Label)) {
+				ret += relabelNodeCost;
 			}
 		}
 		
-		// delete nodes, need to be largest id first
-		deleteNodes.sort(reverseComparator);
-		for(Integer n : deleteNodes) {
-			eo = new EditOperation(EditOperation.DELETE_NODE,deleteNodeCost,n,null,-1,-1);
-			ret.addOperation(eo);
+		if(!directed) {
+			int degree1 = g1.getNodeDegree(n1);
+			int degree2 = g2.getNodeDegree(n2);
+			if(degree1 > degree2) {
+				ret += (degree2-degree1)*addNodeCost;
+			} else {
+				ret += (degree1-degree2)*deleteNodeCost;
+			}
+		} else {
+			int inDegree1 = g1.getNodeInDegree(n1);
+			int inDegree2 = g2.getNodeInDegree(n2);
+			if(inDegree1 > inDegree2) {
+				ret += (inDegree2-inDegree1)*addNodeCost;
+			} else {
+				ret += (inDegree1-inDegree2)*deleteNodeCost;
+			}
+			int outDegree1 = g1.getNodeOutDegree(n1);
+			int outDegree2 = g2.getNodeOutDegree(n2);
+			if(outDegree1 > outDegree2) {
+				ret += (outDegree2-outDegree1)*addNodeCost;
+			} else {
+				ret += (outDegree1-outDegree2)*deleteNodeCost;
+			}
 		}
-		
+
 		return ret;
-		
 	}
+	
 	
 
 	/**
-	 * populate the edge addition and deletion data structures in the undirected case.
+	 * output matrix in readable format for debugging. Must be a square matrix
 	 * 
-	 * @param g1 the first graph to be compared.
-	 * @param g2 the second graph to be compared.
+	 * @param matrix the matrix to format
+	 * @return a string with a formatted matrix
 	 */
-	public void findUndirectedEdgeChanges(FastGraph g1, FastGraph g2) {
-		
-		HashMap<String,LinkedList<Integer>> pairToMultipleEdgeMapping = new HashMap<>(g1.getNumberOfEdges());
-		HashMap<String,Integer> pairToNode1Mapping = new HashMap<>(g1.getNumberOfEdges());
-		HashMap<String,Integer> pairToNode2Mapping = new HashMap<>(g1.getNumberOfEdges());
-
-		// find the edges to delete where g2 does not have the corresponding edge
-		deleteEdges = new ArrayList<>(g1.getNumberOfEdges());
-		for(int e = 0; e < g1.getNumberOfEdges(); e++) {
-			int node1 = g1.getEdgeNode1(e);
-			int node2 = g1.getEdgeNode2(e);
-			
-			// if the g1 node is being deleted, the edge must be deleted
-			if(deleteNodes.contains(node1) || deleteNodes.contains(node2)) {
-				deleteEdges.add(e);
-				continue;
+	protected String formatMatrix(double[][] matrix) {
+		String ret = "";
+		for(int y = 0; y < matrix.length; y++) {
+			for(int x = 0; x < matrix.length; x++) {
+				ret += matrix[x][y]+"\t";
 			}
-			
-			// check for a corresponding edge in g2
-			boolean found = false;
-			Integer node1Map = nodeMapping.get(node1);
-			Integer node2Map = nodeMapping.get(node2);
-			if(node1Map == null || node2Map == null) {
-				// if connecting node in n2 does not exist, then there is no edge
-				found = false;
-			} else {
-
-				int[] connecting = g2.getNodeConnectingEdges(node1Map);
-				for(int connectingIndex = 0; connectingIndex < connecting.length; connectingIndex++) {
-					int connectingE = connecting[connectingIndex];
-					int connectingN = g2.oppositeEnd(connectingE, node1Map);
-					if(connectingN == node2Map) {
-						found = true;
-						break;
-					}
-				}
-			}
-			if(found == false) {
-				deleteEdges.add(e);
-				continue;
-			}
-			
-			// store potential multiedge details, for possible delete
-			String pairEntry = node1+"-"+node2;
-			if(node1 > node2) {
-				pairEntry = node2+"-"+node1;
-			}
-			LinkedList<Integer> edges = pairToMultipleEdgeMapping.get(pairEntry);
-			if(edges == null) {
-				edges = new LinkedList<Integer>();
-				pairToMultipleEdgeMapping.put(pairEntry, edges);
-				pairToNode1Mapping.put(pairEntry, node1);
-				pairToNode2Mapping.put(pairEntry, node2);
-			}
-			edges.add(e);
+			ret += "\n";
 		}
-		// find the edges to add where g1 does not currently have an edge
-		// checks for g2 edges that are not in g1
-		addEdgeNode1List = new LinkedList<>();
-		addEdgeNode2List = new LinkedList<>();
-		for(int e = 0; e < g2.getNumberOfEdges(); e++) {
-			int g2Node1 = g2.getEdgeNode1(e);
-			int g2Node2 = g2.getEdgeNode2(e);
-			
-			Integer g1Node1Map = reverseNodeMapping.get(g2Node1);
-			Integer g1Node2Map = reverseNodeMapping.get(g2Node2);
-
-			boolean found = false;
-			if(isAnAddNode(g1Node1Map) || isAnAddNode(g1Node2Map)) {
-				// if either node is going to be added, we will need to add the edge
-				found = false;
-			} else {
-				// both nodes are in g1, so check for a corresponding edge in g1
-				int[] connecting = g1.getNodeConnectingEdges(g1Node1Map);
-				for(int connectingIndex = 0; connectingIndex < connecting.length; connectingIndex++) {
-					int connectingE = connecting[connectingIndex];
-					int connectingN = g1.oppositeEnd(connectingE, g1Node1Map);
-					if(connectingN == g1Node2Map) {
-						found = true;
-						break;
-					}
-				}
-			}
-			// no edge, so add one
-			if(found == false) {
-				addEdgeNode1List.add(g1Node1Map);
-				addEdgeNode2List.add(g1Node2Map);
-				continue;
-			}
-			
-		}
-		// check for multiple edge entries without sufficient g2 edges to match
-		// this is potentially quite slow if there are a lot of multiedges
-		for(String pairEntry : pairToMultipleEdgeMapping.keySet()) {
-
-			LinkedList<Integer> edges = pairToMultipleEdgeMapping.get(pairEntry);
-			int node1 = pairToNode1Mapping.get(pairEntry);
-			int node2 = pairToNode2Mapping.get(pairEntry);
-			
-			Integer node1Map = nodeMapping.get(node1);
-			Integer node2Map = nodeMapping.get(node2);
-			// we know there is at least one edge in g1. Lets see if there is the same number in g2
-			int count = 0;
-			int[] connecting = g2.getNodeConnectingEdges(node1Map);
-			for(int connectingIndex = 0; connectingIndex < connecting.length; connectingIndex++) {
-				int connectingE = connecting[connectingIndex];
-				int connectingN = g2.oppositeEnd(connectingE, node1Map);
-				if(connectingN == node2Map) {
-					count++;
-				}
-			}
-			
-			// don't want to count self sourcing twice
-			if(node1 == node2) {
-				count = count/2;
-			}
-			
-			// if there are too many edges in g1, add some to the remove list 
-			while(count < edges.size()) {
-				Integer removeEdge = edges.pop();
-				deleteEdges.add(removeEdge);
-			}
-			
-			// if there are too few edges in g1, add some to the add list
-			if(count > edges.size()) {
-				for(int i = 0; i < (count - edges.size());i++) {
-					addEdgeNode1List.add(node1);
-					addEdgeNode2List.add(node2);
-				}
-			}
-		}
+		return ret;
 
 	}
 	
-	/**
-	 * populate the edge addition and deletion data structures in the directed case.
-	 * 
-	 * @param g1 the first graph to be compared.
-	 * @param g2 the second graph to be compared.
-	 */
-	public void findDirectedEdgeChanges(FastGraph g1, FastGraph g2) {
-		
-		HashMap<String,LinkedList<Integer>> pairToMultipleEdgeMapping = new HashMap<>(g1.getNumberOfEdges());
-		HashMap<String,Integer> pairToNode1Mapping = new HashMap<>(g1.getNumberOfEdges());
-		HashMap<String,Integer> pairToNode2Mapping = new HashMap<>(g1.getNumberOfEdges());
-
-		// find the edges to delete where g2 does not have the corresponding edge
-		deleteEdges = new ArrayList<>(g1.getNumberOfEdges());
-		for(int e = 0; e < g1.getNumberOfEdges(); e++) {
-			int node1 = g1.getEdgeNode1(e);
-			int node2 = g1.getEdgeNode2(e);
-			
-			// if the g1 node is being deleted, the edge must be deleted
-			if(deleteNodes.contains(node1) || deleteNodes.contains(node2)) {
-				deleteEdges.add(e);
-				continue;
-			}
-			
-			// check for a corresponding edge in g2
-			boolean found = false;
-			Integer node1Map = nodeMapping.get(node1);
-			Integer node2Map = nodeMapping.get(node2);
-			if(node1Map == null || node2Map == null) {
-				// if connecting node in n2 does not exist, then there is no edge
-				found = false;
-			} else {
-
-				// check the out edges of the g2 node1 to see if it points to the g2 node2
-				int[] connecting = g2.getNodeConnectingOutEdges(node1Map);
-				for(int connectingIndex = 0; connectingIndex < connecting.length; connectingIndex++) {
-					int connectingE = connecting[connectingIndex];
-					int connectingN = g2.getEdgeNode2(connectingE);
-					if(connectingN == node2Map) {
-						found = true;
-						break;
-					}
-				}
-			}
-			if(found == false) {
-				deleteEdges.add(e);
-				continue;
-			}
-			
-			// store potential multiedge details, for possible delete
-			String pairEntry = node1+"-"+node2;
-			LinkedList<Integer> edges = pairToMultipleEdgeMapping.get(pairEntry);
-			if(edges == null) {
-				edges = new LinkedList<Integer>();
-				pairToMultipleEdgeMapping.put(pairEntry, edges);
-				pairToNode1Mapping.put(pairEntry, node1);
-				pairToNode2Mapping.put(pairEntry, node2);
-			}
-			edges.add(e);
-		}
-		// find the edges to add where g1 does not currently have an edge
-		// checks for g2 edges that are not in g1
-		addEdgeNode1List = new LinkedList<>();
-		addEdgeNode2List = new LinkedList<>();
-		for(int e = 0; e < g2.getNumberOfEdges(); e++) {
-			int g2Node1 = g2.getEdgeNode1(e);
-			int g2Node2 = g2.getEdgeNode2(e);
-			
-			Integer g1Node1Map = reverseNodeMapping.get(g2Node1);
-			Integer g1Node2Map = reverseNodeMapping.get(g2Node2);
-			
-			boolean found = false;
-			if(isAnAddNode(g1Node1Map) || isAnAddNode(g1Node2Map)) {
-				// if either node is going to be added, we will need to add the edge
-				found = false;
-			} else {
-				// both nodes are in g1, so check for a corresponding edge in g1
-				int[] connecting = g1.getNodeConnectingOutEdges(g1Node1Map);
-				for(int connectingIndex = 0; connectingIndex < connecting.length; connectingIndex++) {
-					int connectingE = connecting[connectingIndex];
-					if(g1.getEdgeNode1(connectingE) != g1Node1Map) {
-						continue;
-					}
-					if(g1.getEdgeNode2(connectingE) != g1Node2Map) {
-						continue;
-					}
-					found = true;
-					break;
-				}
-			}
-
-			// no edge, so add one
-			if(!found) {
-				addEdgeNode1List.add(g1Node1Map);
-				addEdgeNode2List.add(g1Node2Map);
-				continue;
-			}
-			
-		}
-		// check for multiple edge entries without sufficient g2 edges to match
-		// this is potentially quite slow if there are a lot of multiedges
-		for(String pairEntry : pairToMultipleEdgeMapping.keySet()) {
-			LinkedList<Integer> edges = pairToMultipleEdgeMapping.get(pairEntry);
-
-			int node1 = pairToNode1Mapping.get(pairEntry);
-			int node2 = pairToNode2Mapping.get(pairEntry);
-			
-			Integer node1Map = nodeMapping.get(node1);
-			Integer node2Map = nodeMapping.get(node2);
-			// we know there is at least one edge in g1.
-			// Lets see if there is the same number going in the same direction in g2
-			int count = 0;
-			int[] connecting = g2.getNodeConnectingEdges(node1Map);
-			
-			for(int connectingIndex = 0; connectingIndex < connecting.length; connectingIndex++) {
-				int connectingE = connecting[connectingIndex];
-				if(g2.getEdgeNode1(connectingE) != node1Map) {
-					continue;
-				}
-				if(g2.getEdgeNode2(connectingE) != node2Map) {
-					continue;
-				}
-				count++;
-			}
-			
-			// don't want to count self sourcing twice
-			if(node1 == node2) {
-				count = count/2;
-			}
-			
-			// if there are too many edges in g1, add some to the remove list 
-			while(count < edges.size()) {
-				Integer removeEdge = edges.pop();
-				deleteEdges.add(removeEdge);
-			}
-			
-			// if there are too few edges in g1, add some to the add list
-			if(count > edges.size()) {
-				for(int i = 0; i < (count - edges.size());i++) {
-
-					addEdgeNode1List.add(node1);
-					addEdgeNode2List.add(node2);
-				}
-			}
-		}
-	}
-	
-
-	/**
-	 * See if a nodeMapping node is additional to the current g1 nodes
-	 * 
-	 * @param n
-	 * @return true if the node is going to be added from g2 to the new graph, false if it already exists in g1
-	 */
-	private boolean isAnAddNode(int n) {
-		if(n >= addStart) {
-			return true;
-		}
-		return false;
-	}
 	
 }
+	
+	
+	
