@@ -52,9 +52,9 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 		
 		try {
 			
-			testByRandomGraphLoop();
+//			testByRandomGraphLoop();
 
-			int startNodes = 100000;
+			int startNodes = 100;
 			int nodes = startNodes;
 			while(true) {
 				double ret;
@@ -90,7 +90,7 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 				retEditList1 = ged.getEditList();
 				retList = retEditList1.getEditList();
 				long start2 = System.currentTimeMillis();
-				ged = new ApproximateGEDSimple(false,false,editCosts,1000,0,777777);
+				ged = new ApproximateGEDSimple(false,false,editCosts,1000,0,7777);
 				ret = ged.similarity(g1, g2);
 				
 				System.out.println("OPTIMIZATION nodes "+nodes+" edges "+edges);
@@ -1006,7 +1006,7 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 				System.out.println("AAA problem seed "+seed);
 				System.exit(0);
 			} else {
-				System.out.println("AAA OK "+seed);
+//				System.out.println("AAA OK "+seed);
 			}
 
 			ged = new ApproximateGEDSimple(false,false,editCosts,0,1000,seed+30);
