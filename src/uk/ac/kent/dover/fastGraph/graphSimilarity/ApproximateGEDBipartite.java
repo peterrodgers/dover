@@ -2,6 +2,8 @@ package uk.ac.kent.dover.fastGraph.graphSimilarity;
 
 import java.util.*;
 
+import com.dberm22.lapjv4j.lapjv;
+
 import uk.ac.kent.dover.fastGraph.*;
 import uk.ac.kent.dover.fastGraph.editOperation.*;
 
@@ -9,18 +11,24 @@ import blogspot.software_and_algorithms.stern_library.optimization.HungarianAlgo
 import edu.isi.karma.modeling.research.graphmatching.algorithms.VJAccess;
 
 /**
- * An approximation method for GED from:
+ * Defines a cost between all nodes in g1 to g2, then finds a minimal local matching
+ * using a bipartite matching algorithm.
+ * 
+ * An approximation method for GED using the Hungarian Algorithm from:
  * Riesen K, Bunke H. Approximate graph edit distance computation by means of bipartite graph matching. Image and Vision computing. 2009 Jun 4;27(7):950-9.
  * doi:10.1016/j.imavis.2008.04.004
+ *
+ * or (faster) the Volgenant Jonker algorithm from
+ * Fankhauser S, Riesen K, Bunke H. Speeding up graph edit distance computation through fast bipartite matching. Graph-based representations in pattern recognition. 2011:102-11.
  * 
- * Defines a cost between all nodes in g1 to g2, then finds a minimal matching
- * using the Hungarian algorithm. As the Hungarian algorithm can complete in |N| cubed time
- * complexity, this GED approximation method is |N| cubed.
- * 
- * Hungarian Algorithm from: https://github.com/KevinStern/software-and-algorithms used this
- * has been compared against that from: https://www.programcreek.com/java-api-examples/index.php?source_dir=JContextExplorer-master/JContextExplorer/src/operonClustering/HungarianAlgorithm.java
- * and both seem to return the same results on random matrices,
- * but the former is faster as it appears to have a better time complexity.
+ * comparison between:
+ * Hungarian Algorithm from: a. https://github.com/KevinStern/software-and-algorithms used this
+ * Hungarian Algorithm from: b. https://www.programcreek.com/java-api-examples/index.php?source_dir=JContextExplorer-master/JContextExplorer/src/operonClustering/HungarianAlgorithm.java
+ * Volgenant Jonker Algorithm from c. https://github.com/usc-isi-i2/szeke/blob/master/src/main/java/edu/isi/karma/modeling/research/graphmatching/algorithms/VolgenantJonker.java
+ * Volgenant Jonker Algorithm from d. https://github.com/dberm22/Bipartite-Solver
+ * and all seem to return the same matching on random matrices,
+ * Speed testing gives: c fastest, then a and d similar, with b significantly slower.
+ * E.g. time for 6000 nodes: a: 9.6 secs, b: no termination in reasonable time, c: 2.9, d: 10.2
  * 
  * @author Peter Rodgers
  *
@@ -45,13 +53,9 @@ public class ApproximateGEDBipartite extends GraphEditDistance {
 		Debugger.enabled = false;
 		
 		try {
-//			double[][] costMatrix = {{2,3,5},{7,4,3},{6,2,4}};
-			
 
 			ApproximateGEDBipartite AGED = new ApproximateGEDBipartite();
 			AGED.test();
-
-			
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -59,15 +63,14 @@ public class ApproximateGEDBipartite extends GraphEditDistance {
 
 	}
 	
-	
-	
+
 
 	private void test() {
 long start;
 
 		int size = 1000;
 		double[][] costMatrix = new double[size][size];
-//		Random r = new Random(99643322L);
+//		Random r = new Random(996322L);
 		Random r = new Random(System.currentTimeMillis());
 		for(int i = 0; i < costMatrix.length; i++) {
 			for(int j = 0; j < costMatrix.length; j++) {
@@ -85,7 +88,6 @@ start = System.currentTimeMillis();
 		HungarianAlgorithm ha = new HungarianAlgorithm(costMatrix);
 		int[] retH = ha.execute();
 System.out.println("Hungarian time "+(System.currentTimeMillis()-start)/1000.0);
-
 
 		for(int i = 0; i< size; i++) {
 //			System.out.println("i "+retH[i]+" "+retVJ[i]);
