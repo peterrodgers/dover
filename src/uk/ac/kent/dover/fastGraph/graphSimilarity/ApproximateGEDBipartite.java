@@ -2,9 +2,8 @@ package uk.ac.kent.dover.fastGraph.graphSimilarity;
 
 import java.util.*;
 
-import com.dberm22.lapjv4j.lapjv;
-
 import uk.ac.kent.dover.fastGraph.*;
+import uk.ac.kent.dover.fastGraph.comparators.EditOperationComparator;
 import uk.ac.kent.dover.fastGraph.editOperation.*;
 
 import blogspot.software_and_algorithms.stern_library.optimization.HungarianAlgorithm;
@@ -38,6 +37,8 @@ public class ApproximateGEDBipartite extends GraphEditDistance {
 	private boolean nodeLabels;
 	private boolean directed;
 	
+	private boolean useHungarian = false;
+
 	private Double deleteNodeCost;
 	private Double addNodeCost;
 	private Double deleteEdgeCost;
@@ -48,14 +49,73 @@ public class ApproximateGEDBipartite extends GraphEditDistance {
 	
 	private long approximationTime;
 	
+	
 	public static void main(String [] args) {
 		
 		Debugger.enabled = false;
 		
 		try {
 
-			ApproximateGEDBipartite AGED = new ApproximateGEDBipartite();
-			AGED.test();
+//			ApproximateGEDBipartite aged = new ApproximateGEDBipartite();
+//			aged.test();
+			
+			double ret;
+			List<EditOperation> retList;
+			FastGraph g1,g2,gRet;
+			EditOperation eo;		
+			EditList el, retEditList;
+			HashMap<Integer,Double> editCosts;
+			ApproximateGEDBipartite ged;
+			
+			editCosts = new HashMap<>();
+			editCosts.put(EditOperation.DELETE_NODE,2.0);
+			editCosts.put(EditOperation.ADD_NODE,3.0);
+			editCosts.put(EditOperation.DELETE_EDGE,11.0);
+			editCosts.put(EditOperation.ADD_EDGE,5.0);
+			editCosts.put(EditOperation.RELABEL_NODE,7.0);
+			
+			el = new EditList();
+			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 0",-1,-1);
+			el.addOperation(eo);
+			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node X",-1,-1);
+			el.addOperation(eo);
+			eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",1,0);
+			el.addOperation(eo);
+			eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",1,0);
+			el.addOperation(eo);
+			eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",1,1);
+			el.addOperation(eo);
+			eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",1,1);
+			el.addOperation(eo);
+			eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",0,1);
+			el.addOperation(eo);
+			g1 = FastGraph.randomGraphFactory(0, 0, false);
+			g1 = el.applyOperations(g1);
+		
+			el = new EditList();
+			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 1",-1,-1);
+			el.addOperation(eo);
+			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 0",-1,-1);
+			el.addOperation(eo);
+			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 0",-1,-1);
+			el.addOperation(eo);
+			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 2",-1,-1);
+			el.addOperation(eo);
+			eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",1,0);
+			el.addOperation(eo);
+			g2 = FastGraph.randomGraphFactory(0, 0, false);
+			g2 = el.applyOperations(g2);
+
+			ged = new ApproximateGEDBipartite(true,true,editCosts);
+			
+			ret = ged.similarity(g1, g2);
+			retEditList = ged.getEditList();
+			retList = retEditList.getEditList();
+			
+			gRet = retEditList.applyOperations(g1);
+			
+System.out.println(retEditList);			
+System.out.println(ExactIsomorphism.isomorphic(gRet, g2, true, true)+" "+g1.checkConsistency()+" "+g2.checkConsistency()+" "+gRet.checkConsistency());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -158,7 +218,6 @@ System.out.println("Hungarian time "+(System.currentTimeMillis()-start)/1000.0);
 	}
 
 
-
 	/**
 	 * Set up the edit operation costs from the cost mapping.
 	 * 
@@ -194,8 +253,28 @@ System.out.println("Hungarian time "+(System.currentTimeMillis()-start)/1000.0);
 	 * @return how long the approximation took.
 	 */
 	public long getApproximationTime() {return approximationTime;}
-
 	
+	/**
+	 * Returns the current algorithm used to find bipartite matching
+	 * 
+	 * @return true if current algorithm is Hungarian, false if it is Volgenant Jonker
+	 */
+	public boolean getUseHungarian() {
+		return useHungarian;
+	}
+
+	/**
+	 * Set the algorithm for bipartite matching. Default is false,
+	 * the Hungarian algorithm is always slower than Volgenant Jonker,
+	 * so there is no reason beyond testing to set this to true.
+	 * 
+	 * @param useHungarian true for Hungarian algorithm, false for Volgenant Jonker
+	 */
+	public void setUseHungarian(boolean useHungarian) {
+		this.useHungarian = useHungarian;
+	}
+	
+
 	/**
 	 * This returns an approximation of graph edit distance between the two graphs. 
 	 * Zero means the graphs are already isomorphic.
@@ -209,49 +288,245 @@ System.out.println("Hungarian time "+(System.currentTimeMillis()-start)/1000.0);
 	public double similarity(FastGraph g1, FastGraph g2) {
 		
 		long startTime = System.currentTimeMillis();
-		
-		int size = g1.getNumberOfNodes();
-		int deleteNodeStart = g2.getNumberOfNodes(); // matrix has deleted nodes on left
-		int addNodeStart = Integer.MAX_VALUE; // matrix has no added nodes on bottom
-		if(size < g2.getNumberOfNodes()) {
-			size = g2.getNumberOfNodes();
-			deleteNodeStart = Integer.MAX_VALUE; // matrix has no deleted nodes on left
-			addNodeStart = g1.getNumberOfNodes(); // matrix has added nodes on bottom
-		}
+		int nodes1 = g1.getNumberOfNodes();
+		int nodes2 = g2.getNumberOfNodes();
+		int size = nodes1+nodes2;
 		
 		double[][] costMatrix = new double[size][size];
 		
-		for(int y = 0; y < size; y++) {
-			for(int x = 0; x < size; x++) {
-				if(x >= deleteNodeStart) { // left hand side of the matrix
-					if(deleteNodeStart-x == y) { // cost of a node deletion appears on diagonal
-						costMatrix[x][y] = deleteNodeCost;
+		for(int y = 0; y < size; y++) { // g1 nodes
+			for(int x = 0; x < size; x++) { // g2 nodes
+				if(x < nodes2 && y < nodes1) { // top left of the matrix
+					costMatrix[y][x] = singleNodeEditCost(y,x,g1,g2);
+				} else if(x >= nodes2 && y < nodes1) { // top right of the matrix
+					if(x-nodes2 == y) { // cost of a node deletion appears on diagonal
+						costMatrix[y][x] = singleNodeDeleteCost(y, g1);
 					} else {
-						costMatrix[x][y] = Double.MAX_VALUE;
+						costMatrix[y][x] = Double.MAX_VALUE;
 					}
-				} else if(y >= addNodeStart) { // bottom of the matrix
-					if(deleteNodeStart-y == x) { // cost of a node addition appears on diagonal
-						costMatrix[x][y] = addNodeCost;
+				} else if(x < nodes2 && y >= nodes1) { // bottom left of the matrix
+					if(y-nodes1 == x) { // cost of a node addition appears on diagonal
+						costMatrix[y][x] = singleNodeAddCost(x, g2);
 					} else {
-						costMatrix[x][y] = Double.MAX_VALUE;
+						costMatrix[y][x] = Double.MAX_VALUE;
 					}
-				} else { // filling in the top right
-					costMatrix[x][y] = singleNodeEditCost(x,y,g1,g2);
+				} else { // bottom right
+					costMatrix[y][x] = 0.0;
 				}
 			}
 		}
-System.out.println(formatMatrix(costMatrix));		
 		
-		EditList editList = new EditList();
+		int[] mapping = null;
+		if(useHungarian) {
+			HungarianAlgorithm ha = new HungarianAlgorithm(costMatrix);
+			mapping = ha.execute();
+		} else {
+			VJAccess vja = new VJAccess();
+			vja.computeAssignment(costMatrix);
+			mapping = vja.getAssignment();
+		}
+		
+		editList = findEditListFromMapping(directed, nodeLabels, g1, g2, mapping, editCosts);
 		
 		approximationTime = startTime-System.currentTimeMillis();
 		
-		// form the edit list
-		
 		return editList.getCost();
-	
 
 	}
+
+	/**
+	 * Takes a mapping from g1 nodes to g2 nodes that includes node to node, node to delete, add to node.
+	 * Mapping from g1 nodes to values greater than the number of g2 nodes are delete.
+	 * Mapping from values greater the the number of g1 nodes to g2 nodes are add.
+	 * Edge addition and deletion can be inferred from edges between mapped nodes
+	 * 
+	 * @param directed true if the graph should be treated as directed, false if undirected
+	 * @param nodeLabels true if the nodeLabels are considered, false if they are ignored
+	 * @param g1 the graph the mapping is from
+	 * @param g2 the graph the mapping is to
+	 * @param mapping the mapping
+	 * @param editCosts the costs of each edit
+	 * @return an edit list that uses the mapping to make g1 into g2
+	 */
+	public static EditList findEditListFromMapping(boolean directed, boolean nodeLabels, FastGraph g1, FastGraph g2,int[] mapping, HashMap<Integer,Double> editCosts) {
+		
+		EditList el = new EditList();
+		
+		int nodes1 = g1.getNumberOfNodes();
+		int nodes2 = g2.getNumberOfNodes();
+		int size = nodes1+nodes2;
+		
+		int[] nodeMapping = new int[nodes1]; // if -1 then deleted node
+		int[] reverseNodeMapping = new int[nodes2]; // points at both existing and added nodes
+		
+		HashMap<Integer,Integer> addedNodes = new HashMap<>(size); // mapping from new g1 indexes to g2 indexes
+		ArrayList<Integer> deletedNodes = new ArrayList<>(nodes1); // list of g1 nodes to be deleted
+
+		int n1Count = nodes1; // this is used to assign added node indexes, so starts at the end of the node1 ids
+		for(int n1=0; n1 < mapping.length; n1++) {
+			int n2 = mapping[n1];
+			if(n1 < nodes1 && n2 < nodes2) { // just a normal map (top left of matrix)
+				nodeMapping[n1] = n2;
+				reverseNodeMapping[n2] = n1;
+			} else if (n1 < nodes1 && n2 >= nodes2) { // a node deletion (top right of matrix)
+				deletedNodes.add(n1);
+				nodeMapping[n1] = -1;
+			} else if (n1 >= nodes1 && n2 < nodes2) { // a node addition (bottom left of matrix)
+				addedNodes.put(n1Count,n2);
+				reverseNodeMapping[n2] = n1Count;
+				n1Count++;
+			} else { // indexes beyond nodes1 map to indexes beyond nodes2 (bottom right of matrix), so ignore
+			}
+		}
+		
+		// put the added nodes
+		for(int n1 = nodes1; n1 < n1Count; n1++) {
+			int n2 = addedNodes.get(n1);
+			String label = g2.getNodeLabel(n2);
+			EditOperation eo = new EditOperation(EditOperation.ADD_NODE,editCosts.get(EditOperation.ADD_NODE),-1,label,-1,-1);
+			el.addOperation(eo);
+		}
+		
+		// do the node relabelling if required
+		if(nodeLabels) {
+			for(int n1 = 0; n1 < nodes1; n1++) {
+				int n2 = nodeMapping[n1];
+				if(n2 == -1) {
+					continue;
+				}
+				String label1 = g1.getNodeLabel(n1);
+				String label2 = g2.getNodeLabel(n2);
+				if(!label1.equals(label2)) {
+					EditOperation eo = new EditOperation(EditOperation.RELABEL_NODE,editCosts.get(EditOperation.RELABEL_NODE),n1,label2,-1,-1);
+					el.addOperation(eo);
+				}
+			}
+		}
+		
+		HashMap<String,ArrayList<Integer>> g1EdgeIdMap = new HashMap<>(g1.getNumberOfEdges()*2);
+		for(int e=0; e < g1.getNumberOfEdges(); e++) {
+			int nodeA = g1.getEdgeNode1(e);
+			int nodeB = g1.getEdgeNode2(e);
+			if(!directed) { // in this case both directions are the same edge
+				if(nodeA > nodeB) {
+					nodeB = g1.getEdgeNode1(e);
+					nodeA = g1.getEdgeNode2(e);
+				}
+			}
+			String edgeString = nodeA+"-"+nodeB;
+			ArrayList<Integer> edges = g1EdgeIdMap.get(edgeString);
+			if(edges == null) {
+				edges = new ArrayList<>();
+			}
+			edges.add(e);
+			g1EdgeIdMap.put(edgeString, edges);
+		}
+		
+		
+		HashMap<String,ArrayList<Integer>> g2EdgeIdMap = new HashMap<>(g2.getNumberOfEdges()*2);
+		for(int e=0; e < g2.getNumberOfEdges(); e++) {
+			int nodeA = g2.getEdgeNode1(e);
+			int nodeB = g2.getEdgeNode2(e);
+			if(!directed) { // in this case both directions are the same edge
+				if(nodeA > nodeB) {
+					nodeB = g2.getEdgeNode1(e);
+					nodeA = g2.getEdgeNode2(e);
+				}
+			}
+			String edgeString = nodeA+"-"+nodeB;
+			ArrayList<Integer> edges = g2EdgeIdMap.get(edgeString);
+			if(edges == null) {
+				edges = new ArrayList<>();
+			}
+			edges.add(e);
+			g2EdgeIdMap.put(edgeString, edges);
+		}
+		
+		//TODO
+		
+		// find the difference between g1 edges and g2 edges
+		for(String e1String : g1EdgeIdMap.keySet()) {
+			ArrayList<Integer> e1Ids = g1EdgeIdMap.get(e1String);
+			int e1Count = e1Ids.size();
+			String[] split1 = e1String.split("-");
+			int e1NodeA = Integer.parseInt(split1[0]);
+			int e1NodeB = Integer.parseInt(split1[1]);
+			
+			int e2NodeA = nodeMapping[e1NodeA];
+			int e2NodeB = nodeMapping[e1NodeB];
+			if(!directed) { // either direction, so order the nodes
+				if(e2NodeA > e2NodeB) {
+					e2NodeB = nodeMapping[e1NodeA];
+					e2NodeA = nodeMapping[e1NodeB];
+				}
+			}
+			
+			String e2String = e2NodeA+"-"+e2NodeB;
+			ArrayList<Integer> e2Ids = g2EdgeIdMap.get(e2String);
+			int e2Count = 0;
+			if(e2Ids != null) {
+				e2Count = e2Ids.size();
+			} else {
+				g2EdgeIdMap.remove(e2String);
+			}
+			
+			if(e1Count > e2Count) {
+				for(int i = 0; i < e1Count-e2Count; i++) {
+					int deleteId = e1Ids.get(i);
+					EditOperation eo = new EditOperation(EditOperation.DELETE_EDGE,editCosts.get(EditOperation.DELETE_EDGE),deleteId,null,-1,-1);
+					el.addOperation(eo);
+				}
+			}
+			if(e1Count < e2Count) {
+				for(int i = 0; i < e2Count-e1Count; i++) {
+					int e2Id = e2Ids.get(i);
+					String label = g2.getEdgeLabel(e2Id);
+					EditOperation eo = new EditOperation(EditOperation.ADD_EDGE,editCosts.get(EditOperation.ADD_EDGE),-1,label,e1NodeA,e1NodeB);
+					el.addOperation(eo);
+				}
+			}
+		}
+		
+		// add remaining g2 edges
+		
+		// find the nodes to delete
+		
+		// sort the EditOperations by largest Id first
+		el.sort();
+
+		return el;
+		
+		
+	}
+
+
+
+	/**
+	 * Find the cost to delete n from g.
+	 *
+	 * @param n the node
+	 * @param g the graph containing n
+	 * @return the total cost
+	 */
+	private double singleNodeDeleteCost(int n, FastGraph g) {
+		double ret = (deleteEdgeCost*g.getNodeDegree(n))/2;
+		ret+=deleteNodeCost;
+		return ret;
+	}
+
+	/**
+	 * Find the cost to add a node like n.
+	 *
+	 * @param n the node
+	 * @param g the graph containing n
+	 * @return the total cost
+	 */
+	private double singleNodeAddCost(int n, FastGraph g) {
+		double ret = (addEdgeCost*g.getNodeDegree(n))/2;
+		ret+=deleteNodeCost;
+		return ret;
+	}
+
 	
 	/**
 	 * Find the smallest cost to turn n1 into n2.
@@ -259,7 +534,7 @@ System.out.println(formatMatrix(costMatrix));
 	 * @param n1 the node in g1
 	 * @param n2 the node in g2
 	 * @param g1 the graph for n1
-	 * @param f2 the graph for n2
+	 * @param g2 the graph for n2
 	 * @return the total cost
 	 */
 	private double singleNodeEditCost(int n1, int n2, FastGraph g1, FastGraph g2) {
@@ -276,25 +551,26 @@ System.out.println(formatMatrix(costMatrix));
 		if(!directed) {
 			int degree1 = g1.getNodeDegree(n1);
 			int degree2 = g2.getNodeDegree(n2);
-			if(degree1 > degree2) {
-				ret += (degree2-degree1)*addNodeCost;
+			
+			if(degree1 < degree2) {
+				ret += (degree2-degree1)*addEdgeCost/2;
 			} else {
-				ret += (degree1-degree2)*deleteNodeCost;
+				ret += (degree1-degree2)*deleteEdgeCost/2;
 			}
 		} else {
 			int inDegree1 = g1.getNodeInDegree(n1);
 			int inDegree2 = g2.getNodeInDegree(n2);
-			if(inDegree1 > inDegree2) {
-				ret += (inDegree2-inDegree1)*addNodeCost;
+			if(inDegree1 < inDegree2) {
+				ret += (inDegree2-inDegree1)*addEdgeCost/2;
 			} else {
-				ret += (inDegree1-inDegree2)*deleteNodeCost;
+				ret += (inDegree1-inDegree2)*deleteEdgeCost/2;
 			}
 			int outDegree1 = g1.getNodeOutDegree(n1);
 			int outDegree2 = g2.getNodeOutDegree(n2);
-			if(outDegree1 > outDegree2) {
-				ret += (outDegree2-outDegree1)*addNodeCost;
+			if(outDegree1 < outDegree2) {
+				ret += (outDegree2-outDegree1)*addEdgeCost/2;
 			} else {
-				ret += (outDegree1-outDegree2)*deleteNodeCost;
+				ret += (outDegree1-outDegree2)*deleteEdgeCost/2;
 			}
 		}
 
@@ -309,11 +585,11 @@ System.out.println(formatMatrix(costMatrix));
 	 * @param matrix the matrix to format
 	 * @return a string with a formatted matrix
 	 */
-	protected String formatMatrix(double[][] matrix) {
+	public static String formatMatrix(double[][] matrix) {
 		String ret = "";
 		for(int y = 0; y < matrix.length; y++) {
 			for(int x = 0; x < matrix.length; x++) {
-				ret += matrix[x][y]+"\t";
+				ret += matrix[y][x]+"\t";
 			}
 			ret += "\n";
 		}

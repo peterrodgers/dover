@@ -84,6 +84,12 @@ public class TestRunner {
 		}
 		System.out.println(result.wasSuccessful()+" ExactGEDAStarIsoTest");
 		
+		result = JUnitCore.runClasses(ApproximateGEDBipartiteTest.class);
+		for (Failure failure : result.getFailures()) {
+			System.out.println(failure.toString());
+		}
+		System.out.println(result.wasSuccessful()+" ApproximateGEDBipartiteTest");
+		
    }
 	
 	public static String get0Node0Edge() {

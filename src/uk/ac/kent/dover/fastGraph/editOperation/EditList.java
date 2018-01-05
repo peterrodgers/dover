@@ -2,6 +2,7 @@ package uk.ac.kent.dover.fastGraph.editOperation;
 
 import java.util.*;
 import uk.ac.kent.dover.fastGraph.*;
+import uk.ac.kent.dover.fastGraph.comparators.EditOperationComparator;
 
 
 /**
@@ -157,6 +158,14 @@ public class EditList {
  		
  		return ret;
  	}
+
+ 	/**
+ 	 * Sort the edit list by preferred operation order.
+ 	 */
+	public void sort() {
+		EditOperationComparator eoc = new EditOperationComparator();
+		Collections.sort(editList,eoc);
+	}
 
  	
 	/**

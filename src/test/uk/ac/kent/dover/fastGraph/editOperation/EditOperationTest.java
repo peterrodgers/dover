@@ -8,7 +8,6 @@ import java.util.List;
 import org.junit.Test;
 
 import uk.ac.kent.dover.fastGraph.*;
-import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
 import uk.ac.kent.dover.fastGraph.editOperation.*;
 import uk.ac.kent.dover.fastGraph.graphSimilarity.ApproximateGEDSimple;
 
@@ -146,11 +145,9 @@ public class EditOperationTest {
 	
 	@Test
 	public void test003() throws Exception {
-		double ret;
 		FastGraph g2;
 		EditOperation eo;		
 		EditList el;
-		ApproximateGEDSimple ged;
 
 		el = new EditList();
 		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"order 1",-1,-1);
@@ -179,6 +176,45 @@ public class EditOperationTest {
 		assertEquals(2,g2.getEdgeNode2(c[0]));
 		assertEquals(0,g2.getEdgeNode1(c[1]));
 		assertEquals(4,g2.getEdgeNode2(c[1]));
+	}
+
+	
+	@Test
+	public void test004() throws Exception {
+		FastGraph g1;
+		EditOperation eo;		
+		EditList el;
+
+		el = new EditList();
+		el.sort();
+		assertEquals(0, el.getEditList().size());
+		
+		eo = new EditOperation(EditOperation.DELETE_EDGE,2.5,0,null,-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.DELETE_NODE,2.5,2,null,-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.DELETE_NODE,2.5,0,null,-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.DELETE_NODE,2.5,3,null,-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,3.5,-1,"node0",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,7.5,-1,"edge 0",0,1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,3.5,-1,"node1",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,3.5,-1,"node2",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,3.5,-1,"node3",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,3.5,-1,"edge0",0,0);
+		el.addOperation(eo);
+		g1 = FastGraph.randomGraphFactory(0, 0, false);
+		el.sort();
+System.out.println(el);
+		g1 = el.applyOperations(g1);
+		assertTrue(g1.checkConsistency());
+
 	}
 
 	

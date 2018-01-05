@@ -458,7 +458,6 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 					int g2NodeIndex = n2List.get(j);
 					nodeMapping.put(g1NodeIndex,g2NodeIndex); // also add to the node mapping, as we will need this to add edges
 					reverseNodeMapping.put(g2NodeIndex,g1NodeIndex);
-
 				}
 				break;
 			} else if(n2List.size() == 0) { // run out of g2 nodes, so put the rest of g1 in the delete nodes list
@@ -767,8 +766,9 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 				}
 			}
 		}
-
 	}
+	
+	
 	
 	/**
 	 * populate the edge addition and deletion data structures in the directed case.

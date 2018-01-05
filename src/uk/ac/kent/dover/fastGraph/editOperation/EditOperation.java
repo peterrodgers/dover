@@ -13,12 +13,13 @@ import uk.ac.kent.dover.fastGraph.*;
  *
  */
 public class EditOperation {
-	
+
+	// note these values are used when sorting EO lists, smaller means applied earlier
 	public final static int ADD_NODE = 0;
-	public final static int DELETE_NODE = 1;
+	public final static int RELABEL_NODE = 1;
 	public final static int ADD_EDGE = 2;
 	public final static int DELETE_EDGE = 3;
-	public final static int RELABEL_NODE = 4;
+	public final static int DELETE_NODE = 4;
 
 	private int operationCode;
 	private double cost;
