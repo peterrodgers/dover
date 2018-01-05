@@ -37,10 +37,11 @@ public class EditOperationComparator implements Comparator<EditOperation> {
 		int codeCompare = Integer.compare(eo1.getOperationCode(),eo2.getOperationCode());
 		
 		if(codeCompare != 0) {
-			return -1;
+			return codeCompare;
 		}
 		
-		int idCompare = Integer.compare(eo1.getId(), eo1.getId());
+		int idCompare = Integer.compare(eo1.getId(), eo2.getId());
+
 		return -idCompare;
 		
 	}

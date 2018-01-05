@@ -193,8 +193,6 @@ public class EditOperationTest {
 		el.addOperation(eo);
 		eo = new EditOperation(EditOperation.DELETE_NODE,2.5,2,null,-1,-1);
 		el.addOperation(eo);
-		eo = new EditOperation(EditOperation.DELETE_NODE,2.5,0,null,-1,-1);
-		el.addOperation(eo);
 		eo = new EditOperation(EditOperation.DELETE_NODE,2.5,3,null,-1,-1);
 		el.addOperation(eo);
 		eo = new EditOperation(EditOperation.ADD_NODE,3.5,-1,"node0",-1,-1);
@@ -203,15 +201,46 @@ public class EditOperationTest {
 		el.addOperation(eo);
 		eo = new EditOperation(EditOperation.ADD_NODE,3.5,-1,"node1",-1,-1);
 		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.DELETE_EDGE,2.5,1,null,-1,-1);
+		el.addOperation(eo);
 		eo = new EditOperation(EditOperation.ADD_NODE,3.5,-1,"node2",-1,-1);
 		el.addOperation(eo);
 		eo = new EditOperation(EditOperation.ADD_NODE,3.5,-1,"node3",-1,-1);
 		el.addOperation(eo);
-		eo = new EditOperation(EditOperation.ADD_EDGE,3.5,-1,"edge0",0,0);
+		eo = new EditOperation(EditOperation.DELETE_NODE,2.5,1,null,-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,3.5,-1,"edge2",3,2);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,3.5,-1,"edge3",1,2);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.DELETE_EDGE,3.5,2,null,-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,3.5,-1,"edge1",0,0);
 		el.addOperation(eo);
 		g1 = FastGraph.randomGraphFactory(0, 0, false);
 		el.sort();
-System.out.println(el);
+		
+		assertEquals(EditOperation.ADD_NODE, el.getEditList().get(0).getOperationCode());
+		assertEquals(EditOperation.ADD_NODE, el.getEditList().get(1).getOperationCode());
+		assertEquals(EditOperation.ADD_NODE, el.getEditList().get(2).getOperationCode());
+		assertEquals(EditOperation.ADD_NODE, el.getEditList().get(3).getOperationCode());
+		assertEquals(EditOperation.ADD_EDGE, el.getEditList().get(4).getOperationCode());
+		assertEquals(EditOperation.ADD_EDGE, el.getEditList().get(5).getOperationCode());
+		assertEquals(EditOperation.ADD_EDGE, el.getEditList().get(6).getOperationCode());
+		assertEquals(EditOperation.ADD_EDGE, el.getEditList().get(7).getOperationCode());
+		assertEquals(EditOperation.DELETE_EDGE, el.getEditList().get(8).getOperationCode());
+		assertEquals(2, el.getEditList().get(8).getId());
+		assertEquals(EditOperation.DELETE_EDGE, el.getEditList().get(9).getOperationCode());
+		assertEquals(1, el.getEditList().get(9).getId());
+		assertEquals(EditOperation.DELETE_EDGE, el.getEditList().get(10).getOperationCode());
+		assertEquals(0, el.getEditList().get(10).getId());
+		assertEquals(EditOperation.DELETE_NODE, el.getEditList().get(11).getOperationCode());
+		assertEquals(3, el.getEditList().get(11).getId());
+		assertEquals(EditOperation.DELETE_NODE, el.getEditList().get(12).getOperationCode());
+		assertEquals(2, el.getEditList().get(12).getId());
+		assertEquals(EditOperation.DELETE_NODE, el.getEditList().get(13).getOperationCode());
+		assertEquals(1, el.getEditList().get(13).getId());
+		
 		g1 = el.applyOperations(g1);
 		assertTrue(g1.checkConsistency());
 

@@ -14,6 +14,9 @@ public class EditList {
 
 	LinkedList<EditOperation> editList;
 	double cost = 0.0;
+	
+	EditOperationComparator eoc = new EditOperationComparator();
+
 			
 	public EditList() {
 		editList = new LinkedList<EditOperation>();
@@ -163,7 +166,6 @@ public class EditList {
  	 * Sort the edit list by preferred operation order.
  	 */
 	public void sort() {
-		EditOperationComparator eoc = new EditOperationComparator();
 		Collections.sort(editList,eoc);
 	}
 
