@@ -297,11 +297,11 @@ public class ApproximateGEDBipartiteTest {
 		retEditList = ged.getEditList();
 		retList = retEditList.getEditList();
 
-		assertEquals(7, ret, 0.001);
+		assertEquals(10, ret, 0.001);
 		assertEquals(ret, retEditList.getCost(), 0.001);
 		assertEquals(2, retList.size());
-		assertEquals(EditOperation.ADD_EDGE, retList.get(0).getOperationCode());
-		assertEquals(EditOperation.DELETE_EDGE, retList.get(1).getOperationCode());
+		assertEquals(EditOperation.RELABEL_NODE, retList.get(0).getOperationCode());
+		assertEquals(EditOperation.RELABEL_NODE, retList.get(1).getOperationCode());
 		assertEquals(0, retList.get(1).getId());
 
 		g1 = retEditList.applyOperations(g1);

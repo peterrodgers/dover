@@ -55,73 +55,50 @@ public class ApproximateGEDBipartite extends GraphEditDistance {
 		
 		try {
 
-			long seed = 444555L;
-			Random r = new Random(seed);
-			FastGraph g1,g2,gRet;
+			double ret;
+			List<EditOperation> retList;
+			FastGraph g1,g2;
+			EditOperation eo;		
+			EditList el, retEditList;
 			HashMap<Integer,Double> editCosts;
 			ApproximateGEDBipartite ged;
-			EditList el, retEditList1, retEditList2;
-			int maxNodes = 3;
-			int maxEdges = 1;
-		
+			
 			editCosts = new HashMap<>();
-			editCosts.put(EditOperation.DELETE_NODE,1.0);
-			editCosts.put(EditOperation.ADD_NODE,1.0);
-			editCosts.put(EditOperation.DELETE_EDGE,1.0);
-			editCosts.put(EditOperation.ADD_EDGE,1.0);
-			editCosts.put(EditOperation.RELABEL_NODE,1.0);
-
-			g1 = FastGraph.randomGraphFactory(r.nextInt(maxNodes)+1, r.nextInt(maxEdges+1), seed+10, false);
+			editCosts.put(EditOperation.DELETE_NODE,7.0);
+			editCosts.put(EditOperation.ADD_NODE,6.0);
+			editCosts.put(EditOperation.DELETE_EDGE,3.0);
+			editCosts.put(EditOperation.ADD_EDGE,4.0);
+			editCosts.put(EditOperation.RELABEL_NODE,5.0);
+			
 			el = new EditList();
-			for(int i = 0; i < g1.getNumberOfNodes(); i++) {
-				String color = "brown";
-				int a = r.nextInt(5);
-				if(a == 0) {
-					color = "black";
-				}
-				if(a == 1) {
-					color = "orange";
-				}
-				if(a == 2) {
-					color = "cyan";
-				};
-				if(a == 3) {
-					color = "blue";
-				};
-				el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,-1,i,color,-1,-1));
-			}
+			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 0",-1,-1);
+			el.addOperation(eo);
+			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 1",-1,-1);
+			el.addOperation(eo);
+			eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",1,0);
+			el.addOperation(eo);
+			g1 = FastGraph.randomGraphFactory(0, 0, false);
 			g1 = el.applyOperations(g1);
-
-			g2 = FastGraph.randomGraphFactory(r.nextInt(maxNodes)+1, r.nextInt(maxEdges+1), seed+20, false);
+		
 			el = new EditList();
-			for(int i = 0; i < g2.getNumberOfNodes(); i++) {
-				String color = "yellow";
-				int a = r.nextInt(4);
-				if(a == 0) {
-					color = "teal";
-				}
-				if(a == 1) {
-					color = "black";
-				}
-				if(a == 2) {
-					color = "red";
-				};
-				el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,-1,i,color,-1,-1));
-			}
+			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 0",-1,-1);
+			el.addOperation(eo);
+			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 1",-1,-1);
+			el.addOperation(eo);
+			eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",0,1);
+			el.addOperation(eo);
+			g2 = FastGraph.randomGraphFactory(0, 0, false);
 			g2 = el.applyOperations(g2);
 
+			ged = new ApproximateGEDBipartite(true,true,editCosts);
+			
 
-			ged = new ApproximateGEDBipartite(false,true,editCosts);
 //			ged.setUseHungarian(true);
 			ged.similarity(g1, g2);
-			retEditList1 = ged.getEditList();
-			gRet = retEditList1.applyOperations(g1);
-System.out.println(retEditList1);
-			System.out.println(ExactIsomorphism.isomorphic(g2,gRet,false,true));
-			System.out.println(g1.checkConsistency());
-			System.out.println(g2.checkConsistency());
-			System.out.println(gRet.checkConsistency());
-System.out.println(gRet);
+			retEditList = ged.getEditList();
+			g1 = retEditList.applyOperations(g1);
+System.out.println(retEditList);
+			System.out.println(ExactIsomorphism.isomorphic(g1,g2,true,true)+" "+g1.checkConsistency()+" "+g2.checkConsistency());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -298,7 +275,7 @@ System.out.println(gRet);
 			vja.computeAssignment(costMatrix);
 			mapping = vja.getAssignment();
 		}
-		
+
 		editList = findEditListFromMapping(directed, nodeLabels, g1, g2, mapping, editCosts);
 		
 		approximationTime = startTime-System.currentTimeMillis();
@@ -405,8 +382,6 @@ System.out.println(gRet);
 			g2EdgeIdMap.put(edgeString, edges);
 		}
 		
-		//TODO
-		
 		// find the difference between g1 edges and g2 edges
 		for(String e1String : g1EdgeIdMap.keySet()) {
 			ArrayList<Integer> e1Ids = g1EdgeIdMap.get(e1String);
@@ -488,11 +463,11 @@ System.out.println(gRet);
 	 * @return the total cost
 	 */
 	private double singleNodeDeleteCost(int n, FastGraph g) {
-		double ret = (deleteEdgeCost*g.getNodeDegree(n))/2;
+		double ret = (deleteEdgeCost*g.getNodeDegree(n));
 		ret+=deleteNodeCost;
 		return ret;
 	}
-
+	
 	/**
 	 * Find the cost to add a node like n.
 	 *
@@ -501,7 +476,7 @@ System.out.println(gRet);
 	 * @return the total cost
 	 */
 	private double singleNodeAddCost(int n, FastGraph g) {
-		double ret = (addEdgeCost*g.getNodeDegree(n))/2;
+		double ret = (addEdgeCost*g.getNodeDegree(n));
 		ret+=deleteNodeCost;
 		return ret;
 	}
@@ -532,24 +507,24 @@ System.out.println(gRet);
 			int degree2 = g2.getNodeDegree(n2);
 			
 			if(degree1 < degree2) {
-				ret += (degree2-degree1)*addEdgeCost/2;
+				ret += (degree2-degree1)*addEdgeCost;
 			} else {
-				ret += (degree1-degree2)*deleteEdgeCost/2;
+				ret += (degree1-degree2)*deleteEdgeCost;
 			}
 		} else {
 			int inDegree1 = g1.getNodeInDegree(n1);
 			int inDegree2 = g2.getNodeInDegree(n2);
 			if(inDegree1 < inDegree2) {
-				ret += (inDegree2-inDegree1)*addEdgeCost/2;
+				ret += (inDegree2-inDegree1)*addEdgeCost;
 			} else {
-				ret += (inDegree1-inDegree2)*deleteEdgeCost/2;
+				ret += (inDegree1-inDegree2)*deleteEdgeCost;
 			}
 			int outDegree1 = g1.getNodeOutDegree(n1);
 			int outDegree2 = g2.getNodeOutDegree(n2);
 			if(outDegree1 < outDegree2) {
-				ret += (outDegree2-outDegree1)*addEdgeCost/2;
+				ret += (outDegree2-outDegree1)*addEdgeCost;
 			} else {
-				ret += (outDegree1-outDegree2)*deleteEdgeCost/2;
+				ret += (outDegree1-outDegree2)*deleteEdgeCost;
 			}
 		}
 

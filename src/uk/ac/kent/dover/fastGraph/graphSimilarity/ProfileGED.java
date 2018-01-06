@@ -50,21 +50,15 @@ public class ProfileGED {
 				gedb = new ApproximateGEDBipartite(false,true,editCosts);
 				ret = gedb.similarity(g1, g2);
 				long GEDBtime = System.currentTimeMillis()-start1;
-				System.out.println("BIPARTITE nodes "+nodes+" edges "+edges);
-				System.out.println("similarity time "+GEDBtime/1000.0);
-				System.out.println("cost "+ret+" length "+gedb.getEditList().getEditList().size());
+				System.out.println("       BIPARTITE nodes "+nodes+" edges "+edges+" similarity time "+GEDBtime/1000.0+" cost "+ret+" length "+gedb.getEditList().getEditList().size());
 				
 				long start2 = System.currentTimeMillis();
 //				geds = new ApproximateGEDSimple(false,true,editCosts,GEDBtime,0,seed3);
 				geds = new ApproximateGEDSimple(false,true,editCosts,0,g1.getNumberOfNodes()*2,seed3);
 //				geds = new ApproximateGEDSimple(false,true,editCosts,0,0,seed3);
 				ret = geds.similarity(g1, g2);
-				System.out.println("SIMPLE with optimization nodes "+nodes+" edges "+edges+" swaps "+geds.getNodeSwaps());
-				System.out.println("similarity time "+(System.currentTimeMillis()-start2)/1000.0);
-				System.out.println("cost "+ret+" length "+gedb.getEditList().getEditList().size());
-				
-				System.out.println();
-				
+				System.out.println("SIMPLE nodes "+nodes+" edges "+edges+" swaps "+geds.getNodeSwaps()+" similarity time "+(System.currentTimeMillis()-start2)/1000.0+" cost "+ret+" length "+geds.getEditList().getEditList().size());
+								
 				nodes = nodes + startNodes;
 
 			}
