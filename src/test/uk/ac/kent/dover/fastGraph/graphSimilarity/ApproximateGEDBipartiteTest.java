@@ -188,9 +188,9 @@ public class ApproximateGEDBipartiteTest {
 	public void test008() throws Exception {
 		double ret;
 		List<EditOperation> retList;
-		FastGraph g1,g2;
+		FastGraph g1,g2,gRet;
 		EditOperation eo;		
-		EditList el, retEditList;
+		EditList el, retEditList1, retEditList2;
 		HashMap<Integer,Double> editCosts;
 		ApproximateGEDBipartite ged;
 		
@@ -198,7 +198,7 @@ public class ApproximateGEDBipartiteTest {
 		editCosts.put(EditOperation.DELETE_NODE,12.0);
 		editCosts.put(EditOperation.ADD_NODE,31.0);
 		editCosts.put(EditOperation.DELETE_EDGE,24.0);
-		editCosts.put(EditOperation.ADD_EDGE,0.1);
+		editCosts.put(EditOperation.ADD_EDGE,27.1);
 		editCosts.put(EditOperation.RELABEL_NODE,66.0);
 		
 		el = new EditList();
@@ -219,28 +219,460 @@ public class ApproximateGEDBipartiteTest {
 		g2 = FastGraph.randomGraphFactory(0, 0, false);
 		g2 = el.applyOperations(g2);
 
-		ged = new ApproximateGEDBipartite(false,false,editCosts);
+		ged = new ApproximateGEDBipartite(editCosts);
+		ret = ged.similarity(g1, g2);
+		retEditList1 = ged.getEditList();
+		retList = retEditList1.getEditList();
+
+		assertEquals(24, ret, 0.001);
+		assertEquals(ret, retEditList1.getCost(), 0.001);
+		assertEquals(1, retList.size());
+		assertEquals(EditOperation.DELETE_EDGE, retList.get(0).getOperationCode());
+		assertEquals(0, retList.get(0).getId());
+		assertEquals(0,retEditList1.findDeleteNodeOperations().size());
+		assertEquals(0,retEditList1.findAddNodeOperations().size());
+		assertEquals(1,retEditList1.findDeleteEdgeOperations().size());
+		assertEquals(0,retEditList1.findAddEdgeOperations().size());
+		
+		gRet = retEditList1.applyOperations(g1);
+		assertTrue(ExactIsomorphism.isomorphic(gRet,g2,false));
+		assertTrue(gRet.checkConsistency());
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		
+		ged = new ApproximateGEDBipartite(editCosts);
+		ged.setUseHungarian(true);
+		ged.similarity(g1, g2);
+		retEditList2 = ged.getEditList();
+		gRet = retEditList2.applyOperations(g1);
+		assertTrue(retEditList2.getEditList().equals(retEditList1.getEditList()));
+		assertTrue(ExactIsomorphism.isomorphic(gRet,g2,false));
+		assertTrue(gRet.checkConsistency());
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		
+	}
+
+	
+	@Test
+	public void test009() throws Exception {
+		double ret;
+		List<EditOperation> retList;
+		FastGraph g1,g2;
+		EditOperation eo;		
+		EditList el, retEditList;
+		HashMap<Integer,Double> editCosts;
+		ApproximateGEDBipartite ged;
+		
+		editCosts = new HashMap<>();
+		editCosts.put(EditOperation.DELETE_NODE,7.0);
+		editCosts.put(EditOperation.ADD_NODE,6.0);
+		editCosts.put(EditOperation.DELETE_EDGE,3.0);
+		editCosts.put(EditOperation.ADD_EDGE,4.0);
+		editCosts.put(EditOperation.RELABEL_NODE,5.0);
+		
+		el = new EditList();
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 0",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 1",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",1,0);
+		el.addOperation(eo);
+		g1 = FastGraph.randomGraphFactory(0, 0, false);
+		g1 = el.applyOperations(g1);
+	
+		el = new EditList();
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 0",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 1",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",0,1);
+		el.addOperation(eo);
+		g2 = FastGraph.randomGraphFactory(0, 0, false);
+		g2 = el.applyOperations(g2);
+
+		ged = new ApproximateGEDBipartite(true,true,editCosts);
 		
 		ret = ged.similarity(g1, g2);
 		retEditList = ged.getEditList();
 		retList = retEditList.getEditList();
 
-		assertEquals(4, ret, 0.001);
-		assertEquals(4, retEditList.getCost(), 0.001);
-		assertEquals(1, retList.size());
-		assertEquals(EditOperation.DELETE_EDGE, retList.get(0).getOperationCode());
-		assertEquals(0, retList.get(0).getId());
-		assertEquals(0,retEditList.findDeleteNodeOperations().size());
-		assertEquals(0,retEditList.findAddNodeOperations().size());
-		assertEquals(1,retEditList.findDeleteEdgeOperations().size());
-		assertEquals(0,retEditList.findAddEdgeOperations().size());
-		
+		assertEquals(7, ret, 0.001);
+		assertEquals(ret, retEditList.getCost(), 0.001);
+		assertEquals(2, retList.size());
+		assertEquals(EditOperation.ADD_EDGE, retList.get(0).getOperationCode());
+		assertEquals(EditOperation.DELETE_EDGE, retList.get(1).getOperationCode());
+		assertEquals(0, retList.get(1).getId());
+
 		g1 = retEditList.applyOperations(g1);
-		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false));
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,true,true));
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+	}
+
+	
+	@Test
+	public void test010() throws Exception {
+		double ret;
+		List<EditOperation> retList;
+		FastGraph g1,g2;
+		EditOperation eo;		
+		EditList el, retEditList;
+		HashMap<Integer,Double> editCosts;
+		ApproximateGEDBipartite ged;
+		
+		editCosts = new HashMap<>();
+		editCosts.put(EditOperation.DELETE_NODE,7.0);
+		editCosts.put(EditOperation.ADD_NODE,6.0);
+		editCosts.put(EditOperation.DELETE_EDGE,3.0);
+		editCosts.put(EditOperation.ADD_EDGE,4.0);
+		editCosts.put(EditOperation.RELABEL_NODE,5.0);
+		
+		el = new EditList();
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 0",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 1",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",1,0);
+		el.addOperation(eo);
+		g1 = FastGraph.randomGraphFactory(0, 0, false);
+		g1 = el.applyOperations(g1);
+	
+		el = new EditList();
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 0",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node B",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",0,1);
+		el.addOperation(eo);
+		g2 = FastGraph.randomGraphFactory(0, 0, false);
+		g2 = el.applyOperations(g2);
+
+		ged = new ApproximateGEDBipartite(false,true,editCosts);
+		
+		ret = ged.similarity(g1, g2);
+		retEditList = ged.getEditList();
+		retList = retEditList.getEditList();
+
+		assertEquals(5, ret, 0.001);
+		assertEquals(ret, retEditList.getCost(), 0.001);
+		assertEquals(1, retList.size());
+		assertEquals(EditOperation.RELABEL_NODE, retList.get(0).getOperationCode());
+		assertEquals(1, retList.get(0).getId());
+		assertEquals("node B", retList.get(0).getLabel());
+		g1 = retEditList.applyOperations(g1);
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,true));
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+	}
+
+	
+	@Test
+	public void test011() throws Exception {
+		double ret;
+		FastGraph g1,g2;
+		EditOperation eo;		
+		EditList el, retEditList;
+		HashMap<Integer,Double> editCosts;
+		ApproximateGEDBipartite ged;
+		
+		editCosts = new HashMap<>();
+		editCosts.put(EditOperation.DELETE_NODE,7.0);
+		editCosts.put(EditOperation.ADD_NODE,6.0);
+		editCosts.put(EditOperation.DELETE_EDGE,8.0);
+		editCosts.put(EditOperation.ADD_EDGE,4.0);
+		editCosts.put(EditOperation.RELABEL_NODE,5.0);
+		
+		el = new EditList();
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node A",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node X",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 3",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",1,0);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 1",0,1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 2",1,0);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 3",1,0);
+		el.addOperation(eo);
+		g1 = FastGraph.randomGraphFactory(0, 0, false);
+		g1 = el.applyOperations(g1);
+	
+		el = new EditList();
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 0",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node B",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",0,1);
+		el.addOperation(eo);
+		g2 = FastGraph.randomGraphFactory(0, 0, false);
+		g2 = el.applyOperations(g2);
+
+		ged = new ApproximateGEDBipartite(false,false,editCosts);
+		ret = ged.similarity(g1, g2);
+		retEditList = ged.getEditList();
+		assertEquals(ret, retEditList.getCost(), 0.001);
+		g1 = retEditList.applyOperations(g1);
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,false));
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+
+		ged = new ApproximateGEDBipartite(true,false,editCosts);
+		ret = ged.similarity(g1, g2);
+		retEditList = ged.getEditList();
+		assertEquals(ret, retEditList.getCost(), 0.001);
+		g1 = retEditList.applyOperations(g1);
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,true,false));
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+
+		ged = new ApproximateGEDBipartite(false,true,editCosts);
+		ret = ged.similarity(g1, g2);
+		retEditList = ged.getEditList();
+		assertEquals(ret, retEditList.getCost(), 0.001);
+		g1 = retEditList.applyOperations(g1);
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,true));
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+
+		ged = new ApproximateGEDBipartite(true,true,editCosts);
+		ret = ged.similarity(g1, g2);
+		retEditList = ged.getEditList();
+		assertEquals(ret, retEditList.getCost(), 0.001);
+		g1 = retEditList.applyOperations(g1);
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,true,true));
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+	}
+
+	
+	@Test
+	public void test012() throws Exception {
+		double ret;
+		FastGraph g1,g2;
+		EditOperation eo;		
+		EditList el, retEditList;
+		HashMap<Integer,Double> editCosts;
+		ApproximateGEDBipartite ged;
+		
+		editCosts = new HashMap<>();
+		editCosts.put(EditOperation.DELETE_NODE,7.0);
+		editCosts.put(EditOperation.ADD_NODE,6.0);
+		editCosts.put(EditOperation.DELETE_EDGE,8.0);
+		editCosts.put(EditOperation.ADD_EDGE,4.0);
+		editCosts.put(EditOperation.RELABEL_NODE,5.0);
+		
+		el = new EditList();
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node A",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",0,0);
+		el.addOperation(eo);
+		g1 = FastGraph.randomGraphFactory(0, 0, false);
+		g1 = el.applyOperations(g1);
+	
+		el = new EditList();
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 0",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node A",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node C",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node A",-1,-1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",1,1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 1",1,1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 2",1,1);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 3",1,2);
+		el.addOperation(eo);
+		eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 4",2,1);
+		el.addOperation(eo);
+		g2 = FastGraph.randomGraphFactory(0, 0, false);
+		g2 = el.applyOperations(g2);
+
+		ged = new ApproximateGEDBipartite(false,false,editCosts);
+		ret = ged.similarity(g1, g2);
+		retEditList = ged.getEditList();
+		assertEquals(ret, retEditList.getCost(), 0.001);
+		g1 = retEditList.applyOperations(g1);
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,false));
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+
+		ged = new ApproximateGEDBipartite(true,false,editCosts);
+		ret = ged.similarity(g1, g2);
+		retEditList = ged.getEditList();
+		assertEquals(ret, retEditList.getCost(), 0.001);
+		g1 = retEditList.applyOperations(g1);
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,true,false));
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+
+		ged = new ApproximateGEDBipartite(false,true,editCosts);
+		ret = ged.similarity(g1, g2);
+		retEditList = ged.getEditList();
+		assertEquals(ret, retEditList.getCost(), 0.001);
+		g1 = retEditList.applyOperations(g1);
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false,true));
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+
+		ged = new ApproximateGEDBipartite(true,true,editCosts);
+		ret = ged.similarity(g1, g2);
+		retEditList = ged.getEditList();
+		assertEquals(ret, retEditList.getCost(), 0.001);
+		g1 = retEditList.applyOperations(g1);
+		assertTrue(ExactIsomorphism.isomorphic(g1,g2,true,true));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
 	}
 
 
+	
+	@Test
+	public void test013() throws Exception {
+		int count = 0;
+		while(count < 10) {
+			count++;
+			long seed = 44555L*count;
+			Random r = new Random(seed);
+			FastGraph g1,g2,gRet;
+			HashMap<Integer,Double> editCosts;
+			ApproximateGEDBipartite ged;
+			EditList el, retEditList1, retEditList2;
+			int maxNodes = 20;
+			int maxEdges = 80;
+		
+			editCosts = new HashMap<>();
+			editCosts.put(EditOperation.DELETE_NODE,1.0);
+			editCosts.put(EditOperation.ADD_NODE,1.0);
+			editCosts.put(EditOperation.DELETE_EDGE,1.0);
+			editCosts.put(EditOperation.ADD_EDGE,1.0);
+			editCosts.put(EditOperation.RELABEL_NODE,1.0);
+
+			g1 = FastGraph.randomGraphFactory(r.nextInt(maxNodes)+1, r.nextInt(maxEdges+1), seed+10, false);
+			el = new EditList();
+			for(int i = 0; i < g1.getNumberOfNodes(); i++) {
+				String color = "brown";
+				int a = r.nextInt(5);
+				if(a == 0) {
+					color = "black";
+				}
+				if(a == 1) {
+					color = "orange";
+				}
+				if(a == 2) {
+					color = "cyan";
+				};
+				if(a == 3) {
+					color = "blue";
+				};
+				el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,-1,i,color,-1,-1));
+			}
+			g1 = el.applyOperations(g1);
+
+			g2 = FastGraph.randomGraphFactory(r.nextInt(maxNodes)+1, r.nextInt(maxEdges+1), seed+20, false);
+			el = new EditList();
+			for(int i = 0; i < g2.getNumberOfNodes(); i++) {
+				String color = "yellow";
+				int a = r.nextInt(4);
+				if(a == 0) {
+					color = "teal";
+				}
+				if(a == 1) {
+					color = "black";
+				}
+				if(a == 2) {
+					color = "red";
+				};
+				el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,-1,i,color,-1,-1));
+			}
+			g2 = el.applyOperations(g2);
+
+			ged = new ApproximateGEDBipartite(false,false,editCosts);
+			ged.similarity(g1, g2);
+			retEditList1 = ged.getEditList();
+			gRet = retEditList1.applyOperations(g1);
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,false));
+			assertTrue(g1.checkConsistency());
+			assertTrue(g2.checkConsistency());
+			assertTrue(gRet.checkConsistency());
+
+			ged = new ApproximateGEDBipartite(false,false,editCosts);
+			ged.setUseHungarian(true);
+			ged.similarity(g1, g2);
+			retEditList2 = ged.getEditList();
+			gRet = retEditList2.applyOperations(g1);
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,false));
+			assertTrue(g1.checkConsistency());
+			assertTrue(g2.checkConsistency());
+			assertTrue(gRet.checkConsistency());
+
+			ged = new ApproximateGEDBipartite(false,true,editCosts);
+			ged.similarity(g1, g2);
+			retEditList1 = ged.getEditList();
+			gRet = retEditList1.applyOperations(g1);
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
+			assertTrue(g1.checkConsistency());
+			assertTrue(g2.checkConsistency());
+			assertTrue(gRet.checkConsistency());
+
+			ged = new ApproximateGEDBipartite(false,true,editCosts);
+			ged.setUseHungarian(true);
+			ged.similarity(g1, g2);
+			retEditList2 = ged.getEditList();
+			gRet = retEditList2.applyOperations(g1);
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
+			assertTrue(g1.checkConsistency());
+			assertTrue(g2.checkConsistency());
+			assertTrue(gRet.checkConsistency());
+
+			ged = new ApproximateGEDBipartite(true,false,editCosts);
+			ged.similarity(g1, g2);
+			retEditList1 = ged.getEditList();
+			gRet = retEditList1.applyOperations(g1);
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,false));
+			assertTrue(g1.checkConsistency());
+			assertTrue(g2.checkConsistency());
+			assertTrue(gRet.checkConsistency());
+
+			ged = new ApproximateGEDBipartite(true,false,editCosts);
+			ged.setUseHungarian(true);
+			ged.similarity(g1, g2);
+			retEditList2 = ged.getEditList();
+			gRet = retEditList2.applyOperations(g1);
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,false));
+			assertTrue(g1.checkConsistency());
+			assertTrue(g2.checkConsistency());
+			assertTrue(gRet.checkConsistency());
+
+			ged = new ApproximateGEDBipartite(true,true,editCosts);
+			ged.similarity(g1, g2);
+			retEditList1 = ged.getEditList();
+			gRet = retEditList1.applyOperations(g1);
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,true));
+			assertTrue(g1.checkConsistency());
+			assertTrue(g2.checkConsistency());
+			assertTrue(gRet.checkConsistency());
+
+			ged = new ApproximateGEDBipartite(true,true,editCosts);
+			ged.setUseHungarian(true);
+			ged.similarity(g1, g2);
+			retEditList2 = ged.getEditList();
+			gRet = retEditList2.applyOperations(g1);
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,true));
+			assertTrue(g1.checkConsistency());
+			assertTrue(g2.checkConsistency());
+			assertTrue(gRet.checkConsistency());
+			
+		}
+
+	}
+	
 	
 }

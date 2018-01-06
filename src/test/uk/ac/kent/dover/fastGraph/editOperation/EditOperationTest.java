@@ -197,7 +197,7 @@ public class EditOperationTest {
 		el.addOperation(eo);
 		eo = new EditOperation(EditOperation.ADD_NODE,3.5,-1,"node0",-1,-1);
 		el.addOperation(eo);
-		eo = new EditOperation(EditOperation.ADD_EDGE,7.5,-1,"edge 0",0,1);
+		eo = new EditOperation(EditOperation.ADD_EDGE,3.5,-1,"edge1",0,1);
 		el.addOperation(eo);
 		eo = new EditOperation(EditOperation.ADD_NODE,3.5,-1,"node1",-1,-1);
 		el.addOperation(eo);
@@ -209,17 +209,17 @@ public class EditOperationTest {
 		el.addOperation(eo);
 		eo = new EditOperation(EditOperation.DELETE_NODE,2.5,1,null,-1,-1);
 		el.addOperation(eo);
-		eo = new EditOperation(EditOperation.ADD_EDGE,3.5,-1,"edge2",3,2);
+		eo = new EditOperation(EditOperation.ADD_EDGE,3.5,-1,"edge0",3,2);
 		el.addOperation(eo);
-		eo = new EditOperation(EditOperation.ADD_EDGE,3.5,-1,"edge3",1,2);
+		eo = new EditOperation(EditOperation.ADD_EDGE,3.5,-1,"edge2",1,2);
 		el.addOperation(eo);
-		eo = new EditOperation(EditOperation.DELETE_EDGE,3.5,2,null,-1,-1);
+		eo = new EditOperation(EditOperation.DELETE_EDGE,2.5,2,null,-1,-1);
 		el.addOperation(eo);
-		eo = new EditOperation(EditOperation.ADD_EDGE,3.5,-1,"edge1",0,0);
+		eo = new EditOperation(EditOperation.ADD_EDGE,3.5,-1,"edge3",0,0);
 		el.addOperation(eo);
 		g1 = FastGraph.randomGraphFactory(0, 0, false);
 		el.sort();
-		
+
 		assertEquals(EditOperation.ADD_NODE, el.getEditList().get(0).getOperationCode());
 		assertEquals(EditOperation.ADD_NODE, el.getEditList().get(1).getOperationCode());
 		assertEquals(EditOperation.ADD_NODE, el.getEditList().get(2).getOperationCode());
@@ -245,7 +245,7 @@ public class EditOperationTest {
 		assertTrue(g1.checkConsistency());
 
 	}
-
-	
 	
 }
+
+

@@ -2,8 +2,6 @@ package uk.ac.kent.dover.fastGraph.comparators;
 
 import java.util.Comparator;
 
-import uk.ac.kent.dover.fastGraph.FastGraph;
-import uk.ac.kent.dover.fastGraph.editOperation.EditList;
 import uk.ac.kent.dover.fastGraph.editOperation.EditOperation;
 
 /**
@@ -35,15 +33,40 @@ public class EditOperationComparator implements Comparator<EditOperation> {
 	@Override
 	public int compare(EditOperation eo1, EditOperation eo2) {
 		int codeCompare = Integer.compare(eo1.getOperationCode(),eo2.getOperationCode());
-		
 		if(codeCompare != 0) {
 			return codeCompare;
 		}
 		
 		int idCompare = Integer.compare(eo1.getId(), eo2.getId());
-
-		return -idCompare;
+		if(idCompare != 0) {
+			return -idCompare;
+		}
 		
+		if(eo1.getCost()-eo2.getCost() > 0.000001) {
+			return 1;
+		}
+		if(eo1.getCost()-eo2.getCost() < -0.000001) {
+			return -1;
+		}
+		if(eo1.getLabel() == null && eo2.getLabel() != null) {
+			return 1;
+		}
+		if(eo1.getLabel() != null && eo2.getLabel() == null) {
+			return -1;
+		}
+		if(eo1.getLabel() != null && eo2.getLabel() != null && eo1.getLabel().compareTo(eo2.getLabel()) != 0) {
+			return eo1.getLabel().compareTo(eo2.getLabel());
+		}
+		int n1Compare = Integer.compare(eo1.getN1(), eo2.getN2());
+		if(n1Compare != 0) {
+			return n1Compare;
+		}
+		int n2Compare = Integer.compare(eo1.getN2(), eo2.getN2());
+		if(n2Compare != 0) {
+			return n2Compare;
+		}
+		
+		return 0;
 	}
 
 

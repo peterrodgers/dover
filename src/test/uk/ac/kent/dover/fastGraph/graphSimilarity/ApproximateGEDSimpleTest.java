@@ -2991,7 +2991,7 @@ public class ApproximateGEDSimpleTest {
 		int count = 0;
 		while(count < 10) {
 			count++;
-			long seed = 11223344;
+			long seed = 223344L*count;
 			Random r = new Random(seed);
 			FastGraph g1,g2,gRet;
 			HashMap<Integer,Double> editCosts;

@@ -168,8 +168,28 @@ public class EditList {
 	public void sort() {
 		Collections.sort(editList,eoc);
 	}
-
- 	
+	
+	/**
+	 * @return the hashCode of the list
+	 */
+	@Override
+	public int hashCode() {
+    	return editList.hashCode();
+	}
+	
+    /**
+ 	 * @param obj the object to compare.
+     * @return equality of the lists
+     */
+   @Override
+	public boolean equals(Object obj) {
+    	if (!(obj instanceof EditList)) {
+    		return false;
+    	}
+    	EditList el = (EditList) obj;
+    	return editList.equals(el.editList);
+	}
+    
 	/**
 	 * @return a String output for debugging
 	 */

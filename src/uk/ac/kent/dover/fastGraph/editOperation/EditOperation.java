@@ -1,7 +1,5 @@
 package uk.ac.kent.dover.fastGraph.editOperation;
 
-import java.util.Arrays;
-
 import uk.ac.kent.dover.fastGraph.*;
 
 /**
@@ -20,7 +18,13 @@ public class EditOperation {
 	public final static int ADD_EDGE = 2;
 	public final static int DELETE_EDGE = 3;
 	public final static int DELETE_NODE = 4;
-
+/*
+	public final static int ADD_NODE = 0;
+	public final static int DELETE_NODE = 1;
+	public final static int ADD_EDGE = 2;
+	public final static int DELETE_EDGE = 3;
+	public final static int RELABEL_NODE = 4;
+*/
 	private int operationCode;
 	private double cost;
 	private int id;
@@ -175,7 +179,61 @@ public class EditOperation {
 		
 		return null;
 	}
-	
+
+	/**
+	 * @return a hash code based on class members
+	 */
+	@Override
+	public int hashCode() {
+		int result = 31;
+		result = 7 * result + operationCode;
+		result = 7 * result + Double.hashCode(cost);
+		result = 7 * result + id;
+		result = 7 * result + label.hashCode();
+		result = 7 * n1;
+		result = 7 * n2;
+		return result;
+	}
+
+	/**
+	 * @return equals based on class members
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof EditOperation)) {
+			return false;
+		}
+
+		EditOperation eo = (EditOperation)obj;
+
+		if(operationCode != eo.operationCode) {
+			return false;
+		}
+		if(Math.abs(cost-eo.cost) > 0.000001) {
+			return false;
+		}
+		if(id != eo.id) {
+			return false;
+		}
+		if(label == null && eo.label != null) {
+			return false;
+		}
+		if(label != null && eo.label == null) {
+			return false;
+		}
+		if(label != null && eo.label != null && !label.equals(eo.label)) {
+			return false;
+		}
+		if(n1 != eo.n1) {
+			return false;
+		}
+		if(n2 != eo.n2) {
+			return false;
+		}
+		
+		return true;
+
+	}
 	
 	/**
 	 * @return a String output for debugging
