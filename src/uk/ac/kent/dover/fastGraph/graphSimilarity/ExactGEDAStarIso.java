@@ -48,92 +48,41 @@ private int countPruneByEdgePreviouslyDeleted = 0;
 		
 		try {
 			
+			long seed = 70928;
+System.out.println(seed);
+			Random r = new Random(seed);
+			FastGraph g1,g2,gRet;
+			HashMap<Integer,Double> editCosts;
+			ExactGEDAStarIso ged;
+			EditList el, retEditList1;
+			ApproximateGEDSimple aged;
 			
-			int count = 0;
-			while(count < 10) {
-				count++;
-				long seed = 884455*count;
-				Random r = new Random(seed);
-				FastGraph g1,g2,gRet;
-				HashMap<Integer,Double> editCosts;
-				ExactGEDAStarIso ged;
-				EditList el, retEditList1;
-				ApproximateGEDSimple aged;
-				
-				int maxNodes = 4;
-				int maxEdges = 6;
-			
-				boolean directed = false;
-				boolean nodeLabels = false;
+			int maxNodes = 3;
+			int maxEdges = 3;
 		
-				editCosts = new HashMap<>();
-				editCosts.put(EditOperation.DELETE_NODE,11.0);
-				editCosts.put(EditOperation.ADD_NODE,12.0);
-				editCosts.put(EditOperation.DELETE_EDGE,13.0);
-				editCosts.put(EditOperation.ADD_EDGE,14.0);
-				editCosts.put(EditOperation.RELABEL_NODE,15.0);
-	
-				g1 = FastGraph.randomGraphFactory(r.nextInt(maxNodes)+1, r.nextInt(maxEdges+1), seed+10, false);
-				el = new EditList();
-				for(int i = 0; i < g1.getNumberOfNodes(); i++) {
-					String color = "yellow";
-					int a = r.nextInt(4);
-					if(a == 0) {
-						color = "teal";
-					}
-					if(a == 1) {
-						color = "black";
-					}
-					if(a == 2) {
-						color = "red";
-					};
-					el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,-1,i,color,-1,-1));
-				}
-				g1 = el.applyOperations(g1);
-	
-				g2 = FastGraph.randomGraphFactory(r.nextInt(maxNodes)+1, r.nextInt(maxEdges+1), seed+20, false);
-				el = new EditList();
-				for(int i = 0; i < g2.getNumberOfNodes(); i++) {
-					String color = "yellow";
-					int a = r.nextInt(4);
-					if(a == 0) {
-						color = "teal";
-					}
-					if(a == 1) {
-						color = "black";
-					}
-					if(a == 2) {
-						color = "red";
-					};
-					el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,-1,i,color,-1,-1));
-				}
-				g2 = el.applyOperations(g2);
-System.out.println("GED TEST "+count);
-//System.out.println(g1);
-//System.out.println(g2);
-				aged = new ApproximateGEDSimple(directed,nodeLabels,editCosts,0,1000,888);
-				aged.similarity(g1, g2);
-long approxStartTime = System.currentTimeMillis();
-System.out.println("approx time "+(System.currentTimeMillis()-approxStartTime)/1000.0+" approx cost "+aged.getEditList().getCost()+" approx length "+aged.getEditList().getEditList().size());	
-				ged = new ExactGEDAStarIso(directed,nodeLabels,editCosts);
-				ged.similarity(g1, g2);
-				retEditList1 = ged.getEditList();
-				if(retEditList1 == null) {
-					gRet = null;
-				} else {
-					gRet = retEditList1.applyOperations(g1);
-				}
+			editCosts = new HashMap<>();
+			editCosts.put(EditOperation.DELETE_NODE,11.0);
+			editCosts.put(EditOperation.ADD_NODE,12.0);
+			editCosts.put(EditOperation.DELETE_EDGE,13.0);
+			editCosts.put(EditOperation.ADD_EDGE,14.0);
+			editCosts.put(EditOperation.RELABEL_NODE,15.0);
 
-//System.out.print(retEditList1);
-if(retEditList1 != null) {
-	System.out.println("exact time "+(ged.fullSearchTime)/1000.0+" exact cost "+retEditList1.getCost()+" exact length "+retEditList1.getEditList().size()+" same as approx "+(retEditList1.getCost() == aged.getEditList().getCost())+" checks "+ExactIsomorphism.isomorphic(gRet, g2, directed, nodeLabels)+" "+gRet.checkConsistency());
-	if(retEditList1.getCost() > aged.getEditList().getCost()) {
-		System.out.print("************* ERROR approx cost less than exact cost. seed: "+seed+" count: "+count);
-	}
-} else {
-	System.out.println("NO SOLUTION ");
-}
-			}
+			g1 = FastGraph.randomGraphFactory(1, 1, seed+20, false);
+			g2 = FastGraph.randomGraphFactory(2, 2, seed+20, false);
+//Debugger.enabled = true;
+			ged = new ExactGEDAStarIso(true,false,editCosts);
+			ged.similarity(g1, g2);
+			retEditList1 = ged.getEditList();
+			
+System.out.println("----g1----");
+System.out.println(g1);
+System.out.println("----g2----");
+System.out.println(g2);
+System.out.println("----list----");
+System.out.println(retEditList1);
+			gRet = retEditList1.applyOperations(g1);
+System.out.println(ExactIsomorphism.isomorphic(gRet, g2)+" "+gRet.checkConsistency()+" "+g1.checkConsistency()+" "+g2.checkConsistency());
+			
 	
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -327,17 +276,18 @@ time = System.currentTimeMillis();
 			}
 addAdditionalTime += System.currentTimeMillis()-time;
 
+//Debugger.enabled = true;
 if(iterations%100000 == 0) {
 	fullSearchTime = (System.currentTimeMillis()-startSearchTime);
-	System.out.println("iterations "+iterations/1000000.0+ " million, directed: "+directed+", nodeLabels: "+nodeLabels);
-	System.out.println("time: total\tfindCheapest\tisomorphism\tfindAdditional\t"+(fullSearchTime/1000.0)+"\t"+(findCheapestTime/1000.0)+"\t"+(isomorphicTime/1000.0)+"\t"+(addAdditionalTime/1000.0));
-	System.out.println("currentCandidates.size() "+currentCandidates.size()/1000000.0+ " million\t");
-	System.out.println("countPruneByMaxNodeDegree: "+countPruneByMaxNodeDegree/1000000.0+ " million"+" countPruneByNotAddingNodes: "+countPruneByNotAddingNodes/1000000.0+ " million "+"countPruneByNotDeletingNodes: "+countPruneByNotDeletingNodes/1000000.0+ " million\t"+" countPruneBySingleRelabelling: "+countPruneBySingleRelabelling/1000000.0+ " million countPruneByEdgePreviouslyAdded: "+countPruneByEdgePreviouslyAdded/1000000.0+ " million countPruneByEdgePreviouslyDeleted: "+countPruneByEdgePreviouslyDeleted/1000000.0+ " million");	
+	Debugger.log("iterations "+iterations/1000000.0+ " million, directed: "+directed+", nodeLabels: "+nodeLabels);
+	Debugger.log("time: total\tfindCheapest\tisomorphism\tfindAdditional\t"+(fullSearchTime/1000.0)+"\t"+(findCheapestTime/1000.0)+"\t"+(isomorphicTime/1000.0)+"\t"+(addAdditionalTime/1000.0));
+	Debugger.log("currentCandidates.size() "+currentCandidates.size()/1000000.0+ " million\t");
+	Debugger.log("countPruneByMaxNodeDegree: "+countPruneByMaxNodeDegree/1000000.0+ " million"+" countPruneByNotAddingNodes: "+countPruneByNotAddingNodes/1000000.0+ " million "+"countPruneByNotDeletingNodes: "+countPruneByNotDeletingNodes/1000000.0+ " million\t"+" countPruneBySingleRelabelling: "+countPruneBySingleRelabelling/1000000.0+ " million countPruneByEdgePreviouslyAdded: "+countPruneByEdgePreviouslyAdded/1000000.0+ " million countPruneByEdgePreviouslyDeleted: "+countPruneByEdgePreviouslyDeleted/1000000.0+ " million");	
 	
-//	System.out.print("tryEditList\n"+tryEditList);
-	System.out.println("tryEditList.getCost() "+tryEditList.getCost());
-	System.out.println("tryEditList.getEditList().size() "+tryEditList.getEditList().size());
+	Debugger.log("tryEditList.getCost() "+tryEditList.getCost());
+	Debugger.log("tryEditList.getEditList().size() "+tryEditList.getEditList().size());
 }
+//Debugger.enabled = false;
 			
 		}
 fullSearchTime = (System.currentTimeMillis()-startSearchTime);
@@ -365,35 +315,6 @@ fullSearchTime = (System.currentTimeMillis()-startSearchTime);
 		ArrayList<Integer> edgeN2Deleted = new ArrayList<>(gTarget.getNumberOfNodes());
 		ArrayList<Integer> edgeN1Added = new ArrayList<>(gTarget.getNumberOfNodes());
 		ArrayList<Integer> edgeN2Added = new ArrayList<>(gTarget.getNumberOfNodes());
-/*
-try {
-g = FastGraph.randomGraphFactory(10, 0, false);
-} catch(Exception e) {}
-el = new EditList();
-el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,111,10,"def",-1,-1));
-el.addOperation(new EditOperation(EditOperation.ADD_EDGE,111,-1,"blue",15,12));
-el.addOperation(new EditOperation(EditOperation.DELETE_EDGE,111,-1,"blue",7,17));
-el.addOperation(new EditOperation(EditOperation.DELETE_NODE,111,0,null,-1,-1));
-el.addOperation(new EditOperation(EditOperation.DELETE_EDGE,111,-1,"blue",12,11));
-el.addOperation(new EditOperation(EditOperation.ADD_EDGE,111,-1,"blue",11,3));
-el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,111,43,"hykr",-1,-1));
-el.addOperation(new EditOperation(EditOperation.DELETE_NODE,111,4,null,-1,-1));
-el.addOperation(new EditOperation(EditOperation.ADD_EDGE,111,-1,"blue",4,40));
-el.addOperation(new EditOperation(EditOperation.ADD_EDGE,111,-1,"",15,50));
-el.addOperation(new EditOperation(EditOperation.DELETE_EDGE,111,-1,"blue",2,500));
-el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,111,87,"red",-1,-1));
-el.addOperation(new EditOperation(EditOperation.DELETE_NODE,111,45,null,-1,-1));
-el.addOperation(new EditOperation(EditOperation.DELETE_NODE,111,8,null,-1,-1));
-el.addOperation(new EditOperation(EditOperation.DELETE_NODE,111,498,null,-1,-1));
-el.addOperation(new EditOperation(EditOperation.DELETE_NODE,111,3,null,-1,-1));
-
-System.out.println("relabeled nodes 40 84");
-System.out.println("n1 Added 11 3 13");
-System.out.println("n2 Added 8 38 47");
-System.out.println("n1 Deleted 4 9");
-System.out.println("n2 Deleted 13 8");
-//System.out.println(el);
-*/
 		for(EditOperation eo : el.getEditList()) {
 			if(eo.getOperationCode() == EditOperation.RELABEL_NODE) {
 				relabelledNodes.add(eo.getId());
@@ -511,6 +432,7 @@ countPruneByNotDeletingNodes++;
 				n2Start = n1;
 			}
 			for(int n2 = n2Start; n2 < g.getNumberOfNodes(); n2++) {
+// TODO THIS IS NOT WORKING
 				if(pruneByMaxNodeDegree(g,n1,n2)) {
 countPruneByMaxNodeDegree++;
 					continue;
@@ -606,16 +528,10 @@ countPruneBySingleRelabelling++;
 				return true;
 			}
 		} else {
-			if(g.getNodeInDegree(n1) >= maxInDegree2) {
-				return true;
-			}
-			if(g.getNodeInDegree(n2) >= maxInDegree2) {
-				return true;
-			}
 			if(g.getNodeOutDegree(n1) >= maxOutDegree2) {
 				return true;
 			}
-			if(g.getNodeOutDegree(n2) >= maxOutDegree2) {
+			if(g.getNodeInDegree(n2) >= maxInDegree2) {
 				return true;
 			}
 		}

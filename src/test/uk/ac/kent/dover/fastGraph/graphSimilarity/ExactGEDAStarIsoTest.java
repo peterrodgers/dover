@@ -467,14 +467,171 @@ public class ExactGEDAStarIsoTest {
 		assertTrue(gRet.checkConsistency());
 
 	}
+
+	@Test
+	public void test011() throws Exception {
+
+		long seed = 70928;
+		Random r = new Random(seed);
+		FastGraph g1,g2,gRet;
+		HashMap<Integer,Double> editCosts;
+		ExactGEDAStarIso ged;
+		EditList el, retEditList1;
+		ApproximateGEDSimple aged;
+		
+		int maxNodes = 3;
+		int maxEdges = 3;
+	
+		editCosts = new HashMap<>();
+		editCosts.put(EditOperation.DELETE_NODE,11.0);
+		editCosts.put(EditOperation.ADD_NODE,12.0);
+		editCosts.put(EditOperation.DELETE_EDGE,13.0);
+		editCosts.put(EditOperation.ADD_EDGE,14.0);
+		editCosts.put(EditOperation.RELABEL_NODE,15.0);
+	
+		g1 = FastGraph.randomGraphFactory(1, 1, seed+20, false);
+		g2 = FastGraph.randomGraphFactory(2, 2, seed+20, false);
+		ged = new ExactGEDAStarIso(true,false,editCosts);
+		ged.similarity(g1, g2);
+		retEditList1 = ged.getEditList();
+		
+		gRet = retEditList1.applyOperations(g1);
+		
+		aged = new ApproximateGEDSimple(true,false,editCosts,0,1000,888);
+		aged.similarity(g1, g2);
+		assertTrue(retEditList1.getCost() <= aged.similarity(g1, g2));
+
+		assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,false));
+		assertTrue(g1.checkConsistency());
+		assertTrue(g2.checkConsistency());
+		assertTrue(gRet.checkConsistency());
+	}
 	
 	
 	@Test
-	public void test011() throws Exception {
+	public void test012() throws Exception {
 		int count = 0;
 		while(count < 10) {
 			count++;
-			long seed = 8866*count;
+			long seed = 8866L*count;
+			Random r = new Random(seed);
+			FastGraph g1,g2,gRet;
+			HashMap<Integer,Double> editCosts;
+			ExactGEDAStarIso ged;
+			EditList el, retEditList1;
+			ApproximateGEDSimple aged;
+			
+			int maxNodes = 3;
+			int maxEdges = 3;
+		
+			editCosts = new HashMap<>();
+			editCosts.put(EditOperation.DELETE_NODE,11.0);
+			editCosts.put(EditOperation.ADD_NODE,12.0);
+			editCosts.put(EditOperation.DELETE_EDGE,13.0);
+			editCosts.put(EditOperation.ADD_EDGE,14.0);
+			editCosts.put(EditOperation.RELABEL_NODE,15.0);
+
+			g1 = FastGraph.randomGraphFactory(r.nextInt(maxNodes)+1, r.nextInt(maxEdges+1), seed+10, false);
+			el = new EditList();
+			for(int i = 0; i < g1.getNumberOfNodes(); i++) {
+				String color = "yellow";
+				int a = r.nextInt(4);
+				if(a == 0) {
+					color = "teal";
+				}
+				if(a == 1) {
+					color = "black";
+				}
+				if(a == 2) {
+					color = "red";
+				};
+				el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,-1,i,color,-1,-1));
+			}
+			g1 = el.applyOperations(g1);
+
+			g2 = FastGraph.randomGraphFactory(r.nextInt(maxNodes)+1, r.nextInt(maxEdges+1), seed+20, false);
+			el = new EditList();
+			for(int i = 0; i < g2.getNumberOfNodes(); i++) {
+				String color = "yellow";
+				int a = r.nextInt(4);
+				if(a == 0) {
+					color = "teal";
+				}
+				if(a == 1) {
+					color = "black";
+				}
+				if(a == 2) {
+					color = "red";
+				};
+				el.addOperation(new EditOperation(EditOperation.RELABEL_NODE,-1,i,color,-1,-1));
+			}
+			g2 = el.applyOperations(g2);
+
+			ged = new ExactGEDAStarIso(false,false,editCosts);
+			ged.similarity(g1, g2);
+			retEditList1 = ged.getEditList();
+			gRet = retEditList1.applyOperations(g1);
+			
+			aged = new ApproximateGEDSimple(false,false,editCosts,0,1000,888);
+			aged.similarity(g1, g2);
+			assertTrue(retEditList1.getCost() <= aged.similarity(g1, g2));
+
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,false));
+			assertTrue(g1.checkConsistency());
+			assertTrue(g2.checkConsistency());
+			assertTrue(gRet.checkConsistency());
+
+			ged = new ExactGEDAStarIso(false,true,editCosts);
+			ged.similarity(g1, g2);
+			retEditList1 = ged.getEditList();
+			gRet = retEditList1.applyOperations(g1);
+			
+			aged = new ApproximateGEDSimple(false,true,editCosts,0,1000,888);
+			aged.similarity(g1, g2);
+			assertTrue(retEditList1.getCost() <= aged.similarity(g1, g2));
+
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,false,true));
+			assertTrue(g1.checkConsistency());
+			assertTrue(g2.checkConsistency());
+			assertTrue(gRet.checkConsistency());
+
+			ged = new ExactGEDAStarIso(true,false,editCosts);
+			ged.similarity(g1, g2);
+			retEditList1 = ged.getEditList();
+			gRet = retEditList1.applyOperations(g1);
+			
+			aged = new ApproximateGEDSimple(true,false,editCosts,0,1000,888);
+			aged.similarity(g1, g2);
+			assertTrue(retEditList1.getCost() <= aged.similarity(g1, g2));
+
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,false));
+			assertTrue(g1.checkConsistency());
+			assertTrue(g2.checkConsistency());
+			assertTrue(gRet.checkConsistency());
+
+			ged = new ExactGEDAStarIso(true,true,editCosts);
+			ged.similarity(g1, g2);
+			retEditList1 = ged.getEditList();
+			gRet = retEditList1.applyOperations(g1);
+			
+			aged = new ApproximateGEDSimple(true,true,editCosts,0,1000,888);
+			aged.similarity(g1, g2);
+			assertTrue(retEditList1.getCost() <= aged.similarity(g1, g2));
+
+			assertTrue(ExactIsomorphism.isomorphic(g2,gRet,true,true));
+			assertTrue(g1.checkConsistency());
+			assertTrue(g2.checkConsistency());
+			assertTrue(gRet.checkConsistency());
+		}
+	}
+	
+	@Test
+	public void test013() throws Exception {
+		int count = 0;
+		while(count < 10) {
+			count++;
+			long seed = 44332211L*count;
+System.out.println(count+" "+seed);
 			Random r = new Random(seed);
 			FastGraph g1,g2,gRet;
 			HashMap<Integer,Double> editCosts;

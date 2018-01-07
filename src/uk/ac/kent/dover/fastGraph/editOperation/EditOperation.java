@@ -189,7 +189,9 @@ public class EditOperation {
 		result = 7 * result + operationCode;
 		result = 7 * result + Double.hashCode(cost);
 		result = 7 * result + id;
-		result = 7 * result + label.hashCode();
+		if(label != null) {
+			result = 7 * result + label.hashCode();
+		}
 		result = 7 * n1;
 		result = 7 * n2;
 		return result;
