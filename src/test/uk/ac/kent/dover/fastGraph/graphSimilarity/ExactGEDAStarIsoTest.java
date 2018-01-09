@@ -631,7 +631,7 @@ public class ExactGEDAStarIsoTest {
 		while(count < 10) {
 			count++;
 			long seed = 44332211L*count;
-System.out.println(count+" "+seed);
+
 			Random r = new Random(seed);
 			FastGraph g1,g2,gRet;
 			HashMap<Integer,Double> editCosts;

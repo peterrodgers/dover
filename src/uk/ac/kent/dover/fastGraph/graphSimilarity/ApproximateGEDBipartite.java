@@ -12,22 +12,13 @@ import edu.isi.karma.modeling.research.graphmatching.algorithms.VJAccess;
  * Defines a cost between all nodes in g1 to g2, then finds a minimal local matching
  * using a bipartite matching algorithm.
  * 
- * An approximation method for GED using the Hungarian Algorithm from:
+ * An approximation method for GED using the Volgenant Jonker algorithm from
+ * Fankhauser S, Riesen K, Bunke H. Speeding up graph edit distance computation through fast bipartite matching. Graph-based representations in pattern recognition. 2011:102-11.
+ * 
+ * Or (Slower) the Hungarian Algorithm from:
  * Riesen K, Bunke H. Approximate graph edit distance computation by means of bipartite graph matching. Image and Vision computing. 2009 Jun 4;27(7):950-9.
  * doi:10.1016/j.imavis.2008.04.004
  *
- * or (faster) the Volgenant Jonker algorithm from
- * Fankhauser S, Riesen K, Bunke H. Speeding up graph edit distance computation through fast bipartite matching. Graph-based representations in pattern recognition. 2011:102-11.
- * 
- * comparison between:
- * Hungarian Algorithm from: a. https://github.com/KevinStern/software-and-algorithms used this
- * Hungarian Algorithm from: b. https://www.programcreek.com/java-api-examples/index.php?source_dir=JContextExplorer-master/JContextExplorer/src/operonClustering/HungarianAlgorithm.java
- * Volgenant Jonker Algorithm from c. https://github.com/usc-isi-i2/szeke/blob/master/src/main/java/edu/isi/karma/modeling/research/graphmatching/algorithms/VolgenantJonker.java
- * Volgenant Jonker Algorithm from d. https://github.com/dberm22/Bipartite-Solver
- * and all seem to return the same matching on random matrices,
- * Speed testing gives: c fastest, then a and d similar, with b significantly slower.
- * E.g. time for 6000 nodes: a: 9.6 secs, b: no termination in reasonable time, c: 2.9, d: 10.2
- * 
  * @author Peter Rodgers
  *
  */
@@ -37,7 +28,6 @@ public class ApproximateGEDBipartite extends GraphEditDistance {
 	private boolean directed;
 	
 	private boolean useHungarian = false; // keep this at false, hungarian is slower and less accurate
-
 	private Double deleteNodeCost;
 	private Double addNodeCost;
 	private Double deleteEdgeCost;
@@ -45,6 +35,10 @@ public class ApproximateGEDBipartite extends GraphEditDistance {
 	private Double relabelNodeCost;
 
 	HashMap<Integer,Double> editCosts;
+	
+	private double[][] costMatrix;
+	private int[] mapping;
+
 	
 	private long approximationTime;
 	
@@ -92,8 +86,6 @@ public class ApproximateGEDBipartite extends GraphEditDistance {
 
 			ged = new ApproximateGEDBipartite(true,true,editCosts);
 			
-
-//			ged.setUseHungarian(true);
 			ged.similarity(g1, g2);
 			retEditList = ged.getEditList();
 			g1 = retEditList.applyOperations(g1);
@@ -204,6 +196,18 @@ System.out.println(retEditList);
 	public long getApproximationTime() {return approximationTime;}
 	
 	/**
+	 * 
+	 * @return the costMatrix, set after similarity is called.
+	 */
+	public double[][] getCostMatrix() {return costMatrix;}
+	
+	/**
+	 * 
+	 * @return the g1 nodes to g2 nodes mapping, set after similarity is called.
+	 */
+	public int[] getMapping() {return mapping;}
+	
+	/**
 	 * Returns the current algorithm used to find bipartite matching
 	 * 
 	 * @return true if current algorithm is Hungarian, false if it is Volgenant Jonker
@@ -215,7 +219,7 @@ System.out.println(retEditList);
 	/**
 	 * Set the algorithm for bipartite matching, defaults to false.
 	 * Keep on false as the Hungarian algorithm is 
-	 * slower than Volgenant Jonker and less accurate,
+	 * slower than Volgenant Jonker,
 	 * so there is no reason beyond testing to set this to true.
 	 * 
 	 * @param useHungarian true for Hungarian algorithm, false for Volgenant Jonker
@@ -242,7 +246,7 @@ System.out.println(retEditList);
 		int nodes2 = g2.getNumberOfNodes();
 		int size = nodes1+nodes2;
 		
-		double[][] costMatrix = new double[size][size];
+		costMatrix = new double[size][size];
 		
 		for(int y = 0; y < size; y++) { // g1 nodes
 			for(int x = 0; x < size; x++) { // g2 nodes
@@ -266,7 +270,8 @@ System.out.println(retEditList);
 			}
 		}
 		
-		int[] mapping = null;
+		mapping = null;
+
 		if(useHungarian) {
 			HungarianAlgorithm ha = new HungarianAlgorithm(costMatrix);
 			mapping = ha.execute();
