@@ -1,8 +1,8 @@
 # Dover 
 
-### Scalable Algorithms for Graph Mining in Java
+# Scalable Algorithms for Graph Mining in Java
 
-** Java Algorithms Include: **
+### Java Algorithms Include:
 
 Exact Subgraph Isomorphism
 
