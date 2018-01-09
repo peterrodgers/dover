@@ -2,9 +2,23 @@
 
 ### Scalable Algorithms for Graph Mining in Java
 
-[Installation instructions](https://github.com/peterrodgers/dover/wiki/Installation)
+** Java Algorithms Include: **
+
+Exact Subgraph Isomorphism
+
+Exact Graph Isomorphism
+
+Motif Finding
+
+Exact Graph Edit Distance
+
+Approximate Graph Edit Distance
+
+### Information
 
 Data is available [online](https://www.cs.kent.ac.uk/projects/dover/).
 
-Full instructions, including on installation and usage, are available on the [wiki](https://github.com/peterrodgers/dover/wiki).
+[Installation and usage instructions](https://github.com/peterrodgers/dover/wiki/Installation)
 
+
+Code released under Apache License 2.0.
