@@ -6,6 +6,8 @@
 
 Exact Subgraph Isomorphism
 
+Approximate Subgraph Isomorphism
+
 Exact Graph Isomorphism
 
 Motif Finding
