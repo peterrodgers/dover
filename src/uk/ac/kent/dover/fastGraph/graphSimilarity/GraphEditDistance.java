@@ -1,7 +1,5 @@
 package uk.ac.kent.dover.fastGraph.graphSimilarity;
 
-import java.util.HashMap;
-
 import uk.ac.kent.dover.fastGraph.*;
 import uk.ac.kent.dover.fastGraph.editOperation.*;
 
