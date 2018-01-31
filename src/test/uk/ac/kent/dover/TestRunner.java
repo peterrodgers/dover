@@ -90,6 +90,18 @@ public class TestRunner {
 		}
 		System.out.println(result.wasSuccessful()+" ApproximateGEDBipartiteTest");
 		
+		result = JUnitCore.runClasses(ApproximateGEDHausdorffTest.class);
+		for (Failure failure : result.getFailures()) {
+			System.out.println(failure.toString());
+		}
+		System.out.println(result.wasSuccessful()+" ApproximateGEDHausdorffTest");
+		
+		result = JUnitCore.runClasses(ApproximateGEDLowerBoundsSimpleTest.class);
+		for (Failure failure : result.getFailures()) {
+			System.out.println(failure.toString());
+		}
+		System.out.println(result.wasSuccessful()+" ApproximateGEDLowerBoundsSimpleTest");
+		
    }
 	
 	public static String get0Node0Edge() {
