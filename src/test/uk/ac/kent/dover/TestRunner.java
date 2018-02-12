@@ -101,7 +101,12 @@ public class TestRunner {
 			System.out.println(failure.toString());
 		}
 		System.out.println(result.wasSuccessful()+" ApproximateGEDLowerBoundsSimpleTest");
-		
+
+		result = JUnitCore.runClasses(NeighbourhoodSimilarityTest.class);
+		for (Failure failure : result.getFailures()) {
+			System.out.println(failure.toString());
+		}
+		System.out.println(result.wasSuccessful()+" NeighbourhoodSimilarityTest");
    }
 	
 	public static String get0Node0Edge() {
