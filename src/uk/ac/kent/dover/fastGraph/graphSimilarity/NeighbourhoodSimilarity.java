@@ -49,21 +49,21 @@ public class NeighbourhoodSimilarity extends GraphSimilarity {
 		nodes2.add(ns21);
 		nodes2.add(ns22);
 		nodes2.add(ns23);
-		nodes2.add(ns24);
-		nodes2.add(ns25);
+//		nodes2.add(ns24);
+//		nodes2.add(ns25);
 		List<EdgeStructure> edges2 = new ArrayList<EdgeStructure>();
 		EdgeStructure es20 = new EdgeStructure(0,"es20", 0, (byte)0, (byte)0, 0, 1);
-		EdgeStructure es21 = new EdgeStructure(1,"es21", 0, (byte)0, (byte)0, 1, 3);
-		EdgeStructure es22 = new EdgeStructure(2,"es22", 0, (byte)0, (byte)0, 1, 4);
-		EdgeStructure es23 = new EdgeStructure(3,"es23", 0, (byte)0, (byte)0, 2, 3);
-		EdgeStructure es24 = new EdgeStructure(4,"es24", 0, (byte)0, (byte)0, 3, 4);
-		EdgeStructure es25 = new EdgeStructure(5,"es25", 0, (byte)0, (byte)0, 4, 5);
+//		EdgeStructure es21 = new EdgeStructure(1,"es21", 0, (byte)0, (byte)0, 1, 3);
+//		EdgeStructure es22 = new EdgeStructure(2,"es22", 0, (byte)0, (byte)0, 1, 4);
+//		EdgeStructure es23 = new EdgeStructure(3,"es23", 0, (byte)0, (byte)0, 2, 3);
+//		EdgeStructure es24 = new EdgeStructure(4,"es24", 0, (byte)0, (byte)0, 3, 4);
+//		EdgeStructure es25 = new EdgeStructure(5,"es25", 0, (byte)0, (byte)0, 4, 5);
 		edges2.add(es20);
-		edges2.add(es21);
-		edges2.add(es22);
-		edges2.add(es23);
-		edges2.add(es24);
-		edges2.add(es25);
+//		edges2.add(es21);
+//		edges2.add(es22);
+//		edges2.add(es23);
+//		edges2.add(es24);
+//		edges2.add(es25);
 		List<NodeStructure> nodes3 = new ArrayList<NodeStructure>();
 		NodeStructure ns30 = new NodeStructure(0,"b", 0, (byte)0, (byte)0);
 		NodeStructure ns31 = new NodeStructure(1,"b", 0, (byte)0, (byte)0);
@@ -75,8 +75,8 @@ public class NeighbourhoodSimilarity extends GraphSimilarity {
 		nodes3.add(ns31);
 		nodes3.add(ns32);
 		nodes3.add(ns33);
-		nodes3.add(ns34);
-		nodes3.add(ns35);
+//		nodes3.add(ns34);
+//		nodes3.add(ns35);
 		List<EdgeStructure> edges3 = new ArrayList<EdgeStructure>();
 		EdgeStructure es30 = new EdgeStructure(0,"es30", 0, (byte)0, (byte)0, 0, 1);
 		EdgeStructure es31 = new EdgeStructure(1,"es31", 0, (byte)0, (byte)0, 1, 3);
@@ -87,18 +87,20 @@ public class NeighbourhoodSimilarity extends GraphSimilarity {
 		EdgeStructure es36 = new EdgeStructure(6,"es36", 0, (byte)0, (byte)0, 5, 0);
 		edges3.add(es30);
 		edges3.add(es31);
-		edges3.add(es32);
-		edges3.add(es33);
-		edges3.add(es34);
-		edges3.add(es35);
-		edges3.add(es36);
+//		edges3.add(es32);
+//		edges3.add(es33);
+//		edges3.add(es34);
+//		edges3.add(es35);
+//		edges3.add(es36);
 		
 		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
 		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
 		FastGraph g3 = FastGraph.structureFactory("g3", (byte)0, nodes3, edges3, false);
 		
 		NeighbourhoodSimilarity ns1 = new NeighbourhoodSimilarity(true);
-		double ret = ns1.similarity(g1,g2);
+		double ret = ns1.similarity(g2,g3);
+		System.out.println(ret);
+		ret = ns1.similarity(g3,g2);
 		System.out.println(ret);
 		
 

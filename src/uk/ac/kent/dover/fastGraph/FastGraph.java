@@ -5149,6 +5149,64 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 		return ret;
 	}
 	
+	
+
+	/**
+	 * Generates a new graph with every edge having a pair facing the other way. One way to represent
+	 * undirected graphs. A simple graph is returned, only one edge in each direction is given. Self sourcing
+	 * edges are not duplicated.
+	 * 
+	 * @param g the graph to duplicate edges
+	 * @return a new graph with duplicated and reversed edges
+	 */
+	public FastGraph generateByAddingReversedEdges(FastGraph g) {
+		
+		ArrayList<NodeStructure> nodes = new ArrayList<>(g.getNumberOfNodes());
+		for(int n = 0; n < g.getNumberOfNodes(); n++) {
+			NodeStructure ns = generateNodeStructure(n);
+			nodes.add(ns);
+		}
+		
+		ArrayList<EdgeStructure> edges = new ArrayList<>(g.getNumberOfEdges()*2);
+		for(int e = 0; e < g.getNumberOfEdges(); e++) {
+			if(!edgeExistsInStructureList(edges,g.getEdgeNode1(e),g.getEdgeNode2(e))) {
+				EdgeStructure es = generateEdgeStructure(e);
+				edges.add(es);
+			}
+			if(g.getEdgeNode2(e) != g.getEdgeNode1(e) && !edgeExistsInStructureList(edges,g.getEdgeNode2(e),g.getEdgeNode1(e))) {
+				EdgeStructure es = generateEdgeStructure(e);
+				es.setNode1(g.getEdgeNode2(e));
+				es.setNode2(g.getEdgeNode1(e));
+				edges.add(es);
+			}
+		}
+		
+		FastGraph ret = structureFactory(g.getName()+"-edgesDoubled",g.getGeneration(),nodes,edges,g.getDirect());
+		
+		return ret;
+		
+	}
+	
+
+	/**
+	 * Checks to see if the nodes are already connected in the list
+	 * 
+	 * @param list the list to check
+	 * @param node1 the start node
+	 * @param node2 the target node
+	 * @return true if the nodes are connected, false otherwise
+	 */
+	private boolean edgeExistsInStructureList(List<EdgeStructure> list, int node1, int node2) {
+		for(EdgeStructure es : list) {
+			if(es.getNode1() == node1 && es.getNode2() == node2) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	
 	/**
 	 * 
 	 * @param n the node to base the NodeStructure on.
