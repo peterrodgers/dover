@@ -6,8 +6,6 @@ import java.util.*;
 
 import org.junit.*;
 
-import sashika.Graph;
-import sashika.NMSimilarity;
 import uk.ac.kent.dover.fastGraph.*;
 import uk.ac.kent.dover.fastGraph.graphSimilarity.NeighbourhoodSimilarity;
 
@@ -175,7 +173,7 @@ public class NeighbourhoodSimilarityTest {
 		assertEquals(0.82958,ret,0.001);
 		
 		ret = ns1.similarity(g3,g2);
-		assertEquals(0.85044,ret,0.001); //TODO
+		assertEquals(0.85044,ret,0.001); // note, probably wrong, lacks symmetry
 		
 	}
 	
