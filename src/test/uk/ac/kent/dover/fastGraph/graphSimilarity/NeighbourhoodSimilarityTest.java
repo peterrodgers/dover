@@ -6,9 +6,6 @@ import java.util.*;
 
 import org.junit.*;
 
-import uk.ac.kent.displayGraph.Edge;
-import uk.ac.kent.displayGraph.Graph;
-import uk.ac.kent.displayGraph.Node;
 import uk.ac.kent.dover.fastGraph.*;
 import uk.ac.kent.dover.fastGraph.graphSimilarity.NeighbourhoodSimilarity;
 
@@ -29,20 +26,32 @@ public class NeighbourhoodSimilarityTest {
 		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
 		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
 		
+		ns1 = new NeighbourhoodSimilarity(false);
+		ret = ns1.similarity(g1,g2);
+		assertEquals(0.0,ret,0.001);
 		ns1 = new NeighbourhoodSimilarity(true);
 		ret = ns1.similarity(g1,g2);
 		assertEquals(0.0,ret,0.001);
 
+		ns1 = new NeighbourhoodSimilarity(false);
+		ret = ns1.similarity(g2,g1);
+		assertEquals(0.0,ret,0.001);
 		ns1 = new NeighbourhoodSimilarity(true);
 		ret = ns1.similarity(g2,g1);
 		assertEquals(0.0,ret,0.001);
 		
 		g1 = FastGraph.randomGraphFactory(10, 20, 888, true, false);
 		
+		ns1 = new NeighbourhoodSimilarity(false);
+		ret = ns1.similarity(g2,g1);
+		assertEquals(1.0,ret,0.001);
 		ns1 = new NeighbourhoodSimilarity(true);
 		ret = ns1.similarity(g2,g1);
 		assertEquals(1.0,ret,0.001);
 		
+		ns1 = new NeighbourhoodSimilarity(false);
+		ret = ns1.similarity(g2,g1);
+		assertEquals(1.0,ret,0.001);
 		ns1 = new NeighbourhoodSimilarity(true);
 		ret = ns1.similarity(g2,g1);
 		assertEquals(1.0,ret,0.001);
@@ -58,11 +67,11 @@ public class NeighbourhoodSimilarityTest {
 		FastGraph g1 = FastGraph.randomGraphFactory(5, 8, 888, true, false);
 		FastGraph g2 = ExactIsomorphism.generateRandomIsomorphicGraph(g1, 999, false);
 
-		ns1 = new NeighbourhoodSimilarity(true);
+		ns1 = new NeighbourhoodSimilarity(false);
 		ret = ns1.similarity(g1,g2);
 		assertEquals(0.0,ret,0.001);
 
-		ns1 = new NeighbourhoodSimilarity(true);
+		ns1 = new NeighbourhoodSimilarity(false);
 		ret = ns1.similarity(g2,g1);
 		assertEquals(0.0,ret,0.001);
 
@@ -145,15 +154,15 @@ public class NeighbourhoodSimilarityTest {
 		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
 		FastGraph g3 = FastGraph.structureFactory("g3", (byte)0, nodes3, edges3, false);
 		
-		ns1 = new NeighbourhoodSimilarity(true);
+		ns1 = new NeighbourhoodSimilarity(false);
 		ret = ns1.similarity(g1,g2);
 		assertEquals(0.40604,ret,0.001);
 
-		ns1 = new NeighbourhoodSimilarity(true);
+		ns1 = new NeighbourhoodSimilarity(false);
 		ret = ns1.similarity(g2,g1);
 		assertEquals(0.40604,ret,0.001);
 		
-		ns1 = new NeighbourhoodSimilarity(true);
+		ns1 = new NeighbourhoodSimilarity(false);
 		ret = ns1.similarity(g1,g3);
 		assertEquals(0.73611,ret,0.001);
 		
@@ -165,6 +174,63 @@ public class NeighbourhoodSimilarityTest {
 		
 		ret = ns1.similarity(g3,g2);
 		assertEquals(0.85044,ret,0.001); //TODO
+		
+	}
+	
+	
+	@Test
+	public void test004() throws FastGraphException {
+		
+		NeighbourhoodSimilarity ns1;
+		double ret;
+		
+		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
+		NodeStructure ns10 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns11 = new NodeStructure(1,"a", 0, (byte)0, (byte)0);
+		NodeStructure ns12 = new NodeStructure(2,"a", 0, (byte)0, (byte)0);
+		nodes1.add(ns10);
+		nodes1.add(ns11);
+		nodes1.add(ns12);
+		List<EdgeStructure> edges1 = new ArrayList<EdgeStructure>();
+		EdgeStructure es10 = new EdgeStructure(0,"es10", 0, (byte)0, (byte)0, 0, 1);
+		EdgeStructure es11 = new EdgeStructure(1,"es12", 0, (byte)0, (byte)0, 1, 2);
+		EdgeStructure es12 = new EdgeStructure(2,"es12", 0, (byte)0, (byte)0, 2, 0);
+		edges1.add(es10);
+		edges1.add(es11);
+		edges1.add(es12);
+		List<NodeStructure> nodes2 = new ArrayList<NodeStructure>();
+		NodeStructure ns20 = new NodeStructure(0,"b", 0, (byte)0, (byte)0);
+		NodeStructure ns21 = new NodeStructure(1,"b", 0, (byte)0, (byte)0);
+		NodeStructure ns22 = new NodeStructure(2,"b", 0, (byte)0, (byte)0);
+		nodes2.add(ns20);
+		nodes2.add(ns21);
+		nodes2.add(ns22);
+		List<EdgeStructure> edges2 = new ArrayList<EdgeStructure>();
+		EdgeStructure es20 = new EdgeStructure(0,"es20", 0, (byte)0, (byte)0, 0, 1);
+		EdgeStructure es21 = new EdgeStructure(1,"es21", 0, (byte)0, (byte)0, 1, 2);
+		EdgeStructure es22 = new EdgeStructure(2,"es22", 0, (byte)0, (byte)0, 0, 2);
+		edges2.add(es20);
+		edges2.add(es21);
+		edges2.add(es22);
+		
+		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
+		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
+		
+		ns1 = new NeighbourhoodSimilarity(true);
+		ret = ns1.similarity(g1,g2);
+		assertEquals(0.0,ret,0.001);
+
+		ns1 = new NeighbourhoodSimilarity(true);
+		ret = ns1.similarity(g2,g1);
+		assertEquals(0.0,ret,0.001);
+		
+		ns1 = new NeighbourhoodSimilarity(false);
+		ret = ns1.similarity(g1,g2);
+		assertEquals(1.0,ret,0.001);
+
+		ns1 = new NeighbourhoodSimilarity(false);
+		ret = ns1.similarity(g2,g1);
+		assertEquals(1.0,ret,0.001);
 		
 	}
 	

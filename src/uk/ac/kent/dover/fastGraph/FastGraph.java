@@ -5159,29 +5159,29 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 	 * @param g the graph to duplicate edges
 	 * @return a new graph with duplicated and reversed edges
 	 */
-	public FastGraph generateByAddingReversedEdges(FastGraph g) {
+	public FastGraph generateByAddingReversedEdges() {
 		
-		ArrayList<NodeStructure> nodes = new ArrayList<>(g.getNumberOfNodes());
-		for(int n = 0; n < g.getNumberOfNodes(); n++) {
+		ArrayList<NodeStructure> nodes = new ArrayList<>(getNumberOfNodes());
+		for(int n = 0; n < getNumberOfNodes(); n++) {
 			NodeStructure ns = generateNodeStructure(n);
 			nodes.add(ns);
 		}
 		
-		ArrayList<EdgeStructure> edges = new ArrayList<>(g.getNumberOfEdges()*2);
-		for(int e = 0; e < g.getNumberOfEdges(); e++) {
-			if(!edgeExistsInStructureList(edges,g.getEdgeNode1(e),g.getEdgeNode2(e))) {
+		ArrayList<EdgeStructure> edges = new ArrayList<>(getNumberOfEdges()*2);
+		for(int e = 0; e < getNumberOfEdges(); e++) {
+			if(!edgeExistsInStructureList(edges,getEdgeNode1(e),getEdgeNode2(e))) {
 				EdgeStructure es = generateEdgeStructure(e);
 				edges.add(es);
 			}
-			if(g.getEdgeNode2(e) != g.getEdgeNode1(e) && !edgeExistsInStructureList(edges,g.getEdgeNode2(e),g.getEdgeNode1(e))) {
+			if(getEdgeNode2(e) != getEdgeNode1(e) && !edgeExistsInStructureList(edges,getEdgeNode2(e),getEdgeNode1(e))) {
 				EdgeStructure es = generateEdgeStructure(e);
-				es.setNode1(g.getEdgeNode2(e));
-				es.setNode2(g.getEdgeNode1(e));
+				es.setNode1(getEdgeNode2(e));
+				es.setNode2(getEdgeNode1(e));
 				edges.add(es);
 			}
 		}
 		
-		FastGraph ret = structureFactory(g.getName()+"-edgesDoubled",g.getGeneration(),nodes,edges,g.getDirect());
+		FastGraph ret = structureFactory(getName()+"-edgesDoubled",getGeneration(),nodes,edges,getDirect());
 		
 		return ret;
 		

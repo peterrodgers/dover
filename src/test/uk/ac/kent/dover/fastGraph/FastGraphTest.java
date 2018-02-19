@@ -14,14 +14,10 @@ import test.uk.ac.kent.dover.TestRunner;
 import uk.ac.kent.displayGraph.*;
 import uk.ac.kent.dover.fastGraph.Connected;
 import uk.ac.kent.dover.fastGraph.EdgeStructure;
-import uk.ac.kent.dover.fastGraph.ExactIsomorphism;
 import uk.ac.kent.dover.fastGraph.FastGraph;
 import uk.ac.kent.dover.fastGraph.FastGraphEdgeType;
-import uk.ac.kent.dover.fastGraph.FastGraphException;
 import uk.ac.kent.dover.fastGraph.Launcher;
 import uk.ac.kent.dover.fastGraph.NodeStructure;
-import uk.ac.kent.dover.fastGraph.editOperation.EditList;
-import uk.ac.kent.dover.fastGraph.graphSimilarity.NodeDegreeDifference;
 
 
 /**
@@ -4570,6 +4566,145 @@ public class FastGraphTest {
 		gRet = ret.get(1);
 		assertTrue(gRet.checkConsistency());
 
+	}
+
+	
+	@Test
+	public void test183() throws Exception {
+		LinkedList<EdgeStructure> addEdges;
+		LinkedList<NodeStructure> addNodes;
+		FastGraph g, gRet;
+		NodeStructure ns0,ns1,ns2;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		addEdges = new LinkedList<EdgeStructure>();
+		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
+		gRet = g.generateByAddingReversedEdges();
+		assertEquals(0,gRet.getNumberOfNodes());
+		assertEquals(0,gRet.getNumberOfEdges());
+		
+		addNodes = new LinkedList<NodeStructure>();
+		addEdges = new LinkedList<EdgeStructure>();
+		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
+		addNodes.add(ns0);
+		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
+		gRet = g.generateByAddingReversedEdges();
+		assertEquals(1,gRet.getNumberOfNodes());
+		assertEquals(0,gRet.getNumberOfEdges());
+		
+		addNodes = new LinkedList<NodeStructure>();
+		addEdges = new LinkedList<EdgeStructure>();
+		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
+		ns1 = new NodeStructure(1,"ns1", 1, (byte)1, (byte)0);
+		ns2 = new NodeStructure(2,"ns2", 1, (byte)0, (byte)0);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addNodes.add(ns2);
+		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
+		gRet = g.generateByAddingReversedEdges();
+		assertEquals(3,gRet.getNumberOfNodes());
+		assertEquals(0,gRet.getNumberOfEdges());
+		
+	}
+	
+	@Test
+	public void test184() throws Exception {
+		LinkedList<EdgeStructure> addEdges;
+		LinkedList<NodeStructure> addNodes;
+		FastGraph g, gRet;
+		NodeStructure ns0,ns1;
+		EdgeStructure es0;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
+		ns1 = new NodeStructure(1,"ns1", 1, (byte)1, (byte)0);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addEdges = new LinkedList<EdgeStructure>();
+		es0 = new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 0, 1);
+		addEdges.add(es0);
+		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
+		gRet = g.generateByAddingReversedEdges();
+		assertEquals(2,gRet.getNumberOfNodes());
+		assertEquals(2,gRet.getNumberOfEdges());
+		assertEquals(0,gRet.getEdgeNode1(0));
+		assertEquals(1,gRet.getEdgeNode2(0));
+		assertEquals(1,gRet.getEdgeNode1(1));
+		assertEquals(0,gRet.getEdgeNode2(1));
+		
+		
+	}
+
+	@Test
+	public void test185() throws Exception {
+		LinkedList<EdgeStructure> addEdges;
+		LinkedList<NodeStructure> addNodes;
+		FastGraph g, gRet;
+		NodeStructure ns0,ns1,ns2;
+		EdgeStructure es0,es1,es2;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
+		ns1 = new NodeStructure(1,"ns1", 1, (byte)1, (byte)0);
+		ns2 = new NodeStructure(2,"ns2", 1, (byte)0, (byte)0);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addNodes.add(ns2);
+		addEdges = new LinkedList<EdgeStructure>();
+		es0 = new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 1, 0);
+		es1 = new EdgeStructure(1,"es1", 2, (byte)0, (byte)0, 1, 2);
+		es0 = new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 1, 0);
+		es2 = new EdgeStructure(2,"es2", 2, (byte)0, (byte)0, 0, 1);
+		addEdges.add(es0);
+		addEdges.add(es1);
+		addEdges.add(es2);
+		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
+		gRet = g.generateByAddingReversedEdges();
+		assertEquals(3,gRet.getNumberOfNodes());
+		assertEquals(4,gRet.getNumberOfEdges());
+		assertEquals(1,gRet.getEdgeNode1(0));
+		assertEquals(0,gRet.getEdgeNode2(0));
+		assertEquals(0,gRet.getEdgeNode1(1));
+		assertEquals(1,gRet.getEdgeNode2(1));
+		assertEquals(1,gRet.getEdgeNode1(2));
+		assertEquals(2,gRet.getEdgeNode2(2));
+		assertEquals(2,gRet.getEdgeNode1(3));
+		assertEquals(1,gRet.getEdgeNode2(3));
+		
+	}
+
+	@Test
+	public void test186() throws Exception {
+		LinkedList<EdgeStructure> addEdges;
+		LinkedList<NodeStructure> addNodes;
+		FastGraph g, gRet;
+		NodeStructure ns0,ns1,ns2;
+		EdgeStructure es0,es1,es2;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		ns0 = new NodeStructure(0,"ns0", 1, (byte)1, (byte)0);
+		ns1 = new NodeStructure(1,"ns1", 1, (byte)1, (byte)0);
+		ns2 = new NodeStructure(2,"ns2", 1, (byte)0, (byte)0);
+		addNodes.add(ns0);
+		addNodes.add(ns1);
+		addNodes.add(ns2);
+		addEdges = new LinkedList<EdgeStructure>();
+		es0 = new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 1, 1);
+		es1 = new EdgeStructure(1,"es1", 2, (byte)0, (byte)0, 2, 2);
+		es0 = new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 2, 2);
+		es2 = new EdgeStructure(2,"es2", 2, (byte)0, (byte)0, 1, 1);
+		addEdges.add(es0);
+		addEdges.add(es1);
+		addEdges.add(es2);
+		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
+		gRet = g.generateByAddingReversedEdges();
+		assertEquals(3,gRet.getNumberOfNodes());
+		assertEquals(2,gRet.getNumberOfEdges());
+		assertEquals(2,gRet.getEdgeNode1(0));
+		assertEquals(2,gRet.getEdgeNode2(0));
+		assertEquals(1,gRet.getEdgeNode1(1));
+		assertEquals(1,gRet.getEdgeNode2(1));
+		
 	}
 
 
