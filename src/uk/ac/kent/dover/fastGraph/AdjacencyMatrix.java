@@ -6,7 +6,7 @@ import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 
 /**
- * This class holds all the methods associated with adjacency matricies
+ * This class holds all the methods associated with adjacency matrices
  * 
  * @author Rob Baker
  *
@@ -34,7 +34,6 @@ public class AdjacencyMatrix {
 		for (int[] i : matrix) {
 			System.out.println(Arrays.toString(i));
 		}
-			
 	}
 	
 	/**

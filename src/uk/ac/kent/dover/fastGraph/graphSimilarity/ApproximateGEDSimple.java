@@ -34,7 +34,7 @@ public class ApproximateGEDSimple extends GraphEditDistance {
 	private HashMap<Integer,Integer> nodeMapping; // g1 nodes to g2 nodes
 	private HashMap<Integer,Integer> reverseNodeMapping; // g2 nodes to g1 nodes
 	private ArrayList<Integer> deleteNodes; // g1 nodes to be removed
-	private ArrayList<Integer> deleteEdges; // g1 nodes to be removed
+	private ArrayList<Integer> deleteEdges; // g1 edges to be removed
 	private LinkedList<Integer> addEdgeNode1List; // g1 new node1 to be added
 	private LinkedList<Integer> addEdgeNode2List; // g1 new node2 to be added
 	
