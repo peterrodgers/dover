@@ -113,6 +113,18 @@ public class TestRunner {
 			System.out.println(failure.toString());
 		}
 		System.out.println(result.wasSuccessful()+" BeliefPropagationSimpleTest");
+		
+		result = JUnitCore.runClasses(RandomTrailTest.class);
+		for (Failure failure : result.getFailures()) {
+			System.out.println(failure.toString());
+		}
+		System.out.println(result.wasSuccessful()+" RandomTrailTest");
+		
+		result = JUnitCore.runClasses(RandomTrailSimilarityTest.class);
+		for (Failure failure : result.getFailures()) {
+			System.out.println(failure.toString());
+		}
+		System.out.println(result.wasSuccessful()+" RandomTrailSimilarityTest");
    }
 	
 	public static String get0Node0Edge() {

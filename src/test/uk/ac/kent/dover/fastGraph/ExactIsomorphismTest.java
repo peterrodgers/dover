@@ -4,9 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import test.uk.ac.kent.dover.TestRunner;
 import uk.ac.kent.displayGraph.*;
@@ -1900,8 +1898,6 @@ public class ExactIsomorphismTest {
 		nodes1.add(ns12);
 		List<EdgeStructure> edges1 = new ArrayList<EdgeStructure>();
 		List<NodeStructure> nodes2 = new ArrayList<NodeStructure>();
-		NodeStructure ns20 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
-		NodeStructure ns21 = new NodeStructure(1,"a", 0, (byte)0, (byte)0);
 		List<EdgeStructure> edges2 = new ArrayList<EdgeStructure>();
 
 		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
@@ -1924,8 +1920,6 @@ public class ExactIsomorphismTest {
 	
 	@Test
 	public void test041()  {
-		
-		ExactIsomorphism ei;
 		
 		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
 		NodeStructure ns10 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);

@@ -7,7 +7,6 @@ import java.util.*;
 
 import org.junit.Test;
 
-import test.uk.ac.kent.dover.TestRunner;
 import uk.ac.kent.dover.fastGraph.*;
 import uk.ac.kent.dover.fastGraph.graphSimilarity.NodeDegreeDifference;
 
