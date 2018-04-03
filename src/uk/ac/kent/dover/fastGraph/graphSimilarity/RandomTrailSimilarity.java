@@ -28,23 +28,24 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 	public static void main(String [] args) {
 		
 		Debugger.enabled = false;
-		randomIncreasing();
-//		randomIsomorphismComparison();
+//		randomIncreasing();
+		randomIsomorphismComparison();
 		
 		
 		try {
-			int i = 3887;
+			int i = 3855;
 			double similarity1,similarity2;
 			LinkedList<NodeStructure> addNodes;
 			LinkedList<EdgeStructure> addEdges;
 			FastGraph g1,g2;
 			RandomTrailSimilarity rts;
-
 			addNodes = new LinkedList<NodeStructure>();
 			addNodes.add(new NodeStructure(0,"A", 1, (byte)1, (byte)0));
 			addNodes.add(new NodeStructure(1,"B", 1, (byte)1, (byte)0));
 			addEdges = new LinkedList<EdgeStructure>();
 			addEdges.add(new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 1, 1));
+			addEdges.add(new EdgeStructure(1,"es1", 1, (byte)0, (byte)0, 0, 0));
+			addEdges.add(new EdgeStructure(2,"es2", 1, (byte)0, (byte)0, 0, 1));
 			g1 = FastGraph.structureFactory("g2",(byte)0,addNodes,addEdges,false);
 
 			addNodes = new LinkedList<NodeStructure>();
@@ -52,13 +53,18 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 			addNodes.add(new NodeStructure(1,"B", 1, (byte)1, (byte)0));
 			addEdges = new LinkedList<EdgeStructure>();
 			addEdges.add(new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 1, 0));
+			addEdges.add(new EdgeStructure(1,"es1", 1, (byte)0, (byte)0, 0, 1));
+			addEdges.add(new EdgeStructure(2,"es2", 1, (byte)0, (byte)0, 0, 1));
 			g2 = FastGraph.structureFactory("g2",(byte)0,addNodes,addEdges,false);
 			
-			rts = new RandomTrailSimilarity(false,false,5566);
+			rts = new RandomTrailSimilarity(false, false, 999);
 			rts.setTrailLength(4);
 			rts.setTrailsPerNode(10);
 			similarity1 = rts.similarity(g1, g2);
-System.out.println("similarity "+similarity1);
+			similarity2 = rts.similarity(g2, g1);
+			System.out.println(g1);
+			System.out.println(g2);
+			System.out.println("similarity1 "+similarity1+" similarity2 "+similarity2);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -74,38 +80,43 @@ System.out.println("similarity "+similarity1);
 			boolean isomorphic,directed,labels;
 			FastGraph g1,g2;
 			long g1Seed,g2Seed,rtsSeed;
-			int nodes = 5;
-			int edges = 8;
+			int trailLength = 5;
+			int trailsPerNode = 10;
+			int nodes = 10;
+			int edges = 20;
 			int i = 0;
 			while(true) {
+				boolean fail = false;
 				i++;
+				if(i%1000 == 0) {
+					System.out.println("iteration: "+i);
+				}
 				g1Seed = i*111;
 				g2Seed = i*333;
 				rtsSeed = i*555;
-				System.out.println(i);
 				
 				directed = true;
 				labels = true;
 				g1 = FastGraph.randomGraphFactory(nodes, edges, g1Seed, false);
 				g2 = FastGraph.randomGraphFactory(nodes, edges, g2Seed, false);
+//				g2 = ExactIsomorphism.generateRandomIsomorphicGraph(g1, g2Seed, false);
 				isomorphic = ExactIsomorphism.isomorphic(g1, g2, directed,labels);
 				rts = new RandomTrailSimilarity(directed,labels,rtsSeed);
-				rts.setTrailLength(4);
-				rts.setTrailsPerNode(10);
+				rts.setTrailLength(trailLength);
+				rts.setTrailsPerNode(trailsPerNode);
 				similarity1 = rts.similarity(g1, g2);
 				similarity2 = rts.similarity(g2, g1);
 				if(Math.abs(similarity1-similarity2) > 0.001) {
 					System.out.println("similarity1 "+similarity1+" similarity2 "+similarity2+" "+ directed+" "+labels);
+					fail = true;
 				}
 				if(similarity1 < 0.001 && !isomorphic) {
 					System.out.println("similarity1 "+similarity1+" isomorphic "+isomorphic+" "+ directed+" "+labels);
-//System.out.println("g1");
-//System.out.println(g1);
-//System.out.println("g2");
-//System.out.println(g2);
+					fail = true;
 				}
 				if(similarity1 > 0.001 && isomorphic) {
 					System.out.println("similarity1 "+similarity1+" isomorphic "+isomorphic+" "+ directed+" "+labels);
+					fail = true;
 				}
 				
 				directed = false;
@@ -114,18 +125,21 @@ System.out.println("similarity "+similarity1);
 				g2 = FastGraph.randomGraphFactory(nodes, edges, g2Seed, false);
 				isomorphic = ExactIsomorphism.isomorphic(g1, g2, directed,labels);
 				rts = new RandomTrailSimilarity(directed,labels,rtsSeed);
-				rts.setTrailLength(4);
-				rts.setTrailsPerNode(10);
+				rts.setTrailLength(trailLength);
+				rts.setTrailsPerNode(trailsPerNode);
 				similarity1 = rts.similarity(g1, g2);
 				similarity2 = rts.similarity(g2, g1);
 				if(Math.abs(similarity1-similarity2) > 0.001) {
 					System.out.println("similarity1 "+similarity1+" similarity2 "+similarity2+" "+ directed+" "+labels);
+					fail = true;
 				}
 				if(similarity1 < 0.001 && !isomorphic) {
 					System.out.println("similarity1 "+similarity1+" isomorphic "+isomorphic+" "+ directed+" "+labels);
+					fail = true;
 				}
 				if(similarity1 > 0.001 && isomorphic) {
 					System.out.println("similarity1 "+similarity1+" isomorphic "+isomorphic+" "+ directed+" "+labels);
+					fail = true;
 				}
 
 				directed = true;
@@ -134,18 +148,21 @@ System.out.println("similarity "+similarity1);
 				g2 = FastGraph.randomGraphFactory(nodes, edges, g2Seed, false);
 				isomorphic = ExactIsomorphism.isomorphic(g1, g2, directed,labels);
 				rts = new RandomTrailSimilarity(directed,labels,rtsSeed);
-				rts.setTrailLength(4);
-				rts.setTrailsPerNode(10);
+				rts.setTrailLength(trailLength);
+				rts.setTrailsPerNode(trailsPerNode);
 				similarity1 = rts.similarity(g1, g2);
 				similarity2 = rts.similarity(g2, g1);
 				if(Math.abs(similarity1-similarity2) > 0.001) {
 					System.out.println("similarity1 "+similarity1+" similarity2 "+similarity2+" "+ directed+" "+labels);
+					fail = true;
 				}
 				if(similarity1 < 0.001 && !isomorphic) {
 					System.out.println("similarity1 "+similarity1+" isomorphic "+isomorphic+" "+ directed+" "+labels);
+					fail = true;
 				}
 				if(similarity1 > 0.001 && isomorphic) {
 					System.out.println("similarity1 "+similarity1+" isomorphic "+isomorphic+" "+ directed+" "+labels);
+					fail = true;
 				}
 
 				directed = false;
@@ -154,18 +171,27 @@ System.out.println("similarity "+similarity1);
 				g2 = FastGraph.randomGraphFactory(nodes, edges, g2Seed, false);
 				isomorphic = ExactIsomorphism.isomorphic(g1, g2, directed,labels);
 				rts = new RandomTrailSimilarity(directed,labels,rtsSeed);
-				rts.setTrailLength(4);
-				rts.setTrailsPerNode(10);
+				rts.setTrailLength(trailLength);
+				rts.setTrailsPerNode(trailsPerNode);
 				similarity1 = rts.similarity(g1, g2);
 				similarity2 = rts.similarity(g2, g1);
 				if(Math.abs(similarity1-similarity2) > 0.001) {
 					System.out.println("similarity1 "+similarity1+" similarity2 "+similarity2+" "+ directed+" "+labels);
+					fail = true;
 				}
 				if(similarity1 < 0.001 && !isomorphic) {
 					System.out.println("similarity1 "+similarity1+" isomorphic "+isomorphic+" "+ directed+" "+labels);
+					fail = true;
 				}
 				if(similarity1 > 0.001 && isomorphic) {
 					System.out.println("similarity1 "+similarity1+" isomorphic "+isomorphic+" "+ directed+" "+labels);
+					fail = true;
+				}
+				
+				if(fail) {
+					System.out.println("Failed on i "+i);
+//					System.out.println(g1);
+//					System.out.println(g2);
 				}
 
 				
@@ -537,7 +563,7 @@ System.out.println("similarity "+similarity1);
 
 	/**
 	 * 
-	 * Checks the match of tn2 with the corresponding trail1 node at the position we are going to insert the new 
+	 * Checks the match of trail2 node tn2 with the corresponding trail1 node tn1 at the position we are going to insert the new 
 	 * node into trail2. Checks equal degree, checks node label if {@link nodeLabels} is true.
 	 * 
 	 * @param tn2 the g2 current node in a TrailNode
@@ -554,7 +580,13 @@ System.out.println("similarity "+similarity1);
 		int nextNode2 = g2.oppositeEnd(nextEdge, tn2.getNode());
 		TrailNode nextTN2 = new TrailNode(trail2.size(), nextNode2, -1);
 		
-		TrailNode tn1 = trail1.get(trail2.size()-1);
+		TrailNode tn1 = trail1.get(trail2.size()-1); // equivalent to
+		
+		// if a repeated node, must be repeated in same point in trail
+		// plus cannot have one repeated and not the other
+		if(tn1.getDuplicatePosition() != tn2.getDuplicatePosition()) {
+			return null;
+		}
 		
 		if(!directed) {
 			int n1Degree = g1.getNodeDegree(tn1.getNode());
@@ -575,23 +607,14 @@ System.out.println("similarity "+similarity1);
 			}
 		}
 		
-/* Not working at present, and seems to be not needed		
-		// check repeated node use equality, if this accesses a previous node it must be in the same position in the trail
+		
+		// set the duplicate position for the next node in trail2
 		for(TrailNode tn : trail2) {
 			if(tn.getNode() == nextNode2) { // the trail2 node is going through a previously used node
 				nextTN2.setDuplicatePositon(tn.getPosition());
-				if(nextTN2.getDuplicatePosition() != tn1.getDuplicatePosition()) {
-					return null; // the previously used nodes are in different positions in both trails
-				}
 				break;
 			}
 		}
-		if(tn1.getDuplicatePosition() != -1) { // the trail1 node is going through a previously used node
-			if(nextTN2.getDuplicatePosition() != tn1.getDuplicatePosition()) {
-				return null; // the previously used nodes are in different positions in both trails, this is the case that the trail2 node is -1 for duplicate position
-			}
-		}
-*/
 		
 		if(!nodeLabels) {
 			return nextTN2;

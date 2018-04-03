@@ -18,19 +18,25 @@ public class RandomTrail {
 		
 		Debugger.enabled = false;
 		
-		FastGraph g;
+		LinkedList<NodeStructure> addNodes;
+		LinkedList<EdgeStructure> addEdges;
+		FastGraph g1,g2;
 		RandomTrail rt;
 		ArrayList<TrailNode> ret;
-		g = FastGraph.randomGraphFactory(10, 16, false);
-
-		for(int i = 0; i < 10; i++) {
-			rt = new RandomTrail(false,i*1010);
-			ret = rt.findTrail(g, 0, 10);
-//			for(TrailNode tn : ret) {
-//				System.out.println(tn);
-//			}
-			System.out.println(ret);
-		}
+		addNodes = new LinkedList<NodeStructure>();
+		addNodes.add(new NodeStructure(0,"A", 1, (byte)1, (byte)0));
+		addNodes.add(new NodeStructure(1,"B", 1, (byte)1, (byte)0));
+		addEdges = new LinkedList<EdgeStructure>();
+		addEdges.add(new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 1, 1));
+		addEdges.add(new EdgeStructure(1,"es1", 1, (byte)0, (byte)0, 0, 0));
+		addEdges.add(new EdgeStructure(2,"es2", 1, (byte)0, (byte)0, 0, 1));
+		g1 = FastGraph.structureFactory("g2",(byte)0,addNodes,addEdges,false);
+		
+		rt = new RandomTrail(false, 666);
+		
+		ret = rt.findTrail(g1, 0, 4);
+		System.out.println(g1);
+		System.out.println(ret);
 		
 	}
 
@@ -38,7 +44,7 @@ public class RandomTrail {
 	
 	/**
 	 *
-	 * Create a RandomTrail before running {@link #findTrail(FastGraph) findTrail}.
+	 * Create a RandomTrail before running findTrail.
 	 *
 	 * @param directed if true treat the edges as directed, otherwise travel along them in either direction
 	 */
@@ -49,7 +55,7 @@ public class RandomTrail {
 	
 	/**
 	 *
-	 * Create a RandomTrail before running {@link #findTrail(FastGraph) findTrail}.
+	 * Create a RandomTrail before running findTrail.
 	 *
 	 * @param directed if true treat the edges as directed, otherwise travel along them in either direction
 	 * @param seeds allows testing of known seed for the random branch finder.
@@ -86,6 +92,7 @@ public class RandomTrail {
 		
 		TrailNode startTN = new TrailNode(0,startNode,-1);
 		trail.add(startTN);
+		visitedNodes.add(startNode);
 
 		int[] neighbourEdgesArray;
 		int currentNode = startNode;

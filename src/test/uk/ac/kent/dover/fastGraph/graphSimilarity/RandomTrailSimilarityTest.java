@@ -1,6 +1,8 @@
 package test.uk.ac.kent.dover.fastGraph.graphSimilarity;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.*;
 
@@ -604,5 +606,55 @@ public class RandomTrailSimilarityTest {
 	}
 	
 	
+	@Test
+	public void test011() throws FastGraphException  {
+		double similarity1,similarity2;
+		LinkedList<NodeStructure> addNodes;
+		LinkedList<EdgeStructure> addEdges;
+		FastGraph g1,g2;
+		RandomTrailSimilarity rts;
+
+		addNodes = new LinkedList<NodeStructure>();
+		addNodes.add(new NodeStructure(0,"A", 1, (byte)1, (byte)0));
+		addNodes.add(new NodeStructure(1,"B", 1, (byte)1, (byte)0));
+		addEdges = new LinkedList<EdgeStructure>();
+		addEdges.add(new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 1, 1));
+		addEdges.add(new EdgeStructure(1,"es1", 1, (byte)0, (byte)0, 0, 0));
+		addEdges.add(new EdgeStructure(2,"es2", 1, (byte)0, (byte)0, 0, 1));
+		g1 = FastGraph.structureFactory("g2",(byte)0,addNodes,addEdges,false);
+
+		addNodes = new LinkedList<NodeStructure>();
+		addNodes.add(new NodeStructure(0,"A", 1, (byte)1, (byte)0));
+		addNodes.add(new NodeStructure(1,"B", 1, (byte)1, (byte)0));
+		addEdges = new LinkedList<EdgeStructure>();
+		addEdges.add(new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 1, 0));
+		addEdges.add(new EdgeStructure(1,"es1", 1, (byte)0, (byte)0, 0, 1));
+		addEdges.add(new EdgeStructure(2,"es2", 1, (byte)0, (byte)0, 0, 1));
+		g2 = FastGraph.structureFactory("g2",(byte)0,addNodes,addEdges,false);
+		
+		rts = new RandomTrailSimilarity(false,false,5566);
+		similarity1 = rts.similarity(g1, g2);
+		assertNotEquals(0, similarity1, 0.001);
+		similarity2 = rts.similarity(g2, g1);
+		assertEquals(similarity2, similarity2, 0.001);
+
+		rts = new RandomTrailSimilarity(true,false,8866);
+		similarity1 = rts.similarity(g1, g2);
+		assertNotEquals(0, similarity1, 0.001);
+		similarity2 = rts.similarity(g2, g1);
+		assertEquals(similarity2, similarity2, 0.001);
+
+		rts = new RandomTrailSimilarity(false,true,1133);
+		similarity1 = rts.similarity(g1, g2);
+		assertNotEquals(0, similarity1, 0.001);
+		similarity2 = rts.similarity(g2, g1);
+		assertEquals(similarity2, similarity2, 0.001);
+
+		rts = new RandomTrailSimilarity(true,true,3399);
+		similarity1 = rts.similarity(g1, g2);
+		assertNotEquals(0, similarity1, 0.001);
+		similarity2 = rts.similarity(g2, g1);
+		assertEquals(similarity2, similarity2, 0.001);
+	}
 
 }
