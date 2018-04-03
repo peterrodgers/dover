@@ -6,7 +6,8 @@ import edu.isi.karma.modeling.research.graphmatching.algorithms.VJAccess;
 import uk.ac.kent.dover.fastGraph.*;
 
 /**
- * A similarity method for graphs, using random trails.
+ * A similarity method for graphs, using random trails. To achieve symmetry use the same object
+ * in both g1 g2 and g2 g1 directions, as the same random seed will be applied.
  * 
  * @author Peter Rodgers
  *
@@ -18,7 +19,7 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 	
 	private long randomSeed;
 	
-	private int trailLength = 3; // maximum length for each trail
+	private int trailLength = 4; // maximum length for each trail
 	private int trailsPerNode = 10; // number of random trails found for each node
 	
 	private double[][] costMatrix;
@@ -27,9 +28,157 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 	public static void main(String [] args) {
 		
 		Debugger.enabled = false;
+		randomIncreasing();
+//		randomIsomorphismComparison();
+		
 		
 		try {
+			int i = 3887;
+			double similarity1,similarity2;
+			LinkedList<NodeStructure> addNodes;
+			LinkedList<EdgeStructure> addEdges;
+			FastGraph g1,g2;
+			RandomTrailSimilarity rts;
 
+			addNodes = new LinkedList<NodeStructure>();
+			addNodes.add(new NodeStructure(0,"A", 1, (byte)1, (byte)0));
+			addNodes.add(new NodeStructure(1,"B", 1, (byte)1, (byte)0));
+			addEdges = new LinkedList<EdgeStructure>();
+			addEdges.add(new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 1, 1));
+			g1 = FastGraph.structureFactory("g2",(byte)0,addNodes,addEdges,false);
+
+			addNodes = new LinkedList<NodeStructure>();
+			addNodes.add(new NodeStructure(0,"A", 1, (byte)1, (byte)0));
+			addNodes.add(new NodeStructure(1,"B", 1, (byte)1, (byte)0));
+			addEdges = new LinkedList<EdgeStructure>();
+			addEdges.add(new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 1, 0));
+			g2 = FastGraph.structureFactory("g2",(byte)0,addNodes,addEdges,false);
+			
+			rts = new RandomTrailSimilarity(false,false,5566);
+			rts.setTrailLength(4);
+			rts.setTrailsPerNode(10);
+			similarity1 = rts.similarity(g1, g2);
+System.out.println("similarity "+similarity1);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private static void randomIsomorphismComparison() {
+		
+		try {
+			
+			RandomTrailSimilarity rts;
+			double similarity1,similarity2;
+			boolean isomorphic,directed,labels;
+			FastGraph g1,g2;
+			long g1Seed,g2Seed,rtsSeed;
+			int nodes = 5;
+			int edges = 8;
+			int i = 0;
+			while(true) {
+				i++;
+				g1Seed = i*111;
+				g2Seed = i*333;
+				rtsSeed = i*555;
+				System.out.println(i);
+				
+				directed = true;
+				labels = true;
+				g1 = FastGraph.randomGraphFactory(nodes, edges, g1Seed, false);
+				g2 = FastGraph.randomGraphFactory(nodes, edges, g2Seed, false);
+				isomorphic = ExactIsomorphism.isomorphic(g1, g2, directed,labels);
+				rts = new RandomTrailSimilarity(directed,labels,rtsSeed);
+				rts.setTrailLength(4);
+				rts.setTrailsPerNode(10);
+				similarity1 = rts.similarity(g1, g2);
+				similarity2 = rts.similarity(g2, g1);
+				if(Math.abs(similarity1-similarity2) > 0.001) {
+					System.out.println("similarity1 "+similarity1+" similarity2 "+similarity2+" "+ directed+" "+labels);
+				}
+				if(similarity1 < 0.001 && !isomorphic) {
+					System.out.println("similarity1 "+similarity1+" isomorphic "+isomorphic+" "+ directed+" "+labels);
+//System.out.println("g1");
+//System.out.println(g1);
+//System.out.println("g2");
+//System.out.println(g2);
+				}
+				if(similarity1 > 0.001 && isomorphic) {
+					System.out.println("similarity1 "+similarity1+" isomorphic "+isomorphic+" "+ directed+" "+labels);
+				}
+				
+				directed = false;
+				labels = true;
+				g1 = FastGraph.randomGraphFactory(nodes, edges, g1Seed, false);
+				g2 = FastGraph.randomGraphFactory(nodes, edges, g2Seed, false);
+				isomorphic = ExactIsomorphism.isomorphic(g1, g2, directed,labels);
+				rts = new RandomTrailSimilarity(directed,labels,rtsSeed);
+				rts.setTrailLength(4);
+				rts.setTrailsPerNode(10);
+				similarity1 = rts.similarity(g1, g2);
+				similarity2 = rts.similarity(g2, g1);
+				if(Math.abs(similarity1-similarity2) > 0.001) {
+					System.out.println("similarity1 "+similarity1+" similarity2 "+similarity2+" "+ directed+" "+labels);
+				}
+				if(similarity1 < 0.001 && !isomorphic) {
+					System.out.println("similarity1 "+similarity1+" isomorphic "+isomorphic+" "+ directed+" "+labels);
+				}
+				if(similarity1 > 0.001 && isomorphic) {
+					System.out.println("similarity1 "+similarity1+" isomorphic "+isomorphic+" "+ directed+" "+labels);
+				}
+
+				directed = true;
+				labels = false;
+				g1 = FastGraph.randomGraphFactory(nodes, edges, g1Seed, false);
+				g2 = FastGraph.randomGraphFactory(nodes, edges, g2Seed, false);
+				isomorphic = ExactIsomorphism.isomorphic(g1, g2, directed,labels);
+				rts = new RandomTrailSimilarity(directed,labels,rtsSeed);
+				rts.setTrailLength(4);
+				rts.setTrailsPerNode(10);
+				similarity1 = rts.similarity(g1, g2);
+				similarity2 = rts.similarity(g2, g1);
+				if(Math.abs(similarity1-similarity2) > 0.001) {
+					System.out.println("similarity1 "+similarity1+" similarity2 "+similarity2+" "+ directed+" "+labels);
+				}
+				if(similarity1 < 0.001 && !isomorphic) {
+					System.out.println("similarity1 "+similarity1+" isomorphic "+isomorphic+" "+ directed+" "+labels);
+				}
+				if(similarity1 > 0.001 && isomorphic) {
+					System.out.println("similarity1 "+similarity1+" isomorphic "+isomorphic+" "+ directed+" "+labels);
+				}
+
+				directed = false;
+				labels = false;
+				g1 = FastGraph.randomGraphFactory(nodes, edges, g1Seed, false);
+				g2 = FastGraph.randomGraphFactory(nodes, edges, g2Seed, false);
+				isomorphic = ExactIsomorphism.isomorphic(g1, g2, directed,labels);
+				rts = new RandomTrailSimilarity(directed,labels,rtsSeed);
+				rts.setTrailLength(4);
+				rts.setTrailsPerNode(10);
+				similarity1 = rts.similarity(g1, g2);
+				similarity2 = rts.similarity(g2, g1);
+				if(Math.abs(similarity1-similarity2) > 0.001) {
+					System.out.println("similarity1 "+similarity1+" similarity2 "+similarity2+" "+ directed+" "+labels);
+				}
+				if(similarity1 < 0.001 && !isomorphic) {
+					System.out.println("similarity1 "+similarity1+" isomorphic "+isomorphic+" "+ directed+" "+labels);
+				}
+				if(similarity1 > 0.001 && isomorphic) {
+					System.out.println("similarity1 "+similarity1+" isomorphic "+isomorphic+" "+ directed+" "+labels);
+				}
+
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void randomIncreasing() {
+		
+		try {
+			
 			RandomTrailSimilarity rts;
 			double similarity;
 			FastGraph g1,g2;
@@ -65,25 +214,24 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 				
 				time = System.currentTimeMillis();
 				rts = new RandomTrailSimilarity(true,true,System.currentTimeMillis());
-				rts.setTrailLength(5);
+				rts.setTrailLength(4);
 				rts.setTrailsPerNode(10);
 				similarity = rts.similarity(g1, g2);
 				System.out.println("similarity directed labels "+similarity+" time "+((System.currentTimeMillis()-time)/1000.0)+" seconds");
 				
 				time = System.currentTimeMillis();
 				rts = new RandomTrailSimilarity(true,false,System.currentTimeMillis());
-				rts.setTrailLength(5);
+				rts.setTrailLength(4);
 				rts.setTrailsPerNode(10);
 				similarity = rts.similarity(g1, g2);
 				System.out.println("similarity directed no labels "+similarity+" time "+((System.currentTimeMillis()-time)/1000.0)+" seconds");
 
 				time = System.currentTimeMillis();
 				rts = new RandomTrailSimilarity(false,false,System.currentTimeMillis());
-				rts.setTrailLength(5);
+				rts.setTrailLength(4);
 				rts.setTrailsPerNode(10);
 				similarity = rts.similarity(g1, g2);
 				System.out.println("similarity undirected no labels "+similarity+" time "+((System.currentTimeMillis()-time)/1000.0)+" seconds");
-
 				
 				nodes *= 1.1;
 				edges *= 1.1;
@@ -91,9 +239,8 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-			
-
 	}
+
 
 	/**
 	 * defaults to treating graph as undirected and no node label comparison.
@@ -109,7 +256,7 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 
 
 	/**
-	 * 
+	 * Constructor for specifying directed and use of node labels.
 	 * 
 	 * @param directed true if the graph is treated as directed, false if undirected
 	 * @param nodeLabels true if node label operations should be considered, false if they are ignored
@@ -242,11 +389,9 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 		vja.computeAssignment(costMatrix);
 		mapping = vja.getAssignment();
 
-//System.out.println(ApproximateGEDBipartite.formatMatrix(costMatrix));
-
 		// get the similarity from the mapping
 		double cost = 0.0;
-		for(int i = 0; i < maxNodes-1; i++) {
+		for(int i = 0; i < maxNodes; i++) {
 			cost += costMatrix[i][mapping[i]];
 		}
 		
@@ -269,9 +414,18 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 	private Double randomTrailCost(int n1, int n2, FastGraph g1, FastGraph g2) {
 		
 		double ret = 0.0;
+		// first g1 to g2
 		for(int i = 0; i < trailsPerNode; i++) {
-			randomSeed = 0+(i*111);
+			// commented out because different random seeds g1 to g2 and g2 to g1 mean no symmetry
+			// randomSeed = randomSeed*11;
 			double singleCost = randomSingleTrail(n1, n2, g1, g2);
+			ret += singleCost;
+		}
+		// then g2 to g1
+		for(int i = 0; i < trailsPerNode; i++) {
+			// commented out because different random seeds g1 to g2 and g2 to g1 mean no symmetry
+			// randomSeed = randomSeed*555;
+			double singleCost = randomSingleTrail(n2, n1, g2, g1);
 			ret += singleCost;
 		}
 		
@@ -296,7 +450,7 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 			trail1 = rt.findTrail(g1, n1, trailLength);
 		} catch (FastGraphException e) {
 			e.printStackTrace();
-			System.err.println("Fail in randomTrailCost n1 "+n1+" not found in g1");
+			System.err.println("Fail in randomSingleTrail n1 "+n1+" not found in g1");
 			return null;
 		}
 
@@ -320,7 +474,6 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 				nextEdge = currentNeighbours2.remove(0);
 				nextTN2 = checkNodeMatch(tn2,nextEdge,g1,g2,trail1,trail2);
 				if(nextTN2 != null) { // success
-// TODO check repeated node match
 					break;
 				}
 			}
@@ -333,7 +486,7 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 				}
 				untestedNeighbours2.remove(tn2);
 				trail2Edges.remove(trail2Edges.size()-1);
-				trail2.remove(trail2.size()-1);
+				trail2.remove(trail2.size()-1); // the same as removing tn2
 				tn2 = trail2.get(trail2.size()-1);
 			} else { // found a match
 				tn2 = nextTN2;
@@ -351,7 +504,6 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 			}
 				
 		}
-
 		double ret = trail1.size()-longestTrail2;
 
 		return ret;
@@ -394,6 +546,7 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 	 * @param g2 the second graph, we are building a trail in this graph
 	 * @param trail1 the first trail
 	 * @param trail2 the current state of the second trail
+	 * @param visitedNodes1 a list of g1 nodes that are already in the trail
 	 * @return the other end of nextEdge if it is a match, null otherwise
 	 */
 	private TrailNode checkNodeMatch(TrailNode tn2, int nextEdge, FastGraph g1, FastGraph g2, ArrayList<TrailNode> trail1, ArrayList<TrailNode> trail2) {
@@ -421,6 +574,24 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 				return null;
 			}
 		}
+		
+/* Not working at present, and seems to be not needed		
+		// check repeated node use equality, if this accesses a previous node it must be in the same position in the trail
+		for(TrailNode tn : trail2) {
+			if(tn.getNode() == nextNode2) { // the trail2 node is going through a previously used node
+				nextTN2.setDuplicatePositon(tn.getPosition());
+				if(nextTN2.getDuplicatePosition() != tn1.getDuplicatePosition()) {
+					return null; // the previously used nodes are in different positions in both trails
+				}
+				break;
+			}
+		}
+		if(tn1.getDuplicatePosition() != -1) { // the trail1 node is going through a previously used node
+			if(nextTN2.getDuplicatePosition() != tn1.getDuplicatePosition()) {
+				return null; // the previously used nodes are in different positions in both trails, this is the case that the trail2 node is -1 for duplicate position
+			}
+		}
+*/
 		
 		if(!nodeLabels) {
 			return nextTN2;
