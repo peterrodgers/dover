@@ -19,7 +19,7 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 	
 	private long randomSeed;
 	
-	private int trailLength = 4; // maximum length for each trail
+	private int trailLength = 5; // maximum length for each trail
 	private int trailsPerNode = 10; // number of random trails found for each node
 	
 	private double[][] costMatrix;
