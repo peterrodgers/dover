@@ -36,38 +36,6 @@ public class BeliefPropagationCalculation {
 	int n; // the number of nodes in g1 or g2 (takes the largest)
 	
 	
-	public static void main(String[] args) {
-
-		List<NodeStructure> nodes1 = new ArrayList<NodeStructure>();
-		NodeStructure ns10 = new NodeStructure(0,"a", 0, (byte)0, (byte)0);
-		NodeStructure ns11 = new NodeStructure(1,"b", 0, (byte)0, (byte)0);
-		nodes1.add(ns10);
-		nodes1.add(ns11);
-		List<EdgeStructure> edges1 = new ArrayList<EdgeStructure>();
-		EdgeStructure es10 = new EdgeStructure(0,"es10", 0, (byte)0, (byte)0, 0, 1);
-		edges1.add(es10);
-		
-		List<NodeStructure> nodes2 = new ArrayList<NodeStructure>();
-		List<EdgeStructure> edges2 = new ArrayList<EdgeStructure>();
-
-		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
-		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
-		
-		
-		HashMap<Integer,Integer> nodeMapping = new HashMap<>();
-		
-		BeliefPropagationCalculation bpc = new BeliefPropagationCalculation(g2,g1,nodeMapping);
-		double similarity = bpc.similarity();
-		System.out.println(similarity);
-		
-		nodeMapping = new HashMap<>();
-		bpc = new BeliefPropagationCalculation(g1,g2,nodeMapping);
-		similarity = bpc.similarity();
-		System.out.println(similarity);
-
-	}
-
-	
 	/**
 	 * 
 	 * @param g1 first graph to compare, must be simple with no self sourcing
@@ -250,7 +218,12 @@ public class BeliefPropagationCalculation {
 		return ret;
 	}
 
-	
+
+	/**
+	 * 
+	 * @param m input matrix
+	 * @return a string in table form for printing
+	 */
 	public static String outputMatrix(Matrix m) {
 		
 		String ret = "";

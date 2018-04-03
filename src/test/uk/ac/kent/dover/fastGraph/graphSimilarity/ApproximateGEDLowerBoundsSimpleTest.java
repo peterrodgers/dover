@@ -21,6 +21,8 @@ public class ApproximateGEDLowerBoundsSimpleTest {
 	public void test001() throws FastGraphException {
 		HashMap<Integer,Double> editCosts;
 		
+		new ApproximateGEDLowerBoundsSimple();
+		
 		editCosts = new HashMap<Integer,Double>();
 		editCosts.put(EditOperation.DELETE_EDGE, 4.0);
 		editCosts.put(EditOperation.ADD_EDGE, 1.22);

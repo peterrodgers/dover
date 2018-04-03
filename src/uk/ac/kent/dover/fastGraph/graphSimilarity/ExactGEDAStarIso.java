@@ -42,54 +42,6 @@ private int countPruneByEdgePreviouslyAdded = 0;
 private int countPruneByEdgePreviouslyDeleted = 0;
 
 
-	public static void main(String [] args) {
-		
-		Debugger.enabled = false;
-		
-		try {
-			
-			long seed = 70928;
-System.out.println(seed);
-			Random r = new Random(seed);
-			FastGraph g1,g2,gRet;
-			HashMap<Integer,Double> editCosts;
-			ExactGEDAStarIso ged;
-			EditList el, retEditList1;
-			ApproximateGEDSimple aged;
-			
-			int maxNodes = 3;
-			int maxEdges = 3;
-		
-			editCosts = new HashMap<>();
-			editCosts.put(EditOperation.DELETE_NODE,11.0);
-			editCosts.put(EditOperation.ADD_NODE,12.0);
-			editCosts.put(EditOperation.DELETE_EDGE,13.0);
-			editCosts.put(EditOperation.ADD_EDGE,14.0);
-			editCosts.put(EditOperation.RELABEL_NODE,15.0);
-
-			g1 = FastGraph.randomGraphFactory(1, 1, seed+20, false);
-			g2 = FastGraph.randomGraphFactory(2, 2, seed+20, false);
-//Debugger.enabled = true;
-			ged = new ExactGEDAStarIso(true,false,editCosts);
-			ged.similarity(g1, g2);
-			retEditList1 = ged.getEditList();
-			
-System.out.println("----g1----");
-System.out.println(g1);
-System.out.println("----g2----");
-System.out.println(g2);
-System.out.println("----list----");
-System.out.println(retEditList1);
-			gRet = retEditList1.applyOperations(g1);
-System.out.println(ExactIsomorphism.isomorphic(gRet, g2)+" "+gRet.checkConsistency()+" "+g1.checkConsistency()+" "+g2.checkConsistency());
-			
-	
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
 
 
 	/**
@@ -114,7 +66,7 @@ System.out.println(ExactIsomorphism.isomorphic(gRet, g2)+" "+gRet.checkConsisten
 	 * defaults to treating graph as undirected and no node label comparison.
 	 * editOperations should include nodeDelete, nodeAdd, edgeDelete and edgeAdd.
 	 * 
-	 * @param editOperations should include nodeDelete, nodeAdd, edgeDelete and edgeAdd
+	 * @param editCosts should include nodeDelete, nodeAdd, edgeDelete and edgeAdd
 	 * @throws FastGraphException if an edit operation cost is missing
 	 */
 	public ExactGEDAStarIso(HashMap<Integer,Double> editCosts) throws FastGraphException {
@@ -204,7 +156,6 @@ long fullSearchTime = 0;
 	 * @param g1 the first graph to be compared.
 	 * @param g2 the second graph to be compared.
 	 * @return the cost of the edits between two graphs or -1 if a cost cannot be found due to no solutions less than maxCost.
-	 * @throws FastGraphException if an EditList tries to delete an attached node
 	 */
 	@Override
 	public double similarity(FastGraph g1, FastGraph g2) {

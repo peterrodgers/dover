@@ -21,61 +21,6 @@ public class ApproximateGEDLowerBoundsSimple  extends GraphEditDistance {
 	private Double relabelNodeCost;
 	
 	
-	public static void main(String [] args) {
-		
-		Debugger.enabled = false;
-		
-		try {
-
-			double ret;
-			FastGraph g1,g2;
-			EditOperation eo;		
-			EditList el;
-			HashMap<Integer,Double> editCosts;
-			ApproximateGEDLowerBoundsSimple ged;
-			
-			editCosts = new HashMap<>();
-			editCosts.put(EditOperation.DELETE_NODE,2.0);
-			editCosts.put(EditOperation.ADD_NODE,3.0);
-			editCosts.put(EditOperation.DELETE_EDGE,4.0);
-			editCosts.put(EditOperation.ADD_EDGE,5.0);
-			editCosts.put(EditOperation.RELABEL_NODE,6.0);
-
-			el = new EditList();
-			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node a",-1,-1);
-			el.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node b",-1,-1);
-			el.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node c",-1,-1);
-			el.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",1,0);
-			el.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 1",1,2);
-			el.addOperation(eo);
-			g1 = FastGraph.randomGraphFactory(0, 0, false);
-			g1 = el.applyOperations(g1);
-			
-			el = new EditList();
-			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 0",-1,-1);
-			el.addOperation(eo);
-			g2 = FastGraph.randomGraphFactory(0, 0, false);
-			g2 = el.applyOperations(g2);
-		
-			ged = new ApproximateGEDLowerBoundsSimple(true,editCosts);
-			ret = ged.similarity(g1, g2);
-System.out.println("Simple LB "+ret);
-
-ApproximateGEDSimple geds = new ApproximateGEDSimple(false,true, editCosts,0L,1000,44L);
-ret = geds.similarity(g1, g2);
-System.out.println("Simple GED "+ret);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-	
-
 
 
 	/**

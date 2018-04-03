@@ -26,14 +26,17 @@ public class NeighbourhoodSimilarityTest {
 		FastGraph g1 = FastGraph.structureFactory("g1", (byte)0, nodes1, edges1, false);
 		FastGraph g2 = FastGraph.structureFactory("g2", (byte)0, nodes2, edges2, false);
 		
-		ns1 = new NeighbourhoodSimilarity(false);
+		ns1 = new NeighbourhoodSimilarity();
 		ret = ns1.similarity(g1,g2);
 		assertEquals(0.0,ret,0.001);
 		ns1 = new NeighbourhoodSimilarity(true);
 		ret = ns1.similarity(g1,g2);
 		assertEquals(0.0,ret,0.001);
 
+		
 		ns1 = new NeighbourhoodSimilarity(false);
+		ns1.setEpsilon(0.001);
+		assertEquals(0.001,ns1.getEpsilon(),0.000001);
 		ret = ns1.similarity(g2,g1);
 		assertEquals(0.0,ret,0.001);
 		ns1 = new NeighbourhoodSimilarity(true);

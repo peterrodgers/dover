@@ -58,7 +58,7 @@ public class RandomTrail {
 	 * Create a RandomTrail before running findTrail.
 	 *
 	 * @param directed if true treat the edges as directed, otherwise travel along them in either direction
-	 * @param seeds allows testing of known seed for the random branch finder.
+	 * @param seed allows testing of known seed for the random branch finder.
 	 */
 	public RandomTrail(boolean directed, long seed) {
 		this.random = new Random(seed);

@@ -179,7 +179,7 @@ public class ExactIsomorphism {
 	 * 
 	 * @param fastGraph one graph to be tested.
 	 * @param directed true if the graphs should be treated as directed, false if they are undirected
-	 * @param nodeComparator if set, used to compare the node attributes for a match, if null, only the topology is tested, node attributes will not affect matching.
+	 * @param nodeLabels if true compares node labels for a match, if false ignores node labels.
 	 * g1 in the node comparator should be the first parameter, g2 should be the graph to be tested for isomorphism
 	 */
 	public ExactIsomorphism(FastGraph fastGraph, boolean directed, boolean nodeLabels) {
@@ -1121,8 +1121,7 @@ bruteForceStartTime = -1;
 	 * @param g1 one FastGraph to be tested
 	 * @param g2 the other FastGraph to be tested
 	 * @param directed false if the graphs are treated as undirected, true if they are directed
-	 * @param nodeComparator if set, used to compare the node attributes for a match, if null, only the topology is tested, node attributes will not affect matching.
-	 * g1 and g2 in the node comparator should correspond to the first and second parameter, respectively.
+	 * @param nodeLabels if true the node labels must be equal for a match, if false then node labels are ignored
 	 * @return true if g1 and g2 are isomorphic, false otherwise
 	 */
 	public static boolean isomorphic(FastGraph g1, FastGraph g2, boolean directed, boolean nodeLabels) {

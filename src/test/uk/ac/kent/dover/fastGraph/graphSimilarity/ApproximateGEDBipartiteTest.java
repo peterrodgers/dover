@@ -138,6 +138,13 @@ public class ApproximateGEDBipartiteTest {
 		assertTrue(ExactIsomorphism.isomorphic(g1,g2,false));
 		assertTrue(g1.checkConsistency());
 		assertTrue(g2.checkConsistency());
+		
+		assertEquals(1,ged.getCostMatrix()[0].length);
+		assertEquals(1,ged.getMapping().length);
+		assertFalse(ged.getUseHungarian());
+		String s = ApproximateGEDBipartite.formatMatrix(ged.getCostMatrix());
+		assertTrue(s != null);
+
 	}
 	
 	

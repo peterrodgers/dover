@@ -11,7 +11,7 @@ import uk.ac.kent.dover.fastGraph.editOperation.*;
  * Undirected graphs only. This implementation does consider node labels (if required) but does not consider edge labels.
  * 
  * From:
- * Fischer, A., Suen, C. Y., Frinken, V., Riesen, K., & Bunke, H. (2015). Approximation of graph edit distance based on Hausdorff matching. Pattern Recognition, 48(2), 331-343. * 
+ * Fischer, A., Suen, C. Y., Frinken, V., Riesen, K., and Bunke, H. (2015). Approximation of graph edit distance based on Hausdorff matching. Pattern Recognition, 48(2), 331-343.
  *
  * @author Peter Rodgers
  *
@@ -28,68 +28,6 @@ public class ApproximateGEDHausdorff extends GraphEditDistance {
 	
 	HashMap<Integer,Double> editCosts;
 
-
-	
-	public static void main(String [] args) {
-		
-		
-		Debugger.enabled = false;
-		
-		try {
-
-			double ret;
-			FastGraph g1,g2;
-			EditOperation eo;		
-			EditList el;
-			HashMap<Integer,Double> editCosts;
-			ApproximateGEDHausdorff ged;
-			
-			editCosts = new HashMap<>();
-			editCosts.put(EditOperation.DELETE_NODE,7.0);
-			editCosts.put(EditOperation.ADD_NODE,6.0);
-			editCosts.put(EditOperation.DELETE_EDGE,3.0);
-			editCosts.put(EditOperation.ADD_EDGE,4.0);
-			editCosts.put(EditOperation.RELABEL_NODE,5.0);
-			
-			el = new EditList();
-			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 0",-1,-1);
-			el.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 1",-1,-1);
-			el.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",1,0);
-			el.addOperation(eo);
-			g1 = FastGraph.randomGraphFactory(0, 0, false);
-			g1 = el.applyOperations(g1);
-		
-			el = new EditList();
-			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 9",-1,-1);
-			el.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 2",-1,-1);
-			el.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 7",-1,-1);
-			el.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",1,0);
-			el.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 1",1,2);
-			el.addOperation(eo);
-			g2 = FastGraph.randomGraphFactory(0, 0, false);
-			g2 = el.applyOperations(g2);
-
-			boolean nodeLabels = true;
-
-			ged = new ApproximateGEDHausdorff(nodeLabels, editCosts);
-			ret = ged.similarity(g1, g2);
-System.out.println("Hausdorff "+ret);
-
-ApproximateGEDSimple geds = new ApproximateGEDSimple(false, nodeLabels, editCosts,0L,1000,44L);
-ret = geds.similarity(g1, g2);
-System.out.println("Simple "+ret);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
 
 
 
@@ -183,11 +121,12 @@ System.out.println("Simple "+ret);
 	
 	/**
 	 * Algorithm 3 from 
-	 * Fischer, A., Suen, C. Y., Frinken, V., Riesen, K., & Bunke, H. (2015). Approximation of graph edit distance based on Hausdorff matching. Pattern Recognition, 48(2), 331-343. * 
+	 * Fischer, A., Suen, C. Y., Frinken, V., Riesen, K., and Bunke, H. (2015). Approximation of graph edit distance based on Hausdorff matching. Pattern Recognition, 48(2), 331-343. * 
 	 *
 	 *
 	 * @param g1 the first graph to be compared
 	 * @param g2 the seconod graph to be compared
+	 * @return the Hausdorff distance between the two graphs
 	 */
 	public double hausdorffDistance(FastGraph g1, FastGraph g2) {
 		int nodes1 = g1.getNumberOfNodes();
@@ -260,10 +199,11 @@ System.out.println("Simple "+ret);
 	
 	/**
 	 * First half of equation 12 from 
-	 * Fischer, A., Suen, C. Y., Frinken, V., Riesen, K., & Bunke, H. (2015). Approximation of graph edit distance based on Hausdorff matching. Pattern Recognition, 48(2), 331-343. * 
+	 * Fischer, A., Suen, C. Y., Frinken, V., Riesen, K., and Bunke, H. (2015). Approximation of graph edit distance based on Hausdorff matching. Pattern Recognition, 48(2), 331-343. * 
 	 *
 	 * @param g1 the first graph
 	 * @param g2 the second graph
+	 * @return the lower bound
 	 */
 	public double lowerGraphBound(FastGraph g1, FastGraph g2) {
 		int nodes1 = g1.getNumberOfNodes();
@@ -284,10 +224,13 @@ System.out.println("Simple "+ret);
 	
 	/**
 	 * Second half of equation 12 from 
-	 * Fischer, A., Suen, C. Y., Frinken, V., Riesen, K., & Bunke, H. (2015). Approximation of graph edit distance based on Hausdorff matching. Pattern Recognition, 48(2), 331-343. * 
+	 * Fischer, A., Suen, C. Y., Frinken, V., Riesen, K., and Bunke, H. (2015). Approximation of graph edit distance based on Hausdorff matching. Pattern Recognition, 48(2), 331-343.
 	 *
 	 * @param n1 a node in graph1
 	 * @param n2 a node in graph2
+	 * @param g1 the graph for n1
+	 * @param g2 the graph for n2
+	 * @return the lower bound
 	 */
 	public double lowerNodeBound(int n1, int n2, FastGraph g1, FastGraph g2) {
 		int[] connectingNodes1 = g1.getNodeConnectingNodes(n1);

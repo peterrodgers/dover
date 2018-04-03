@@ -43,64 +43,6 @@ public class ApproximateGEDBipartite extends GraphEditDistance {
 	private long approximationTime;
 	
 	
-	public static void main(String [] args) {
-		
-		Debugger.enabled = false;
-		
-		try {
-
-			double ret;
-			List<EditOperation> retList;
-			FastGraph g1,g2;
-			EditOperation eo;		
-			EditList el, retEditList;
-			HashMap<Integer,Double> editCosts;
-			ApproximateGEDBipartite ged;
-			
-			editCosts = new HashMap<>();
-			editCosts.put(EditOperation.DELETE_NODE,7.0);
-			editCosts.put(EditOperation.ADD_NODE,6.0);
-			editCosts.put(EditOperation.DELETE_EDGE,3.0);
-			editCosts.put(EditOperation.ADD_EDGE,4.0);
-			editCosts.put(EditOperation.RELABEL_NODE,5.0);
-			
-			el = new EditList();
-			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 0",-1,-1);
-			el.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 1",-1,-1);
-			el.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",1,0);
-			el.addOperation(eo);
-			g1 = FastGraph.randomGraphFactory(0, 0, false);
-			g1 = el.applyOperations(g1);
-		
-			el = new EditList();
-			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 0",-1,-1);
-			el.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_NODE,1.5,-1,"node 1",-1,-1);
-			el.addOperation(eo);
-			eo = new EditOperation(EditOperation.ADD_EDGE,1.5,-1,"edge 0",0,1);
-			el.addOperation(eo);
-			g2 = FastGraph.randomGraphFactory(0, 0, false);
-			g2 = el.applyOperations(g2);
-
-			ged = new ApproximateGEDBipartite(true,true,editCosts);
-			
-			ged.similarity(g1, g2);
-			retEditList = ged.getEditList();
-			g1 = retEditList.applyOperations(g1);
-System.out.println(retEditList);
-			System.out.println(ExactIsomorphism.isomorphic(g1,g2,true,true)+" "+g1.checkConsistency()+" "+g2.checkConsistency());
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-	
-
-
-
 
 	/**
 	 * defaults to treating graph as undirected and no node label comparison,
@@ -126,7 +68,7 @@ System.out.println(retEditList);
 	 * defaults to treating graph as undirected and no node label comparison.
 	 * editOperations should include nodeDelete, nodeAdd, edgeDelete and edgeAdd.
 	 * 
-	 * @param editOperations should include nodeDelete, nodeAdd, edgeDelete and edgeAdd
+	 * @param editCosts should include nodeDelete, nodeAdd, edgeDelete and edgeAdd
 	 * @throws FastGraphException if an edit operation cost is missing
 	 */
 	public ApproximateGEDBipartite(HashMap<Integer,Double> editCosts) throws FastGraphException {

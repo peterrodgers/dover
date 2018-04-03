@@ -130,6 +130,7 @@ public class ExactGEDAStarIsoTest {
 		g2 = el.applyOperations(g2);
 
 		ged = new ExactGEDAStarIso(false,false,editCosts);
+		ged.setMaxCost(10000000.0);
 		
 		ret = ged.similarity(g1, g2);
 		retEditList = ged.getEditList();

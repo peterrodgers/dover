@@ -15,8 +15,6 @@ public abstract class GraphEditDistance extends GraphSimilarity {
 	/**
 	 * use this to define editCosts in the constructor. Typically used
 	 * to give all editCosts entries default values of 1.0
-	 * 
-	 * @param editOperations gives the allowed operations and their cost
 	 */
 	public GraphEditDistance() {
 		super();

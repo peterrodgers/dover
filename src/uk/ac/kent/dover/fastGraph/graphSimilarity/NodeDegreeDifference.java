@@ -14,46 +14,6 @@ import uk.ac.kent.dover.fastGraph.*;
  */
 public class NodeDegreeDifference extends GraphSimilarity {
 
-
-	public static void main(String [] args) {
-
-		final int MILLION = 1000000;
-		int numberOfNodes = MILLION/5;
-		int numberOfEdges = MILLION*2;
-		double similarity;
-		FastGraph g1,g2;
-		NodeDegreeDifference ndd = new NodeDegreeDifference(true);
-		long time;
-		
-		while(true) {
-			try {
-				if(numberOfEdges < MILLION) {
-					System.out.println("nodes: "+numberOfNodes+", edges: "+numberOfEdges);
-				} else {
-					System.out.println("nodes: "+numberOfNodes/(MILLION*1.0)+" million, edges: "+numberOfEdges/(MILLION*1.0)+" million");
-				}
-				time = System.currentTimeMillis();
-				g1 = FastGraph.randomGraphFactory(numberOfNodes, numberOfEdges, false);
-				System.out.println("Random g1 created time: "+(System.currentTimeMillis()-time)/1000.0+" seconds");
-				time = System.currentTimeMillis();
-				
-				g2 = FastGraph.randomGraphFactory(numberOfNodes, numberOfEdges, false);
-				System.out.println("Random g2 created time: "+(System.currentTimeMillis()-time)/1000.0+" seconds");
-				time = System.currentTimeMillis();
-				
-				similarity = ndd.similarity(g1, g2);
-				System.out.println("Similarity: "+similarity+" time: "+(System.currentTimeMillis()-time)/1000.0+" seconds\n");
-				time = System.currentTimeMillis();
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-				System.exit(1);
-			}
-			numberOfNodes *= 2;
-			numberOfEdges *= 2;
-		}
-	
-	}
-	
 	
 	public NodeDegreeDifference() {
 		super();

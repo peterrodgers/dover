@@ -37,6 +37,7 @@ public class BeliefPropagationSimpleTest {
 		ret = bpc.similarity();
 		assertEquals(0.0,ret,0.001);
 		
+		
 	}
 	
 	@Test

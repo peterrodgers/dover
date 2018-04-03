@@ -20,6 +20,40 @@ public class EditOperationTest {
 
 	@Test
 	public void test001() throws Exception {
+		EditOperation addNode, deleteNode;		
+		
+		addNode = new EditOperation(EditOperation.ADD_NODE,1,-1,"node 0",-1,-1);
+		deleteNode = new EditOperation(addNode);
+		
+		assertEquals(EditOperation.ADD_NODE,deleteNode.getOperationCode());
+		deleteNode.setOperationCode(EditOperation.DELETE_NODE);
+		assertEquals(EditOperation.DELETE_NODE,deleteNode.getOperationCode());
+
+		assertEquals(1,deleteNode.getCost(),0.001);
+		deleteNode.setCost(1.3);
+		assertEquals(1.3,deleteNode.getCost(),0.001);
+
+		assertEquals(-1,deleteNode.getId());
+		deleteNode.setId(3);
+		assertEquals(3,deleteNode.getId());
+
+		assertEquals("node 0",deleteNode.getLabel());
+		deleteNode.setLabel("node ZZZ");
+		assertEquals("node ZZZ",deleteNode.getLabel());
+
+		assertEquals(-1,deleteNode.getN1());
+		deleteNode.setN1(5);
+		assertEquals(5,deleteNode.getN1());
+
+		assertEquals(-1,deleteNode.getN2());
+		deleteNode.setN2(7);
+		assertEquals(7,deleteNode.getN2());
+
+
+	}
+	
+	@Test
+	public void test002() throws Exception {
 		EditOperation deleteNode, addNode, deleteEdge, addEdge, relabelNode;		
 		EditList el1,el2;
 		FastGraph g;
@@ -69,7 +103,7 @@ public class EditOperationTest {
 	}
 	
 	@Test
-	public void test002() throws Exception {
+	public void test003() throws Exception {
 		EditOperation deleteNode, addNode, deleteEdge, addEdge, relabelNode;		
 		EditList el1,el2;
 		FastGraph g,g2;
@@ -144,7 +178,7 @@ public class EditOperationTest {
 	
 	
 	@Test
-	public void test003() throws Exception {
+	public void test004() throws Exception {
 		FastGraph g2;
 		EditOperation eo;		
 		EditList el;
@@ -180,7 +214,7 @@ public class EditOperationTest {
 
 	
 	@Test
-	public void test004() throws Exception {
+	public void test005() throws Exception {
 		FastGraph g1;
 		EditOperation eo;		
 		EditList el;

@@ -4505,7 +4505,6 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 	 * 
 	 * @param n the node to remove
 	 * @return if successful, the new fast graph or null if n is connected
-	 * @throws Exception Throws if the new FastGraph does not build correctly. Most likely out of memory error.
 	 */
 	public FastGraph generateGraphByDeletingSingletonNode(int n) {
 		if(this.getNodeDegree(n) != 0) {
@@ -4603,7 +4602,6 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 	 * 
 	 * @param ns the node to add
 	 * @return the new fast graph
-	 * @throws Exception Throws if the new FastGraph does not build correctly. Most likely out of memory error.
 	 */
 	public FastGraph generateGraphByAddingNode(NodeStructure ns) {
 		
@@ -4682,7 +4680,6 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 	 * 
 	 * @param e the node to remove
 	 * @return the new fast graph
-	 * @throws Exception Throws if the new FastGraph does not build correctly.
 	 */
 	public FastGraph generateGraphByDeletingEdge(int e) {
 		
@@ -5156,7 +5153,6 @@ Debugger.outputTime("time to create new time slice total nodes "+g2.getNumberOfN
 	 * undirected graphs. A simple graph is returned, only one edge in each direction is given. Self sourcing
 	 * edges are not duplicated.
 	 * 
-	 * @param g the graph to duplicate edges
 	 * @return a new graph with duplicated and reversed edges
 	 */
 	public FastGraph generateByAddingReversedEdges() {

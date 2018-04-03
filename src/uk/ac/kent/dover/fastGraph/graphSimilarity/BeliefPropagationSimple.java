@@ -36,58 +36,6 @@ public class BeliefPropagationSimple extends GraphSimilarity {
 	private Random random;
 
 	
-	public static void main(String [] args) {
-		
-		Debugger.enabled = false;
-
-		
-		try {
-			
-//			testByRandomGraphLoop();
-
-			int startNodes = 100;
-			int nodes = startNodes;
-			while(true) {
-				double ret;
-				FastGraph g1,g2;
-				BeliefPropagationSimple bps;
-				
-				int edges = nodes*10;
-				
-				g1 = FastGraph.randomGraphFactory(nodes, edges, 7777, false);
-				
-				g2 = FastGraph.randomGraphFactory(nodes, edges, 5555, false);
-				
-				long start1 = System.currentTimeMillis();
-				
-				bps = new BeliefPropagationSimple(0,0,111);
-				
-				ret = bps.similarity(g1, g2);
-				
-				System.out.println("NO OPTIMIZATION nodes "+nodes+" edges "+edges);
-				System.out.println("similarity time "+(System.currentTimeMillis()-start1)/1000.0);
-				System.out.println("cost "+ret);
-				
-				long start2 = System.currentTimeMillis();
-				bps = new BeliefPropagationSimple(1000,0,7777);
-				ret = bps.similarity(g1, g2);
-				
-				System.out.println("OPTIMIZATION nodes "+nodes+" edges "+edges);
-				System.out.println("similarity time "+(System.currentTimeMillis()-start2)/1000.0);
-				System.out.println("node swaps "+bps.getNodeSwaps());
-				System.out.println("cost "+ret);
-				
-				nodes = nodes + startNodes;
-
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-	
-	
 
 	/**
 	 * Constructor to be called before running algorithm.
@@ -100,7 +48,6 @@ public class BeliefPropagationSimple extends GraphSimilarity {
 		this.randomSeed = System.currentTimeMillis();
 		
 	}
-
 
 
 	/**

@@ -32,8 +32,6 @@ public class NeighbourhoodSimilarity extends GraphSimilarity {
 	/**
 	* defaults to treating graph as undirected,
 	* with all edit costs at 1.0.
-	* 
-	* @throws FastGraphException should not throw this as all required edit operations are present by default
 	*/
 	public NeighbourhoodSimilarity() {
 		super();
@@ -62,8 +60,8 @@ public class NeighbourhoodSimilarity extends GraphSimilarity {
 	* This returns an the neighbourhood similarity between the two graphs. Values between 0 and 1, with
 	* 0 being isomorphic and 1 being entirely dissimilar.
 	* 
-	* @param g1 the first graph to be compared.
-	* @param g2 the second graph to be compared.
+	* @param inG1 the first graph to be compared.
+	* @param inG2 the second graph to be compared.
 	* @return the cost of the edits between two graphs.
 	*/
 	@Override
