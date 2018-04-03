@@ -114,6 +114,12 @@ public class ApproximateGEDHausdorffTest {
 		assertEquals(0, ret, 0.001);
 		ret = ged.similarity(g2, g1);
 		assertEquals(0, ret, 0.001);
+
+		ged = new ApproximateGEDHausdorff();
+		ret = ged.similarity(g1, g2);
+		assertEquals(0, ret, 0.001);
+		ret = ged.similarity(g2, g1);
+		assertEquals(0, ret, 0.001);
 	}
 	
 	

@@ -219,30 +219,5 @@ public class BeliefPropagationCalculation {
 	}
 
 
-	/**
-	 * 
-	 * @param m input matrix
-	 * @return a string in table form for printing
-	 */
-	public static String outputMatrix(Matrix m) {
-		
-		String ret = "";
-		
-		double[][] vals= m.getArray();
-
-		// now loop through the rows of valsTransposed to print
-		for(int i = 0; i < vals.length; i++) {
-		    for(int j = 0; j < vals[i].length; j++) {
-		    	if(j > 0) {
-		    		ret += "\t";
-		    	}
-		        ret += vals[j][i];
-		    }
-	        ret += "\n";
-		}
-		
-		return ret;
-	}
-	
 
 }

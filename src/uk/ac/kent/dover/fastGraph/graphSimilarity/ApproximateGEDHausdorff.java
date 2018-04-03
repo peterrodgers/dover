@@ -27,10 +27,7 @@ public class ApproximateGEDHausdorff extends GraphEditDistance {
 	private Double relabelNodeCost;
 	
 	HashMap<Integer,Double> editCosts;
-
-
-
-
+	
 
 	/**
 	 * defaults to treating graph as undirected and no node label comparison,
@@ -81,7 +78,11 @@ public class ApproximateGEDHausdorff extends GraphEditDistance {
 		addNodeCost = editCosts.get(EditOperation.ADD_NODE);
 		deleteEdgeCost = editCosts.get(EditOperation.DELETE_EDGE);
 		addEdgeCost = editCosts.get(EditOperation.ADD_EDGE);
-		relabelNodeCost = editCosts.get(EditOperation.RELABEL_NODE);
+		if(nodeLabels) {
+			relabelNodeCost = editCosts.get(EditOperation.RELABEL_NODE);
+		} else {
+			relabelNodeCost = null;
+		}
 		
 		if(deleteNodeCost == null) {
 			throw new FastGraphException("Missing editCosts entry for EditOperation.DELETE_NODE");
@@ -151,9 +152,9 @@ public class ApproximateGEDHausdorff extends GraphEditDistance {
 			}
 		}
 		
-		double relabelCost = relabelNodeCost;
-		if(!nodeLabels) {
-			relabelCost = 0.0;
+		double relabelCost = 0.0;
+		if(nodeLabels) {
+			relabelCost = relabelNodeCost;
 		}
 		
 		for(int n1 = 0; n1 < nodes1; n1++) {

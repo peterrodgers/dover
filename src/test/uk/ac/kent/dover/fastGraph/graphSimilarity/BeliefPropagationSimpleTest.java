@@ -386,6 +386,8 @@ public class BeliefPropagationSimpleTest {
 		bps = new BeliefPropagationSimple();
 		ret = bps.similarity(g1,g2);
 		assertEquals(0.0,ret,0.001);
+		assertEquals(0,bps.getNodeSwaps());
+		assertTrue(bps.getApproximationTime()>=0);
 
 		bps = new BeliefPropagationSimple();
 		ret = bps.similarity(g2,g1);
