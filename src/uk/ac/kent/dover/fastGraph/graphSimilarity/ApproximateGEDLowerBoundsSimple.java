@@ -2,11 +2,8 @@ package uk.ac.kent.dover.fastGraph.graphSimilarity;
 
 import java.util.*;
 
-import uk.ac.kent.dover.fastGraph.Debugger;
-import uk.ac.kent.dover.fastGraph.FastGraph;
-import uk.ac.kent.dover.fastGraph.FastGraphException;
-import uk.ac.kent.dover.fastGraph.editOperation.EditList;
-import uk.ac.kent.dover.fastGraph.editOperation.EditOperation;
+import uk.ac.kent.dover.fastGraph.*;
+import uk.ac.kent.dover.fastGraph.editOperation.*;
 
 public class ApproximateGEDLowerBoundsSimple  extends GraphEditDistance {
 

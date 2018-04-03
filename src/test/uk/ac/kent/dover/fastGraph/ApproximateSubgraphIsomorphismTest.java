@@ -2,7 +2,6 @@ package test.uk.ac.kent.dover.fastGraph;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import test.uk.ac.kent.dover.TestRunner;

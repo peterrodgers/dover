@@ -2,14 +2,10 @@ package test.uk.ac.kent.dover.fastGraph.editOperation;
 
 import static org.junit.Assert.*;
 
-import java.util.HashMap;
-import java.util.List;
-
 import org.junit.Test;
 
 import uk.ac.kent.dover.fastGraph.*;
 import uk.ac.kent.dover.fastGraph.editOperation.*;
-import uk.ac.kent.dover.fastGraph.graphSimilarity.ApproximateGEDSimple;
 
 /**
  * 

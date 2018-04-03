@@ -201,8 +201,6 @@ public class AdjacencyMatrix {
 	 * @return double[][] of Eigenvalues
 	 */
 	public double[] findEigenvalues(double[][] inputMatrix) {
-		int matrixSize = inputMatrix.length;
-
 		Matrix A = new Matrix(inputMatrix);
 		
 		// compute the spectral decomposition

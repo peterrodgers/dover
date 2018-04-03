@@ -40,7 +40,6 @@ public abstract class SubgraphIsomorphism {
 		uk.ac.kent.displayGraph.Graph dg = sub.generateDisplayGraph();
 		dg.randomizeNodePoints(new Point(20,20),300,300);
 		uk.ac.kent.displayGraph.display.GraphWindow gw = new uk.ac.kent.displayGraph.display.GraphWindow(dg, false);
-		uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder bse = new uk.ac.kent.displayGraph.drawers.BasicSpringEmbedder();
 		GraphDrawerSpringEmbedder se = new GraphDrawerSpringEmbedder(KeyEvent.VK_Q,"Spring Embedder - randomize, no animation",true);
 		se.setAnimateFlag(false);
 		se.setIterations(100);
@@ -68,10 +67,6 @@ public abstract class SubgraphIsomorphism {
 		
 		doc.head().appendElement("title").text(target.getName());
 
-		Element headline = doc.body().appendElement("h1").text(target.getName());
-		
-		Element pageNumberHeader = doc.body().appendElement("h2").text(type+" Subgraph Isomorphism");
-		
 		//size
 		Element linksDiv = doc.body().appendElement("div");
 		linksDiv.appendText("Subgraphs found: ");

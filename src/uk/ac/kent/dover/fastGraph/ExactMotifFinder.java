@@ -30,8 +30,6 @@ public class ExactMotifFinder {
 	private FastGraph g;
 	private MotifTask mt = null;
 	private EnumerateSubgraphNeighbourhood enumerator;
-	private EnumerateSubgraphRandom enumeratorRandom;
-	private HashSet<FastGraph> subgraphs; // subgraphs found by the enumerator
 	private boolean saveAll = false;
 	private int numOfResults = 0;
 	private FastGraph referenceGraph = null;
@@ -57,7 +55,6 @@ public class ExactMotifFinder {
 		this.saveAll = saveAll;
 		//enumerator = new EnumerateSubgraphFanmod(g);
 		enumerator = new EnumerateSubgraphNeighbourhood(g);
-		enumeratorRandom = new EnumerateSubgraphRandom(g);
 	}
 	
 	/**
@@ -683,10 +680,6 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		
 		doc.head().appendElement("title").text(g.getName());
 
-		Element headline = doc.body().appendElement("h1").text(g.getName());
-		
-		Element pageNumberHeader = doc.body().appendElement("h2").text("Sizes:");
-		
 		//size
 		Element linksDiv = doc.body().appendElement("div");
 		linksDiv.appendText("Sizes: ");
@@ -725,8 +718,6 @@ Debugger.log("hash string \t"+key+"\tnum of diff isom groups\t"+sameHashList.siz
 		
 		doc.head().appendElement("title").text(g.getName());
 
-		Element headline = doc.body().appendElement("h1").text(g.getName());
-		Element pageNumberHeader = doc.body().appendElement("h2").text("Size " + motifSize + ", Page "+(pageNumber+1));
 		
 		//size
 		Element linksDiv = doc.body().appendElement("div");

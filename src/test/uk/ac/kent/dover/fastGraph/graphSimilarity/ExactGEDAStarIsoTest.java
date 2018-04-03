@@ -473,16 +473,12 @@ public class ExactGEDAStarIsoTest {
 	public void test011() throws Exception {
 
 		long seed = 70928;
-		Random r = new Random(seed);
 		FastGraph g1,g2,gRet;
 		HashMap<Integer,Double> editCosts;
 		ExactGEDAStarIso ged;
-		EditList el, retEditList1;
+		EditList retEditList1;
 		ApproximateGEDSimple aged;
 		
-		int maxNodes = 3;
-		int maxEdges = 3;
-	
 		editCosts = new HashMap<>();
 		editCosts.put(EditOperation.DELETE_NODE,11.0);
 		editCosts.put(EditOperation.ADD_NODE,12.0);

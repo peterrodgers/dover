@@ -90,7 +90,6 @@ public class ApproximateGEDHausdorffTest {
 	public void test006() throws Exception {
 		double ret;
 		FastGraph g1,g2;
-		EditOperation eo;		
 		HashMap<Integer,Double> editCosts;
 		ApproximateGEDHausdorff ged;
 		

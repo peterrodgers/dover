@@ -91,7 +91,6 @@ public class ExactIsomorphism {
 	public static void main(String [] args) {
 		
 		FastGraph g1,g2;
-		ExactIsomorphism ei;
 		
 		try {
 			
@@ -287,7 +286,6 @@ isomorphismStartTime = -1;
 		
 		for(int i = 0; i < connectedList1.size(); i++) {
 			
-			FastGraph g1 = connectedList1.get(i);
 			ExactIsomorphism ei = eiList1.get(i);
 			
 			boolean found = false;

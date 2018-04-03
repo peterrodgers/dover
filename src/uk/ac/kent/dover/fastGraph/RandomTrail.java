@@ -14,33 +14,6 @@ public class RandomTrail {
 	private Random random;
 	
 	
-	public static void main(String [] args) throws Exception {
-		
-		Debugger.enabled = false;
-		
-		LinkedList<NodeStructure> addNodes;
-		LinkedList<EdgeStructure> addEdges;
-		FastGraph g1,g2;
-		RandomTrail rt;
-		ArrayList<TrailNode> ret;
-		addNodes = new LinkedList<NodeStructure>();
-		addNodes.add(new NodeStructure(0,"A", 1, (byte)1, (byte)0));
-		addNodes.add(new NodeStructure(1,"B", 1, (byte)1, (byte)0));
-		addEdges = new LinkedList<EdgeStructure>();
-		addEdges.add(new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 1, 1));
-		addEdges.add(new EdgeStructure(1,"es1", 1, (byte)0, (byte)0, 0, 0));
-		addEdges.add(new EdgeStructure(2,"es2", 1, (byte)0, (byte)0, 0, 1));
-		g1 = FastGraph.structureFactory("g2",(byte)0,addNodes,addEdges,false);
-		
-		rt = new RandomTrail(false, 666);
-		
-		ret = rt.findTrail(g1, 0, 4);
-		System.out.println(g1);
-		System.out.println(ret);
-		
-	}
-
-
 	
 	/**
 	 *

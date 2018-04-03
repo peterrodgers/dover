@@ -2,7 +2,6 @@ package uk.ac.kent.dover.fastGraph.comparators;
 
 import java.util.Comparator;
 
-import uk.ac.kent.dover.fastGraph.FastGraph;
 import uk.ac.kent.dover.fastGraph.editOperation.EditList;
 
 /**

@@ -1,7 +1,5 @@
 package uk.ac.kent.dover.fastGraph.graphSimilarity;
 
-import java.util.*;
-
 import uk.ac.kent.dover.fastGraph.*;
 
 /**

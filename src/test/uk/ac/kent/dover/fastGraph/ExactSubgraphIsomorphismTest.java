@@ -1,24 +1,14 @@
 package test.uk.ac.kent.dover.fastGraph;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.LinkedList;
 
 import org.junit.Test;
 
-import uk.ac.kent.displayGraph.Edge;
-import uk.ac.kent.displayGraph.Graph;
-import uk.ac.kent.displayGraph.Node;
-import uk.ac.kent.dover.fastGraph.ExactIsomorphism;
-import uk.ac.kent.dover.fastGraph.ExactSubgraphIsomorphism;
-import uk.ac.kent.dover.fastGraph.FastGraph;
-import uk.ac.kent.dover.fastGraph.SubgraphMapping;
-import uk.ac.kent.dover.fastGraph.comparators.AlwaysTrueEdgeComparator;
-import uk.ac.kent.dover.fastGraph.comparators.AlwaysTrueNodeComparator;
-import uk.ac.kent.dover.fastGraph.comparators.SimpleEdgeLabelComparator;
-import uk.ac.kent.dover.fastGraph.comparators.SimpleNodeLabelComparator;
+import uk.ac.kent.displayGraph.*;
+import uk.ac.kent.dover.fastGraph.*;
+import uk.ac.kent.dover.fastGraph.comparators.*;
 
 public class ExactSubgraphIsomorphismTest {
 
@@ -27,7 +17,6 @@ public class ExactSubgraphIsomorphismTest {
 	@Test
 	public void test001() throws Exception {
 		FastGraph g1,g2;
-		ExactIsomorphism ei;
 		SimpleNodeLabelComparator snlc;
 		AlwaysTrueNodeComparator atnc;
 		g1 = FastGraph.randomGraphFactory(10,20,1,false);
@@ -48,7 +37,6 @@ public class ExactSubgraphIsomorphismTest {
 	@Test
 	public void test002() throws Exception {
 		FastGraph g1,g2;
-		ExactIsomorphism ei;
 		SimpleEdgeLabelComparator selc;
 		AlwaysTrueEdgeComparator atec;
 		g1 = FastGraph.randomGraphFactory(10,20,1,false);
@@ -299,7 +287,6 @@ public class ExactSubgraphIsomorphismTest {
 	@Test
 	public void test009() {
 
-		LinkedList<SubgraphMapping> sgm;
 		Graph targetGraph = new Graph("triangle");
 		Node n0 = new Node("nA");
 		targetGraph.addNode(n0);

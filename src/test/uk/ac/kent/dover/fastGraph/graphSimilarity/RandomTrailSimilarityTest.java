@@ -1,18 +1,12 @@
 package test.uk.ac.kent.dover.fastGraph.graphSimilarity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.*;
 
 import org.junit.Test;
 
-import uk.ac.kent.dover.fastGraph.EdgeStructure;
-import uk.ac.kent.dover.fastGraph.ExactIsomorphism;
-import uk.ac.kent.dover.fastGraph.FastGraph;
-import uk.ac.kent.dover.fastGraph.FastGraphException;
-import uk.ac.kent.dover.fastGraph.NodeStructure;
+import uk.ac.kent.dover.fastGraph.*;
 import uk.ac.kent.dover.fastGraph.graphSimilarity.RandomTrailSimilarity;
 
 public class RandomTrailSimilarityTest {
