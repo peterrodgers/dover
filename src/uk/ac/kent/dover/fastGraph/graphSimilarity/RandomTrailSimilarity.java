@@ -27,8 +27,6 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 
 
 
-	
-
 	/**
 	 * defaults to treating graph as undirected and no node label comparison.
 	 * 
@@ -291,6 +289,7 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 			}
 				
 		}
+		
 		double ret = trail1.size()-longestTrail2;
 
 		return ret;
@@ -341,33 +340,9 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 		int nextNode2 = g2.oppositeEnd(nextEdge, tn2.getNode());
 		TrailNode nextTN2 = new TrailNode(trail2.size(), nextNode2, -1);
 		
-		TrailNode tn1 = trail1.get(trail2.size()-1); // equivalent to
+		TrailNode nextTN1 = trail1.get(trail2.size());
 		
-		// if a repeated node, must be repeated in same point in trail
-		// plus cannot have one repeated and not the other
-		if(tn1.getDuplicatePosition() != tn2.getDuplicatePosition()) {
-			return null;
-		}
-		
-		if(!directed) {
-			int n1Degree = g1.getNodeDegree(tn1.getNode());
-			int n2Degree = g2.getNodeDegree(tn2.getNode());
-			if(n1Degree != n2Degree) {
-				return null;
-			}
-		} else {
-			int n1OutDegree = g1.getNodeOutDegree(tn1.getNode());
-			int n2OutDegree = g2.getNodeOutDegree(tn2.getNode());
-			if(n1OutDegree != n2OutDegree) {
-				return null;
-			}
-			int n1InDegree = g1.getNodeInDegree(tn1.getNode());
-			int n2InDegree = g2.getNodeInDegree(tn2.getNode());
-			if(n1InDegree != n2InDegree) {
-				return null;
-			}
-		}
-		
+//		TrailNode tn1 = trail1.get(trail2.size()-1);
 		
 		// set the duplicate position for the next node in trail2
 		for(TrailNode tn : trail2) {
@@ -377,12 +352,38 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 			}
 		}
 		
+		// if a repeated node, must be repeated in same point in trail
+		// plus cannot have one repeated and not the other
+		if(nextTN1.getDuplicatePosition() != nextTN2.getDuplicatePosition()) {
+			return null;
+		}
+		
+		if(!directed) {
+			int n1Degree = g1.getNodeDegree(nextTN1.getNode());
+			int n2Degree = g2.getNodeDegree(nextTN2.getNode());
+			if(n1Degree != n2Degree) {
+				return null;
+			}
+		} else {
+			int n1OutDegree = g1.getNodeOutDegree(nextTN1.getNode());
+			int n2OutDegree = g2.getNodeOutDegree(nextTN2.getNode());
+			if(n1OutDegree != n2OutDegree) {
+				return null;
+			}
+			int n1InDegree = g1.getNodeInDegree(nextTN1.getNode());
+			int n2InDegree = g2.getNodeInDegree(nextTN2.getNode());
+			if(n1InDegree != n2InDegree) {
+				return null;
+			}
+		}
+
+		
 		if(!nodeLabels) {
 			return nextTN2;
 		}
 		
-		String label1 = g1.getNodeLabel(tn1.getNode());
-		String label2 = g2.getNodeLabel(tn2.getNode());
+		String label1 = g1.getNodeLabel(nextTN1.getNode());
+		String label2 = g2.getNodeLabel(nextTN2.getNode());
 		
 		if(label1.equals(label2)) {
 			return nextTN2;
