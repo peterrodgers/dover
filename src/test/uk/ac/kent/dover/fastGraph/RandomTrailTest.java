@@ -200,6 +200,35 @@ public class RandomTrailTest {
 		assertEquals(2,ret.get(2).getNode());
 		
 	}
+	
+	@Test
+	public void test006() throws Exception {		
+		FastGraph g;
+		RandomTrail rt;
+		ArrayList<TrailNode> ret;
+		LinkedList<NodeStructure> addNodes;
+		LinkedList<EdgeStructure> addEdges;
+		
+		addNodes = new LinkedList<NodeStructure>();
+		addNodes.add(new NodeStructure(0,"A", 1, (byte)1, (byte)0));
+		addEdges = new LinkedList<EdgeStructure>();
+		addEdges.add(new EdgeStructure(0,"es0", 1, (byte)0, (byte)0, 0, 0));
+		addEdges.add(new EdgeStructure(1,"es1", 1, (byte)0, (byte)0, 0, 0));
+		g = FastGraph.structureFactory("g",(byte)0,addNodes,addEdges,false);
+		
+		rt = new RandomTrail(true, 8888);
+		ret = rt.findTrail(g, 0, 2);
+		assertEquals(2,ret.size());
+		assertEquals(0,ret.get(0).getNode());
+		assertEquals(0,ret.get(1).getNode());
+		
+		rt = new RandomTrail(false, 8888);
+		ret = rt.findTrail(g, 0, 2);
+		assertEquals(2,ret.size());
+		assertEquals(0,ret.get(0).getNode());
+		assertEquals(0,ret.get(1).getNode());
+		
+	}
 		
 
 }

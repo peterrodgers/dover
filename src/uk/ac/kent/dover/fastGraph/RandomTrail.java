@@ -87,7 +87,7 @@ public class RandomTrail {
 			if(neighbourEdgesList.size() == 0) {
 				break;
 			}
-			
+
 			int ePos = random.nextInt(neighbourEdgesList.size());
 			
 			int edge = neighbourEdgesList.get(ePos);
