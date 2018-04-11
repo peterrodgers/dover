@@ -1,22 +1,9 @@
 package uk.ac.kent.dover.fastGraph;
 
 import java.nio.ByteBuffer;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.TimeZone;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import java.text.*;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * A class to hold a number of useful methods
@@ -474,4 +461,43 @@ public class Util {
 		}
 		return false;
 	}
+
+	/**
+	 * output matrix in readable format for debugging.
+	 * 
+	 * @param matrix the matrix to format
+	 * @return a string with a formatted matrix
+	 */
+	public static String formatMatrix(double[][] matrix) {
+		String ret = "";
+		for(int y = 0; y < matrix.length; y++) {
+			for(int x = 0; x < matrix[y].length; x++) {
+				ret += matrix[y][x]+"\t";
+			}
+			ret += "\n";
+		}
+		return ret;
+	
+	}
+	
+	/**
+	 * output matrix in readable format for debugging. Must be a square matrix
+	 * 
+	 * @param matrix the matrix to format
+	 * @return a string with a formatted matrix
+	 */
+	public static String formatMatrix(int[][] matrix) {
+		String ret = "";
+		for(int y = 0; y < matrix.length; y++) {
+			for(int x = 0; x < matrix[y].length; x++) {
+				ret += matrix[y][x]+"\t";
+			}
+			ret += "\n";
+		}
+		return ret;
+	
+	}
+	
+	
+	
 }

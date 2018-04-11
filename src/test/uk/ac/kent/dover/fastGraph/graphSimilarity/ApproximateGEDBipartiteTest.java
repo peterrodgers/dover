@@ -142,7 +142,7 @@ public class ApproximateGEDBipartiteTest {
 		assertEquals(1,ged.getCostMatrix()[0].length);
 		assertEquals(1,ged.getMapping().length);
 		assertFalse(ged.getUseHungarian());
-		String s = ApproximateGEDBipartite.formatMatrix(ged.getCostMatrix());
+		String s = Util.formatMatrix(ged.getCostMatrix());
 		assertTrue(s != null);
 
 	}

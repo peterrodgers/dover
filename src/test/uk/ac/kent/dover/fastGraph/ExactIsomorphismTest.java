@@ -909,7 +909,7 @@ public class ExactIsomorphismTest {
 	
 
 	@Test
-	public void test22()  {
+	public void test022()  {
 
 		ExactIsomorphism ei;
 		Graph dg1 = new Graph("dg1");
@@ -947,7 +947,7 @@ public class ExactIsomorphismTest {
 	
 
 	@Test
-	public void test23()  {
+	public void test023()  {
 
 		ExactIsomorphism ei;
 		Graph dg1 = new Graph("dg1");
@@ -980,7 +980,7 @@ public class ExactIsomorphismTest {
 	}
 	
 	@Test
-	public void test24()  {
+	public void test024()  {
 
 		ExactIsomorphism ei;
 		Graph dg1 = new Graph("dg1");
@@ -1018,7 +1018,7 @@ public class ExactIsomorphismTest {
 	
 
 	@Test
-	public void test25()  {
+	public void test025()  {
 
 		ExactIsomorphism ei;
 		Graph dg1 = new Graph("dg1");
@@ -1055,7 +1055,7 @@ public class ExactIsomorphismTest {
 	}
 	
 	@Test
-	public void test26()  {
+	public void test026()  {
 
 		ExactIsomorphism ei;
 		Graph dg1 = new Graph("dg1");
@@ -1094,7 +1094,7 @@ public class ExactIsomorphismTest {
 	}
 	
 	@Test
-	public void test27()  {
+	public void test027()  {
 
 		ExactIsomorphism ei;
 		Graph dg1 = new Graph("dg1");
@@ -1148,7 +1148,7 @@ public class ExactIsomorphismTest {
 	}
 		
 	@Test
-	public void test29()  {
+	public void test029()  {
 
 		ExactIsomorphism ei;
 		
@@ -1185,7 +1185,7 @@ public class ExactIsomorphismTest {
 
 	
 	@Test
-	public void test30()  {
+	public void test030()  {
 	
 		ExactIsomorphism ei;
 		
@@ -1988,6 +1988,48 @@ public class ExactIsomorphismTest {
 		}
 
 	}
+	
+	@Test
+	public void test043() throws FastGraphException {
+		boolean directed,labels;
+		FastGraph g1,g2;
+		long g1Seed,g2Seed;
+		int nodes = 4;
+		int edges = 7;
+		int i = 22907;
+		g1Seed = i*7777;
+		g2Seed = i*111;
+		
+		directed = false;
+		labels = false;
+		g1 = FastGraph.randomGraphFactory(nodes, edges, g1Seed, false);
+		g2 = FastGraph.randomGraphFactory(nodes, edges, g2Seed, false);
+		assertTrue(ExactIsomorphism.isomorphic(g1, g2, directed, labels));
+		assertTrue(ExactIsomorphism.isomorphic(g2, g1, directed, labels));
+		
+		directed = true;
+		labels = false;
+		g1 = FastGraph.randomGraphFactory(nodes, edges, g1Seed, false);
+		g2 = FastGraph.randomGraphFactory(nodes, edges, g2Seed, false);
+		assertFalse(ExactIsomorphism.isomorphic(g1, g2, directed, labels));
+		assertFalse(ExactIsomorphism.isomorphic(g2, g1, directed, labels));
+
+		directed = false;
+		labels = true;
+		g1 = FastGraph.randomGraphFactory(nodes, edges, g1Seed, false);
+		g2 = FastGraph.randomGraphFactory(nodes, edges, g2Seed, false);
+		assertFalse(ExactIsomorphism.isomorphic(g1, g2, directed, labels));
+		assertFalse(ExactIsomorphism.isomorphic(g2, g1, directed, labels));
+		
+		directed = true;
+		labels = true;
+		g1 = FastGraph.randomGraphFactory(nodes, edges, g1Seed, false);
+		g2 = FastGraph.randomGraphFactory(nodes, edges, g2Seed, false);
+		assertFalse(ExactIsomorphism.isomorphic(g1, g2, directed, labels));
+		assertFalse(ExactIsomorphism.isomorphic(g2, g1, directed, labels));
+		
+	}
+
 		
 	
 }

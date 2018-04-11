@@ -479,26 +479,6 @@ public class ApproximateGEDBipartite extends GraphEditDistance {
 	}
 	
 	
-
-	/**
-	 * output matrix in readable format for debugging. Must be a square matrix
-	 * 
-	 * @param matrix the matrix to format
-	 * @return a string with a formatted matrix
-	 */
-	public static String formatMatrix(double[][] matrix) {
-		String ret = "";
-		for(int y = 0; y < matrix.length; y++) {
-			for(int x = 0; x < matrix.length; x++) {
-				ret += matrix[y][x]+"\t";
-			}
-			ret += "\n";
-		}
-		return ret;
-
-	}
-	
-	
 }
 	
 	

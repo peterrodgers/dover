@@ -26,6 +26,10 @@ public class ExactIsomorphism {
 	private AdjacencyMatrix am2;
 	private int[][] matrix1;
 	private int[][] matrix2;
+	private int[][] inMatrix1;
+	private int[][] inMatrix2;
+	private int[][] outMatrix1;
+	private int[][] outMatrix2;
 	private double[] eigenvalues1;
 	private double[] eigenvalues2;
 	
@@ -216,8 +220,13 @@ public class ExactIsomorphism {
 			matrix1 = am1.buildIntAdjacencyMatrix();
 			eigenvalues1 = am1.findEigenvalues(matrix1);
 			eigenvalues1 = Util.roundArray(eigenvalues1,DECIMAL_PLACES);
+			
+			if(directed) {
+				inMatrix1 = am1.buildIntInAdjacencyMatrix();
+				outMatrix1 = am1.buildIntOutAdjacencyMatrix();
+			}
 		}
-		
+
 		matches1 = new int[fastGraph.getNumberOfNodes()];
 		matches2 = new int[fastGraph.getNumberOfNodes()];
 
@@ -578,15 +587,12 @@ bruteForceStartTime = -1;
 				}
 			}
 
-			/*
 			// removed edges Count check, never seems to be used
 			int edgeCount = matrix1[n1][node];
 			int matchedEdgeCount = matrix2[n2][matchNode];
 			if(edgeCount != matchedEdgeCount) { // different number of edge between the nodes and the matched nodes
-//System.out.println("edge counts differ");
 				return false;
 			}
-			*/
 			
 			numberOfn1NeigboursMatched++;
 		}
@@ -710,6 +716,10 @@ timeForIsomorphismTests += System.currentTimeMillis()-isomorphismStartTime;
 isomorphismStartTime = -1;		
 			return false;
 		}
+		
+		inMatrix2 = am2.buildIntInAdjacencyMatrix();
+		outMatrix2 = am2.buildIntOutAdjacencyMatrix();
+
 		
 if(isomorphismStartTime == -1) {
 	isomorphismStartTime = System.currentTimeMillis();
@@ -866,15 +876,12 @@ bruteForceStartTime = -1;
 					return false;
 				}
 			}
-			/*
-			// removed edges Count check, never seems to be used
-			int edgeCount = matrix1[n1][node];
-			int matchedEdgeCount = matrix2[n2][matchNode];
+
+			int edgeCount = inMatrix1[n1][node];
+			int matchedEdgeCount = inMatrix2[n2][matchNode];
 			if(edgeCount != matchedEdgeCount) { // different number of edge between the nodes and the matched nodes
-//System.out.println("edge counts differ");
 				return false;
 			}
-			*/
 			
 			numberOfn1NeigboursMatched++;
 		}
@@ -918,15 +925,12 @@ bruteForceStartTime = -1;
 					return false;
 				}
 			}
-			/*
-			// removed edges Count check, never seems to be used
-			int edgeCount = matrix1[n1][node];
-			int matchedEdgeCount = matrix2[n2][matchNode];
+			int edgeCount = outMatrix1[n1][node];
+			int matchedEdgeCount = outMatrix2[n2][matchNode];
 			if(edgeCount != matchedEdgeCount) { // different number of edge between the nodes and the matched nodes
-//System.out.println("edge counts differ");
 				return false;
 			}
-			*/
+			
 			
 			numberOfn1NeigboursMatched++;
 		}
