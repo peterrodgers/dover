@@ -63,7 +63,7 @@ public class RandomTrail {
 		HashSet<Integer> visitedNodes = new HashSet<Integer>(length*3);
 		HashSet<Integer> visitedEdges = new HashSet<Integer>(length*3);
 		
-		TrailNode startTN = new TrailNode(0,startNode,-1);
+		TrailNode startTN = new TrailNode(0,startNode,-1,-1);
 		trail.add(startTN);
 		visitedNodes.add(startNode);
 
@@ -106,7 +106,7 @@ public class RandomTrail {
 				}
 			}
 
-			TrailNode tn = new TrailNode(pos,node,duplicatePosition);
+			TrailNode tn = new TrailNode(pos,node,duplicatePosition,edge);
 			trail.add(tn);
 			
 			visitedEdges.add(edge);

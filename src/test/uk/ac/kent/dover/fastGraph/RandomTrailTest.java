@@ -1,6 +1,6 @@
 package test.uk.ac.kent.dover.fastGraph;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.*;
 
@@ -90,51 +90,67 @@ public class RandomTrailTest {
 		ret = rt.findTrail(g, 0, 1);
 		assertEquals(1,ret.size());
 		assertEquals(0,ret.get(0).getNode());
+		assertEquals(-1,ret.get(0).getEdge());
 		
 		rt = new RandomTrail(false);
 		ret = rt.findTrail(g, 0, 2);
 		assertEquals(2,ret.size());
 		assertEquals(0,ret.get(0).getNode());
+		assertEquals(-1,ret.get(0).getEdge());
 		assertEquals(1,ret.get(1).getNode());
+		assertTrue(ret.get(1).getEdge() >= 0);
 		
 		rt = new RandomTrail(false,777);
 		ret = rt.findTrail(g, 0, 3);
 		assertEquals(3,ret.size());
 		assertEquals(0,ret.get(0).getNode());
+		assertEquals(-1,ret.get(0).getEdge());
 		assertEquals(1,ret.get(1).getNode());
+		assertTrue(ret.get(1).getEdge() >= 0);
 		assertEquals(0,ret.get(2).getNode());
+		assertTrue(ret.get(2).getEdge() >= 0);
 		
 		rt = new RandomTrail(false);
 		ret = rt.findTrail(g, 0, 4);
 		assertEquals(3,ret.size());
 		assertEquals(0,ret.get(0).getNode());
+		assertEquals(-1,ret.get(0).getEdge());
 		assertEquals(1,ret.get(1).getNode());
+		assertTrue(ret.get(1).getEdge() >= 0);
 		assertEquals(0,ret.get(2).getNode());
+		assertTrue(ret.get(2).getEdge() >= 0);
 		
 		rt = new RandomTrail(false);
 		ret = rt.findTrail(g, 1, 4);
 		assertEquals(3,ret.size());
 		assertEquals(1,ret.get(0).getNode());
+		assertEquals(-1,ret.get(0).getEdge());
 		assertEquals(0,ret.get(1).getNode());
+		assertTrue(ret.get(1).getEdge() >= 0);
 		assertEquals(1,ret.get(2).getNode());
+		assertTrue(ret.get(2).getEdge() >= 0);
 		
 		rt = new RandomTrail(true,444);
 		ret = rt.findTrail(g, 0, 2);
 		assertEquals(2,ret.size());
 		assertEquals(0,ret.get(0).getNode());
+		assertEquals(-1,ret.get(0).getEdge());
 		assertEquals(1,ret.get(1).getNode());
+		assertTrue(ret.get(1).getEdge() >= 0);
 		
 		rt = new RandomTrail(true);
 		ret = rt.findTrail(g, 0, 4);
 		assertEquals(2,ret.size());
 		assertEquals(0,ret.get(0).getNode());
+		assertEquals(-1,ret.get(0).getEdge());
 		assertEquals(1,ret.get(1).getNode());
+		assertTrue(ret.get(1).getEdge() >= 0);
 		
 		rt = new RandomTrail(true);
 		ret = rt.findTrail(g, 1, 4);
 		assertEquals(1,ret.size());
 		assertEquals(1,ret.get(0).getNode());
-		
+		assertEquals(-1,ret.get(0).getEdge());
 		
 	}
 	
@@ -171,33 +187,45 @@ public class RandomTrailTest {
 		ret = rt.findTrail(g, 0, 1);
 		assertEquals(1,ret.size());
 		assertEquals(0,ret.get(0).getNode());
+		assertEquals(-1,ret.get(0).getEdge());
 		
 		rt = new RandomTrail(false);
 		ret = rt.findTrail(g, 0, 2);
 		assertEquals(2,ret.size());
 		assertEquals(0,ret.get(0).getNode());
+		assertEquals(-1,ret.get(0).getEdge());
 		assertEquals(1,ret.get(1).getNode());
+		assertEquals(0,ret.get(1).getEdge());
 		
 		rt = new RandomTrail(false,777);
 		ret = rt.findTrail(g, 3, 4);
 		assertEquals(4,ret.size());
 		assertEquals(3,ret.get(0).getNode());
+		assertEquals(-1,ret.get(0).getEdge());
 		assertEquals(2,ret.get(1).getNode());
+		assertEquals(2,ret.get(1).getEdge());
 		assertEquals(1,ret.get(2).getNode());
+		assertEquals(1,ret.get(2).getEdge());
 		assertEquals(0,ret.get(3).getNode());
+		assertEquals(0,ret.get(3).getEdge());
 		
 		rt = new RandomTrail(true,444);
 		ret = rt.findTrail(g, 3, 2);
 		assertEquals(2,ret.size());
 		assertEquals(3,ret.get(0).getNode());
+		assertEquals(-1,ret.get(0).getEdge());
 		assertEquals(2,ret.get(1).getNode());
+		assertEquals(2,ret.get(1).getEdge());
 		
 		rt = new RandomTrail(true,444);
 		ret = rt.findTrail(g, 0, 4);
 		assertEquals(3,ret.size());
 		assertEquals(0,ret.get(0).getNode());
+		assertEquals(-1,ret.get(0).getEdge());
 		assertEquals(1,ret.get(1).getNode());
+		assertEquals(0,ret.get(1).getEdge());
 		assertEquals(2,ret.get(2).getNode());
+		assertEquals(1,ret.get(2).getEdge());
 		
 	}
 	
@@ -220,13 +248,37 @@ public class RandomTrailTest {
 		ret = rt.findTrail(g, 0, 2);
 		assertEquals(2,ret.size());
 		assertEquals(0,ret.get(0).getNode());
+		assertEquals(-1,ret.get(0).getEdge());
 		assertEquals(0,ret.get(1).getNode());
+		assertEquals(1,ret.get(1).getEdge());
 		
 		rt = new RandomTrail(false, 8888);
 		ret = rt.findTrail(g, 0, 2);
 		assertEquals(2,ret.size());
 		assertEquals(0,ret.get(0).getNode());
+		assertEquals(-1,ret.get(0).getEdge());
 		assertEquals(0,ret.get(1).getNode());
+		assertEquals(1,ret.get(1).getEdge());
+		
+		rt = new RandomTrail(true, 333311);
+		ret = rt.findTrail(g, 0, 3);
+		assertEquals(3,ret.size());
+		assertEquals(0,ret.get(0).getNode());
+		assertEquals(-1,ret.get(0).getEdge());
+		assertEquals(0,ret.get(1).getNode());
+		assertEquals(0,ret.get(1).getEdge());
+		assertEquals(0,ret.get(2).getNode());
+		assertEquals(1,ret.get(2).getEdge());
+		
+		rt = new RandomTrail(false, 333311);
+		ret = rt.findTrail(g, 0, 3);
+		assertEquals(3,ret.size());
+		assertEquals(0,ret.get(0).getNode());
+		assertEquals(-1,ret.get(0).getEdge());
+		assertEquals(0,ret.get(1).getNode());
+		assertEquals(1,ret.get(1).getEdge());
+		assertEquals(0,ret.get(2).getNode());
+		assertEquals(0,ret.get(2).getEdge());
 		
 	}
 		

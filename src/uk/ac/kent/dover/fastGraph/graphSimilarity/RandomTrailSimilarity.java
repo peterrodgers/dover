@@ -1,8 +1,5 @@
 package uk.ac.kent.dover.fastGraph.graphSimilarity;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.*;
 
 import edu.isi.karma.modeling.research.graphmatching.algorithms.VJAccess;
@@ -11,8 +8,16 @@ import uk.ac.kent.dover.fastGraph.editOperation.EditList;
 import uk.ac.kent.dover.fastGraph.editOperation.EditOperation;
 
 /**
- * A similarity method for graphs, using random trails. To achieve symmetry use the same object
- * in both g1 g2 and g2 g1 directions, as the same random seed will be applied.
+ * A similarity method for graphs, using random trails. Finds random undirected trails of the
+ * given length from each node in g2 then attempts to find it from all nodes in g2. When directed
+ * is set, the trail must follow the same direction of edges, if undirected the trail can
+ * go along either direction.
+ * 
+ * The node node difference is then the sum of difference in lengths of trail. The
+ * Volgenant Jonker matching algorithm is used to match the nodes by minimal difference.
+ * 
+ * Similarity of 0 means the graphs are the same (approximates graph isomorphism). Isomorphic
+ * graphs will always have a similarity of 0.
  * 
  * @author Peter Rodgers
  *
@@ -39,20 +44,6 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 		
 		try {
 
-			boolean directed,labels;
-			FastGraph g1,g2;
-			long g1Seed,g2Seed;
-			int nodes = 4;
-			int edges = 7;
-			int i = 22907;
-			g1Seed = i*7777;
-			g2Seed = i*111;
-			
-			directed = false;
-			labels = true;
-			g1 = FastGraph.randomGraphFactory(nodes, edges, g1Seed, false);
-			g2 = FastGraph.randomGraphFactory(nodes, edges, g2Seed, false);
-			System.out.println(ExactIsomorphism.isomorphic(g1, g2, directed, labels));
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -70,10 +61,10 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 			boolean isomorphic,directed,labels;
 			FastGraph g1,g2;
 			long g1Seed,g2Seed,rtsSeed;
-			int trailLength = 6;
-			int trailsPerNode = 4;
-			int nodes = 10;
-			int edges = 20;
+			int trailLength = 4;
+			int trailsPerNode = 5;
+			int nodes = 5;
+			int edges = 8;
 			int i = 0;
 			EditList el;
 			Random r;
@@ -84,9 +75,9 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 				if(i%1000 == 0) {
 					System.out.println("iteration: "+i+" time: "+(System.currentTimeMillis()-startTime)/1000.0);
 				}
-				g1Seed = i*779793;
-				g2Seed = i*11993;
-				rtsSeed = i*9599943;
+				g1Seed = i*797933;
+				g2Seed = i*119933;
+				rtsSeed = i*999433;
 //				g1Seed = System.currentTimeMillis()*77*i;
 //				g2Seed = System.currentTimeMillis()*111*i;
 //				rtsSeed = System.currentTimeMillis()*9*i;
@@ -244,7 +235,7 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 					}
 				}
 				if(eB == -1) {
-					System.out.println(i+" no edge swap found "+eA+" "+eB);
+//					System.out.println(i+" no edge swap found "+eA+" "+eB);
 					continue;
 				} else {
 					el = new EditList();
@@ -606,11 +597,13 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 		double ret = 0.0;
 		long seed = 0L;
 		// first g1 to g2
+
 		for(int i = 0; i < trailsPerNode; i++) {
 			seed = randomSeed*11*(i+1);
 			double singleCost = randomSingleTrail(n1, n2, g1, g2,seed);
 			ret += singleCost;
 		}
+
 		// then g2 to g1
 		for(int i = 0; i < trailsPerNode; i++) {
 			seed = randomSeed*555*(i+1);
@@ -636,20 +629,22 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 		ArrayList<TrailNode> trail1 = null;
 		
 		try {
-			RandomTrail rt = new RandomTrail(directed,seed);
+			// now for directed, we find undirected trails and check edge direction
+			// RandomTrail rt = new RandomTrail(directed,seed);
+			 RandomTrail rt = new RandomTrail(false,seed);
 			trail1 = rt.findTrail(g1, n1, trailLength);
 		} catch (FastGraphException e) {
 			e.printStackTrace();
 			System.err.println("Fail in randomSingleTrail n1 "+n1+" not found in g1");
 			return null;
 		}
-
+		
 		// exhaustive search for trail1 in g2
 
 		HashMap<TrailNode,ArrayList<Integer>> untestedNeighbours2 = new HashMap<>(trailLength*3);
 		ArrayList<Integer> trail2Edges = new ArrayList<>(trailLength+1);
 		ArrayList<TrailNode> trail2 = new ArrayList<>(trailLength+1);
-		TrailNode tn2 = new TrailNode(0,n2,-1);
+		TrailNode tn2 = new TrailNode(0,n2,-1,-1);
 		int longestTrail2 = 0;
 		if(checkNodeMatch(trail1.get(0),tn2,g1,g2)) {
 			trail2.add(tn2);
@@ -697,7 +692,9 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 					
 			}
 		}
-		
+//System.out.println("trail1 "+trail1);
+//System.out.println("trail2 "+trail1);
+
 		double ret = trail1.size()-longestTrail2;
 
 		return ret;
@@ -714,11 +711,14 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 	private ArrayList<Integer> getNeighbourEdgesList(TrailNode tn2, FastGraph g2, ArrayList<Integer> trail2Edges) {
 		// add the neighbour edges for testing
 		int[] neighbourEdgesArray;
-		if(directed) {
-			neighbourEdgesArray = g2.getNodeConnectingOutEdges(tn2.getNode());
-		} else {
+		
+		// treatment of directed has changed. No longer finding just out trails
+		// Instead we find undirected trails and test the edge direction matches
+//		if(directed) {
+//			neighbourEdgesArray = g2.getNodeConnectingOutEdges(tn2.getNode());
+//		} else {
 			neighbourEdgesArray = g2.getNodeConnectingEdges(tn2.getNode());
-		}
+//		}
 		ArrayList<Integer> neighbourEdgesList = new ArrayList<Integer>(neighbourEdgesArray.length+1);
 		for(int i = 0; i < neighbourEdgesArray.length;i++) {
 			int e = neighbourEdgesArray[i];
@@ -746,7 +746,7 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 	private TrailNode checkNextNodeMatch(TrailNode tn2, int nextEdge, FastGraph g1, FastGraph g2, ArrayList<TrailNode> trail1, ArrayList<TrailNode> trail2) {
 
 		int nextNode2 = g2.oppositeEnd(nextEdge, tn2.getNode());
-		TrailNode nextTN2 = new TrailNode(trail2.size(), nextNode2, -1);
+		TrailNode nextTN2 = new TrailNode(trail2.size(), nextNode2, -1, nextEdge);
 		
 		TrailNode nextTN1 = trail1.get(trail2.size());
 		
@@ -762,6 +762,27 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 		
 		if(!checkNodeMatch(nextTN1,nextTN2,g1,g2)) {
 			return null;
+		}
+		
+		if(directed) {
+			int e1 = nextTN1.getEdge();
+			int e2 = nextTN2.getEdge();
+			if(e1 != -1) { // can't test edges to the first node
+				boolean e1Out = false;
+				if(g1.getEdgeNode2(e1) == nextTN1.getNode()) {
+					e1Out = true;
+				}
+				boolean e2Out = false;
+				if(g2.getEdgeNode2(e2) == nextTN2.getNode()) {
+					e2Out = true;
+				}
+				if(e1Out && !e2Out) { // for a directed match, edges must be in the same direction
+					return null;
+				}
+				if(!e1Out && e2Out) { // for a directed match, edges must be in the same direction
+					return null;
+				}
+			}
 		}
 		
 		return nextTN2;
