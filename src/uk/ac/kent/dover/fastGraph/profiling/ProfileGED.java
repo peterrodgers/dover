@@ -28,7 +28,7 @@ public class ProfileGED {
 			labels.add("black");
 			labels.add("green");
 
-			long startTime,simpleTime,bipartiteTime;
+			long startTime,simpleTime,bipartiteTime,hausdorffTime,lowerTime;
 			Random r;
 			final int iterations = 20;
 			final int startNodes = 10000;
@@ -85,10 +85,28 @@ public class ProfileGED {
 					ApproximateGEDBipartite bipartiteGED = new ApproximateGEDBipartite(directed,labelled,editCosts);
 					double bipartiteSimilarity = bipartiteGED.similarity(g1, g2);
 					bipartiteTime = System.currentTimeMillis()-startTime;
+					
+					double hausdorffSimilarity = -1;
+					hausdorffTime = -1;
+					if(!directed) {
+						startTime = System.currentTimeMillis();
+						ApproximateGEDHausdorff hausdorffGED = new ApproximateGEDHausdorff(labelled,editCosts);
+						hausdorffSimilarity = hausdorffGED.similarity(g1, g2);
+						hausdorffTime = System.currentTimeMillis()-startTime;
+					}
+
+					double lowerSimilarity = -1;
+					lowerTime = -1;
+					if(!directed) {
+						startTime = System.currentTimeMillis();
+						ApproximateGEDLowerBoundsSimple lowerGED = new ApproximateGEDLowerBoundsSimple(labelled,editCosts);
+						lowerSimilarity = lowerGED.similarity(g1, g2);
+						lowerTime = System.currentTimeMillis()-startTime;
+					}
 
 					System.out.print("nodes\t"+nodes+"\tedges\t"+edges+"\tedits\t"+edits+"\tdirected\t"+directed+"\tlabelled\t"+labelled+"\tsimple\t"+simple+"\t");
-					System.out.print(i + "\toriginal cost:\t"+el.getCost()+"\tsimple cost:\t"+simpleSimilarity+"\tbipartite cost:\t"+bipartiteSimilarity+"\t");
-					System.out.println("original time:\t-1.0"+"\tsimple time:\t"+(simpleTime/1000.0)+"\tbipartite time:\t"+(bipartiteTime/1000.0));
+					System.out.print(i + "\toriginal cost:\t"+el.getCost()+"\tsimple cost:\t"+simpleSimilarity+"\tbipartite cost:\t"+bipartiteSimilarity+"\t"+"\thausdorff cost:\t"+hausdorffSimilarity+"\t"+"\tlower cost:\t"+lowerSimilarity+"\t");
+					System.out.println("original time:\t-1.0"+"\tsimple time:\t"+(simpleTime/1000.0)+"\tbipartite time:\t"+(bipartiteTime/1000.0)+"\thausdorff time:\t"+(hausdorffTime/1000.0)+"\tlower time:\t"+(lowerTime/1000.0));
 					
 				}
 
