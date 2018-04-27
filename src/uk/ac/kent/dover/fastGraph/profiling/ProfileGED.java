@@ -33,7 +33,7 @@ public class ProfileGED {
 			final int iterations = 20;
 			final int startNodes = 10000;
 			final int startEdges = startNodes*10;
-			final int startEdits = 100;
+			final int startEdits = 20;
 			final boolean directed = false;
 			final boolean labelled = true;
 			final boolean simple = true;
@@ -46,7 +46,6 @@ public class ProfileGED {
 				nodes += startNodes;
 				edges += startEdges;
 				edits += startEdits;
-				System.out.println("nodes\t"+nodes+"\tedges\t"+edges+"\tedits\t"+edits+"\tdirected\t"+directed+"\tlabelled\t"+labelled+"\tsimple\t"+simple);
 				for(int i = 1; i <= iterations; i++) {
 					
 					long seed1 = System.currentTimeMillis()*i*nodes;
@@ -87,6 +86,7 @@ public class ProfileGED {
 					double bipartiteSimilarity = bipartiteGED.similarity(g1, g2);
 					bipartiteTime = System.currentTimeMillis()-startTime;
 
+					System.out.print("nodes\t"+nodes+"\tedges\t"+edges+"\tedits\t"+edits+"\tdirected\t"+directed+"\tlabelled\t"+labelled+"\tsimple\t"+simple+"\t");
 					System.out.print(i + "\toriginal cost:\t"+el.getCost()+"\tsimple cost:\t"+simpleSimilarity+"\tbipartite cost:\t"+bipartiteSimilarity+"\t");
 					System.out.println("original time:\t-1.0"+"\tsimple time:\t"+(simpleTime/1000.0)+"\tbipartite time:\t"+(bipartiteTime/1000.0));
 					
