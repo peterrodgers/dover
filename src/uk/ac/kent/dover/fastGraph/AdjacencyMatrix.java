@@ -71,6 +71,46 @@ public class AdjacencyMatrix {
 	}
 	
 	/**
+	 * Builds a matrix for the out edges for each node.
+	 * Assumes the graph is undirected
+	 * 
+	 * @return A 2D array of ints
+	 */
+	public int[][] buildIntOutAdjacencyMatrix() {
+		
+		int[][] matrix = new int[g.getNumberOfNodes()][g.getNumberOfNodes()]; //create an 2D array that has the dimensions of the current graph 
+		
+		for (int n = 0; n < g.getNumberOfNodes(); n++) {
+			int[] connectingNodeIndexes = g.getNodeConnectingOutNodes(n);
+			for (int i : connectingNodeIndexes) {
+				matrix[n][i]++;
+			}			
+		}		
+	 
+		return matrix;
+	}
+	
+	/**
+	 * Builds a matrix for the in edges for each node.
+	 * Assumes the graph is undirected
+	 * 
+	 * @return A 2D array of ints
+	 */
+	public int[][] buildIntInAdjacencyMatrix() {
+		
+		int[][] matrix = new int[g.getNumberOfNodes()][g.getNumberOfNodes()]; //create an 2D array that has the dimensions of the current graph 
+		
+		for (int n = 0; n < g.getNumberOfNodes(); n++) {
+			int[] connectingNodeIndexes = g.getNodeConnectingInNodes(n);
+			for (int i : connectingNodeIndexes) {
+				matrix[n][i]++;
+			}			
+		}		
+	 
+		return matrix;
+	}
+	
+	/**
 	 * Builds an adjacency matrix from a graph.
 	 * Assumes a nodes only connects to another once
 	 * Assumes the graph is undirected
