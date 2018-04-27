@@ -1,9 +1,10 @@
-package uk.ac.kent.dover.fastGraph.graphSimilarity;
+package uk.ac.kent.dover.fastGraph.profiling;
 
 import java.util.*;
 
 import uk.ac.kent.dover.fastGraph.*;
 import uk.ac.kent.dover.fastGraph.editOperation.*;
+import uk.ac.kent.dover.fastGraph.graphSimilarity.*;
 
 public class ProfileGED {
 
@@ -11,9 +12,93 @@ public class ProfileGED {
 		
 		Debugger.enabled = false;
 		
-		profileSimpleBipartite();
+		profileRandomGraphsWithEdits();
 		
 	}
+	
+	
+
+	protected static void profileRandomGraphsWithEdits() {
+		try {
+			
+			Debugger.enabled = false;
+			
+			ArrayList<String> labels = new ArrayList<>();
+			labels.add("blue");
+			labels.add("black");
+			labels.add("green");
+
+			long startTime,simpleTime,bipartiteTime;
+			Random r;
+			final int iterations = 20;
+			final int startNodes = 10000;
+			final int startEdges = startNodes*10;
+			final int startEdits = 100;
+			final boolean directed = false;
+			final boolean labelled = true;
+			final boolean simple = true;
+			
+			int nodes = 0;
+			int edges = 0;
+			int edits = 0;
+
+			while(nodes < 10000000) {
+				nodes += startNodes;
+				edges += startEdges;
+				edits += startEdits;
+				System.out.println("nodes\t"+nodes+"\tedges\t"+edges+"\tedits\t"+edits+"\tdirected\t"+directed+"\tlabelled\t"+labelled+"\tsimple\t"+simple);
+				for(int i = 1; i <= iterations; i++) {
+					
+					long seed1 = System.currentTimeMillis()*i*nodes;
+					long seed2 = System.currentTimeMillis()*i*nodes*1199;
+					long seed3 = System.currentTimeMillis()*i*nodes*3311;
+					long seed4 = System.currentTimeMillis()*i*nodes*7711;
+					long seed5 = System.currentTimeMillis()*i*nodes*1177;
+					long seed6 = System.currentTimeMillis()*i*nodes*4477;
+					
+					FastGraph g1 = FastGraph.randomGraphFactory(10, 15, seed1, simple, false);
+					
+					r = new Random(seed6);
+					HashMap<Integer,Double> editCosts = new HashMap<>();
+					editCosts.put(EditOperation.DELETE_NODE,(double)(r.nextInt(10)+1));
+					editCosts.put(EditOperation.ADD_NODE,(double)(r.nextInt(10)+1));
+					editCosts.put(EditOperation.DELETE_EDGE,(double)(r.nextInt(10)+1));
+					editCosts.put(EditOperation.ADD_EDGE,(double)(r.nextInt(10)+1));
+					editCosts.put(EditOperation.RELABEL_NODE,(double)(r.nextInt(10)+1));
+				
+					r = new Random(seed3);
+					for(int n = 0; n < g1.getNumberOfNodes(); n++) {
+						String label = labels.get(r.nextInt(labels.size()));
+						g1 = g1.generateGraphByRelabellingNode(n, label);
+					}
+					
+					EditList el = EditList.generateEditList(g1,edits,labels,editCosts, seed2);
+
+					FastGraph g2 = el.applyOperations(g1);
+					g2 = ExactIsomorphism.generateRandomIsomorphicGraph(g2, seed5, false);
+					
+					startTime = System.currentTimeMillis();
+					ApproximateGEDSimple simpleGED = new ApproximateGEDSimple(directed, labelled, editCosts, 1000, 0, seed4);
+					double simpleSimilarity = simpleGED.similarity(g1, g2);
+					simpleTime = System.currentTimeMillis()-startTime;
+
+					startTime = System.currentTimeMillis();
+					ApproximateGEDBipartite bipartiteGED = new ApproximateGEDBipartite(directed,labelled,editCosts);
+					double bipartiteSimilarity = bipartiteGED.similarity(g1, g2);
+					bipartiteTime = System.currentTimeMillis()-startTime;
+
+					System.out.print(i + "\toriginal cost:\t"+el.getCost()+"\tsimple cost:\t"+simpleSimilarity+"\tbipartite cost:\t"+bipartiteSimilarity+"\t");
+					System.out.println("original time:\t-1.0"+"\tsimple time:\t"+(simpleTime/1000.0)+"\tbipartite time:\t"+(bipartiteTime/1000.0));
+					
+				}
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	
 	protected static void profileSimpleBipartite() {
 		try {
@@ -162,8 +247,10 @@ public class ProfileGED {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 
 	}
+
 
 
 }

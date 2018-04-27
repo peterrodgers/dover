@@ -1190,7 +1190,7 @@ bruteForceStartTime = -1;
 	 * testing two isomorphic graphs guarantees that the brute force part of the algorithm is used.
 	 * @param inGraph The starting graph
 	 * @param seed The random seed
-	 * @param direct If the graph is to be on heap (false) or off heap (tre)
+	 * @param direct If the graph is to be on heap (false) or off heap (true)
 	 * @return The new graph, isomorphic to the old one but with swapped node ids.
 	 */
 	public static FastGraph generateRandomIsomorphicGraph(FastGraph inGraph, long seed, boolean direct) {

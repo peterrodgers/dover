@@ -57,7 +57,7 @@ public class EditOperationComparator implements Comparator<EditOperation> {
 		if(eo1.getLabel() != null && eo2.getLabel() != null && eo1.getLabel().compareTo(eo2.getLabel()) != 0) {
 			return eo1.getLabel().compareTo(eo2.getLabel());
 		}
-		int n1Compare = Integer.compare(eo1.getN1(), eo2.getN2());
+		int n1Compare = Integer.compare(eo1.getN1(), eo2.getN1());
 		if(n1Compare != 0) {
 			return n1Compare;
 		}
