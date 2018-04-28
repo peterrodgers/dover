@@ -2,6 +2,9 @@ package test.uk.ac.kent.dover.fastGraph.editOperation;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.junit.Test;
 
 import uk.ac.kent.dover.fastGraph.*;
@@ -275,6 +278,67 @@ public class EditOperationTest {
 		assertTrue(g1.checkConsistency());
 
 	}
+	
+	
+	
+	@Test
+	public void test006() throws Exception {
+		FastGraph g1;
+		EditOperation eo;		
+		EditList el;
+		
+		HashMap<Integer,Double> editCosts = new HashMap<>();
+		editCosts.put(EditOperation.DELETE_NODE,3.1);
+		editCosts.put(EditOperation.ADD_NODE,4.7);
+		editCosts.put(EditOperation.DELETE_EDGE,2.9);
+		editCosts.put(EditOperation.ADD_EDGE,1.5);
+		editCosts.put(EditOperation.RELABEL_NODE,6.9);
+
+		for(int i = 1; i <=10; i++) {
+			g1 = FastGraph.randomGraphFactory(20, 40, i*777, false);
+	
+			el = EditList.generateEditList(g1,i,null,editCosts, i*9999);
+			
+			assertEquals(i,el.getEditList().size());
+	
+			g1 = el.applyOperations(g1);
+			assertTrue(g1.checkConsistency());
+		}
+
+	}
+	
+	@Test
+	public void test007() throws Exception {
+		FastGraph g1;
+		EditOperation eo;		
+		EditList el;
+		
+		ArrayList<String> labels = new ArrayList<>();
+		labels.add("blue");
+		labels.add("black");
+		labels.add("green");
+
+		HashMap<Integer,Double> editCosts = new HashMap<>();
+		editCosts.put(EditOperation.DELETE_NODE,1.9);
+		editCosts.put(EditOperation.ADD_NODE,4.1);
+		editCosts.put(EditOperation.DELETE_EDGE,3.3);
+		editCosts.put(EditOperation.ADD_EDGE,0.8);
+		editCosts.put(EditOperation.RELABEL_NODE,0.1);
+
+		for(int i = 1; i <=10; i++) {
+			g1 = FastGraph.randomGraphFactory(33, 100, i*997, false);
+	
+			el = EditList.generateEditList(g1,i,labels,editCosts, i*9977);
+			
+			assertEquals(i,el.getEditList().size());
+	
+			g1 = el.applyOperations(g1);
+			assertTrue(g1.checkConsistency());
+		}
+
+	}
+	
+
 	
 }
 
