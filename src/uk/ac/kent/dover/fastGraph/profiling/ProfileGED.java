@@ -1,5 +1,6 @@
 package uk.ac.kent.dover.fastGraph.profiling;
 
+import java.io.*;
 import java.text.*;
 import java.util.*;
 
@@ -25,6 +26,11 @@ public class ProfileGED {
 			Debugger.enabled = false;
 			
 			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+			DateFormat fileFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+			
+			
+			String fileName = fileFormat.format(new Date())+".txt";
+
 			
 			ArrayList<String> labels = new ArrayList<>();
 			labels.add("blue");
@@ -43,7 +49,7 @@ public class ProfileGED {
 			
 			final boolean directed = false;
 			final boolean labelled = true;
-			final boolean simple = true;
+			final boolean simple = false;
 			
 			int nodes = startNodes;
 			int edges = startEdges;
@@ -161,11 +167,14 @@ public class ProfileGED {
 					randomTrailTime = System.currentTimeMillis()-startTime;
 
 					
-					System.out.print(dateFormat.format(new Date())+"\t");
-					System.out.print("nodes\t"+nodes+"\tedges\t"+edges+"\tedits\t"+edits+"\tdirected\t"+directed+"\tlabelled\t"+labelled+"\tsimple\t"+simple+"\t");
-					System.out.print(i + "\toriginal cost:\t"+el.getCost()+"\tGED simple cost:\t"+simpleSimilarity+"\tGED bipartite cost:\t"+bipartiteSimilarity+"\t"+"\tGED hausdorff cost:\t"+hausdorffSimilarity+"\t"+"\tGED lower cost:\t"+lowerSimilarity+"\tbelief simple cost:\t"+beliefSimpleSimilarity+"\tbelief calculation cost:\t"+beliefCalculationSimilarity+"\tneighbourhood cost:\t"+neighbourhoodSimilarity+"\tdegree difference cost:\t"+degreeDifferenceSimilarity+"\trandom trail cost:\t"+randomTrailSimilarity+"\t");
-					System.out.println("original time:\t-1.0"+"\tGED simple time:\t"+(simpleTime/1000.0)+"\tGED bipartite time:\t"+(bipartiteTime/1000.0)+"\tGED hausdorff time:\t"+(hausdorffTime/1000.0)+"\tGED lower time:\t"+(lowerTime/1000.0)+"\tbelief simple time:\t"+(beliefSimpleTime/1000.0)+"\tbelief calculation time:\t"+(beliefCalculationTime/1000.0)+"\tneighbourhood time:\t"+(neighbourhoodTime/1000.0)+"\tdegree difference time:\t"+(degreeDifferenceTime/1000.0)+"\trandom trail time:\t"+(randomTrailTime/1000.0));
+					String line = dateFormat.format(new Date())+"\t";
+					line += "nodes\t"+nodes+"\tedges\t"+edges+"\tedits\t"+edits+"\tdirected\t"+directed+"\tlabelled\t"+labelled+"\tsimple\t"+simple+"\t";
+					line += i + "\toriginal cost:\t"+el.getCost()+"\tGED simple cost:\t"+simpleSimilarity+"\tGED bipartite cost:\t"+bipartiteSimilarity+"\t"+"\tGED hausdorff cost:\t"+hausdorffSimilarity+"\t"+"\tGED lower cost:\t"+lowerSimilarity+"\tbelief simple cost:\t"+beliefSimpleSimilarity+"\tbelief calculation cost:\t"+beliefCalculationSimilarity+"\tneighbourhood cost:\t"+neighbourhoodSimilarity+"\tdegree difference cost:\t"+degreeDifferenceSimilarity+"\trandom trail cost:\t"+randomTrailSimilarity+"\t";
+					line += "original time:\t-1.0"+"\tGED simple time:\t"+(simpleTime/1000.0)+"\tGED bipartite time:\t"+(bipartiteTime/1000.0)+"\tGED hausdorff time:\t"+(hausdorffTime/1000.0)+"\tGED lower time:\t"+(lowerTime/1000.0)+"\tbelief simple time:\t"+(beliefSimpleTime/1000.0)+"\tbelief calculation time:\t"+(beliefCalculationTime/1000.0)+"\tneighbourhood time:\t"+(neighbourhoodTime/1000.0)+"\tdegree difference time:\t"+(degreeDifferenceTime/1000.0)+"\trandom trail time:\t"+(randomTrailTime/1000.0);
 					
+					System.out.println(line);
+
+					appendToFile(fileName,line);
 				}
 				
 				nodes += incrNodes;
@@ -177,6 +186,38 @@ public class ProfileGED {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Writes the line to the file. Creates the file if it does not exist.
+	 * @param fileName file to write to
+	 * @param line data to write
+	 * @return true on success, false on fail
+	 */
+	public static boolean appendToFile(String fileName, String line) {
+		
+		try	{
+			
+		File file = new File(fileName);
+
+		if (!file.exists()) {
+			file.createNewFile();
+		}
+
+		FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
+		BufferedWriter bw = new BufferedWriter(fw);
+
+		bw.write(line+"\n");
+		
+		bw.close();
+		fw.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
 	}
 	
 	
