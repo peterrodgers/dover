@@ -40,16 +40,16 @@ public class ProfileGED {
 			long startTime;
 			Random r;
 			final int iterations = 10;
-			final int startNodes = 20;
-			final int startEdges = startNodes*5;
-			final int startEdits = 5;
-			final int incrNodes = 20;
-			final int incrEdges = incrNodes*5;
-			final int incrEdits = 5;
+			final int startNodes = 100;
+			final int startEdges = startNodes*10;
+			final int startEdits = -1;
+			final int incrNodes = 100;
+			final int incrEdges = incrNodes*10;
+			final int incrEdits = 0;
 			
 			final boolean directed = false;
-			final boolean labelled = true;
-			final boolean simple = false;
+			final boolean labelled = false;
+			final boolean simple = true;
 			
 			int nodes = startNodes;
 			int edges = startEdges;
@@ -69,38 +69,55 @@ public class ProfileGED {
 					long seed6 = startSeed*i*nodes*4477;
 					long seed7 = startSeed*i*nodes*3399;
 					
+					r = new Random(seed3);
+					
 					FastGraph g1 = FastGraph.randomGraphFactory(nodes, edges, seed1, simple, false);
 					
-					r = new Random(seed6);
+					if(labelled) {
+						for(int n = 0; n < g1.getNumberOfNodes(); n++) {
+							String label = labels.get(r.nextInt(labels.size()));
+							g1 = g1.generateGraphByRelabellingNode(n, label);
+						}
+					}
+
+					int g2Nodes = nodes+(nodes/20-(r.nextInt(1+nodes/10)));
+					int g2Edges = edges+(edges/20-(r.nextInt(1+edges/10)));
+
+					FastGraph g2 = FastGraph.randomGraphFactory(g2Nodes, g2Edges, seed1*7447, simple, false);
+					
+					if(labelled) {
+						for(int n = 0; n < g2.getNumberOfNodes(); n++) {
+							String label = labels.get(r.nextInt(labels.size()));
+							g2 = g2.generateGraphByRelabellingNode(n, label);
+						}
+					}
+					
+ 					r = new Random(seed6);
 					HashMap<Integer,Double> editCosts = new HashMap<>();
 					editCosts.put(EditOperation.DELETE_NODE,(double)(r.nextInt(10)+1));
 					editCosts.put(EditOperation.ADD_NODE,(double)(r.nextInt(10)+1));
 					editCosts.put(EditOperation.DELETE_EDGE,(double)(r.nextInt(10)+1));
 					editCosts.put(EditOperation.ADD_EDGE,(double)(r.nextInt(10)+1));
 					editCosts.put(EditOperation.RELABEL_NODE,(double)(r.nextInt(10)+1));
-				
-					if(labelled) {
-						r = new Random(seed3);
-						for(int n = 0; n < g1.getNumberOfNodes(); n++) {
-							String label = labels.get(r.nextInt(labels.size()));
-							g1 = g1.generateGraphByRelabellingNode(n, label);
-						}
-					}
-					
+/*
 					EditList el = EditList.generateEditList(g1,edits,labels,editCosts, seed2);
 
 					FastGraph g2 = el.applyOperations(g1);
 					g2 = ExactIsomorphism.generateRandomIsomorphicGraph(g2, seed5, false);
-					
+*/
+					double simpleSimilarity = -1;
+					long simpleTime = -1;
 					startTime = System.currentTimeMillis();
 					ApproximateGEDSimple simpleGED = new ApproximateGEDSimple(directed, labelled, editCosts, 1000, 0, seed4);
-					double simpleSimilarity = simpleGED.similarity(g1, g2);
-					long simpleTime = System.currentTimeMillis()-startTime;
+					simpleSimilarity = simpleGED.similarity(g1, g2);
+					simpleTime = System.currentTimeMillis()-startTime;
 
+					double  bipartiteSimilarity = -1;
+					long bipartiteTime = -1;
 					startTime = System.currentTimeMillis();
 					ApproximateGEDBipartite bipartiteGED = new ApproximateGEDBipartite(directed,labelled,editCosts);
-					double bipartiteSimilarity = bipartiteGED.similarity(g1, g2);
-					long bipartiteTime = System.currentTimeMillis()-startTime;
+					bipartiteSimilarity = bipartiteGED.similarity(g1, g2);
+					bipartiteTime = System.currentTimeMillis()-startTime;
 					
 					double hausdorffSimilarity = -1;
 					long hausdorffTime = -1;
@@ -144,7 +161,7 @@ public class ProfileGED {
 					if(!labelled) {
 						startTime = System.currentTimeMillis();
 						NeighbourhoodSimilarity neighbourhood = new NeighbourhoodSimilarity(directed);
-//						neighbourhoodSimilarity = neighbourhood.similarity(g1, g2);
+						neighbourhoodSimilarity = neighbourhood.similarity(g1, g2);
 						neighbourhoodTime = System.currentTimeMillis()-startTime;
 					}
 
@@ -168,9 +185,11 @@ public class ProfileGED {
 
 					
 					String line = dateFormat.format(new Date())+"\t";
-					line += "nodes\t"+nodes+"\tedges\t"+edges+"\tedits\t"+edits+"\tdirected\t"+directed+"\tlabelled\t"+labelled+"\tsimple\t"+simple+"\t";
-					line += i + "\toriginal cost:\t"+el.getCost()+"\tGED simple cost:\t"+simpleSimilarity+"\tGED bipartite cost:\t"+bipartiteSimilarity+"\t"+"\tGED hausdorff cost:\t"+hausdorffSimilarity+"\t"+"\tGED lower cost:\t"+lowerSimilarity+"\tbelief simple cost:\t"+beliefSimpleSimilarity+"\tbelief calculation cost:\t"+beliefCalculationSimilarity+"\tneighbourhood cost:\t"+neighbourhoodSimilarity+"\tdegree difference cost:\t"+degreeDifferenceSimilarity+"\trandom trail cost:\t"+randomTrailSimilarity+"\t";
-					line += "original time:\t-1.0"+"\tGED simple time:\t"+(simpleTime/1000.0)+"\tGED bipartite time:\t"+(bipartiteTime/1000.0)+"\tGED hausdorff time:\t"+(hausdorffTime/1000.0)+"\tGED lower time:\t"+(lowerTime/1000.0)+"\tbelief simple time:\t"+(beliefSimpleTime/1000.0)+"\tbelief calculation time:\t"+(beliefCalculationTime/1000.0)+"\tneighbourhood time:\t"+(neighbourhoodTime/1000.0)+"\tdegree difference time:\t"+(degreeDifferenceTime/1000.0)+"\trandom trail time:\t"+(randomTrailTime/1000.0);
+//					line += "g1 nodes\t"+nodes+"\tg2 edges\t"+edges+"\tg2 nodes\t"+g2Nodes+"\tg2 edges\t"+g2Edges+"\tedits\t"+edits+"\tdirected\t"+directed+"\tlabelled\t"+labelled+"\tsimple\t"+simple+"\t";
+//					line += i + "\toriginal cost:\t"+el.getCost()+"\tGED simple cost:\t"+simpleSimilarity+"\tGED bipartite cost:\t"+bipartiteSimilarity+"\t"+"\tGED hausdorff cost:\t"+hausdorffSimilarity+"\t"+"\tGED lower cost:\t"+lowerSimilarity+"\tbelief simple cost:\t"+beliefSimpleSimilarity+"\tbelief calculation cost:\t"+beliefCalculationSimilarity+"\tneighbourhood cost:\t"+neighbourhoodSimilarity+"\tdegree difference cost:\t"+degreeDifferenceSimilarity+"\trandom trail cost:\t"+randomTrailSimilarity+"\t";
+					line += "g1 nodes\t"+nodes+"\tg2 edges\t"+edges+"\tg2 nodes\t"+g2Nodes+"\tg2 edges\t"+g2Edges+"\tdirected\t"+directed+"\tlabelled\t"+labelled+"\tsimple\t"+simple+"\t";
+					line += i + "\tGED simple cost:\t"+simpleSimilarity+"\tGED bipartite cost:\t"+bipartiteSimilarity+"\t"+"\tGED hausdorff cost:\t"+hausdorffSimilarity+"\t"+"\tGED lower cost:\t"+lowerSimilarity+"\tbelief simple cost:\t"+beliefSimpleSimilarity+"\tbelief calculation cost:\t"+beliefCalculationSimilarity+"\tneighbourhood cost:\t"+neighbourhoodSimilarity+"\tdegree difference cost:\t"+degreeDifferenceSimilarity+"\trandom trail cost:\t"+randomTrailSimilarity+"\t";
+					line += "\tGED simple time:\t"+(simpleTime/1000.0)+"\tGED bipartite time:\t"+(bipartiteTime/1000.0)+"\tGED hausdorff time:\t"+(hausdorffTime/1000.0)+"\tGED lower time:\t"+(lowerTime/1000.0)+"\tbelief simple time:\t"+(beliefSimpleTime/1000.0)+"\tbelief calculation time:\t"+(beliefCalculationTime/1000.0)+"\tneighbourhood time:\t"+(neighbourhoodTime/1000.0)+"\tdegree difference time:\t"+(degreeDifferenceTime/1000.0)+"\trandom trail time:\t"+(randomTrailTime/1000.0);
 					
 					System.out.println(line);
 
