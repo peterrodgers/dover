@@ -2446,7 +2446,9 @@ if(edgeIndex%1000000==0 ) {
 	public void populateRandomGraph(boolean simple, long seed) throws FastGraphException {
 		
 		if(simple) {
-			if((numberOfNodes*(numberOfNodes-1))/2 < numberOfEdges) {
+			long nodeN = numberOfNodes;
+			long edgeN = numberOfEdges;
+			if((nodeN*(nodeN-1))/2 < edgeN) {
 				throw new FastGraphException("Too many edges to generate a simple graph.");
 			}
 		}

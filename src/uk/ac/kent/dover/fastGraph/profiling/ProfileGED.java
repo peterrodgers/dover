@@ -79,7 +79,7 @@ public class ProfileGED {
 							g1 = g1.generateGraphByRelabellingNode(n, label);
 						}
 					}
-
+/*
 					int g2Nodes = nodes+(nodes/20-(r.nextInt(1+nodes/10)));
 					int g2Edges = edges+(edges/20-(r.nextInt(1+edges/10)));
 
@@ -91,7 +91,9 @@ public class ProfileGED {
 							g2 = g2.generateGraphByRelabellingNode(n, label);
 						}
 					}
-					
+*/					
+
+
  					r = new Random(seed6);
 					HashMap<Integer,Double> editCosts = new HashMap<>();
 					editCosts.put(EditOperation.DELETE_NODE,(double)(r.nextInt(10)+1));
@@ -101,10 +103,11 @@ public class ProfileGED {
 					editCosts.put(EditOperation.RELABEL_NODE,(double)(r.nextInt(10)+1));
 /*
 					EditList el = EditList.generateEditList(g1,edits,labels,editCosts, seed2);
-
 					FastGraph g2 = el.applyOperations(g1);
-					g2 = ExactIsomorphism.generateRandomIsomorphicGraph(g2, seed5, false);
 */
+					int g2Nodes = nodes;
+					int g2Edges = edges;
+					FastGraph g2 = ExactIsomorphism.generateRandomIsomorphicGraph(g1, seed5, false);
 					double simpleSimilarity = -1;
 					long simpleTime = -1;
 					startTime = System.currentTimeMillis();
@@ -118,7 +121,7 @@ public class ProfileGED {
 					ApproximateGEDBipartite bipartiteGED = new ApproximateGEDBipartite(directed,labelled,editCosts);
 					bipartiteSimilarity = bipartiteGED.similarity(g1, g2);
 					bipartiteTime = System.currentTimeMillis()-startTime;
-					
+
 					double hausdorffSimilarity = -1;
 					long hausdorffTime = -1;
 					if(!directed) {
@@ -161,8 +164,8 @@ public class ProfileGED {
 					if(!labelled) {
 						startTime = System.currentTimeMillis();
 						NeighbourhoodSimilarity neighbourhood = new NeighbourhoodSimilarity(directed);
-						neighbourhoodSimilarity = neighbourhood.similarity(g1, g2);
-						neighbourhoodTime = System.currentTimeMillis()-startTime;
+//						neighbourhoodSimilarity = neighbourhood.similarity(g1, g2);
+//						neighbourhoodTime = System.currentTimeMillis()-startTime;
 					}
 
 					double degreeDifferenceSimilarity = -1;
