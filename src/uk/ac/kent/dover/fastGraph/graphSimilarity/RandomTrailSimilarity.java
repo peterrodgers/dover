@@ -6,6 +6,7 @@ import edu.isi.karma.modeling.research.graphmatching.algorithms.VJAccess;
 import uk.ac.kent.dover.fastGraph.*;
 import uk.ac.kent.dover.fastGraph.editOperation.EditList;
 import uk.ac.kent.dover.fastGraph.editOperation.EditOperation;
+import uk.ac.kent.dover.fastGraph.profiling.ProfileGED;
 
 /**
  * A similarity method for graphs, using random trails. Finds random undirected trails of the
@@ -209,42 +210,7 @@ public class RandomTrailSimilarity extends GraphSimilarity {
 */
 				// generate a graph nearly the same as g1, might still be isomorphic
 				// will have the same degree profile as g1
-				g2 = ExactIsomorphism.generateRandomIsomorphicGraph(g1, g2Seed, false);
-
-				int eA = -1;
-				int eB = -1;
-				int nA1 = -1;
-				int nA2 = -1;
-				int nB1 = -1;
-				int nB2 = -1;
-				for(int k = 0; k < g2.getNumberOfEdges(); k++) {
-					int n1 = g2.getEdgeNode1(k);
-					int n2 = g2.getEdgeNode2(k);
-					if(eA == -1 && n1 != n2) {
-						eA = k;
-						nA1 = n1;
-						nA2 = n2;
-					}
-					if(eB == -1 && n1 != n2) {
-						if(eA != -1 && n1 != nA1 && n1 != nA2 && n2 != nA1 && n2 != nA2) {
-							eB = k;
-							nB1 = n1;
-							nB2 = n2;
-							break;
-						}
-					}
-				}
-				if(eB == -1) {
-//					System.out.println(i+" no edge swap found "+eA+" "+eB);
-					continue;
-				} else {
-					el = new EditList();
-					el.addOperation(new EditOperation(EditOperation.DELETE_EDGE,1,eB,null,-1,-1));
-					el.addOperation(new EditOperation(EditOperation.DELETE_EDGE,1,eA,null,-1,-1));
-					el.addOperation(new EditOperation(EditOperation.ADD_EDGE,1,-1,"newEdgeA",nA1,nB2));
-					el.addOperation(new EditOperation(EditOperation.ADD_EDGE,1,-1,"newEdgeB",nB1,nA2));
-					g2 = el.applyOperations(g2);
-				}
+				g2 = ProfileGED.minorChangeToGraph(g1,g2Seed, false);
 				
 				directed = false;
 				labels = false;
